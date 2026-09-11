@@ -321,16 +321,21 @@ window.startPageTutorial = function() {
 
 // Injetar botão de tutorial para mobile no corpo da página
 document.addEventListener('DOMContentLoaded', () => {
-    const mainColumn = document.querySelector('.main-column');
+    const mainContent = document.querySelector('.main-content');
     
-    if (mainColumn) {
+    if (mainContent) {
         const mobileHelpBtn = document.createElement('button');
         // Usa a mesma classe base para herdar o visual e uma classe extra para mobile
         mobileHelpBtn.className = 'btn-tutorial-sidebar btn-tutorial-mobile-full';
         mobileHelpBtn.innerHTML = '<i class="ph ph-question"></i> Como utilizar o CRM';
-        mobileHelpBtn.onclick = window.startTutorial;
+        mobileHelpBtn.onclick = window.startPageTutorial;
         
-        // Insere bem no começo do conteúdo principal
-        mainColumn.insertBefore(mobileHelpBtn, mainColumn.firstChild);
+        // Insere o botão logo abaixo do header
+        const header = document.querySelector('.header');
+        if (header && header.nextSibling) {
+            header.parentNode.insertBefore(mobileHelpBtn, header.nextSibling);
+        } else {
+            mainContent.insertBefore(mobileHelpBtn, mainContent.firstChild);
+        }
     }
 });
