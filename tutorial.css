@@ -1,0 +1,234 @@
+/* Overlay escuro do tutorial */
+#tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.7);
+    z-index: 9998;
+    display: none;
+    backdrop-filter: blur(2px);
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
+#tutorial-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Classe aplicada aos elementos destacados */
+.tutorial-highlight {
+    position: relative !important;
+    z-index: 9999 !important;
+    background-color: var(--color-bg-main) !important;
+    box-shadow: 0 0 0 8px rgba(0, 168, 132, 0.2), 0 0 20px rgba(0, 0, 0, 0.1) !important;
+    border-radius: 8px !important;
+    pointer-events: none !important; /* Evita cliques indesejados durante o tutorial */
+    transition: all 0.3s ease;
+}
+
+/* Caixa do tooltip do tutorial */
+#tutorial-tooltip {
+    position: absolute;
+    z-index: 10000;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    width: 320px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#tutorial-tooltip.active {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.tutorial-tooltip-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tutorial-tooltip-header .icon-box {
+    width: 40px;
+    height: 40px;
+    background: #ccfbf1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #00a884;
+    font-size: 20px;
+}
+
+.tutorial-tooltip-header h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #0f172a;
+    font-weight: 600;
+}
+
+.tutorial-tooltip-body {
+    color: #475569;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.tutorial-tooltip-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.tutorial-step-counter {
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.tutorial-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.tutorial-btn-close {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.tutorial-btn-close:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.tutorial-btn-next {
+    background: #00a884;
+    border: none;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.tutorial-btn-next:hover {
+    background: #008f6f;
+}
+
+/* Seta do tooltip */
+.tutorial-arrow {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #ffffff;
+    transform: rotate(45deg);
+}
+
+.tutorial-arrow.top {
+    top: -8px;
+    left: 50%;
+    margin-left: -8px;
+    box-shadow: -2px -2px 5px rgba(0,0,0,0.05);
+}
+
+.tutorial-arrow.bottom {
+    bottom: -8px;
+    left: 50%;
+    margin-left: -8px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+}
+
+.tutorial-arrow.left {
+    left: -8px;
+    top: 50%;
+    margin-top: -8px;
+    box-shadow: -2px 2px 5px rgba(0,0,0,0.05);
+}
+
+.tutorial-arrow.right {
+    right: -8px;
+    top: 50%;
+    margin-top: -8px;
+    box-shadow: 2px -2px 5px rgba(0,0,0,0.05);
+}
+
+/* Botão na sidebar */
+.btn-tutorial-sidebar {
+    width: 100%;
+    margin-top: 16px;
+    padding: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    color: #334155;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-tutorial-sidebar:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+.btn-tutorial-sidebar i {
+    font-size: 18px;
+    color: #00a884;
+}
+
+.btn-tutorial-mobile-full {
+    display: none;
+}
+
+/* Responsividade Mobile para o Tutorial */
+@media (max-width: 768px) {
+    .btn-tutorial-mobile-full {
+        display: flex;
+        width: 100%;
+        margin-bottom: 24px;
+        justify-content: center;
+    }
+    
+    #tutorial-tooltip {
+        width: 90vw;
+        left: 5vw !important; /* Força centralização horizontal */
+        padding: 16px;
+    }
+    
+    .tutorial-arrow.left, .tutorial-arrow.right {
+        display: none; /* Em mobile, setas laterais não funcionam bem, é melhor deixar só topo/baixo */
+    }
+    
+    .tutorial-arrow.top {
+        left: 50% !important;
+    }
+    
+    .tutorial-arrow.bottom {
+        left: 50% !important;
+    }
+}

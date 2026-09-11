@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AutomatiZAP - CRM Dashboard</title>
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tutorial.css">
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <img src="logo.png" alt="AutomatiZAP CRM" class="logo-img">
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item active">
+                    <i class="ph ph-squares-four"></i>
+                    <span>Visão geral</span>
+                </a>
+                <a href="leads.html" class="nav-item">
+                    <i class="ph ph-users"></i>
+                    <span>Leads</span>
+                </a>
+
+                <a href="conversas.html" class="nav-item">
+                    <i class="ph ph-chat-circle-dots"></i>
+                    <span>Conversas</span>
+                </a>
+                <a href="tarefas.html" class="nav-item">
+                    <i class="ph ph-check-square-offset"></i>
+                    <span>Tarefas</span>
+                </a>
+                <a href="relatorios.html" class="nav-item">
+                    <i class="ph ph-chart-bar"></i>
+                    <span>Relatórios</span>
+                </a>
+
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="system-status">
+                    <div class="status-icon-container">
+                        <i class="ph-fill ph-whatsapp-logo"></i>
+                    </div>
+                    <div class="status-details">
+                        <p>Atendimento automatizado<br>pelo WhatsApp</p>
+                        <div class="status-badge">
+                            <span class="dot"></span> Sistema online
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-tutorial-sidebar" onclick="window.startPageTutorial()">
+                    <i class="ph ph-question"></i> Como utilizar o CRM
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-titles">
+                    <button class="mobile-menu-btn"><i class="ph ph-list"></i></button>
+                    <a href="index.html" class="mobile-logo-header">
+                        <img src="logo.png" alt="AutomatiZAP CRM" class="logo-img">
+                    </a>
+                    <div class="desktop-header-title">
+                        <h1>Visão geral</h1>
+                        <p>Acompanhe seus leads, o desempenho do atendimento e o andamento das negociações.</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="date-wrapper" id="date-wrapper">
+                        <button class="date-filter" id="date-filter-btn">
+                            <i class="ph ph-calendar-blank"></i>
+                            <span id="date-filter-text">01/09/2025 - 07/09/2025</span>
+                            <i class="ph ph-caret-down"></i>
+                        </button>
+                        
+                        <!-- Date Dropdown -->
+                        <div class="date-dropdown" id="date-dropdown">
+                            <div class="date-dropdown-header">
+                                <h4>Filtrar por Período</h4>
+                            </div>
+                            <div class="date-dropdown-body">
+                                <div class="calendar-header">
+                                    <button class="btn-icon xs" id="cal-prev"><i class="ph ph-caret-left"></i></button>
+                                    <strong id="cal-month-year">Setembro 2025</strong>
+                                    <button class="btn-icon xs" id="cal-next"><i class="ph ph-caret-right"></i></button>
+                                </div>
+                                <div class="calendar-grid" id="calendar-grid">
+                                    <span class="cal-day-name">D</span>
+                                    <span class="cal-day-name">S</span>
+                                    <span class="cal-day-name">T</span>
+                                    <span class="cal-day-name">Q</span>
+                                    <span class="cal-day-name">Q</span>
+                                    <span class="cal-day-name">S</span>
+                                    <span class="cal-day-name">S</span>
+                                    <!-- Dias injetados via JS -->
+                                </div>
+                                <div style="display: flex; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--color-text-sec);">
+                                    <span id="cal-selection-text">Selecione a data inicial</span>
+                                </div>
+                            </div>
+                            <div class="date-dropdown-footer">
+                                <button class="btn btn--primary" id="btn-apply-date" style="width: 100%;">Aplicar Filtro</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notification-wrapper" id="notification-wrapper">
+                        <button class="notification-btn" id="notification-btn">
+                            <i class="ph ph-bell"></i>
+                            <span class="notification-dot"></span>
+                        </button>
+                        
+                        <!-- Notification Dropdown -->
+                        <div class="notification-dropdown" id="notification-dropdown">
+                            <div class="notif-header">
+                                <h4>Notificações</h4>
+                            </div>
+                            <div class="notif-list" id="notif-list">
+                                <div style="padding: 20px; text-align: center; color: var(--color-text-mut); font-size: 13px;">Nenhuma notificação.</div>
+                            </div>
+                            <div class="notif-footer">
+                                <a href="#">Ver todas</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-menu" id="user-menu-btn">
+                        <div class="avatar dark">AD</div>
+                        <div class="user-info">
+                            <span class="user-name">AutomatiZAP Digital</span>
+                            <span class="user-role">Administrador</span>
+                        </div>
+                        <i class="ph ph-caret-down"></i>
+                        
+                        <!-- Dropdown do Usuário -->
+                        <div class="user-dropdown" id="user-dropdown">
+                            <div class="dropdown-item">
+                                <i class="ph ph-gear"></i> Configurações
+                            </div>
+                            <div class="dropdown-item theme-item" onclick="event.stopPropagation()">
+                                <span><i class="ph ph-moon"></i> Modo Escuro</span>
+                                <label class="theme-switch" title="Alternar Tema">
+                                    <input type="checkbox" id="theme-toggle-checkbox">
+                                    <span class="slider round">
+                                        <i class="ph-fill ph-sun icon-sun"></i>
+                                        <i class="ph-fill ph-moon icon-moon"></i>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-item" style="color: var(--color-danger);">
+                                <i class="ph ph-sign-out"></i> Sair
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid no-sidebar">
+
+                <!-- Coluna Principal (Esquerda) -->
+                <div class="main-column">
+
+                    <section class="kpis-section">
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div class="icon-wrapper green-light"><i class="ph ph-users text-primary"></i></div>
+                                <h3>Novos leads</h3>
+                            </div>
+                            <div class="kpi-content">
+                                <h2 id="kpi-total">--</h2>
+                                <div class="kpi-trend positive">
+                                    <i class="ph ph-arrow-up"></i>
+                                    <div class="trend-text">
+                                        <span>total registrado</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div class="icon-wrapper green-light"><i class="ph ph-clock text-primary"></i></div>
+                                <h3>Tempo Economizado</h3>
+                            </div>
+                            <div class="kpi-content">
+                                <h2 id="kpi-em-atendimento">--</h2>
+                                <div class="kpi-trend positive">
+                                    <i class="ph ph-arrow-up"></i>
+                                    <div class="trend-text">
+                                        <span>em horas</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div class="icon-wrapper green-light"><i class="ph ph-star text-primary"></i></div>
+                                <h3>Fechados</h3>
+                            </div>
+                            <div class="kpi-content">
+                                <h2 id="kpi-fechados">--</h2>
+                                <div class="kpi-trend positive">
+                                    <i class="ph ph-arrow-up"></i>
+                                    <div class="trend-text">
+                                        <span>negócios fechados</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div class="icon-wrapper green-light"><i class="ph ph-chart-pie text-primary"></i></div>
+                                <h3>Taxa de conversão</h3>
+                            </div>
+                            <div class="kpi-content">
+                                <h2 id="kpi-taxa">--%</h2>
+                                <div class="kpi-trend positive">
+                                    <i class="ph ph-arrow-up"></i>
+                                    <div class="trend-text">
+                                        <span>fechados / total</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+
+
+                    <!-- Leads Table -->
+                    <section class="card table-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="ph ph-users text-primary"></i>
+                                <div>
+                                    <h3>Leads recentes</h3>
+                                    <p>Últimos potenciais clientes atendidos pelo robô.</p>
+                                </div>
+                            </div>
+                            <div class="table-controls">
+                                <div class="search-input">
+                                    <i class="ph ph-magnifying-glass"></i>
+                                    <input type="text" placeholder="Buscar por nome, telefone ou interesse...">
+                                </div>
+                                <button class="btn-icon outline"><i class="ph ph-funnel"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Origem</th>
+                                        <th>Interesse</th>
+                                        <th>Status</th>
+                                        <th>Último contato</th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Linhas carregadas dinamicamente via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-footer">
+                            <span class="pagination-info" id="dashboard-pagination-info">Mostrando 0 leads</span>
+                            <div class="pagination">
+                                <button class="page-btn"><i class="ph ph-caret-left"></i></button>
+                                <button class="page-btn active">1</button>
+                                <button class="page-btn">2</button>
+                                <button class="page-btn">3</button>
+                                <button class="page-btn">4</button>
+                                <button class="page-btn">5</button>
+                                <button class="page-btn"><i class="ph ph-caret-right"></i></button>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="tutorial.js"></script>
+    <script type="module" src="script.js"></script>
+    <script>
+        window.initDashboard = async function() {
+            if(!window.dbAPI) return;
+            const leads = await window.dbAPI.fetchLeads();
+            
+            // Atualizar contadores KPI
+            document.getElementById('kpi-total').textContent = leads.length;
+            
+            // Calcular tempo economizado (igual relatorios)
+            let iaCount = 0;
+            for (const lead of leads) {
+                const conversas = await window.dbAPI.fetchConversations(lead.id);
+                iaCount += conversas.filter(c => c.enviado_por === 'IA').length;
+            }
+            const tempoPoupadoHoras = Math.round(((iaCount * 2) / 60) * 10) / 10;
+            document.getElementById('kpi-em-atendimento').textContent = `${tempoPoupadoHoras}h`;
+
+            const fechados = leads.filter(l => l.status === 'Fechado').length;
+            document.getElementById('kpi-fechados').textContent = fechados;
+            const taxa = leads.length > 0 ? Math.round((fechados / leads.length) * 100) : 0;
+            document.getElementById('kpi-taxa').textContent = taxa + '%';
+
+            // Atualizar paginação
+            const paginationEl = document.getElementById('dashboard-pagination-info');
+            if(paginationEl) paginationEl.textContent = `Mostrando ${Math.min(5, leads.length)} de ${leads.length} leads`;
+
+            // Atualizar tabela
+            const tbody = document.querySelector('.data-table tbody');
+            if(tbody) tbody.innerHTML = '';
+            
+            if (leads.length === 0 && tbody) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 32px; color: var(--color-text-mut);">Nenhum lead encontrado.</td></tr>';
+            } else {
+                leads.slice(0, 5).forEach(lead => {
+                    let badgeClass = 'primary-light';
+                    if(lead.status === 'Fechado') badgeClass = 'success';
+                    else if(lead.status === 'Em Atendimento') badgeClass = 'warning';
+                    else if(lead.status === 'Perdido') badgeClass = 'danger';
+
+                    const date = new Date(lead.criado_em);
+                    const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>
+                                <div class="user-cell" style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0;">${lead.nome.charAt(0).toUpperCase()}</div>
+                                    <span class="user-name" style="font-weight: 500;">${lead.nome}</span>
+                                </div>
+                            </td>
+                            <td>${lead.origem || 'WhatsApp'}</td>
+                            <td>${lead.interesse || 'Não informado'}</td>
+                            <td><span class="badge ${badgeClass}">${lead.status}</span></td>
+                            <td>${formattedDate}</td>
+                        </tr>
+                    `;
+                });
+            }
+        };
+    </script>
+</body>
+
+</html>

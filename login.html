@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login - AutomatiZAP CRM</title>
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-body">
+    
+    <div class="login-layout">
+        <!-- Formulário (Esquerdo) -->
+        <div class="login-form-container">
+            <div class="login-header">
+                <img src="logo.png" alt="AutomatiZAP CRM">
+                <h3>Bem vindo de volta!</h3>
+                <p>Insira seu Usuário e Senha para acessar o painel.</p>
+            </div>
+
+            <div class="login-error" id="login-error">
+                Usuário ou senha incorretos. Tente novamente.
+            </div>
+
+            <form class="login-form" id="login-form">
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <div class="input-wrapper">
+                        <i class="ph ph-envelope"></i>
+                        <input type="email" id="email" placeholder="Digite seu e-mail" required autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <div class="input-wrapper">
+                        <i class="ph ph-lock-key"></i>
+                        <input type="password" id="password" placeholder="Digite sua senha (ex: 000)" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn">Entrar</button>
+                <div style="text-align: center; margin-top: 16px;">
+                    <a href="#" style="color: var(--color-primary); font-size: 13px; font-weight: 600;">Esqueceu sua senha? Clique para recuperar</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Lado Visual (Direito) -->
+        <div class="login-visual" style="background: url('bg-login.png') no-repeat center center / cover;">
+            <img src="robot.png" alt="Robô IA" class="login-robot">
+            
+            <div class="login-visual-content" style="margin-left: 200px;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 8px;">
+                    <h2 style="margin: 0; text-align: left; line-height: 1.1;">AutomatiZAP<br><span style="font-size: 24px; font-weight: 400; letter-spacing: 4px;">DIGITAL</span></h2>
+                </div>
+                <p style="font-size: 16px;">CRM integrado com agente de IA para whatsapp</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabase.js';
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            const errorMsg = document.getElementById('login-error');
+            const loginBtn = document.querySelector('.login-btn');
+            
+            // Estado de carregamento
+            loginBtn.textContent = 'Entrando...';
+            loginBtn.disabled = true;
+            errorMsg.style.display = 'none';
+
+            // Faz o login via Supabase
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: pass,
+            });
+
+            if (error) {
+                // Exibe erro
+                loginBtn.textContent = 'Entrar';
+                loginBtn.disabled = false;
+                errorMsg.textContent = 'Erro do Banco: ' + error.message;
+                errorMsg.style.display = 'block';
+                
+                // Efeito visual de tremor
+                const form = document.querySelector('.login-form-container');
+                form.style.transform = 'translateX(-10px)';
+                setTimeout(() => form.style.transform = 'translateX(10px)', 100);
+                setTimeout(() => form.style.transform = 'translateX(-10px)', 200);
+                setTimeout(() => form.style.transform = 'translateX(0)', 300);
+            } else {
+                // Sucesso! Redireciona para o painel principal
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>
