@@ -17,16 +17,16 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                     if (userData && !error) {
                         const userName = userData.nome_completo || 'Usuário';
                         const userRole = userData.funcao || 'Membro';
-                        
+
                         // Bloqueio por falta de pagamento
                         if (userData.status_assinatura === 'inadimplente' && window.location.pathname.indexOf('configuracoes.html') === -1) {
                             window.location.href = 'configuracoes.html?tab=assinatura';
                             return;
                         }
-                        
+
                         document.querySelectorAll('.user-info .user-name').forEach(el => el.textContent = userName);
                         document.querySelectorAll('.user-info .user-role').forEach(el => el.textContent = userRole);
-                        
+
                         document.querySelectorAll('.user-menu .avatar').forEach(el => {
                             if (userData.avatar_url) {
                                 el.innerHTML = `<img src="${userData.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
@@ -52,13 +52,13 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                 import('./data.js').then((module) => {
                     // Inicializa os dados da página específica
                     if (window.location.pathname.indexOf('index.html') > -1 || window.location.pathname.endsWith('/')) {
-                        if(window.initDashboard) window.initDashboard();
+                        if (window.initDashboard) window.initDashboard();
                     } else if (window.location.pathname.indexOf('leads.html') > -1) {
-                        if(window.initLeads) window.initLeads();
+                        if (window.initLeads) window.initLeads();
                     } else if (window.location.pathname.indexOf('conversas.html') > -1) {
-                        if(window.initConversations) window.initConversations();
+                        if (window.initConversations) window.initConversations();
                     } else if (window.location.pathname.indexOf('configuracoes.html') > -1) {
-                        if(window.initSettings) window.initSettings();
+                        if (window.initSettings) window.initSettings();
                     }
                 });
             }
@@ -83,11 +83,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (themeCheckbox) {
         const themeText = document.querySelector('.theme-item span');
-        
+
         // Função para atualizar o texto do tema
         const updateThemeText = (isDark) => {
-            if(themeText) {
-                if(isDark) {
+            if (themeText) {
+                if (isDark) {
                     themeText.innerHTML = '<i class="ph ph-moon"></i> Modo Escuro';
                 } else {
                     themeText.innerHTML = '<i class="ph ph-sun"></i> Modo Claro';
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         themeCheckbox.addEventListener('change', (e) => {
             const isDark = e.target.checked;
             updateThemeText(isDark);
-            
+
             if (isDark) {
                 document.body.classList.add('dark-mode');
                 localStorage.setItem('theme', 'dark');
@@ -151,9 +151,9 @@ document.addEventListener('DOMContentLoaded', () => {
         notifBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             notifDropdown.classList.toggle('show');
-            
+
             // Fecha o user dropdown se estiver aberto
-            if(userDropdown) userDropdown.classList.remove('show');
+            if (userDropdown) userDropdown.classList.remove('show');
         });
 
         document.addEventListener('click', (e) => {
@@ -191,14 +191,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Live Search ---
     const searchInputs = document.querySelectorAll('.search-input input');
-    
+
     searchInputs.forEach(input => {
         input.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            
+
             // Procura a tabela de dados mais próxima, ou assume a principal da página
             const tableRows = document.querySelectorAll('.data-table tbody tr');
-            
+
             tableRows.forEach(row => {
                 const textContent = row.textContent.toLowerCase();
                 if (textContent.includes(searchTerm)) {
@@ -218,33 +218,33 @@ document.addEventListener('DOMContentLoaded', () => {
     if (tableRows.length > 0 && highlightSidebar) {
         tableRows.forEach(row => {
             row.style.cursor = 'pointer'; // Adiciona cursor de clique
-            
+
             row.addEventListener('click', () => {
                 // 1. Coleta os dados da linha clicada
                 const nameEl = row.querySelector('.font-medium');
                 const name = nameEl ? nameEl.textContent.trim() : 'Nome não informado';
-                
+
                 const initialsEl = row.querySelector('.avatar');
                 const initials = initialsEl ? initialsEl.textContent.trim() : '--';
-                
+
                 const cells = row.querySelectorAll('td');
                 const origin = cells.length > 1 ? cells[1].textContent.trim() : 'Desconhecida';
                 const interest = cells.length > 2 ? cells[2].textContent.trim() : 'Não informado';
                 const statusHtml = cells.length > 3 ? cells[3].innerHTML : '';
-                
+
                 // 2. Atualiza a barra lateral (Perfil)
                 const hlName = highlightSidebar.querySelector('.profile-info h3');
                 if (hlName) hlName.textContent = name;
-                
+
                 const hlAvatar = highlightSidebar.querySelector('.highlight-profile .avatar');
                 if (hlAvatar) {
                     hlAvatar.textContent = initials;
                     // Opcional: remover cores antigas e sortear uma nova baseada no nome
                 }
-                
+
                 const hlOrigin = highlightSidebar.querySelector('.origin-info span');
                 if (hlOrigin) hlOrigin.textContent = 'Origem: ' + origin;
-                
+
                 // 3. Atualiza os detalhes
                 const detailValues = highlightSidebar.querySelectorAll('.detail-value');
                 if (detailValues.length >= 4) {
@@ -254,11 +254,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     // detailValues[2] é Qualificação
                     detailValues[3].innerHTML = statusHtml; // Status
                 }
-                
+
                 // Adiciona um efeito visual de destaque na linha clicada
                 tableRows.forEach(r => r.style.backgroundColor = '');
                 row.style.backgroundColor = 'rgba(0, 168, 132, 0.05)'; // Verde sutil
-                
+
                 // Se estiver no mobile, rolar a tela para a barra lateral
                 if (window.innerWidth <= 1024) {
                     highlightSidebar.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.style.maxWidth = '400px';
         modal.style.transform = 'scale(0.95)';
         modal.style.transition = 'transform 0.2s';
-        
+
         let html = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h3 style="font-size: 18px; margin: 0;">${title}</h3>
@@ -322,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         overlay.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', close));
         overlay.addEventListener('click', (e) => {
-            if(e.target === overlay) close();
+            if (e.target === overlay) close();
         });
 
         overlay.querySelector('.apply-modal').addEventListener('click', () => {
@@ -334,17 +334,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Lógica do Botão de Data (Dropdown) ---
     const dateBtn = document.getElementById('date-filter-btn');
     const dateDropdown = document.getElementById('date-dropdown');
-    
+
     if (dateBtn && dateDropdown) {
         dateBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             dateDropdown.classList.toggle('show');
-            
+
             // Fecha outros dropdowns se estiverem abertos
             const userDropdown = document.getElementById('user-dropdown');
             const notifDropdown = document.getElementById('notification-dropdown');
-            if(userDropdown) userDropdown.classList.remove('show');
-            if(notifDropdown) notifDropdown.classList.remove('show');
+            if (userDropdown) userDropdown.classList.remove('show');
+            if (notifDropdown) notifDropdown.classList.remove('show');
         });
 
         document.addEventListener('click', (e) => {
@@ -360,13 +360,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const prevBtn = document.getElementById('cal-prev');
         const nextBtn = document.getElementById('cal-next');
         let currentDate = new Date();
-        
+
         let rangeStart = null;
         let rangeEnd = null;
 
         function renderCalendar() {
-            if(!calendarGrid) return;
-            
+            if (!calendarGrid) return;
+
             // Limpa dias anteriores (mantém os span dos nomes da semana)
             const days = calendarGrid.querySelectorAll('.cal-day');
             days.forEach(d => d.remove());
@@ -376,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
             const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-            if(monthYearTxt) monthYearTxt.textContent = `${monthNames[month]} ${year}`;
+            if (monthYearTxt) monthYearTxt.textContent = `${monthNames[month]} ${year}`;
 
             const firstDay = new Date(year, month, 1).getDay(); // 0 (Dom) a 6 (Sab)
             const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const dayDiv = document.createElement('div');
                 dayDiv.className = 'cal-day';
                 dayDiv.textContent = i;
-                
+
                 const thisDate = new Date(year, month, i);
 
                 // Classes de range
@@ -416,7 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!rangeStart || (rangeStart && rangeEnd)) {
                         rangeStart = thisDate;
                         rangeEnd = null;
-                        if(selectionTxt) selectionTxt.textContent = `De: ${i} de ${monthNames[month]} - Selecione o fim`;
+                        if (selectionTxt) selectionTxt.textContent = `De: ${i} de ${monthNames[month]} - Selecione o fim`;
                     } else if (rangeStart && !rangeEnd) {
                         if (thisDate < rangeStart) {
                             rangeEnd = rangeStart;
@@ -424,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         } else {
                             rangeEnd = thisDate;
                         }
-                        if(selectionTxt) selectionTxt.textContent = `Período selecionado: ${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth()+1).toString().padStart(2, '0')} até ${rangeEnd.getDate().toString().padStart(2, '0')}/${(rangeEnd.getMonth()+1).toString().padStart(2, '0')}`;
+                        if (selectionTxt) selectionTxt.textContent = `Período selecionado: ${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth() + 1).toString().padStart(2, '0')} até ${rangeEnd.getDate().toString().padStart(2, '0')}/${(rangeEnd.getMonth() + 1).toString().padStart(2, '0')}`;
                     }
                     renderCalendar();
                 });
@@ -433,13 +433,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        if(prevBtn) prevBtn.addEventListener('click', (e) => {
+        if (prevBtn) prevBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             currentDate.setMonth(currentDate.getMonth() - 1);
             renderCalendar();
         });
-        
-        if(nextBtn) nextBtn.addEventListener('click', (e) => {
+
+        if (nextBtn) nextBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             currentDate.setMonth(currentDate.getMonth() + 1);
             renderCalendar();
@@ -453,11 +453,11 @@ document.addEventListener('DOMContentLoaded', () => {
             applyBtn.addEventListener('click', () => {
                 const dateText = document.getElementById('date-filter-text');
                 if (rangeStart && rangeEnd) {
-                    const startStr = `${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth()+1).toString().padStart(2, '0')}`;
-                    const endStr = `${rangeEnd.getDate().toString().padStart(2, '0')}/${(rangeEnd.getMonth()+1).toString().padStart(2, '0')}`;
+                    const startStr = `${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth() + 1).toString().padStart(2, '0')}`;
+                    const endStr = `${rangeEnd.getDate().toString().padStart(2, '0')}/${(rangeEnd.getMonth() + 1).toString().padStart(2, '0')}`;
                     if (dateText) dateText.textContent = `${startStr} - ${endStr}`;
                 } else if (rangeStart) {
-                    const startStr = `${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth()+1).toString().padStart(2, '0')}`;
+                    const startStr = `${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth() + 1).toString().padStart(2, '0')}`;
                     if (dateText) dateText.textContent = `A partir de ${startStr}`;
                 } else {
                     if (dateText) dateText.textContent = `Sem limite de data`;
@@ -508,12 +508,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                 `;
-                
+
                 createModal('Filtros Avançados', content, (modal) => {
                     const statusVal = modal.querySelector('#modal-status-select').value;
-                    
+
                     // A data selecionada estaria em mRangeStart e mRangeEnd (variáveis abaixo)
-                    
+
                     // Lógica simples de filtro na tabela atual (por status)
                     const tableRows = document.querySelectorAll('.data-table tbody tr');
                     tableRows.forEach(row => {
@@ -540,14 +540,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const mSelectionTxt = document.getElementById('modal-cal-selection-text');
                 const mPrevBtn = document.getElementById('modal-cal-prev');
                 const mNextBtn = document.getElementById('modal-cal-next');
-                
+
                 let mCurrentDate = new Date();
                 let mRangeStart = null;
                 let mRangeEnd = null;
 
                 function renderModalCalendar() {
-                    if(!mCalendarGrid) return;
-                    
+                    if (!mCalendarGrid) return;
+
                     const days = mCalendarGrid.querySelectorAll('.cal-day');
                     days.forEach(d => d.remove());
                     const empties = mCalendarGrid.querySelectorAll('.empty');
@@ -556,7 +556,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const year = mCurrentDate.getFullYear();
                     const month = mCurrentDate.getMonth();
                     const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-                    if(mMonthYearTxt) mMonthYearTxt.textContent = `${monthNames[month]} ${year}`;
+                    if (mMonthYearTxt) mMonthYearTxt.textContent = `${monthNames[month]} ${year}`;
 
                     const firstDay = new Date(year, month, 1).getDay();
                     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -571,7 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const dayDiv = document.createElement('div');
                         dayDiv.className = 'cal-day';
                         dayDiv.textContent = i;
-                        
+
                         const thisDate = new Date(year, month, i);
 
                         if (mRangeStart && mRangeEnd) {
@@ -587,7 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (!mRangeStart || (mRangeStart && mRangeEnd)) {
                                 mRangeStart = thisDate;
                                 mRangeEnd = null;
-                                if(mSelectionTxt) mSelectionTxt.textContent = `De: ${i} de ${monthNames[month]} - Selecione o fim`;
+                                if (mSelectionTxt) mSelectionTxt.textContent = `De: ${i} de ${monthNames[month]} - Selecione o fim`;
                             } else if (mRangeStart && !mRangeEnd) {
                                 if (thisDate < mRangeStart) {
                                     mRangeEnd = mRangeStart;
@@ -595,7 +595,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 } else {
                                     mRangeEnd = thisDate;
                                 }
-                                if(mSelectionTxt) mSelectionTxt.textContent = `Período selecionado: ${mRangeStart.getDate().toString().padStart(2, '0')}/${(mRangeStart.getMonth()+1).toString().padStart(2, '0')} até ${mRangeEnd.getDate().toString().padStart(2, '0')}/${(mRangeEnd.getMonth()+1).toString().padStart(2, '0')}`;
+                                if (mSelectionTxt) mSelectionTxt.textContent = `Período selecionado: ${mRangeStart.getDate().toString().padStart(2, '0')}/${(mRangeStart.getMonth() + 1).toString().padStart(2, '0')} até ${mRangeEnd.getDate().toString().padStart(2, '0')}/${(mRangeEnd.getMonth() + 1).toString().padStart(2, '0')}`;
                             }
                             renderModalCalendar();
                         });
@@ -604,13 +604,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
-                if(mPrevBtn) mPrevBtn.addEventListener('click', (e) => {
+                if (mPrevBtn) mPrevBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     mCurrentDate.setMonth(mCurrentDate.getMonth() - 1);
                     renderModalCalendar();
                 });
-                
-                if(mNextBtn) mNextBtn.addEventListener('click', (e) => {
+
+                if (mNextBtn) mNextBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     mCurrentDate.setMonth(mCurrentDate.getMonth() + 1);
                     renderModalCalendar();
@@ -643,7 +643,7 @@ const dossierOverlay = document.getElementById('dossier-overlay');
 const dossierClose = document.getElementById('dossier-close');
 
 function openDossier(title) {
-    if(dossierDrawer && dossierOverlay) {
+    if (dossierDrawer && dossierOverlay) {
         document.getElementById('dossier-name').innerText = title;
         dossierDrawer.classList.add('open');
         dossierOverlay.classList.add('open');
@@ -651,7 +651,7 @@ function openDossier(title) {
 }
 
 function closeDossier() {
-    if(dossierDrawer && dossierOverlay) {
+    if (dossierDrawer && dossierOverlay) {
         dossierDrawer.classList.remove('open');
         dossierOverlay.classList.remove('open');
     }
@@ -662,7 +662,7 @@ if (taskItems) {
         item.style.cursor = 'pointer';
         item.addEventListener('click', (e) => {
             // Não abrir se clicou no checkbox ou botões
-            if(e.target.tagName.toLowerCase() === 'input' || e.target.closest('button')) {
+            if (e.target.tagName.toLowerCase() === 'input' || e.target.closest('button')) {
                 return;
             }
             const title = item.querySelector('.task-title').innerText;
@@ -671,8 +671,8 @@ if (taskItems) {
     });
 }
 
-if(dossierClose) dossierClose.addEventListener('click', closeDossier);
-if(dossierOverlay) dossierOverlay.addEventListener('click', closeDossier);
+if (dossierClose) dossierClose.addEventListener('click', closeDossier);
+if (dossierOverlay) dossierOverlay.addEventListener('click', closeDossier);
 
 // ==========================================================================
 //   Lógica do Teclado iOS Simulado e Chat Input
@@ -683,7 +683,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const iosKeyboard = document.getElementById('ios-keyboard');
     const btnSend = document.getElementById('btn-send-message');
     const messagesContainer = document.getElementById('chat-messages-container');
-    
+
     if (!fakeInput || !iosKeyboard || !btnSend || !messagesContainer) return;
 
     let currentText = '';
@@ -723,12 +723,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Suporte a Teclado Físico (Desktop) ---
     document.addEventListener('keydown', (e) => {
         if (!fakeInput.classList.contains('active')) return;
-        
+
         if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta' || e.key === 'CapsLock' || e.key === 'Tab') return;
-        
+
         if (e.key === 'Backspace') {
             currentText = currentText.slice(0, -1);
-            if(currentText.length === 0) isShifted = true;
+            if (currentText.length === 0) isShifted = true;
             updateInput();
             e.preventDefault(); // Evitar voltar página no navegador
         } else if (e.key === 'Enter') {
@@ -745,7 +745,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Lógica do Teclado Virtual ---
     const keys = iosKeyboard.querySelectorAll('.key:not(.special)');
     let isShifted = true; // Primeira letra Maiúscula
-    
+
     function triggerHaptic() {
         if (navigator.vibrate) {
             navigator.vibrate(15);
@@ -754,7 +754,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkAutocorrect() {
         const bar = document.getElementById('autocorrect-bar');
         const suggestionElement = document.getElementById('autocorrect-suggestion');
-        if(!bar || !suggestionElement) return;
+        if (!bar || !suggestionElement) return;
 
         const words = currentText.split(/\s+/);
         const lastWord = words[words.length - 1].toLowerCase();
@@ -798,13 +798,14 @@ document.addEventListener('DOMContentLoaded', () => {
             'blz': 'beleza',
             'qm': 'quem',
             'oq': 'o que',
-            'aki': 'aqui'
+            'aki': 'aqui',
+            'sin': 'sim',
         };
 
         if (corrections[lastWord]) {
             suggestionElement.innerText = corrections[lastWord];
             bar.style.display = 'flex';
-            
+
             suggestionElement.onclick = (e) => {
                 e.stopPropagation();
                 triggerHaptic();
@@ -823,14 +824,14 @@ document.addEventListener('DOMContentLoaded', () => {
         key.addEventListener('click', (e) => {
             e.stopPropagation();
             let char = key.innerText;
-            if(key.classList.contains('space')) {
+            if (key.classList.contains('space')) {
                 char = ' ';
             } else {
                 // Se for letra e não estiver shifted, converte. Se for número, não faz toLowerCase
-                if(!isShifted && char.match(/[a-zA-Z]/)) char = char.toLowerCase();
-                if(char.match(/[a-zA-Z]/)) isShifted = false; // Desliga shift após primeira letra
+                if (!isShifted && char.match(/[a-zA-Z]/)) char = char.toLowerCase();
+                if (char.match(/[a-zA-Z]/)) isShifted = false; // Desliga shift após primeira letra
             }
-            
+
             currentText += char;
             updateInput();
             checkAutocorrect();
@@ -849,11 +850,11 @@ document.addEventListener('DOMContentLoaded', () => {
             e.stopPropagation();
             e.preventDefault(); // Evitar comportamento padrão
             triggerHaptic();
-            
+
             const apagarChar = () => {
                 if (currentText.length > 0) {
                     currentText = currentText.slice(0, -1);
-                    if(currentText.length === 0) isShifted = true;
+                    if (currentText.length === 0) isShifted = true;
                     updateInput();
                     checkAutocorrect();
                     fakeInput.classList.add('active');
@@ -879,7 +880,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         btn.addEventListener('mousedown', startBackspace);
         btn.addEventListener('touchstart', startBackspace, { passive: false });
-        
+
         btn.addEventListener('mouseup', stopBackspace);
         btn.addEventListener('mouseleave', stopBackspace);
         btn.addEventListener('touchend', stopBackspace);
@@ -889,11 +890,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Alternar Layouts (ABC / 123)
     const kbLetters = document.getElementById('keyboard-letters');
     const kbNumbers = document.getElementById('keyboard-numbers');
-    
+
     const btnNum = document.querySelector('.key-toggle-num');
     const btnAbc = document.querySelector('.key-toggle-abc');
-    
-    if(btnNum && kbLetters && kbNumbers) {
+
+    if (btnNum && kbLetters && kbNumbers) {
         btnNum.addEventListener('click', (e) => {
             e.stopPropagation();
             triggerHaptic();
@@ -902,8 +903,8 @@ document.addEventListener('DOMContentLoaded', () => {
             fakeInput.classList.add('active');
         });
     }
-    
-    if(btnAbc && kbLetters && kbNumbers) {
+
+    if (btnAbc && kbLetters && kbNumbers) {
         btnAbc.addEventListener('click', (e) => {
             e.stopPropagation();
             triggerHaptic();
@@ -912,7 +913,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fakeInput.classList.add('active');
         });
     }
-    
+
     // Botão Enter/Retorno
     const btnEnters = document.querySelectorAll('.btn-send-enter');
     btnEnters.forEach(btn => {
@@ -942,7 +943,7 @@ document.addEventListener('DOMContentLoaded', () => {
         msgDiv.style.position = 'relative';
         msgDiv.style.zIndex = '2';
         msgDiv.style.marginBottom = '12px';
-        
+
         msgDiv.innerHTML = `
             <div style="position: absolute; top: 0; right: -6px; width: 0; height: 0; border-top: 0px solid transparent; border-left: 6px solid #d9fdd3; border-bottom: 6px solid transparent;"></div>
             <p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35; word-wrap: break-word;">${currentText}</p>
@@ -953,7 +954,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         messagesContainer.appendChild(msgDiv);
-        
+
         // Rola para baixo suavemente
         messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'smooth' });
 
@@ -961,12 +962,12 @@ document.addEventListener('DOMContentLoaded', () => {
         currentText = '';
         isShifted = true;
         updateInput();
-        
+
         if (kbLetters && kbNumbers) {
             kbNumbers.style.display = 'none';
             kbLetters.style.display = 'flex';
         }
-        
+
         // Ocultar teclado
         fakeInput.classList.remove('active');
         iosKeyboard.classList.remove('show');
@@ -976,17 +977,17 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- Lógica da Lista em Acordeão (Accordion) ---
 document.addEventListener('DOMContentLoaded', () => {
     const accordionHeaders = document.querySelectorAll('.accordion-header');
-    
+
     accordionHeaders.forEach(header => {
         header.addEventListener('click', () => {
             const currentItem = header.parentElement;
             const isCurrentlyActive = currentItem.classList.contains('active');
-            
+
             // Fecha todos os outros acordeões
             document.querySelectorAll('.accordion-item').forEach(item => {
                 item.classList.remove('active');
             });
-            
+
             // Se não estava ativo antes, abre ele (comportamento de toggle)
             if (!isCurrentlyActive) {
                 currentItem.classList.add('active');
