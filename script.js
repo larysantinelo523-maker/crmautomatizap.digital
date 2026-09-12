@@ -1,4 +1,9 @@
 // --- Verificação de Autenticação Global ---
+window.getBrasiliaDate = function() {
+    const str = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
+    return new Date(str);
+};
+
 if (window.location.pathname.indexOf('login.html') === -1) {
     import('./supabase.js').then(({ supabase }) => {
         supabase.auth.getSession().then(async ({ data }) => {
@@ -74,7 +79,7 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                         // 1. Verificar Vencimento da Mensalidade
                         if (userData && userData.data_vencimento) {
                             const vencDate = new Date(userData.data_vencimento);
-                            const now = new Date();
+                            const now = window.getBrasiliaDate();
                             const diffTime = vencDate - now;
                             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                             
@@ -95,10 +100,10 @@ if (window.location.pathname.indexOf('login.html') === -1) {
 
                         // 2. Verificar Novos Leads nas últimas 24h
                         const leads = await module.fetchLeads();
-                        const now = new Date();
+                        const nowLeads = window.getBrasiliaDate();
                         const newLeads = leads.filter(l => {
                             const leadDate = new Date(l.criado_em);
-                            const diff = (now - leadDate) / (1000 * 60 * 60); // horas
+                            const diff = (nowLeads - leadDate) / (1000 * 60 * 60); // horas
                             return diff <= 24;
                         });
 
@@ -112,7 +117,13 @@ if (window.location.pathname.indexOf('login.html') === -1) {
 
                         // 3. Verificar Tarefas Pendentes para hoje
                         const tarefas = await module.fetchTasks();
-                        const todayStr = new Date().toISOString().split('T')[0];
+                        
+                        // Forçar formatação YYYY-MM-DD segura no horário de Brasília
+                        const brDate = window.getBrasiliaDate();
+                        const y = brDate.getFullYear();
+                        const m = String(brDate.getMonth() + 1).padStart(2, '0');
+                        const d = String(brDate.getDate()).padStart(2, '0');
+                        const todayStr = `${y}-${m}-${d}`;
                         
                         const pendingTasks = tarefas.filter(t => t.status === 'pendente' && t.data_vencimento && t.data_vencimento.startsWith(todayStr));
                         
