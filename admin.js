@@ -93,16 +93,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('clock-date').textContent = now.toLocaleDateString('pt-BR', options);
     }, 1000);
 
-    // Dropdown do perfil (mobile)
+    // Dropdown do perfil
     const userMenuBtn = document.getElementById('user-menu-btn');
-    if(userMenuBtn) {
+    const userDropdown = document.getElementById('user-dropdown');
+    if (userMenuBtn && userDropdown) {
         userMenuBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            this.classList.toggle('active');
+            userDropdown.classList.toggle('show');
         });
         document.addEventListener('click', function(e) {
-            if (userMenuBtn.classList.contains('active') && !userMenuBtn.contains(e.target)) {
-                userMenuBtn.classList.remove('active');
+            if (!userMenuBtn.contains(e.target)) {
+                userDropdown.classList.remove('show');
             }
         });
     }
