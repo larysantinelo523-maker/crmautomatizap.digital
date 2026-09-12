@@ -1,17 +1,17 @@
 /* admin.css - Estilos exclusivos para o Painel Master */
 
-body {
-    background-color: #0f111a;
-    color: #e2e8f0;
+body, .app-container, .main-content {
+    background-color: #0f111a !important;
+    color: #e2e8f0 !important;
 }
 
 .sidebar {
-    background-color: #1a1d2d;
-    border-right: 1px solid #2d3142;
+    background-color: #1a1d2d !important;
+    border-right: 1px solid #2d3142 !important;
 }
 
 .nav-item {
-    color: #94a3b8;
+    color: #94a3b8 !important;
 }
 
 .nav-item:hover, .nav-item.active {
@@ -21,16 +21,16 @@ body {
 }
 
 .header {
-    background-color: #1a1d2d;
-    border-bottom: 1px solid #2d3142;
+    background-color: #1a1d2d !important;
+    border-bottom: 1px solid #2d3142 !important;
 }
 
 .header-title h1 {
-    color: #f8fafc;
+    color: #f8fafc !important;
 }
 
 .header-title p {
-    color: #94a3b8;
+    color: #94a3b8 !important;
 }
 
 .kpi-grid {
@@ -41,8 +41,8 @@ body {
 }
 
 .kpi-card {
-    background-color: #1a1d2d;
-    border: 1px solid #2d3142;
+    background-color: #1a1d2d !important;
+    border: 1px solid #2d3142 !important;
     border-radius: 16px;
     padding: 24px;
     display: flex;
@@ -62,7 +62,7 @@ body {
 
 .kpi-info h3 {
     font-size: 13px;
-    color: #94a3b8;
+    color: #94a3b8 !important;
     margin-bottom: 4px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -71,18 +71,26 @@ body {
 .kpi-info .kpi-value {
     font-size: 32px;
     font-weight: 700;
-    color: #f8fafc;
+    color: #f8fafc !important;
 }
 
 .card {
-    background-color: #1a1d2d;
-    border: 1px solid #2d3142;
+    background-color: #1a1d2d !important;
+    border: 1px solid #2d3142 !important;
+}
+
+.card h2 {
+    color: #f8fafc !important;
+}
+
+.form-group label {
+    color: #94a3b8 !important;
 }
 
 .form-control {
-    background-color: #0f111a;
-    border: 1px solid #2d3142;
-    color: #f8fafc;
+    background-color: #0f111a !important;
+    border: 1px solid #2d3142 !important;
+    color: #f8fafc !important;
 }
 
 .form-control:focus {
