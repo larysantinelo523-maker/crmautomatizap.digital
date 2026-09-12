@@ -231,6 +231,12 @@
                                     <input type="text" id="settings-name" class="input-field" placeholder="Seu nome"
                                         style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg-card); color: var(--color-text-main);">
                                 </div>
+                                <div class="input-group">
+                                    <label
+                                        style="font-size: 13px; font-weight: 500; color: var(--color-text-sec); margin-bottom: 6px; display: block;">Nova Senha</label>
+                                    <input type="password" id="settings-password" class="input-field" placeholder="Deixe em branco para não alterar"
+                                        style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg-card); color: var(--color-text-main);">
+                                </div>
                                 <button class="btn btn--primary" id="btn-save-profile"
                                     style="align-self: flex-start; margin-top: 8px;">Salvar Alterações</button>
                             </div>
@@ -520,6 +526,15 @@
                         .eq('id', userId);
 
                     if (updateError) throw updateError;
+                    
+                    // Mudar Senha
+                    const newPassword = document.getElementById('settings-password').value;
+                    if (newPassword && newPassword.trim() !== '') {
+                        const { error: passwordError } = await supabase.auth.updateUser({
+                            password: newPassword
+                        });
+                        if (passwordError) throw passwordError;
+                    }
 
                     // Reload page to reflect changes
                     window.location.reload();
