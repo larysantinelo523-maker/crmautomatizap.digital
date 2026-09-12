@@ -12,7 +12,8 @@ export default defineConfig({
         leads: resolve(__dirname, 'leads.html'),
         relatorios: resolve(__dirname, 'relatorios.html'),
         conversas: resolve(__dirname, 'conversas.html'),
-        tarefas: resolve(__dirname, 'tarefas.html')
+        tarefas: resolve(__dirname, 'tarefas.html'),
+        configuracoes: resolve(__dirname, 'configuracoes.html')
       }
     }
   }
