@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const sectionTitles = {
         'dashboard': { title: 'Visão Geral Master', sub: 'Acompanhe as métricas globais de todos os seus clientes SaaS.' },
-        'cadastrar': { title: 'Cadastrar Cliente', sub: 'Crie um novo ambiente de CRM para um cliente.' },
+        'cadastrar': { title: 'Cadastrar Empresa', sub: 'Crie um novo ambiente de CRM para uma empresa.' },
         'configuracoes': { title: 'Configurações', sub: 'Gerencie a segurança da sua conta master.' },
         'detalhes-empresa': { title: 'Visão Geral da Empresa', sub: 'Acompanhe de perto as métricas deste cliente específico.' }
     };
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 5. Carregar Lista de Empresas (Tenants)
     async function loadTenantsList() {
         const tbody = document.getElementById('empresas-tbody');
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px;">Carregando empresas... <i class="ph ph-spinner-gap"></i></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 32px;"><div class="kpi-loading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;"><i class="ph ph-spinner-gap"></i><span style="font-size: 14px;">Carregando empresas...</span></div></td></tr>';
 
         try {
             const res = await fetch('/api/list_tenants');
