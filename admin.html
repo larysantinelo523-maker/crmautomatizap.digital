@@ -56,10 +56,7 @@
                     <i class="ph ph-squares-four"></i>
                     <span>Visão Geral Master</span>
                 </a>
-                <a href="#" class="nav-item" data-target="cadastrar">
-                    <i class="ph ph-user-plus"></i>
-                    <span>Cadastrar Empresa</span>
-                </a>
+
                 <a href="#" class="nav-item" data-target="configuracoes">
                     <i class="ph ph-gear"></i>
                     <span>Configurações</span>
@@ -193,7 +190,7 @@
                     </div>
 
                     <div class="card table-card" style="margin-top: 24px;">
-                        <div class="card-header">
+                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
                             <div class="card-title">
                                 <i class="ph ph-buildings text-primary"></i>
                                 <div>
@@ -201,6 +198,7 @@
                                     <p>Clique em uma empresa para visualizar o painel detalhado dela.</p>
                                 </div>
                             </div>
+                            <button class="btn btn-primary" id="btn-open-cadastrar-modal">Cadastrar Empresa +</button>
                         </div>
 
                         <div class="table-responsive">
@@ -221,49 +219,6 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-                </section>
-
-                <!-- Secao Cadastrar Cliente -->
-                <section id="sec-cadastrar" class="admin-section">
-                    <div class="card" style="max-width: 600px; margin: 0 auto;">
-                        <h2 style="margin-bottom: 24px; color: var(--color-text-main);">Cadastrar Nova Empresa (Tenant)</h2>
-                        <form id="form-create-tenant">
-                            <div class="form-group">
-                                <label style="color: var(--color-text-mut);">Nome da Empresa</label>
-                                <div class="input-wrapper">
-                                    <i class="ph ph-building"></i>
-                                    <input type="text" id="tenant-nome" class="form-control" placeholder="Ex: Barbearia do João" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label style="color: var(--color-text-mut);">E-mail de Login (Administrador da Empresa)</label>
-                                <div class="input-wrapper">
-                                    <i class="ph ph-envelope-simple"></i>
-                                    <input type="email" id="tenant-email" class="form-control" placeholder="contato@empresa.com" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label style="color: var(--color-text-mut);">Senha Inicial</label>
-                                <div class="input-wrapper">
-                                    <i class="ph ph-lock-key"></i>
-                                    <input type="password" id="tenant-senha" class="form-control" placeholder="Senha provisória" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label style="color: var(--color-text-mut);">Dia e Data de Vencimento Mensal</label>
-                                <div class="input-wrapper">
-                                    <i class="ph ph-calendar"></i>
-                                    <input type="date" id="tenant-vencimento" class="form-control" required>
-                                </div>
-                                <small style="color: var(--color-text-sec); display: block; margin-top: 8px;">Esta data definirá quando os avisos de fatura vão aparecer no CRM do cliente.</small>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;" id="btn-submit-tenant">
-                                Criar Cliente no Sistema
-                            </button>
-                            <div id="tenant-msg" style="margin-top: 16px; font-weight: 600; text-align: center;"></div>
-                        </form>
                     </div>
                 </section>
                 
@@ -331,6 +286,57 @@
 
             </div>
         </main>
+    </div>
+
+    <!-- Modal Cadastrar Empresa -->
+    <div id="modal-cadastrar-empresa" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Cadastrar Nova Empresa (Tenant)</h2>
+                <button class="close-modal"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-create-tenant">
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Nome da Empresa</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-building"></i>
+                            <input type="text" id="tenant-nome" class="form-control" placeholder="Ex: Barbearia do João" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">E-mail de Login (Administrador da Empresa)</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-envelope-simple"></i>
+                            <input type="email" id="tenant-email" class="form-control" placeholder="contato@empresa.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Senha Inicial</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-lock-key"></i>
+                            <input type="password" id="tenant-senha" class="form-control" placeholder="Senha provisória" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Dia e Data de Vencimento Mensal</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-calendar"></i>
+                            <input type="date" id="tenant-vencimento" class="form-control" required>
+                        </div>
+                        <small style="color: var(--color-text-sec); display: block; margin-top: 8px;">Esta data definirá quando os avisos de fatura vão aparecer no CRM do cliente.</small>
+                    </div>
+                    
+                    <div class="form-actions" style="margin-top: 32px; display: flex; justify-content: flex-end;">
+                        <button type="submit" class="btn btn-primary" id="btn-submit-tenant">
+                            <i class="ph ph-check"></i>
+                            Criar Empresa no Sistema
+                        </button>
+                    </div>
+                    <div id="tenant-msg" style="margin-top: 16px; font-weight: 600; text-align: center;"></div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- Script Base -->

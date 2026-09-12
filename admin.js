@@ -309,7 +309,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         Highcharts.mapChart('admin-map-container', mapConfig);
     }
 
-    // 7. Cadastrar Cliente via API
+    // Lógica do Modal de Cadastrar Empresa
+    const modalCadastrar = document.getElementById('modal-cadastrar-empresa');
+    const btnOpenCadastrar = document.getElementById('btn-open-cadastrar-modal');
+    
+    if (btnOpenCadastrar && modalCadastrar) {
+        btnOpenCadastrar.addEventListener('click', () => {
+            modalCadastrar.classList.add('active');
+            document.getElementById('tenant-msg').textContent = '';
+        });
+
+        // Fechar ao clicar no "X" ou fora do modal
+        const closeBtn = modalCadastrar.querySelector('.close-modal');
+        if(closeBtn) closeBtn.addEventListener('click', () => modalCadastrar.classList.remove('active'));
+        
+        modalCadastrar.addEventListener('click', (e) => {
+            if (e.target === modalCadastrar) {
+                modalCadastrar.classList.remove('active');
+            }
+        });
+    }
+
+    // 7. Cadastrar Empresa via API
     document.getElementById('form-create-tenant').addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -338,8 +359,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (res.ok) {
                 msg.style.color = '#00A884';
-                msg.textContent = '✅ Cliente cadastrado com sucesso! Já pode acessar o CRM.';
+                msg.textContent = '✅ Empresa cadastrada com sucesso!';
                 document.getElementById('form-create-tenant').reset();
+                
+                // Recarregar os dados na tela e fechar o modal
+                loadDashboardStats();
+                loadTenantsList();
+                
+                setTimeout(() => {
+                    modalCadastrar.classList.remove('active');
+                    msg.textContent = '';
+                }, 2000);
+
             } else {
                 msg.style.color = '#ef4444';
                 msg.textContent = '❌ Erro: ' + (data.error || 'Erro desconhecido');
@@ -350,7 +381,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             msg.textContent = '❌ Erro de conexão. Configure o Vercel corretamente.';
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Criar Cliente no Sistema';
+            btn.innerHTML = '<i class="ph ph-check"></i> Criar Empresa no Sistema';
         }
     });
 
