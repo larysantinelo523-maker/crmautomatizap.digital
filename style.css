@@ -634,6 +634,9 @@ body.dark-mode .cal-day.in-range {
         right: 16px;
         width: 260px;
     }
+    .mobile-clock-widget {
+        display: flex !important;
+    }
 }
 
 body.dark-mode .notification-dropdown {

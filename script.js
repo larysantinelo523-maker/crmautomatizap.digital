@@ -6,19 +6,28 @@ window.getBrasiliaDate = function() {
 
 // --- Relógio da Sidebar em Tempo Real ---
 function updateSidebarClock() {
-    const clockTime = document.getElementById('clock-time');
-    const clockDate = document.getElementById('clock-date');
-    if (!clockTime || !clockDate) return;
-
     const brDate = window.getBrasiliaDate();
-    
     const h = String(brDate.getHours()).padStart(2, '0');
     const m = String(brDate.getMinutes()).padStart(2, '0');
-    clockTime.textContent = `${h}:${m} (Brasília)`;
-
     const options = { weekday: 'short', day: '2-digit', month: 'long' };
     let dateStr = brDate.toLocaleDateString('pt-BR', options);
-    clockDate.textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+    dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+
+    // Desktop/Sidebar Clock
+    const clockTime = document.getElementById('clock-time');
+    const clockDate = document.getElementById('clock-date');
+    if (clockTime && clockDate) {
+        clockTime.textContent = `${h}:${m} (Brasília)`;
+        clockDate.textContent = dateStr;
+    }
+
+    // Mobile/Dropdown Clock
+    const mClockTime = document.getElementById('mobile-clock-time');
+    const mClockDate = document.getElementById('mobile-clock-date');
+    if (mClockTime && mClockDate) {
+        mClockTime.textContent = `${h}:${m} (Brasília)`;
+        mClockDate.textContent = dateStr;
+    }
 }
 // Atualiza a cada segundo
 setInterval(updateSidebarClock, 1000);
