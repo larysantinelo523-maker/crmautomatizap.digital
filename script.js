@@ -113,16 +113,25 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                             const diffTime = vencDate - now;
                             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                             
+                            let notifText = '';
+                            let isExpired = false;
+
                             if (diffDays < 0) {
-                                html += `<div style="padding: 12px; border-bottom: 1px solid var(--color-border); cursor: pointer;" onclick="window.location.href='configuracoes.html?tab=assinatura'">
-                                    <div style="font-weight: 600; font-size: 13px; color: var(--color-danger); margin-bottom: 4px;"><i class="ph ph-warning-circle"></i> Assinatura Vencida</div>
-                                    <div style="font-size: 12px; color: var(--color-text-mut);">Sua assinatura venceu há ${Math.abs(diffDays)} dias. Renove agora para evitar o bloqueio.</div>
-                                </div>`;
-                                notifCount++;
+                                isExpired = true;
+                                if (diffDays === -1) notifText = "Sua assinatura venceu ontem. Renove agora para evitar o bloqueio.";
+                                else notifText = `Sua assinatura venceu há ${Math.abs(diffDays)} dias. Renove agora para evitar o bloqueio.`;
+                            } else if (diffDays === 0) {
+                                notifText = "Sua assinatura vence hoje! Renove agora para evitar a suspensão.";
+                            } else if (diffDays === 1) {
+                                notifText = "Atenção: Falta 1 dia para o vencimento da sua assinatura.";
                             } else if (diffDays <= 5) {
+                                notifText = `Atenção: Faltam ${diffDays} dias para o vencimento da sua assinatura.`;
+                            }
+
+                            if (notifText) {
                                 html += `<div style="padding: 12px; border-bottom: 1px solid var(--color-border); cursor: pointer;" onclick="window.location.href='configuracoes.html?tab=assinatura'">
-                                    <div style="font-weight: 600; font-size: 13px; color: var(--color-warning); margin-bottom: 4px;"><i class="ph ph-warning"></i> Vencimento Próximo</div>
-                                    <div style="font-size: 12px; color: var(--color-text-mut);">Sua assinatura vence em ${diffDays} dias.</div>
+                                    <div style="font-weight: 600; font-size: 13px; color: ${isExpired ? 'var(--color-danger)' : 'var(--color-warning)'}; margin-bottom: 4px;"><i class="ph ${isExpired ? 'ph-warning-circle' : 'ph-warning'}"></i> ${isExpired ? 'Assinatura Vencida' : 'Vencimento Próximo'}</div>
+                                    <div style="font-size: 12px; color: var(--color-text-mut);">${notifText}</div>
                                 </div>`;
                                 notifCount++;
                             }
