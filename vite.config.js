@@ -14,7 +14,8 @@ export default defineConfig({
         conversas: resolve(__dirname, 'conversas.html'),
         tarefas: resolve(__dirname, 'tarefas.html'),
         configuracoes: resolve(__dirname, 'configuracoes.html'),
-        notificacoes: resolve(__dirname, 'notificacoes.html')
+        notificacoes: resolve(__dirname, 'notificacoes.html'),
+        admin: resolve(__dirname, 'admin.html')
       }
     }
   }
