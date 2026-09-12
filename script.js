@@ -127,9 +127,15 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                         if (notifCount > 0) {
                             notifList.innerHTML = html;
                             if (notifDot) notifDot.style.display = 'block';
+                            
+                            const notifPageList = document.getElementById('notif-page-list');
+                            if (notifPageList) notifPageList.innerHTML = html;
                         } else {
                             notifList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--color-text-mut); font-size: 13px;">Nenhuma notificação.</div>';
                             if (notifDot) notifDot.style.display = 'none';
+                            
+                            const notifPageList = document.getElementById('notif-page-list');
+                            if (notifPageList) notifPageList.innerHTML = '<div style="padding: 32px; text-align: center; color: var(--color-text-mut);">Nenhuma notificação.</div>';
                         }
                     }
 

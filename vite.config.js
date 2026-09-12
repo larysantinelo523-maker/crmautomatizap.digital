@@ -13,7 +13,8 @@ export default defineConfig({
         relatorios: resolve(__dirname, 'relatorios.html'),
         conversas: resolve(__dirname, 'conversas.html'),
         tarefas: resolve(__dirname, 'tarefas.html'),
-        configuracoes: resolve(__dirname, 'configuracoes.html')
+        configuracoes: resolve(__dirname, 'configuracoes.html'),
+        notificacoes: resolve(__dirname, 'notificacoes.html')
       }
     }
   }
