@@ -49,7 +49,8 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                 }
 
                 // Se estiver logado, carrega o módulo de dados
-                import('./data.js').then((module) => {
+                // Se estiver logado, carrega o módulo de dados
+                import('./data.js').then(async (module) => {
                     // Inicializa os dados da página específica
                     if (window.location.pathname.indexOf('index.html') > -1 || window.location.pathname.endsWith('/')) {
                         if (window.initDashboard) window.initDashboard();
@@ -60,6 +61,80 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                     } else if (window.location.pathname.indexOf('configuracoes.html') > -1) {
                         if (window.initSettings) window.initSettings();
                     }
+                    
+                    // --- Lógica de Notificações Inteligentes ---
+                    async function loadNotifications() {
+                        const notifList = document.getElementById('notif-list');
+                        const notifDot = document.querySelector('.notification-dot');
+                        if (!notifList) return;
+
+                        let html = '';
+                        let notifCount = 0;
+
+                        // 1. Verificar Vencimento da Mensalidade
+                        if (userData && userData.data_vencimento) {
+                            const vencDate = new Date(userData.data_vencimento);
+                            const now = new Date();
+                            const diffTime = vencDate - now;
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                            
+                            if (diffDays < 0) {
+                                html += `<div style="padding: 12px; border-bottom: 1px solid var(--color-border); cursor: pointer;" onclick="window.location.href='configuracoes.html?tab=assinatura'">
+                                    <div style="font-weight: 600; font-size: 13px; color: var(--color-danger); margin-bottom: 4px;"><i class="ph ph-warning-circle"></i> Assinatura Vencida</div>
+                                    <div style="font-size: 12px; color: var(--color-text-mut);">Sua assinatura venceu há ${Math.abs(diffDays)} dias. Renove agora para evitar o bloqueio.</div>
+                                </div>`;
+                                notifCount++;
+                            } else if (diffDays <= 5) {
+                                html += `<div style="padding: 12px; border-bottom: 1px solid var(--color-border); cursor: pointer;" onclick="window.location.href='configuracoes.html?tab=assinatura'">
+                                    <div style="font-weight: 600; font-size: 13px; color: var(--color-warning); margin-bottom: 4px;"><i class="ph ph-warning"></i> Vencimento Próximo</div>
+                                    <div style="font-size: 12px; color: var(--color-text-mut);">Sua assinatura vence em ${diffDays} dias.</div>
+                                </div>`;
+                                notifCount++;
+                            }
+                        }
+
+                        // 2. Verificar Novos Leads nas últimas 24h
+                        const leads = await module.fetchLeads();
+                        const now = new Date();
+                        const newLeads = leads.filter(l => {
+                            const leadDate = new Date(l.criado_em);
+                            const diff = (now - leadDate) / (1000 * 60 * 60); // horas
+                            return diff <= 24;
+                        });
+
+                        newLeads.forEach(l => {
+                            html += `<div style="padding: 12px; border-bottom: 1px solid var(--color-border); cursor: pointer;" onclick="window.location.href='leads.html'">
+                                <div style="font-weight: 600; font-size: 13px; color: var(--color-text); margin-bottom: 4px;"><i class="ph ph-user-plus text-primary"></i> Novo Lead</div>
+                                <div style="font-size: 12px; color: var(--color-text-mut);">Você recebeu um novo lead: ${l.nome}</div>
+                            </div>`;
+                            notifCount++;
+                        });
+
+                        // 3. Verificar Tarefas Pendentes para hoje
+                        const tarefas = await module.fetchTasks();
+                        const todayStr = new Date().toISOString().split('T')[0];
+                        
+                        const pendingTasks = tarefas.filter(t => t.status === 'pendente' && t.data_vencimento && t.data_vencimento.startsWith(todayStr));
+                        
+                        pendingTasks.forEach(t => {
+                            html += `<div style="padding: 12px; border-bottom: 1px solid var(--color-border); cursor: pointer;" onclick="window.location.href='tarefas.html'">
+                                <div style="font-weight: 600; font-size: 13px; color: var(--color-text); margin-bottom: 4px;"><i class="ph ph-check-square text-success"></i> Tarefa de Hoje</div>
+                                <div style="font-size: 12px; color: var(--color-text-mut);">${t.titulo}</div>
+                            </div>`;
+                            notifCount++;
+                        });
+
+                        if (notifCount > 0) {
+                            notifList.innerHTML = html;
+                            if (notifDot) notifDot.style.display = 'block';
+                        } else {
+                            notifList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--color-text-mut); font-size: 13px;">Nenhuma notificação.</div>';
+                            if (notifDot) notifDot.style.display = 'none';
+                        }
+                    }
+
+                    // Aguardar um momento para garantir que a UI foi renderizada
+                    setTimeout(loadNotifications, 500);
                 });
             }
         });

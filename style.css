@@ -387,6 +387,7 @@ body.dark-mode .header {
     height: 6px;
     background-color: var(--color-primary);
     border-radius: 50%;
+    display: none;
 }
 
 /* --- Date Dropdown --- */

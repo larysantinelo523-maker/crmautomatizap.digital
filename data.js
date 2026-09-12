@@ -40,6 +40,36 @@ export async function fetchConversations(leadId) {
     return data;
 }
 
+export async function fetchTasks() {
+    const { data, error } = await supabase
+        .from('tarefas')
+        .select('*')
+        .order('data_vencimento', { ascending: true });
+    
+    if (error) {
+        console.error('Erro ao buscar tarefas:', error);
+        return [];
+    }
+    return data;
+}
+
+export async function fetchUserData() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    const { data, error } = await supabase
+        .from('usuarios')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+    
+    if (error) {
+        console.error('Erro ao buscar usuário:', error);
+        return null;
+    }
+    return data;
+}
+
 export async function sendMessage(leadId, messageText) {
     const id_empresa = await fetchCompanyId();
     if (!id_empresa) return null;
@@ -138,6 +168,8 @@ export async function seedFakeData() {
 window.dbAPI = {
     fetchLeads,
     fetchConversations,
+    fetchTasks,
+    fetchUserData,
     sendMessage,
     toggleBotState,
     seedFakeData
