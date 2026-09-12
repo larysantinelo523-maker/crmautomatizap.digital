@@ -49,7 +49,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const sectionTitles = {
         'dashboard': { title: 'Visão Geral Master', sub: 'Acompanhe as métricas globais de todos os seus clientes SaaS.' },
-        'empresas': { title: 'Todas as Empresas', sub: 'Gerencie todos os seus clientes registrados.' },
         'cadastrar': { title: 'Cadastrar Cliente', sub: 'Crie um novo ambiente de CRM para um cliente.' },
         'configuracoes': { title: 'Configurações', sub: 'Gerencie a segurança da sua conta master.' },
         'detalhes-empresa': { title: 'Visão Geral da Empresa', sub: 'Acompanhe de perto as métricas deste cliente específico.' }
@@ -64,8 +63,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             pageSubtitle.textContent = sectionTitles[target].sub;
         }
 
-        if (target === 'dashboard') loadDashboardStats();
-        if (target === 'empresas') loadTenantsList();
+        if (target === 'dashboard') {
+            loadDashboardStats();
+            loadTenantsList();
+        }
     }
 
     navItems.forEach(item => {
@@ -128,6 +129,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     loadDashboardStats();
+    loadTenantsList();
 
     // 5. Carregar Lista de Empresas (Tenants)
     async function loadTenantsList() {
