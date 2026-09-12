@@ -164,15 +164,24 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                             notifCount++;
                         });
 
+                        const badge = document.getElementById('notif-badge');
+
                         if (notifCount > 0) {
                             notifList.innerHTML = html;
                             if (notifDot) notifDot.style.display = 'block';
+                            if (badge) {
+                                badge.textContent = notifCount === 1 ? '1 nova' : `${notifCount} novas`;
+                                badge.style.display = 'inline-block';
+                            }
                             
                             const notifPageList = document.getElementById('notif-page-list');
                             if (notifPageList) notifPageList.innerHTML = html;
                         } else {
                             notifList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--color-text-mut); font-size: 13px;">Nenhuma notificação.</div>';
                             if (notifDot) notifDot.style.display = 'none';
+                            if (badge) {
+                                badge.style.display = 'none';
+                            }
                             
                             const notifPageList = document.getElementById('notif-page-list');
                             if (notifPageList) notifPageList.innerHTML = '<div style="padding: 32px; text-align: center; color: var(--color-text-mut);">Nenhuma notificação.</div>';
