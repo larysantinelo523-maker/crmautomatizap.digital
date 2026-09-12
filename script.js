@@ -39,6 +39,7 @@ if (window.location.pathname.indexOf('login.html') === -1) {
             if (!data.session) {
                 window.location.href = 'login.html';
             } else {
+                let currentUserData = null;
                 // Busca os dados adicionais do usuário logado na tabela 'usuarios'
                 try {
                     const userId = data.session.user.id;
@@ -49,6 +50,7 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                         .single();
 
                     if (userData && !error) {
+                        currentUserData = userData;
                         const userName = userData.nome_completo || 'Usuário';
                         const userRole = userData.funcao || 'Membro';
 
@@ -83,7 +85,6 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                 }
 
                 // Se estiver logado, carrega o módulo de dados
-                // Se estiver logado, carrega o módulo de dados
                 import('./data.js').then(async (module) => {
                     // Inicializa os dados da página específica
                     if (window.location.pathname.indexOf('index.html') > -1 || window.location.pathname.endsWith('/')) {
@@ -106,8 +107,8 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                         let notifCount = 0;
 
                         // 1. Verificar Vencimento da Mensalidade
-                        if (userData && userData.data_vencimento) {
-                            const vencDate = new Date(userData.data_vencimento);
+                        if (currentUserData && currentUserData.data_vencimento) {
+                            const vencDate = new Date(currentUserData.data_vencimento);
                             const now = window.getBrasiliaDate();
                             const diffTime = vencDate - now;
                             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
