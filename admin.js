@@ -338,7 +338,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const msg = document.getElementById('tenant-msg');
         
         btn.disabled = true;
-        btn.textContent = 'Criando ambiente...';
+        btn.innerHTML = '<i class="ph ph-spinner-gap" style="font-size: 20px; animation: spin 1s linear infinite;"></i> Criando ambiente...';
         msg.textContent = '';
         
         const payload = {
@@ -381,7 +381,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             msg.textContent = '❌ Erro de conexão. Configure o Vercel corretamente.';
         } finally {
             btn.disabled = false;
-            btn.innerHTML = '<i class="ph ph-check"></i> Criar Empresa no Sistema';
+            btn.innerHTML = '<i class="ph ph-check" style="font-size: 20px;"></i> Criar Empresa no Sistema';
         }
     });
 
