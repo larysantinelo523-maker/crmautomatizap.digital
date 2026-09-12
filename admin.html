@@ -3,111 +3,267 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Painel Admin - AutomatiZAP CRM</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="admin.css">
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Highcharts -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <!-- Mapas Highcharts -->
+    <script src="https://code.highcharts.com/maps/modules/map.js"></script>
+    <script src="https://code.highcharts.com/mapdata/countries/br/br-all.js"></script>
+    
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- CSS Base do CRM -->
+    <link rel="stylesheet" href="style.css?v=1.4">
+    <style>
+        /* Ajustes específicos do Admin Master, caso precise */
+        .admin-section {
+            display: none;
+        }
+        .admin-section.active {
+            display: block;
+        }
+        /* Esconder dropdown de data no admin */
+        #date-wrapper {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="app-container">
-        <!-- Sidebar Customizada para Admin -->
+    <div class="layout">
+        <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="logo">
-                <img src="https://crmautomatizap.com/wp-content/uploads/2024/07/automatizap-crm.png" alt="AutomatiZAP Logo">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <img src="logo.png" alt="AutomatiZAP CRM" class="logo-img">
+                </a>
             </div>
-            
-            <nav class="nav-menu">
+
+            <nav class="sidebar-nav">
                 <a href="#" class="nav-item active" data-target="dashboard">
-                    <i class="ph ph-squares-four"></i> Visão Geral SaaS
+                    <i class="ph ph-squares-four"></i>
+                    <span>Visão Geral Master</span>
+                </a>
+                <a href="#" class="nav-item" data-target="empresas">
+                    <i class="ph ph-buildings"></i>
+                    <span>Todas as Empresas</span>
                 </a>
                 <a href="#" class="nav-item" data-target="cadastrar">
-                    <i class="ph ph-building"></i> Cadastrar Cliente
+                    <i class="ph ph-user-plus"></i>
+                    <span>Cadastrar Cliente</span>
                 </a>
                 <a href="#" class="nav-item" data-target="configuracoes">
-                    <i class="ph ph-gear"></i> Configurações Master
+                    <i class="ph ph-gear"></i>
+                    <span>Configurações</span>
                 </a>
             </nav>
 
             <div class="sidebar-footer">
-                <div class="user-info-sidebar">
-                    <div class="avatar dark">AD</div>
-                    <div class="user-details">
-                        <span class="user-name">Master Admin</span>
-                        <span class="user-role">SaaS Admin</span>
+                <div class="sidebar-clock" id="sidebar-clock" style="margin-bottom: 12px; padding: 12px; background: var(--color-bg-main); border-radius: 8px; border: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px;">
+                    <i class="ph ph-clock" style="font-size: 20px; color: var(--color-primary);"></i>
+                    <div>
+                        <div id="clock-time" style="font-size: 15px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">00:00</div>
+                        <div id="clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">Carregando...</div>
                     </div>
                 </div>
-                <button id="btn-logout" class="btn btn-outline" style="width: 100%; margin-top: 10px;">Sair</button>
             </div>
         </aside>
 
-        <!-- Conteúdo Principal -->
+        <!-- Main Content -->
         <main class="main-content">
+            <!-- Header -->
             <header class="header">
-                <div class="header-title">
-                    <h1 id="page-title">Visão Geral SaaS</h1>
-                    <p id="page-subtitle">Acompanhe as métricas globais de todos os seus clientes.</p>
+                <div class="header-titles">
+                    <button class="mobile-menu-btn"><i class="ph ph-list"></i></button>
+                    <a href="admin.html" class="mobile-logo-header">
+                        <img src="logo.png" alt="AutomatiZAP CRM" class="logo-img">
+                    </a>
+                    <div class="desktop-header-title">
+                        <h1 id="page-title">Visão Geral Master</h1>
+                        <p id="page-subtitle">Acompanhe as métricas globais de todos os seus clientes SaaS.</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="user-menu" id="user-menu-btn">
+                        <div class="avatar dark">AD</div>
+                        <div class="user-info">
+                            <span class="user-name">AutomatiZAP Master</span>
+                            <span class="user-role">SaaS Admin</span>
+                        </div>
+                        <i class="ph ph-caret-down"></i>
+                        
+                        <!-- Dropdown do Usuário -->
+                        <div class="user-dropdown" id="user-dropdown">
+                            <div class="mobile-clock-widget" style="padding: 12px 16px; border-bottom: 1px solid var(--color-border); display: none; align-items: center; gap: 12px; margin-bottom: 4px;">
+                                <i class="ph ph-clock" style="font-size: 20px; color: var(--color-primary);"></i>
+                                <div>
+                                    <div id="mobile-clock-time" style="font-size: 14px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">00:00</div>
+                                    <div id="mobile-clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">Carregando...</div>
+                                </div>
+                            </div>
+                            <div class="dropdown-item theme-item" onclick="event.stopPropagation()">
+                                <span><i class="ph ph-moon"></i> Modo Escuro</span>
+                                <label class="theme-switch" title="Alternar Tema">
+                                    <input type="checkbox" id="theme-toggle-checkbox">
+                                    <span class="slider round">
+                                        <i class="ph-fill ph-sun icon-sun"></i>
+                                        <i class="ph-fill ph-moon icon-moon"></i>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-item" id="btn-logout" style="color: var(--color-danger);">
+                                <i class="ph ph-sign-out"></i> Sair
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </header>
 
-            <div class="content-wrapper">
-                
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid no-sidebar" style="padding: 24px;">
+
                 <!-- Secao Dashboard -->
                 <section id="sec-dashboard" class="admin-section active">
-                    <div class="kpi-grid">
+                    <div class="kpis-section">
                         <div class="kpi-card">
-                            <div class="kpi-icon" style="background: rgba(30, 203, 79, 0.1); color: var(--color-primary);">
-                                <i class="ph ph-users"></i>
+                            <div class="kpi-header">
+                                <div class="icon-wrapper green-light"><i class="ph ph-buildings text-primary"></i></div>
+                                <h3>Total de Empresas</h3>
                             </div>
-                            <div class="kpi-info">
-                                <h3>Total de Leads Capturados</h3>
-                                <div class="kpi-value" id="kpi-leads">...</div>
+                            <div class="kpi-content">
+                                <h2 id="kpi-empresas">
+                                    <div class="kpi-loading">
+                                        <i class="ph ph-spinner-gap"></i>
+                                        <span>Atualizando...</span>
+                                    </div>
+                                </h2>
                             </div>
                         </div>
                         <div class="kpi-card">
-                            <div class="kpi-icon" style="background: rgba(43, 92, 255, 0.1); color: var(--color-secondary);">
-                                <i class="ph ph-buildings"></i>
+                            <div class="kpi-header">
+                                <div class="icon-wrapper green-light"><i class="ph ph-users text-primary"></i></div>
+                                <h3>Total de Leads</h3>
                             </div>
-                            <div class="kpi-info">
-                                <h3>Empresas Ativas</h3>
-                                <div class="kpi-value" id="kpi-empresas">...</div>
+                            <div class="kpi-content">
+                                <h2 id="kpi-leads">
+                                    <div class="kpi-loading">
+                                        <i class="ph ph-spinner-gap"></i>
+                                        <span>Atualizando...</span>
+                                    </div>
+                                </h2>
                             </div>
                         </div>
                         <div class="kpi-card">
-                            <div class="kpi-icon" style="background: rgba(255, 171, 0, 0.1); color: var(--color-warning);">
-                                <i class="ph ph-chats"></i>
+                            <div class="kpi-header">
+                                <div class="icon-wrapper green-light"><i class="ph ph-chats text-primary"></i></div>
+                                <h3>Total de Conversas</h3>
                             </div>
-                            <div class="kpi-info">
-                                <h3>Conversas Geradas</h3>
-                                <div class="kpi-value" id="kpi-conversas">...</div>
+                            <div class="kpi-content">
+                                <h2 id="kpi-conversas">
+                                    <div class="kpi-loading">
+                                        <i class="ph ph-spinner-gap"></i>
+                                        <span>Atualizando...</span>
+                                    </div>
+                                </h2>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div class="icon-wrapper green-light"><i class="ph ph-user-circle text-primary"></i></div>
+                                <h3>Usuários Cadastrados</h3>
+                            </div>
+                            <div class="kpi-content">
+                                <h2 id="kpi-usuarios">
+                                    <div class="kpi-loading">
+                                        <i class="ph ph-spinner-gap"></i>
+                                        <span>Atualizando...</span>
+                                    </div>
+                                </h2>
                             </div>
                         </div>
                     </div>
                 </section>
 
+                <!-- Secao Todas as Empresas -->
+                <section id="sec-empresas" class="admin-section">
+                    <div class="card table-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="ph ph-buildings text-primary"></i>
+                                <div>
+                                    <h3>Lista de Clientes SaaS</h3>
+                                    <p>Clique em uma empresa para visualizar o painel detalhado dela.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome da Empresa</th>
+                                        <th>Responsável (E-mail)</th>
+                                        <th>Vencimento Fatura</th>
+                                        <th>Total de Leads</th>
+                                        <th>Status Pagamento</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="empresas-tbody">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 24px;">Carregando empresas...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Secao Cadastrar Cliente -->
-                <section id="sec-cadastrar" class="admin-section" style="display: none;">
+                <section id="sec-cadastrar" class="admin-section">
                     <div class="card" style="max-width: 600px; margin: 0 auto;">
-                        <h2 style="margin-bottom: 24px;">Cadastrar Nova Empresa (Tenant)</h2>
+                        <h2 style="margin-bottom: 24px; color: var(--color-text-main);">Cadastrar Nova Empresa (Tenant)</h2>
                         <form id="form-create-tenant">
                             <div class="form-group">
-                                <label>Nome da Empresa</label>
-                                <input type="text" id="tenant-nome" class="form-control" placeholder="Ex: Barbearia do João" required>
+                                <label style="color: var(--color-text-mut);">Nome da Empresa</label>
+                                <div class="input-wrapper">
+                                    <i class="ph ph-building"></i>
+                                    <input type="text" id="tenant-nome" class="form-control" placeholder="Ex: Barbearia do João" required>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label>E-mail de Login (Administrador da Empresa)</label>
-                                <input type="email" id="tenant-email" class="form-control" placeholder="contato@empresa.com" required>
+                                <label style="color: var(--color-text-mut);">E-mail de Login (Administrador da Empresa)</label>
+                                <div class="input-wrapper">
+                                    <i class="ph ph-envelope-simple"></i>
+                                    <input type="email" id="tenant-email" class="form-control" placeholder="contato@empresa.com" required>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label>Senha Inicial</label>
-                                <input type="password" id="tenant-senha" class="form-control" placeholder="Senha provisória" required>
+                                <label style="color: var(--color-text-mut);">Senha Inicial</label>
+                                <div class="input-wrapper">
+                                    <i class="ph ph-lock-key"></i>
+                                    <input type="password" id="tenant-senha" class="form-control" placeholder="Senha provisória" required>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label>Dia e Data de Vencimento Mensal</label>
-                                <input type="date" id="tenant-vencimento" class="form-control" required>
-                                <small style="color: var(--color-text-mut); display: block; margin-top: 8px;">Esta data definirá quando os avisos de fatura vão aparecer no CRM do cliente.</small>
+                                <label style="color: var(--color-text-mut);">Dia e Data de Vencimento Mensal</label>
+                                <div class="input-wrapper">
+                                    <i class="ph ph-calendar"></i>
+                                    <input type="date" id="tenant-vencimento" class="form-control" required>
+                                </div>
+                                <small style="color: var(--color-text-sec); display: block; margin-top: 8px;">Esta data definirá quando os avisos de fatura vão aparecer no CRM do cliente.</small>
                             </div>
                             
                             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;" id="btn-submit-tenant">
@@ -117,17 +273,65 @@
                         </form>
                     </div>
                 </section>
+                
+                <!-- Secao Detalhes da Empresa (Mini Dashboard) -->
+                <section id="sec-detalhes-empresa" class="admin-section">
+                    <button class="btn btn-outline" id="btn-voltar-empresas" style="margin-bottom: 24px;">
+                        <i class="ph ph-arrow-left"></i> Voltar para Lista
+                    </button>
+                    
+                    <div class="card" style="margin-bottom: 24px;">
+                        <h2 id="detalhe-nome-empresa" style="margin-bottom: 8px;">Empresa</h2>
+                        <p id="detalhe-email-empresa" style="color: var(--color-text-mut);">email@empresa.com</p>
+                    </div>
+
+                    <!-- Gráficos Idênticos aos Relatórios -->
+                    <div class="charts-row">
+                        <div class="card chart-card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i class="ph ph-trend-up text-primary"></i>
+                                    <div>
+                                        <h3>Leads ao longo do tempo</h3>
+                                        <p>Volume de leads recebidos da empresa.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chart-container" id="admin-chart-line" style="min-height: 300px; display: flex; align-items: center; justify-content: center; color: var(--color-text-mut);">
+                                Carregando gráfico...
+                            </div>
+                        </div>
+
+                        <div class="card chart-card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i class="ph ph-map-pin text-primary"></i>
+                                    <div>
+                                        <h3>Leads por Estado</h3>
+                                        <p>Distribuição geográfica.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chart-container" id="admin-map-container" style="min-height: 300px; display: flex; align-items: center; justify-content: center; color: var(--color-text-mut);">
+                                Carregando mapa...
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
                 <!-- Secao Configuracoes -->
-                <section id="sec-configuracoes" class="admin-section" style="display: none;">
+                <section id="sec-configuracoes" class="admin-section">
                     <div class="card" style="max-width: 600px; margin: 0 auto;">
-                        <h2 style="margin-bottom: 24px;">Segurança Master</h2>
+                        <h2 style="margin-bottom: 24px; color: var(--color-text-main);">Segurança Master</h2>
                         <form id="form-change-password">
                             <div class="form-group">
-                                <label>Nova Senha</label>
-                                <input type="password" id="admin-new-password" class="form-control" required>
+                                <label style="color: var(--color-text-mut);">Nova Senha</label>
+                                <div class="input-wrapper">
+                                    <i class="ph ph-lock-key"></i>
+                                    <input type="password" id="admin-new-password" class="form-control" required>
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-primary" id="btn-change-password">Atualizar Senha Master</button>
+                            <button type="submit" class="btn btn-primary" id="btn-change-password" style="width: 100%;">Atualizar Senha Master</button>
                         </form>
                     </div>
                 </section>
@@ -136,6 +340,7 @@
         </main>
     </div>
 
+    <!-- Script Base -->
     <script type="module" src="admin.js"></script>
 </body>
 
