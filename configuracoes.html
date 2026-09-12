@@ -131,9 +131,12 @@
 
                         <!-- Notification Dropdown -->
                         <div class="notification-dropdown" id="notification-dropdown">
-                            <div class="notif-header">
-                                <h4>Notificações</h4>
-                                <span class="badge primary-light" id="notif-badge" style="display: none;"></span>
+                            <div class="notif-header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--color-border);">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <h4 style="margin: 0; font-size: 16px; font-weight: 600;">Notificações</h4>
+                                    <span class="badge primary-light" id="notif-badge" style="display: none; padding: 2px 8px; border-radius: 12px; font-size: 11px;"></span>
+                                </div>
+                                <button id="btn-read-all" style="background: none; border: none; font-size: 12px; color: var(--color-primary); cursor: pointer; display: none;">Marcar lidas</button>
                             </div>
                             <div class="notif-list" id="notif-list">
                                 <div style="padding: 20px; text-align: center; color: var(--color-text-mut); font-size: 13px;">Nenhuma notificação.</div>

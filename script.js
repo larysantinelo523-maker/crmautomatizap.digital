@@ -165,14 +165,39 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                             notifCount++;
                         });
 
+                        let hiddenCount = parseInt(localStorage.getItem('notifs_hidden_until_count')) || 0;
+                        if (hiddenCount > notifCount) {
+                            hiddenCount = notifCount;
+                            localStorage.setItem('notifs_hidden_until_count', hiddenCount);
+                        }
+                        const newCount = notifCount - hiddenCount;
+
                         const badge = document.getElementById('notif-badge');
+                        const btnReadAll = document.getElementById('btn-read-all');
+                        
+                        if (btnReadAll && !btnReadAll.dataset.listener) {
+                            btnReadAll.dataset.listener = "true";
+                            btnReadAll.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                localStorage.setItem('notifs_hidden_until_count', notifCount);
+                                loadNotifications();
+                            });
+                        }
 
                         if (notifCount > 0) {
                             notifList.innerHTML = html;
-                            if (notifDot) notifDot.style.display = 'block';
-                            if (badge) {
-                                badge.textContent = notifCount === 1 ? '1 nova' : `${notifCount} novas`;
-                                badge.style.display = 'inline-block';
+                            
+                            if (newCount > 0) {
+                                if (notifDot) notifDot.style.display = 'block';
+                                if (badge) {
+                                    badge.textContent = newCount === 1 ? '1 nova' : `${newCount} novas`;
+                                    badge.style.display = 'inline-block';
+                                }
+                                if (btnReadAll) btnReadAll.style.display = 'inline-block';
+                            } else {
+                                if (notifDot) notifDot.style.display = 'none';
+                                if (badge) badge.style.display = 'none';
+                                if (btnReadAll) btnReadAll.style.display = 'none';
                             }
                             
                             const notifPageList = document.getElementById('notif-page-list');
@@ -180,9 +205,8 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                         } else {
                             notifList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--color-text-mut); font-size: 13px;">Nenhuma notificação.</div>';
                             if (notifDot) notifDot.style.display = 'none';
-                            if (badge) {
-                                badge.style.display = 'none';
-                            }
+                            if (badge) badge.style.display = 'none';
+                            if (btnReadAll) btnReadAll.style.display = 'none';
                             
                             const notifPageList = document.getElementById('notif-page-list');
                             if (notifPageList) notifPageList.innerHTML = '<div style="padding: 32px; text-align: center; color: var(--color-text-mut);">Nenhuma notificação.</div>';
