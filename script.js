@@ -751,25 +751,6 @@ document.addEventListener('DOMContentLoaded', () => {
             navigator.vibrate(15);
         }
     }
-
-    let spellDictionary = null;
-    
-    // Inicia o download do dicionário asincronamente em background
-    async function initDictionary() {
-        try {
-            const affData = await fetch('dict/pt.aff').then(res => res.text());
-            const dicData = await fetch('dict/pt.dic').then(res => res.text());
-            spellDictionary = new Typo('pt_BR', affData, dicData);
-            console.log("Dicionário Typo.js carregado com sucesso!");
-        } catch(e) {
-            console.error("Falha ao carregar dicionário", e);
-        }
-    }
-    
-    if (typeof Typo !== 'undefined') {
-        initDictionary();
-    }
-
     function checkAutocorrect() {
         const bar = document.getElementById('autocorrect-bar');
         const suggestionElement = document.getElementById('autocorrect-suggestion');
@@ -820,31 +801,19 @@ document.addEventListener('DOMContentLoaded', () => {
             'aki': 'aqui'
         };
 
-        function showSuggestion(sugg) {
-            suggestionElement.innerText = sugg;
+        if (corrections[lastWord]) {
+            suggestionElement.innerText = corrections[lastWord];
             bar.style.display = 'flex';
             
             suggestionElement.onclick = (e) => {
                 e.stopPropagation();
                 triggerHaptic();
-                words[words.length - 1] = sugg;
+                words[words.length - 1] = corrections[lastWord];
                 currentText = words.join(' ') + ' '; // Adiciona espaço após corrigir
                 updateInput();
                 bar.style.display = 'none';
                 fakeInput.classList.add('active');
             };
-        }
-
-        if (corrections[lastWord]) {
-            showSuggestion(corrections[lastWord]);
-        } else if (spellDictionary && lastWord.length > 2 && lastWord.match(/^[a-záàâãéèêíïóôõöúçñ]+$/i) && !spellDictionary.check(lastWord)) {
-            // Verifica apenas se a palavra tem mais de 2 letras e contém apenas letras
-            const suggestions = spellDictionary.suggest(lastWord);
-            if (suggestions && suggestions.length > 0) {
-                showSuggestion(suggestions[0]);
-            } else {
-                bar.style.display = 'none';
-            }
         } else {
             bar.style.display = 'none';
         }
