@@ -15,7 +15,7 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.4">
     <link rel="stylesheet" href="tutorial.css">
 </head>
 
@@ -174,7 +174,7 @@
                         
                         <!-- Dropdown do Usuário -->
                         <div class="user-dropdown" id="user-dropdown">
-                            <div class="dropdown-item">
+                            <div class="dropdown-item" onclick="window.location.href='configuracoes.html'">
                                 <i class="ph ph-gear"></i> Configurações
                             </div>
                             <div class="dropdown-item theme-item" onclick="event.stopPropagation()">
@@ -217,6 +217,12 @@
                             </div>
                         </div>
 
+                        <!-- Empty State Mobile -->
+                        <div id="dossier-empty-state-mobile" class="mobile-empty-state" style="display: none; align-items: center; gap: 8px; color: var(--color-text-mut); font-size: 13px; padding: 0 16px 16px;">
+                            <i class="ph ph-info"></i>
+                            <span>Selecione um cliente na tabela para atualizar as informações do card abaixo.</span>
+                        </div>
+
                         <div class="table-responsive">
                             <table class="data-table">
                                 <thead>
@@ -254,19 +260,22 @@
                 <div class="side-column">
 
                     <!-- Empty State (Aviso pequeno) -->
-                    <div id="dossier-empty-state" style="display: flex; align-items: center; gap: 8px; color: var(--color-text-mut); font-size: 13px; padding: 0 4px;">
+                    <div id="dossier-empty-state" class="desktop-empty-state" style="display: flex; align-items: center; gap: 8px; color: var(--color-text-mut); font-size: 13px; padding: 0 4px;">
                         <i class="ph ph-info"></i>
-                        <span>Selecione um cliente na tabela para atualizar as informações do card abaixo.</span>
+                        <span>Selecione um cliente na tabela para atualizar as informações do card.</span>
                     </div>
 
                     <!-- Lead Destaque - Vazio por padrão -->
                     <section class="card lead-highlight" id="lead-highlight-card" style="display: none;">
-                        <div class="highlight-header">
+                        <div class="highlight-header" style="position: relative;">
                             <div class="title-with-icon">
                                 <i class="ph ph-user"></i>
                                 <span>Informações do lead</span>
                             </div>
-                            <span class="badge primary-light" id="lead-highlight-badge">--</span>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="badge primary-light" id="lead-highlight-badge">--</span>
+                                <button onclick="fecharDossie()" style="background: none; border: none; cursor: pointer; color: var(--color-text-mut); display: flex; align-items: center; justify-content: center; padding: 4px;" title="Fechar"><i class="ph ph-x" style="font-size: 16px;"></i></button>
+                            </div>
                         </div>
 
                         <div class="highlight-profile">
@@ -350,23 +359,31 @@
                     const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
                     const tr = document.createElement('tr');
-                    tr.style.cursor = 'pointer';
                     tr.innerHTML = `
-                        <td onclick="event.stopPropagation()"><input type="checkbox"></td>
                         <td>
                             <div class="user-cell" style="display: flex; align-items: center; gap: 12px;">
                                 <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0;">${lead.nome.charAt(0).toUpperCase()}</div>
-                                <span class="user-name" style="font-weight: 500;">${lead.nome}</span>
+                                <span class="user-name" style="font-weight: 500; color: var(--color-text-main);">${lead.nome}</span>
                             </div>
                         </td>
-                        <td>${lead.interesse || 'Não informado'}</td>
-                        <td><span class="badge ${badgeClass}">${lead.status}</span></td>
-                        <td>${formattedDate}</td>
+                        <td class="mobile-origem">${lead.origem || 'WhatsApp'}</td>
+                        <td class="mobile-interesse">${lead.interesse || 'Não informado'}</td>
+                        <td class="mobile-status"><span class="badge ${badgeClass}">${lead.status}</span></td>
+                        <td class="mobile-date">${formattedDate}</td>
                         <td style="text-align: right;">
-                            <button class="btn-exibir-infos" style="background: none; border: none; color: var(--color-primary); font-weight: 500; cursor: pointer; font-family: inherit; font-size: inherit; padding: 0; text-decoration: underline;" onclick="event.stopPropagation(); abrirDossie(lead, badgeClass, formattedDate)">Exibir informações</button>
+                            <button class="btn-exibir-infos">
+                                <span class="desktop-text">Exibir Dossiê <i class="ph ph-caret-down"></i></span>
+                                <span class="mobile-text">Clique para Exibir Informações do Lead</span>
+                            </button>
                         </td>
                     `;
-                    tr.onclick = () => abrirDossie(lead, badgeClass, formattedDate);
+                    const btnInfo = tr.querySelector('.btn-exibir-infos');
+                    if(btnInfo) {
+                        btnInfo.onclick = (e) => {
+                            e.stopPropagation();
+                            abrirDossie(lead, badgeClass, formattedDate);
+                        };
+                    }
                     tbody.appendChild(tr);
                 });
             }
@@ -393,10 +410,18 @@
         };
 
         function abrirDossie(lead, badgeClass, dateStr) {
-            // Mostra o card e esconde o aviso
-            document.getElementById('dossier-empty-state').style.display = 'none';
+            const emptyDesktop = document.getElementById('dossier-empty-state');
+            if (emptyDesktop) emptyDesktop.style.display = 'none';
+            const emptyMobile = document.getElementById('dossier-empty-state-mobile');
+            if (emptyMobile) emptyMobile.style.display = 'none';
+
             const card = document.getElementById('lead-highlight-card');
             card.style.display = 'block';
+
+            // Scroll suave para o dossiê (âncora)
+            setTimeout(() => {
+                card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
 
             // Preenche os dados
             const initials = lead.nome.charAt(0).toUpperCase();
@@ -428,6 +453,21 @@
                     <i class="ph ph-chat-teardrop-text"></i> Abrir Conversa
                 </button>
             `;
+
+            // Rola a tela até o dossiê (útil para dispositivos móveis)
+            setTimeout(() => {
+                const dossierArea = document.querySelector('.highlight-section') || card;
+                dossierArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 50);
+        }
+        function fecharDossie() {
+            document.getElementById('lead-highlight-card').style.display = 'none';
+            
+            const emptyDesktop = document.getElementById('dossier-empty-state');
+            if (emptyDesktop) emptyDesktop.style.display = 'flex';
+            
+            const emptyMobile = document.getElementById('dossier-empty-state-mobile');
+            if (emptyMobile) emptyMobile.style.display = 'flex';
         }
     </script>
 </body>

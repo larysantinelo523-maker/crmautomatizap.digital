@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutomatiZAP - CRM Dashboard</title>
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tutorial.css">
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <img src="logo.png" alt="AutomatiZAP CRM" class="logo-img">
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <i class="ph ph-squares-four"></i>
+                    <span>Visão geral</span>
+                </a>
+                <a href="leads.html" class="nav-item active">
+                    <i class="ph ph-users"></i>
+                    <span>Leads</span>
+                </a>
+
+                <a href="conversas.html" class="nav-item">
+                    <i class="ph ph-chat-circle-dots"></i>
+                    <span>Conversas</span>
+                </a>
+                <a href="tarefas.html" class="nav-item">
+                    <i class="ph ph-check-square-offset"></i>
+                    <span>Tarefas</span>
+                </a>
+                <a href="relatorios.html" class="nav-item">
+                    <i class="ph ph-chart-bar"></i>
+                    <span>Relatórios</span>
+                </a>
+
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="system-status">
+                    <div class="status-icon-container">
+                        <i class="ph-fill ph-whatsapp-logo"></i>
+                    </div>
+                    <div class="status-details">
+                        <p>Atendimento automatizado<br>pelo WhatsApp</p>
+                        <div class="status-badge">
+                            <span class="dot"></span> Sistema online
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-tutorial-sidebar" onclick="window.startPageTutorial()">
+                    <i class="ph ph-question"></i> Como utilizar o CRM
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-titles">
+                    <button class="mobile-menu-btn"><i class="ph ph-list"></i></button>
+                    <a href="index.html" class="mobile-logo-header">
+                        <img src="logo.png" alt="AutomatiZAP CRM" class="logo-img">
+                    </a>
+                    <div class="desktop-header-title">
+                        <h1>Configurações</h1>
+                        <p>Gerencie seu perfil e as configurações da sua assinatura.</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="date-wrapper" id="date-wrapper">
+                        <button class="date-filter" id="date-filter-btn">
+                            <i class="ph ph-calendar-blank"></i>
+                            <span id="date-filter-text">01/09/2025 - 07/09/2025</span>
+                            <i class="ph ph-caret-down"></i>
+                        </button>
+                        
+                        <!-- Date Dropdown -->
+                        <div class="date-dropdown" id="date-dropdown">
+                            <div class="date-dropdown-header">
+                                <h4>Filtrar por Período</h4>
+                            </div>
+                            <div class="date-dropdown-body">
+                                <div class="calendar-header">
+                                    <button class="btn-icon xs" id="cal-prev"><i class="ph ph-caret-left"></i></button>
+                                    <strong id="cal-month-year">Setembro 2025</strong>
+                                    <button class="btn-icon xs" id="cal-next"><i class="ph ph-caret-right"></i></button>
+                                </div>
+                                <div class="calendar-grid" id="calendar-grid">
+                                    <span class="cal-day-name">D</span>
+                                    <span class="cal-day-name">S</span>
+                                    <span class="cal-day-name">T</span>
+                                    <span class="cal-day-name">Q</span>
+                                    <span class="cal-day-name">Q</span>
+                                    <span class="cal-day-name">S</span>
+                                    <span class="cal-day-name">S</span>
+                                    <!-- Dias injetados via JS -->
+                                </div>
+                                <div style="display: flex; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--color-text-sec);">
+                                    <span id="cal-selection-text">Selecione a data inicial</span>
+                                </div>
+                            </div>
+                            <div class="date-dropdown-footer">
+                                <button class="btn btn--primary" id="btn-apply-date" style="width: 100%;">Aplicar Filtro</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notification-wrapper" id="notification-wrapper">
+                        <button class="notification-btn" id="notification-btn">
+                            <i class="ph ph-bell"></i>
+                            <span class="notification-dot"></span>
+                        </button>
+                        
+                        <!-- Notification Dropdown -->
+                        <div class="notification-dropdown" id="notification-dropdown">
+                            <div class="notif-header">
+                                <h4>Notificações</h4>
+                                <span class="badge primary-light">2 novas</span>
+                            </div>
+                            <div class="notif-list">
+                                <div class="notif-item unread">
+                                    <div class="notif-icon primary-light"><i class="ph ph-chat-teardrop-text"></i></div>
+                                    <div class="notif-content">
+                                        <p><strong>Mariana Silva</strong> enviou uma mensagem.</p>
+                                        <span class="notif-time">Agora mesmo</span>
+                                    </div>
+                                </div>
+                                <div class="notif-item unread">
+                                    <div class="notif-icon warning-light"><i class="ph ph-clock"></i></div>
+                                    <div class="notif-content">
+                                        <p>Tarefa <strong>Enviar proposta</strong> atrasada.</p>
+                                        <span class="notif-time">Há 30 min</span>
+                                    </div>
+                                </div>
+                                <div class="notif-item">
+                                    <div class="notif-icon green-light"><i class="ph ph-check-circle"></i></div>
+                                    <div class="notif-content">
+                                        <p>Robô online no WhatsApp.</p>
+                                        <span class="notif-time">Hoje, 08:00</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="notif-footer">
+                                <a href="#">Ver todas</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-menu" id="user-menu-btn">
+                        <div class="avatar dark">AD</div>
+                        <div class="user-info">
+                            <span class="user-name">AutomatiZAP Digital</span>
+                            <span class="user-role">Administrador</span>
+                        </div>
+                        <i class="ph ph-caret-down"></i>
+                        
+                        <!-- Dropdown do Usuário -->
+                        <div class="user-dropdown" id="user-dropdown">
+                            <div class="dropdown-item">
+                                <i class="ph ph-gear"></i> Configurações
+                            </div>
+                            <div class="dropdown-item theme-item" onclick="event.stopPropagation()">
+                                <span><i class="ph ph-moon"></i> Modo Escuro</span>
+                                <label class="theme-switch" title="Alternar Tema">
+                                    <input type="checkbox" id="theme-toggle-checkbox">
+                                    <span class="slider round">
+                                        <i class="ph-fill ph-sun icon-sun"></i>
+                                        <i class="ph-fill ph-moon icon-moon"></i>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-item" style="color: var(--color-danger);">
+                                <i class="ph ph-sign-out"></i> Sair
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <div class="main-column" style="flex: 1;">
+                    <section class="card settings-card" style="padding: 24px;">
+                        <div class="settings-tabs" style="display: flex; gap: 24px; border-bottom: 1px solid var(--color-border); margin-bottom: 24px;">
+                            <button class="tab-btn active" onclick="switchSettingsTab('perfil')" id="tab-perfil" style="background: none; border: none; border-bottom: 2px solid var(--color-primary); padding-bottom: 12px; font-weight: 600; color: var(--color-primary); cursor: pointer; font-size: 15px;">Meu Perfil</button>
+                            <button class="tab-btn" onclick="switchSettingsTab('assinatura')" id="tab-assinatura" style="background: none; border: none; border-bottom: 2px solid transparent; padding-bottom: 12px; font-weight: 500; color: var(--color-text-mut); cursor: pointer; font-size: 15px;">Assinatura</button>
+                        </div>
+
+                        <!-- Aba Perfil -->
+                        <div id="content-perfil" class="settings-content">
+                            <h3 style="margin-bottom: 16px;">Foto de Perfil</h3>
+                            <div style="display: flex; align-items: center; gap: 24px; margin-bottom: 32px; flex-wrap: wrap;">
+                                <div class="avatar-wrapper" style="position: relative; width: 80px; height: 80px; min-width: 80px; min-height: 80px; flex-shrink: 0; border-radius: 50%; overflow: hidden; background: var(--color-bg-main); display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px dashed var(--color-border);" onclick="document.getElementById('avatar-upload').click()">
+                                    <img id="avatar-preview" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                                    <i id="avatar-icon" class="ph ph-camera" style="font-size: 24px; color: var(--color-text-mut);"></i>
+                                    <input type="file" id="avatar-upload" accept="image/*" style="display: none;" onchange="handleAvatarChange(event)">
+                                </div>
+                                <div>
+                                    <p style="font-size: 14px; color: var(--color-text-sec); margin-bottom: 8px;">Clique na imagem para alterar sua foto.</p>
+                                    <button class="btn btn--secondary" onclick="document.getElementById('avatar-upload').click()">Escolher arquivo</button>
+                                </div>
+                            </div>
+
+                            <h3 style="margin-bottom: 16px;">Informações Pessoais</h3>
+                            <div style="display: flex; flex-direction: column; gap: 16px; max-width: 400px;">
+                                <div class="input-group">
+                                    <label style="font-size: 13px; font-weight: 500; color: var(--color-text-sec); margin-bottom: 6px; display: block;">Nome Completo</label>
+                                    <input type="text" id="settings-name" class="input-field" placeholder="Seu nome" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg-card); color: var(--color-text-main);">
+                                </div>
+                                <button class="btn btn--primary" id="btn-save-profile" style="align-self: flex-start; margin-top: 8px;">Salvar Alterações</button>
+                            </div>
+                        </div>
+
+                        <!-- Aba Assinatura -->
+                        <div id="content-assinatura" class="settings-content" style="display: none;">
+                            <div style="display: flex; flex-direction: column; gap: 24px;">
+                                <div style="background: var(--color-bg-main); padding: 24px; border-radius: 12px; border: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                                    <div>
+                                        <h3 style="margin-bottom: 8px; color: var(--color-text-main);">Status da Assinatura</h3>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span id="sub-status-badge" style="padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: #dcfce7; color: #166534;">Ativo</span>
+                                            <span style="font-size: 14px; color: var(--color-text-sec);">Vence em: <strong id="sub-due-date">--/--/----</strong></span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p style="font-size: 13px; color: var(--color-text-mut); margin-bottom: 4px;">Dias restantes</p>
+                                        <h2 id="sub-days-left" style="color: var(--color-primary); font-size: 28px;">--</h2>
+                                    </div>
+                                </div>
+
+                                <h3 style="margin-top: 16px;">Pagamento da Mensalidade</h3>
+                                <p style="font-size: 14px; color: var(--color-text-sec); max-width: 600px; margin-bottom: 24px;">
+                                    Sua assinatura garante acesso contínuo a todos os recursos do AutomatiZAP. O pagamento via PIX será liberado 3 dias antes do vencimento.
+                                </p>
+
+                                <div id="payment-area" style="display: flex; gap: 24px; flex-wrap: wrap; background: var(--color-bg-main); padding: 24px 16px; border-radius: 16px; border: 1px solid var(--color-border);">
+                                    
+                                    <!-- Esquerda: QR Code -->
+                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; max-width: 240px; margin: 0 auto;">
+                                        <div style="font-weight: 600; color: var(--color-text-main); font-size: 15px;">Pague via PIX</div>
+                                        <div id="qr-container" style="padding: 16px; background: white; border-radius: 16px; border: 2px dashed #00b1ea; position: relative; display: flex; align-items: center; justify-content: center; width: 200px; height: 200px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,177,234,0.1);">
+                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=mercado_pago_mock" id="pix-qr-code" style="width: 160px; height: 160px; filter: blur(6px); opacity: 0.3; transition: all 0.3s;">
+                                            <div id="qr-overlay" style="position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 16px; text-align: center; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(2px);">
+                                                <i class="ph ph-lock-key" style="font-size: 28px; color: var(--color-text-sec); margin-bottom: 8px;"></i>
+                                                <span style="font-size: 13px; color: var(--color-text-main); font-weight: 600; line-height: 1.4;">Fatura ainda não disponível.</span>
+                                            </div>
+                                        </div>
+                                        <button id="btn-copy-pix" class="btn btn--primary" style="display: none; width: 100%; margin-top: 4px; border-radius: 8px; justify-content: center; font-size: 13px;">
+                                            <i class="ph ph-copy"></i> Copiar Código PIX
+                                        </button>
+                                    </div>
+
+                                    <!-- Direita: Informações de Segurança -->
+                                    <div style="flex: 1; min-width: 240px; display: flex; flex-direction: column; justify-content: space-between;">
+                                        <div>
+                                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                                                <!-- Logo oficial do Mercado Pago -->
+                                                <img src="mercado_pago_logo.png" alt="Mercado Pago" style="width: 48px; height: 48px; object-fit: contain;">
+                                                <div>
+                                                    <div style="font-weight: 700; color: var(--color-text-main); font-size: 15px;">Processamento Seguro</div>
+                                                    <div style="font-size: 13px; color: var(--color-text-mut);">Ambiente 100% criptografado e auditado</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <p style="font-size: 13px; color: var(--color-text-sec); line-height: 1.6; margin-bottom: 24px; padding-left: 12px; border-left: 2px solid #009ee3;">
+                                                <strong>A AutomatiZAP aceita exclusivamente pagamentos via PIX.</strong><br> 
+                                                Nosso sistema de cobrança é gerenciado pelo Mercado Pago. Isso significa que todos os seus pagamentos estão sob rigorosas normas de segurança (PCI-DSS) internacionais. Ao realizar o pagamento via PIX, a liberação no sistema ocorre de forma <strong>automática e instantânea</strong>.
+                                            </p>
+
+                                            <!-- Badges de Segurança -->
+                                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                                                <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-sec); background: var(--color-bg-card); padding: 6px 10px; border-radius: 6px; border: 1px solid var(--color-border);">
+                                                    <i class="ph-fill ph-shield-check" style="color: #059669; font-size: 16px;"></i> Compra Segura
+                                                </div>
+                                                <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-sec); background: var(--color-bg-card); padding: 6px 10px; border-radius: 6px; border: 1px solid var(--color-border);">
+                                                    <i class="ph-fill ph-lock-key" style="color: #009ee3; font-size: 16px;"></i> SSL 256 bits
+                                                </div>
+                                                <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-sec); background: var(--color-bg-card); padding: 6px 10px; border-radius: 6px; border: 1px solid var(--color-border);">
+                                                    <i class="ph-fill ph-lightning" style="color: #d97706; font-size: 16px;"></i> Liberação Imediata
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="tutorial.js"></script>
+    <script type="module" src="script.js"></script>
+    <script>
+        function switchSettingsTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.borderBottomColor = 'transparent';
+                btn.style.color = 'var(--color-text-mut)';
+                btn.style.fontWeight = '500';
+            });
+            document.querySelectorAll('.settings-content').forEach(content => {
+                content.style.display = 'none';
+            });
+
+            const activeBtn = document.getElementById(`tab-${tabName}`);
+            activeBtn.classList.add('active');
+            activeBtn.style.borderBottomColor = 'var(--color-primary)';
+            activeBtn.style.color = 'var(--color-primary)';
+            activeBtn.style.fontWeight = '600';
+
+            document.getElementById(`content-${tabName}`).style.display = 'block';
+        }
+
+        function handleAvatarChange(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('avatar-preview');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    document.getElementById('avatar-icon').style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+                // The actual upload will be handled by script.js when "Salvar Alterações" is clicked
+            }
+        }
+
+        window.initSettings = async function() {
+            const { data: sessionData } = await supabase.auth.getSession();
+            if (!sessionData || !sessionData.session) return;
+            const userId = sessionData.session.user.id;
+
+            // Fetch current user data
+            const { data: userData, error } = await supabase
+                .from('usuarios')
+                .select('nome_completo, avatar_url, status_assinatura, data_vencimento')
+                .eq('id', userId)
+                .single();
+
+            if (error) {
+                console.error("Erro ao buscar dados de configurações:", error);
+                return;
+            }
+
+            // Populate Profile Tab
+            if (userData.nome_completo) {
+                document.getElementById('settings-name').value = userData.nome_completo;
+            }
+            if (userData.avatar_url) {
+                const img = document.getElementById('avatar-preview');
+                img.src = userData.avatar_url;
+                img.style.display = 'block';
+                document.getElementById('avatar-icon').style.display = 'none';
+            }
+
+            // Populate Subscription Tab
+            const subStatusBadge = document.getElementById('sub-status-badge');
+            const subDueDate = document.getElementById('sub-due-date');
+            const subDaysLeft = document.getElementById('sub-days-left');
+            const qrContainer = document.getElementById('pix-qr-code');
+            const qrOverlay = document.getElementById('qr-overlay');
+            const btnCopyPix = document.getElementById('btn-copy-pix');
+
+            let vDate = new Date(); // default to today if missing
+            if (userData.data_vencimento) {
+                vDate = new Date(userData.data_vencimento + 'T00:00:00'); // fix timezone offset
+                subDueDate.textContent = vDate.toLocaleDateString('pt-BR');
+            }
+
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const timeDiff = vDate.getTime() - today.getTime();
+            const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            
+            subDaysLeft.textContent = daysLeft;
+
+            if (userData.status_assinatura === 'vencido' || userData.status_assinatura === 'inadimplente' || daysLeft <= 0) {
+                subStatusBadge.textContent = 'Vencido';
+                subStatusBadge.style.background = '#fee2e2';
+                subStatusBadge.style.color = '#991b1b';
+                subDaysLeft.style.color = '#991b1b';
+                subDaysLeft.textContent = '0';
+                
+                qrContainer.style.filter = 'none';
+                qrContainer.style.opacity = '1';
+                qrOverlay.style.display = 'none';
+                btnCopyPix.style.display = 'flex';
+            } else {
+                subStatusBadge.textContent = 'Ativo';
+                subStatusBadge.style.background = '#dcfce7';
+                subStatusBadge.style.color = '#166534';
+                
+                if (daysLeft <= 3) {
+                    qrContainer.style.filter = 'none';
+                    qrContainer.style.opacity = '1';
+                    qrOverlay.style.display = 'none';
+                    btnCopyPix.style.display = 'flex';
+                } else {
+                    qrContainer.style.filter = 'blur(5px)';
+                    qrContainer.style.opacity = '0.5';
+                    qrOverlay.style.display = 'flex';
+                    btnCopyPix.style.display = 'none';
+                }
+            }
+
+            // Ação de copiar PIX (mock para teste)
+            if(btnCopyPix) {
+                btnCopyPix.addEventListener('click', () => {
+                    navigator.clipboard.writeText('00020101021126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-4266141740005204000053039865802BR5913AutomatiZAP6009Sao Paulo62070503***6304A1B2');
+                    const originalText = btnCopyPix.innerHTML;
+                    btnCopyPix.innerHTML = '<i class="ph ph-check"></i> Código Copiado!';
+                    btnCopyPix.style.background = '#166534'; // Sucesso (verde)
+                    setTimeout(() => {
+                        btnCopyPix.innerHTML = originalText;
+                        btnCopyPix.style.background = '';
+                    }, 2000);
+                });
+            }
+
+            // Save Profile Button Event
+            document.getElementById('btn-save-profile').addEventListener('click', async () => {
+                const btn = document.getElementById('btn-save-profile');
+                btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Salvando...';
+                btn.disabled = true;
+                
+                const newName = document.getElementById('settings-name').value;
+                const fileInput = document.getElementById('avatar-upload');
+                
+                let avatarUrl = userData.avatar_url;
+
+                try {
+                    // Avatar upload if selected
+                    if (fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+                        const fileExt = file.name.split('.').pop();
+                        const fileName = `${userId}-${Math.random()}.${fileExt}`;
+                        
+                        const { data: uploadData, error: uploadError } = await supabase.storage
+                            .from('avatares')
+                            .upload(fileName, file, { upsert: true });
+                            
+                        if (uploadError) throw uploadError;
+                        
+                        const { data: publicUrlData } = supabase.storage
+                            .from('avatares')
+                            .getPublicUrl(fileName);
+                            
+                        avatarUrl = publicUrlData.publicUrl;
+                    }
+
+                    // Update DB
+                    const { error: updateError } = await supabase
+                        .from('usuarios')
+                        .update({ nome_completo: newName, avatar_url: avatarUrl })
+                        .eq('id', userId);
+                        
+                    if (updateError) throw updateError;
+                    
+                    // Reload page to reflect changes
+                    window.location.reload();
+                    
+                } catch(e) {
+                    console.error("Erro ao salvar perfil:", e);
+                    alert("Erro ao salvar alterações.");
+                    btn.innerHTML = 'Salvar Alterações';
+                    btn.disabled = false;
+                }
+            });
+            
+            // Lidar com navegação pela aba via URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('tab') === 'assinatura') {
+                switchSettingsTab('assinatura');
+            }
+        };
+    </script>
+</body>
+
+</html>

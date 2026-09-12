@@ -10,7 +10,7 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                     const userId = data.session.user.id;
                     const { data: userData, error } = await supabase
                         .from('usuarios')
-                        .select('nome_completo, funcao')
+                        .select('nome_completo, funcao, avatar_url, status_assinatura, data_vencimento')
                         .eq('id', userId)
                         .single();
 
@@ -18,11 +18,21 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                         const userName = userData.nome_completo || 'Usuário';
                         const userRole = userData.funcao || 'Membro';
                         
+                        // Bloqueio por falta de pagamento
+                        if (userData.status_assinatura === 'inadimplente' && window.location.pathname.indexOf('configuracoes.html') === -1) {
+                            window.location.href = 'configuracoes.html?tab=assinatura';
+                            return;
+                        }
+                        
                         document.querySelectorAll('.user-info .user-name').forEach(el => el.textContent = userName);
                         document.querySelectorAll('.user-info .user-role').forEach(el => el.textContent = userRole);
                         
                         document.querySelectorAll('.user-menu .avatar').forEach(el => {
-                            el.textContent = userName.substring(0, 2).toUpperCase();
+                            if (userData.avatar_url) {
+                                el.innerHTML = `<img src="${userData.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+                            } else {
+                                el.textContent = userName.substring(0, 2).toUpperCase();
+                            }
                         });
                     } else {
                         // Fallback: se der erro (ex: RLS bloqueando), usa o e-mail da sessão
@@ -47,6 +57,8 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                         if(window.initLeads) window.initLeads();
                     } else if (window.location.pathname.indexOf('conversas.html') > -1) {
                         if(window.initConversations) window.initConversations();
+                    } else if (window.location.pathname.indexOf('configuracoes.html') > -1) {
+                        if(window.initSettings) window.initSettings();
                     }
                 });
             }

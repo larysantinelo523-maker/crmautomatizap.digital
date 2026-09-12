@@ -307,9 +307,7 @@ button {
       ========================================================================== */
 .header {
     height: var(--header-height);
-    background-color: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background-color: var(--color-bg-card); /* Fundo sólido para não misturar as informações */
     padding: 0 32px;
     display: flex;
     align-items: center;
@@ -318,12 +316,12 @@ button {
     /* border mais suave */
     position: sticky;
     top: 0;
-    z-index: 100;
-    /* Aumentado de 90 para 100 para garantir que fique por cima */
+    z-index: 999;
+    /* Aumentado de 100 para 999 para garantir que fique por cima de avisos */
 }
 
 body.dark-mode .header {
-    background-color: rgba(31, 41, 55, 0.6);
+    background-color: var(--color-bg-card);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -2198,11 +2196,36 @@ body.dark-mode .accordion-content {
     }
 
     .data-table td:nth-child(6) {
-        position: absolute;
-        top: 16px;
-        right: 16px;
+        position: relative;
+        top: auto;
+        right: auto;
         padding: 0;
-        width: auto;
+        width: calc(100% + 32px);
+        margin-left: -16px;
+        margin-right: -16px;
+        margin-bottom: -16px;
+        margin-top: 16px;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .data-table td:nth-child(6) .btn-exibir-infos {
+        width: 100%;
+        background-color: var(--color-primary); /* verde do sistema */
+        color: white !important;
+        padding: 14px;
+        border-radius: 0;
+        justify-content: center;
+        font-weight: 500;
+    }
+    
+    .data-table td:nth-child(6) .desktop-text {
+        display: none;
+    }
+    
+    .data-table td:nth-child(6) .mobile-text {
+        display: block;
     }
 
     .data-table td:nth-child(6)::before {
@@ -2782,6 +2805,41 @@ body.dark-mode .logo-img {
     .login-form-container {
         width: 100%;
         padding: 32px;
+    }
+}
+
+/* ==========================================================================
+   Responsivo Desktop/Mobile Actions
+   ========================================================================== */
+.btn-exibir-infos {
+    background: none;
+    border: none;
+    color: var(--color-text-main);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+}
+.btn-exibir-infos .mobile-text {
+    display: none;
+}
+.btn-exibir-infos .desktop-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.mobile-empty-state {
+    display: none !important;
+}
+@media (max-width: 768px) {
+    .mobile-empty-state {
+        display: flex !important;
+    }
+    .desktop-empty-state {
+        display: none !important;
     }
 }
 /* Loading Animation */
