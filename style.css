@@ -307,7 +307,8 @@ button {
       ========================================================================== */
 .header {
     height: var(--header-height);
-    background-color: var(--color-bg-card); /* Fundo sólido para não misturar as informações */
+    background-color: var(--color-bg-card);
+    /* Fundo sólido para não misturar as informações */
     padding: 0 32px;
     display: flex;
     align-items: center;
@@ -2209,21 +2210,22 @@ body.dark-mode .accordion-content {
         border-bottom-right-radius: 12px;
         overflow: hidden;
     }
-    
+
     .data-table td:nth-child(6) .btn-exibir-infos {
         width: 100%;
-        background-color: var(--color-primary); /* verde do sistema */
+        background-color: var(--color-primary);
+        /* verde do sistema */
         color: white !important;
         padding: 14px;
         border-radius: 0;
         justify-content: center;
         font-weight: 500;
     }
-    
+
     .data-table td:nth-child(6) .desktop-text {
         display: none;
     }
-    
+
     .data-table td:nth-child(6) .mobile-text {
         display: block;
     }
@@ -2328,11 +2330,13 @@ body.dark-mode .accordion-content {
     }
 
     .iphone-mockup-wrapper {
-        width: 176% !important; /* Tamanho escolhido pelo usuário no painel de debug */
+        width: 203% !important;
+        /* Tamanho escolhido pelo usuário no painel de debug */
         height: auto !important;
         max-width: none !important;
         margin: 0 !important;
-        align-self: flex-start !important; /* Reseta o alinhamento do flex para a posição left: 50% funcionar certinho */
+        align-self: flex-start !important;
+        /* Reseta o alinhamento do flex para a posição left: 50% funcionar certinho */
         position: relative !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
@@ -2826,25 +2830,31 @@ body.dark-mode .logo-img {
     gap: 4px;
     padding: 0;
 }
+
 .btn-exibir-infos .mobile-text {
     display: none;
 }
+
 .btn-exibir-infos .desktop-text {
     display: inline-flex;
     align-items: center;
     gap: 4px;
 }
+
 .mobile-empty-state {
     display: none !important;
 }
+
 @media (max-width: 768px) {
     .mobile-empty-state {
         display: flex !important;
     }
+
     .desktop-empty-state {
         display: none !important;
     }
 }
+
 /* Loading Animation */
 .kpi-loading {
     display: flex;
@@ -2852,16 +2862,21 @@ body.dark-mode .logo-img {
     align-items: flex-start;
     gap: 4px;
 }
+
 .kpi-loading i {
     font-size: 24px;
     color: var(--color-primary);
     animation: spin 1s linear infinite;
 }
+
 .kpi-loading span {
     font-size: 11px;
     color: var(--color-text-mut);
     font-weight: 500;
 }
+
 @keyframes spin {
-    100% { transform: rotate(360deg); }
+    100% {
+        transform: rotate(360deg);
+    }
 }
