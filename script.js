@@ -746,6 +746,44 @@ document.addEventListener('DOMContentLoaded', () => {
     const keys = iosKeyboard.querySelectorAll('.key:not(.special)');
     let isShifted = true; // Primeira letra Maiúscula
     
+    function triggerHaptic() {
+        if (navigator.vibrate) {
+            navigator.vibrate(15);
+        }
+    }
+
+    function checkAutocorrect() {
+        const bar = document.getElementById('autocorrect-bar');
+        const suggestionElement = document.getElementById('autocorrect-suggestion');
+        if(!bar || !suggestionElement) return;
+
+        const words = currentText.split(/\s+/);
+        const lastWord = words[words.length - 1].toLowerCase();
+
+        const corrections = {
+            'tido': 'tudo',
+            'cmo': 'como',
+            'ta': 'tá'
+        };
+
+        if (corrections[lastWord]) {
+            suggestionElement.innerText = corrections[lastWord];
+            bar.style.display = 'flex';
+            
+            suggestionElement.onclick = (e) => {
+                e.stopPropagation();
+                triggerHaptic();
+                words[words.length - 1] = corrections[lastWord];
+                currentText = words.join(' ') + ' '; // Adiciona espaço após corrigir
+                updateInput();
+                bar.style.display = 'none';
+                fakeInput.classList.add('active');
+            };
+        } else {
+            bar.style.display = 'none';
+        }
+    }
+
     keys.forEach(key => {
         key.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -760,21 +798,57 @@ document.addEventListener('DOMContentLoaded', () => {
             
             currentText += char;
             updateInput();
+            checkAutocorrect();
+            triggerHaptic();
             fakeInput.classList.add('active');
         });
     });
 
-
-    // Teclas Backspace
+    // Teclas Backspace Contínuo
     const backspaces = document.querySelectorAll('.key-backspace');
     backspaces.forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        let backspaceInterval;
+        let backspaceTimeout;
+
+        const startBackspace = (e) => {
             e.stopPropagation();
-            currentText = currentText.slice(0, -1);
-            if(currentText.length === 0) isShifted = true;
-            updateInput();
-            fakeInput.classList.add('active');
-        });
+            e.preventDefault(); // Evitar comportamento padrão
+            triggerHaptic();
+            
+            const apagarChar = () => {
+                if (currentText.length > 0) {
+                    currentText = currentText.slice(0, -1);
+                    if(currentText.length === 0) isShifted = true;
+                    updateInput();
+                    checkAutocorrect();
+                    fakeInput.classList.add('active');
+                }
+            };
+
+            // Apaga o primeiro char imediatamente
+            apagarChar();
+
+            // Espera um pouco antes de apagar continuamente
+            backspaceTimeout = setTimeout(() => {
+                backspaceInterval = setInterval(() => {
+                    apagarChar();
+                    triggerHaptic();
+                }, 50); // Apaga a cada 50ms
+            }, 400); // Demora 400ms para iniciar o modo contínuo
+        };
+
+        const stopBackspace = () => {
+            clearTimeout(backspaceTimeout);
+            clearInterval(backspaceInterval);
+        };
+
+        btn.addEventListener('mousedown', startBackspace);
+        btn.addEventListener('touchstart', startBackspace, { passive: false });
+        
+        btn.addEventListener('mouseup', stopBackspace);
+        btn.addEventListener('mouseleave', stopBackspace);
+        btn.addEventListener('touchend', stopBackspace);
+        btn.addEventListener('touchcancel', stopBackspace);
     });
 
     // Alternar Layouts (ABC / 123)
@@ -787,6 +861,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(btnNum && kbLetters && kbNumbers) {
         btnNum.addEventListener('click', (e) => {
             e.stopPropagation();
+            triggerHaptic();
             kbLetters.style.display = 'none';
             kbNumbers.style.display = 'flex';
             fakeInput.classList.add('active');
@@ -796,6 +871,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(btnAbc && kbLetters && kbNumbers) {
         btnAbc.addEventListener('click', (e) => {
             e.stopPropagation();
+            triggerHaptic();
             kbNumbers.style.display = 'none';
             kbLetters.style.display = 'flex';
             fakeInput.classList.add('active');

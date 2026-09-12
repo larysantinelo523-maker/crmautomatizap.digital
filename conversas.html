@@ -15,7 +15,7 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="style.css?v=2.0">
+    <link rel="stylesheet" href="style.css?v=2.1">
     <link rel="stylesheet" href="tutorial.css">
 </head>
 
@@ -331,6 +331,16 @@
                                 <!-- Teclado iOS Simulado (Oculto) -->
                                 <div id="ios-keyboard" class="ios-keyboard">
 
+                                    <!-- Barra de Autocorreção (Sugestões) -->
+                                    <div id="autocorrect-bar" class="autocorrect-bar" style="display: none;">
+                                        <div class="suggestion empty">"tido"</div>
+                                        <div class="separator"></div>
+                                        <div class="suggestion active" id="autocorrect-suggestion">tudo</div>
+                                        <div class="separator"></div>
+                                        <div class="suggestion empty">tida</div>
+                                    </div>
+
+
                                     <!-- Layout de Letras -->
                                     <div id="keyboard-letters" style="display: flex; flex-direction: column; gap: 8px;">
                                         <div class="keyboard-row">
@@ -587,7 +597,7 @@
         });
     </script>
     <script type="module" src="tutorial.js"></script>
-    <script type="module" src="script.js">    </script>
+    <script type="module" src="script.js?v=1.1"></script>
 </body>
 
 </html>
