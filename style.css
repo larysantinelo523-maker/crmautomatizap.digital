@@ -2328,16 +2328,19 @@ body.dark-mode .accordion-content {
     }
 
     .iphone-mockup-wrapper {
-        width: 207% !important;
+        width: 193% !important; /* Tamanho escolhido pelo usuário no painel de debug */
+        height: auto !important;
         max-width: none !important;
-        margin-top: -10px !important;
-        margin-bottom: -10% !important;
-        align-self: center;
+        margin: 0 !important;
+        align-self: flex-start !important; /* Reseta o alinhamento do flex para a posição left: 50% funcionar certinho */
+        position: relative !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
     }
 
+    /* Removemos o override de top e bottom para usar os originais perfeitos do desktop */
     .mockup-screen {
-        top: 8.6% !important;
-        bottom: -6.2% !important;
+        /* Mantém as proporções originais definidas no HTML */
     }
 
     /* Ajustes das Tarefas no Mobile */
