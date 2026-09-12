@@ -764,16 +764,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Teclas de Espaço
-    const spaceKeys = document.querySelectorAll('.key-space');
-    spaceKeys.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            currentText += ' ';
-            updateInput();
-            fakeInput.classList.add('active');
-        });
-    });
 
     // Teclas Backspace
     const backspaces = document.querySelectorAll('.key-backspace');

@@ -2330,7 +2330,7 @@ body.dark-mode .accordion-content {
     }
 
     .iphone-mockup-wrapper {
-        width: 203% !important;
+        width: 10% !important;
         /* Tamanho escolhido pelo usuário no painel de debug */
         height: auto !important;
         max-width: none !important;
