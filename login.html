@@ -35,8 +35,8 @@
                 <div class="form-group">
                     <label for="email">E-mail</label>
                     <div class="input-wrapper">
-                        <i class="ph ph-envelope"></i>
-                        <input type="email" id="email" placeholder="Digite seu e-mail" required autocomplete="email">
+                        <i class="ph ph-envelope-simple"></i>
+                        <input type="text" id="email" placeholder="Digite seu e-mail ou usuário" required>
                     </div>
                 </div>
 
@@ -74,7 +74,10 @@
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const email = document.getElementById('email').value;
+            let email = document.getElementById('email').value.trim();
+            if (!email.includes('@')) {
+                email += '@automatizap.com';
+            }
             const pass = document.getElementById('password').value;
             const errorMsg = document.getElementById('login-error');
             const loginBtn = document.querySelector('.login-btn');

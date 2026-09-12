@@ -54,6 +54,12 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                         const userName = userData.nome_completo || 'Usuário';
                         const userRole = userData.funcao || 'Membro';
 
+                        // Redireciona Master Admin para o painel admin
+                        if (userRole === 'admin_saas' && window.location.pathname.indexOf('admin.html') === -1) {
+                            window.location.href = 'admin.html';
+                            return;
+                        }
+
                         // Bloqueio por falta de pagamento
                         if (userData.status_assinatura === 'inadimplente' && window.location.pathname.indexOf('configuracoes.html') === -1) {
                             window.location.href = 'configuracoes.html?tab=assinatura';

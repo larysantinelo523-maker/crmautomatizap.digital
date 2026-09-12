@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - AutomatiZAP CRM</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Customizada para Admin -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="https://crmautomatizap.com/wp-content/uploads/2024/07/automatizap-crm.png" alt="AutomatiZAP Logo">
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-target="dashboard">
+                    <i class="ph ph-squares-four"></i> Visão Geral SaaS
+                </a>
+                <a href="#" class="nav-item" data-target="cadastrar">
+                    <i class="ph ph-building"></i> Cadastrar Cliente
+                </a>
+                <a href="#" class="nav-item" data-target="configuracoes">
+                    <i class="ph ph-gear"></i> Configurações Master
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info-sidebar">
+                    <div class="avatar dark">AD</div>
+                    <div class="user-details">
+                        <span class="user-name">Master Admin</span>
+                        <span class="user-role">SaaS Admin</span>
+                    </div>
+                </div>
+                <button id="btn-logout" class="btn btn-outline" style="width: 100%; margin-top: 10px;">Sair</button>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-title">
+                    <h1 id="page-title">Visão Geral SaaS</h1>
+                    <p id="page-subtitle">Acompanhe as métricas globais de todos os seus clientes.</p>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                
+                <!-- Secao Dashboard -->
+                <section id="sec-dashboard" class="admin-section active">
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-icon" style="background: rgba(30, 203, 79, 0.1); color: var(--color-primary);">
+                                <i class="ph ph-users"></i>
+                            </div>
+                            <div class="kpi-info">
+                                <h3>Total de Leads Capturados</h3>
+                                <div class="kpi-value" id="kpi-leads">...</div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon" style="background: rgba(43, 92, 255, 0.1); color: var(--color-secondary);">
+                                <i class="ph ph-buildings"></i>
+                            </div>
+                            <div class="kpi-info">
+                                <h3>Empresas Ativas</h3>
+                                <div class="kpi-value" id="kpi-empresas">...</div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon" style="background: rgba(255, 171, 0, 0.1); color: var(--color-warning);">
+                                <i class="ph ph-chats"></i>
+                            </div>
+                            <div class="kpi-info">
+                                <h3>Conversas Geradas</h3>
+                                <div class="kpi-value" id="kpi-conversas">...</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Secao Cadastrar Cliente -->
+                <section id="sec-cadastrar" class="admin-section" style="display: none;">
+                    <div class="card" style="max-width: 600px; margin: 0 auto;">
+                        <h2 style="margin-bottom: 24px;">Cadastrar Nova Empresa (Tenant)</h2>
+                        <form id="form-create-tenant">
+                            <div class="form-group">
+                                <label>Nome da Empresa</label>
+                                <input type="text" id="tenant-nome" class="form-control" placeholder="Ex: Barbearia do João" required>
+                            </div>
+                            <div class="form-group">
+                                <label>E-mail de Login (Administrador da Empresa)</label>
+                                <input type="email" id="tenant-email" class="form-control" placeholder="contato@empresa.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Senha Inicial</label>
+                                <input type="password" id="tenant-senha" class="form-control" placeholder="Senha provisória" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Dia e Data de Vencimento Mensal</label>
+                                <input type="date" id="tenant-vencimento" class="form-control" required>
+                                <small style="color: var(--color-text-mut); display: block; margin-top: 8px;">Esta data definirá quando os avisos de fatura vão aparecer no CRM do cliente.</small>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;" id="btn-submit-tenant">
+                                Criar Cliente no Sistema
+                            </button>
+                            <div id="tenant-msg" style="margin-top: 16px; font-weight: 600; text-align: center;"></div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Secao Configuracoes -->
+                <section id="sec-configuracoes" class="admin-section" style="display: none;">
+                    <div class="card" style="max-width: 600px; margin: 0 auto;">
+                        <h2 style="margin-bottom: 24px;">Segurança Master</h2>
+                        <form id="form-change-password">
+                            <div class="form-group">
+                                <label>Nova Senha</label>
+                                <input type="password" id="admin-new-password" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="btn-change-password">Atualizar Senha Master</button>
+                        </form>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="admin.js"></script>
+</body>
+
+</html>
