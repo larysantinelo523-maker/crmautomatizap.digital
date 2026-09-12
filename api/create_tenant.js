@@ -54,7 +54,7 @@ export default async function handler(req, res) {
             id: userId,
             id_empresa: empresaId,
             nome_completo: 'Admin ' + nome_empresa,
-            funcao: 'admin',
+            tipo_usuario: 'usuário',
             status_assinatura: 'ativo'
         };
 

@@ -11,11 +11,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const { data: userData } = await supabase
         .from('usuarios')
-        .select('funcao')
+        .select('tipo_usuario')
         .eq('id', session.user.id)
         .single();
 
-    if (!userData || userData.funcao !== 'admin_saas') {
+    if (!userData || userData.tipo_usuario !== 'administrador') {
         window.location.href = 'index.html';
         return;
     }
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadDashboardStats() {
         try {
             const res = await fetch('/api/get_stats');
-            if (!res.ok) throw new Error("Erro na API");
+            if (!res.ok) throw new Error("Erro na API (verifique chave Supabase na Vercel)");
             const stats = await res.json();
             
             document.getElementById('kpi-empresas').innerHTML = stats.empresas;
@@ -120,6 +120,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('kpi-usuarios').innerHTML = stats.usuarios;
         } catch (e) {
             console.error(e);
+            document.querySelectorAll('.kpi-content h2').forEach(el => {
+                el.innerHTML = '<span style="color:#ef4444; font-size: 14px;">Erro ao carregar</span>';
+            });
         }
     }
 

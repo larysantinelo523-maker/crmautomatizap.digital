@@ -45,17 +45,17 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                     const userId = data.session.user.id;
                     const { data: userData, error } = await supabase
                         .from('usuarios')
-                        .select('nome_completo, funcao, avatar_url, status_assinatura, data_vencimento')
+                        .select('nome_completo, tipo_usuario, avatar_url, status_assinatura, data_vencimento')
                         .eq('id', userId)
                         .single();
 
                     if (userData && !error) {
                         currentUserData = userData;
                         const userName = userData.nome_completo || 'Usuário';
-                        const userRole = userData.funcao || 'Membro';
+                        const userRole = userData.tipo_usuario || 'usuário';
 
                         // Redireciona Master Admin para o painel admin
-                        if (userRole === 'admin_saas' && window.location.pathname.indexOf('admin.html') === -1) {
+                        if (userRole === 'administrador' && window.location.pathname.indexOf('admin.html') === -1) {
                             window.location.href = 'admin.html';
                             return;
                         }
