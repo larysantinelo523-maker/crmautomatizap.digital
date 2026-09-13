@@ -4,13 +4,8 @@ export async function fetchCompanyId() {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) return null;
 
-    const { data } = await supabase
-        .from('usuarios')
-        .select('id_empresa')
-        .eq('id', userData.user.id)
-        .single();
-    
-    return data?.id_empresa || null;
+    // O ID da empresa é o próprio ID do usuário
+    return userData.user.id;
 }
 
 export async function fetchLeads() {
@@ -18,7 +13,7 @@ export async function fetchLeads() {
         .from('leads')
         .select('*')
         .order('criado_em', { ascending: false });
-    
+
     if (error) {
         console.error('Erro ao buscar leads:', error);
         return [];
@@ -32,7 +27,7 @@ export async function fetchConversations(leadId) {
         .select('*')
         .eq('id_lead', leadId)
         .order('criado_em', { ascending: true });
-    
+
     if (error) {
         console.error('Erro ao buscar conversas:', error);
         return [];
@@ -45,7 +40,7 @@ export async function fetchTasks() {
         .from('tarefas')
         .select('*')
         .order('data_vencimento', { ascending: true });
-    
+
     if (error) {
         console.error('Erro ao buscar tarefas:', error);
         return [];
@@ -62,7 +57,7 @@ export async function fetchUserData() {
         .select('*')
         .eq('id', user.id)
         .single();
-    
+
     if (error) {
         console.error('Erro ao buscar usuário:', error);
         return null;
@@ -102,7 +97,7 @@ export async function toggleBotState(leadId, isActive) {
         .delete()
         .eq('id_lead', leadId)
         .eq('enviado_por', 'Sistema');
-        
+
     if (deleteError) {
         console.error('Erro ao deletar msgs antigas:', deleteError);
     }
@@ -142,7 +137,7 @@ export async function seedFakeData() {
             { id_empresa, nome: 'Roberto Costa', telefone: '(31) 91234-5678', status: 'Fechado', origem: 'Site', interesse: 'Gestão de redes sociais', orcamento: 'R$ 5.000+', qualificacao: 'Alta', resumo: 'Fechamos pacote trimestral de gestão de redes sociais. O cliente já enviou as referências visuais.' }
         ])
         .select();
-    
+
     if (leadsError) {
         alert("Erro ao criar leads: " + leadsError.message);
         return;
