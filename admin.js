@@ -149,7 +149,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             tenants.forEach(tenant => {
-                let statusBadge = tenant.status === 'ativo' ? '<span class="badge success">Ativo</span>' : '<span class="badge danger">Inadimplente</span>';
+                let isInadimplente = false;
+                if (tenant.status === 'inadimplente' || tenant.status === 'cancelado') {
+                    isInadimplente = true;
+                } else if (tenant.vencimento && tenant.vencimento !== 'N/A') {
+                    const hoje = new Date();
+                    hoje.setHours(0,0,0,0);
+                    const parts = tenant.vencimento.split('-');
+                    if (parts.length === 3) {
+                        const venc = new Date(parts[0], parts[1] - 1, parts[2]);
+                        if (venc < hoje) isInadimplente = true;
+                    }
+                }
+                
+                let statusBadge = isInadimplente ? '<span class="badge danger">Inadimplente</span>' : '<span class="badge success">Ativo</span>';
                 
                 // Formatar Data
                 let dataVenc = 'Não definido';
