@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <td>
                         <div style="display: flex; align-items: center; gap: 8px; font-family: monospace; font-size: 12px; background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px;">
                             <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${tenant.id_empresa}</span>
-                            <button class="btn-copy-id" data-id="${tenant.id_empresa}" style="background: none; border: none; cursor: pointer; color: var(--color-primary);" title="Copiar Chave (CNPJ)"><i class="ph ph-copy"></i></button>
+                            <button class="btn-copy-id" data-id="${tenant.id_empresa}" style="background: none; border: none; cursor: pointer; color: var(--color-primary);" title="Copiar Chave de API"><i class="ph ph-copy"></i></button>
                         </div>
                     </td>
                 `;
