@@ -88,7 +88,21 @@
                         <p id="page-subtitle">Acompanhe as métricas globais de todos os seus clientes SaaS.</p>
                     </div>
                 </div>
-                <div class="header-actions">
+                <div class="header-actions" style="display: flex; align-items: center; gap: 16px;">
+                    <div class="admin-filters" style="display: flex; align-items: center; gap: 12px; margin-right: 16px;">
+                        <div class="search-input" style="position: relative; display: flex; align-items: center;">
+                            <i class="ph ph-magnifying-glass" style="position: absolute; left: 12px; color: var(--color-text-mut);"></i>
+                            <input type="text" id="search-empresas" placeholder="Buscar empresa..." style="padding: 8px 12px 8px 36px; border: 1px solid var(--color-border); border-radius: 8px; background: transparent; color: var(--color-text-main); font-size: 13px; outline: none; width: 220px;">
+                        </div>
+                        <div class="date-dropdown-wrapper" style="position: relative; display: flex; align-items: center;">
+                            <div style="background: transparent; border: 1px solid var(--color-border); border-radius: 8px; padding: 0 12px; height: 38px; display: flex; align-items: center; gap: 8px; color: var(--color-text-main); font-size: 13px;">
+                                <i class="ph ph-calendar-blank"></i>
+                                <input type="date" id="date-filter-empresas" style="border: none; background: transparent; color: var(--color-text-main); font-size: 13px; outline: none; cursor: pointer; font-family: inherit;">
+                            </div>
+                        </div>
+                        <button class="btn-icon outline" id="btn-clear-admin-filters" title="Limpar Filtros" style="display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--color-border); background: transparent; color: var(--color-text-main); cursor: pointer;"><i class="ph ph-funnel-x"></i></button>
+                    </div>
+
                     <div class="user-menu" id="user-menu-btn">
                         <div class="avatar dark">AD</div>
                         <div class="user-info">
@@ -199,18 +213,6 @@
                                 </div>
                             </div>
                             
-                            <div class="table-controls" style="margin-left: auto; display: flex; align-items: center; gap: 12px; margin-right: 12px;">
-                                <div class="search-input" style="position: relative; display: flex; align-items: center;">
-                                    <i class="ph ph-magnifying-glass" style="position: absolute; left: 12px; color: var(--color-text-mut);"></i>
-                                    <input type="text" id="search-empresas" placeholder="Buscar por empresa..." style="padding: 8px 12px 8px 36px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg-sec); color: var(--color-text); font-size: 13px; outline: none; width: 220px;">
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--color-border); border-radius: 8px; padding: 0 12px; height: 36px; background: var(--color-bg-sec);">
-                                    <i class="ph ph-calendar-blank" style="color: var(--color-text-mut);"></i>
-                                    <input type="date" id="date-filter-empresas" style="border: none; background: transparent; color: var(--color-text); font-size: 13px; outline: none; cursor: pointer;">
-                                </div>
-                                <button class="btn-icon outline" id="btn-clear-admin-filters" title="Limpar Filtros" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg-sec); color: var(--color-text-mut); cursor: pointer;"><i class="ph ph-funnel-x"></i></button>
-                            </div>
-
                             <button class="btn btn-primary" id="btn-open-cadastrar-modal">Cadastrar Empresa +</button>
                         </div>
 
