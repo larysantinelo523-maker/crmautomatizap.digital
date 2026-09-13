@@ -597,13 +597,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (tenantVencDate) {
                     const thisTime = thisDate.getTime();
-                    const vencTime = tenantVencDate.getTime();
-                    const diffTime = vencTime - thisTime;
-                    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+                    const targetDay = tenantVencDate.getDate();
+                    
+                    // Cria datas de vencimento para o mês atual e para o próximo mês
+                    // Isso garante que a transição de meses (ex: vencimento dia 2, e estamos no dia 30) funcione
+                    const vencThisMonth = new Date(year, month, targetDay);
+                    const vencNextMonth = new Date(year, month + 1, targetDay);
+                    
+                    const diffThis = Math.round((vencThisMonth.getTime() - thisTime) / (1000 * 60 * 60 * 24));
+                    const diffNext = Math.round((vencNextMonth.getTime() - thisTime) / (1000 * 60 * 60 * 24));
 
-                    if (diffDays === 0) {
+                    if (diffThis === 0 || diffNext === 0) {
                         dayDiv.classList.add('due-date-danger');
-                    } else if (diffDays > 0 && diffDays <= 3) {
+                    } else if ((diffThis > 0 && diffThis <= 3) || (diffNext > 0 && diffNext <= 3)) {
                         dayDiv.classList.add('due-date-warning');
                     }
                 }
