@@ -173,7 +173,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <td>${dataVenc}</td>
                     <td><strong>${tenant.total_leads}</strong> leads</td>
                     <td>${statusBadge}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px; font-family: monospace; font-size: 12px; background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px;">
+                            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${tenant.id_empresa}</span>
+                            <button class="btn-copy-id" data-id="${tenant.id_empresa}" style="background: none; border: none; cursor: pointer; color: var(--color-primary);" title="Copiar Chave (CNPJ)"><i class="ph ph-copy"></i></button>
+                        </div>
+                    </td>
                 `;
+
+                // Adiciona evento de copiar sem disparar o click da linha
+                const btnCopy = tr.querySelector('.btn-copy-id');
+                btnCopy.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    navigator.clipboard.writeText(tenant.id_empresa).then(() => {
+                        const icon = btnCopy.querySelector('i');
+                        icon.className = 'ph ph-check';
+                        icon.style.color = 'var(--color-success)';
+                        setTimeout(() => {
+                            icon.className = 'ph ph-copy';
+                            icon.style.color = 'var(--color-primary)';
+                        }, 2000);
+                    });
+                });
 
                 tr.addEventListener('click', () => {
                     loadTenantDetails(tenant.id_empresa, tenant.nome, tenant.email);
