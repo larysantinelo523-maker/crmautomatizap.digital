@@ -645,6 +645,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 dayDiv.textContent = i;
 
                 const thisDate = new Date(year, month, i);
+                
+                // Highlight current day (today)
+                const brDate = typeof window.getBrasiliaDate === 'function' ? window.getBrasiliaDate() : new Date();
+                if (thisDate.getFullYear() === brDate.getFullYear() &&
+                    thisDate.getMonth() === brDate.getMonth() &&
+                    thisDate.getDate() === brDate.getDate()) {
+                    dayDiv.classList.add('today-date');
+                }
 
                 // Classes de range
                 if (rangeStart && rangeEnd) {

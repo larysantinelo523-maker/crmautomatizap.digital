@@ -546,6 +546,17 @@ body.dark-mode .cal-day:hover {
     background: transparent;
 }
 
+.cal-day.today-date {
+    background: #e6f6ee;
+    color: var(--color-primary-dark);
+    font-weight: 600;
+}
+
+body.dark-mode .cal-day.today-date {
+    background: rgba(0, 168, 132, 0.15);
+    color: var(--color-primary-light);
+}
+
 .cal-day.selected {
     background: var(--color-primary);
     color: white;
