@@ -55,14 +55,18 @@
             </nav>
 
             <div class="sidebar-footer">
-                                <div class="sidebar-clock" id="sidebar-clock" style="margin-bottom: 12px; padding: 12px; background: var(--color-bg-main); border-radius: 8px; border: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px;">
+                <div class="sidebar-clock" id="sidebar-clock"
+                    style="margin-bottom: 12px; padding: 12px; background: var(--color-bg-main); border-radius: 8px; border: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px;">
                     <i class="ph ph-clock" style="font-size: 20px; color: var(--color-primary);"></i>
                     <div>
-                        <div id="clock-time" style="font-size: 15px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">00:00</div>
-                        <div id="clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">Carregando...</div>
+                        <div id="clock-time"
+                            style="font-size: 15px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">
+                            00:00</div>
+                        <div id="clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">
+                            Carregando...</div>
                     </div>
                 </div>
-                
+
                 <button class="btn-tutorial-sidebar" onclick="window.startPageTutorial()">
                     <i class="ph ph-question"></i> Como utilizar o CRM
                 </button>
@@ -90,7 +94,7 @@
                             <span id="date-filter-text">01/09/2025 - 07/09/2025</span>
                             <i class="ph ph-caret-down"></i>
                         </button>
-                        
+
                         <!-- Date Dropdown -->
                         <div class="date-dropdown" id="date-dropdown">
                             <div class="date-dropdown-header">
@@ -112,12 +116,14 @@
                                     <span class="cal-day-name">S</span>
                                     <!-- Dias injetados via JS -->
                                 </div>
-                                <div style="display: flex; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--color-text-sec);">
+                                <div
+                                    style="display: flex; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--color-text-sec);">
                                     <span id="cal-selection-text">Selecione a data inicial</span>
                                 </div>
                             </div>
                             <div class="date-dropdown-footer">
-                                <button class="btn btn--primary" id="btn-apply-date" style="width: 100%;">Aplicar Filtro</button>
+                                <button class="btn btn--primary" id="btn-apply-date" style="width: 100%;">Aplicar
+                                    Filtro</button>
                             </div>
                         </div>
                     </div>
@@ -126,18 +132,24 @@
                             <i class="ph ph-bell"></i>
                             <span class="notification-dot"></span>
                         </button>
-                        
+
                         <!-- Notification Dropdown -->
                         <div class="notification-dropdown" id="notification-dropdown">
-                            <div class="notif-header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--color-border);">
+                            <div class="notif-header"
+                                style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--color-border);">
                                 <div style="display: flex; align-items: center; gap: 8px;">
                                     <h4 style="margin: 0; font-size: 16px; font-weight: 600;">Notificações</h4>
-                                    <span class="badge primary-light" id="notif-badge" style="display: none; padding: 2px 8px; border-radius: 12px; font-size: 11px;"></span>
+                                    <span class="badge primary-light" id="notif-badge"
+                                        style="display: none; padding: 2px 8px; border-radius: 12px; font-size: 11px;"></span>
                                 </div>
-                                <button id="btn-read-all" style="background: none; border: none; font-size: 12px; color: var(--color-primary); cursor: pointer; display: none;">Marcar lidas</button>
+                                <button id="btn-read-all"
+                                    style="background: none; border: none; font-size: 12px; color: var(--color-primary); cursor: pointer; display: none;">Marcar
+                                    lidas</button>
                             </div>
                             <div class="notif-list" id="notif-list">
-                                <div style="padding: 20px; text-align: center; color: var(--color-text-mut); font-size: 13px;">Nenhuma notificação.</div>
+                                <div
+                                    style="padding: 20px; text-align: center; color: var(--color-text-mut); font-size: 13px;">
+                                    Nenhuma notificação.</div>
                             </div>
                             <div class="notif-footer">
                                 <a href="notificacoes.html">Ver todas</a>
@@ -151,14 +163,19 @@
                             <span class="user-role">Administrador</span>
                         </div>
                         <i class="ph ph-caret-down"></i>
-                        
+
                         <!-- Dropdown do Usuário -->
                         <div class="user-dropdown" id="user-dropdown">
-                            <div class="mobile-clock-widget" style="padding: 12px 16px; border-bottom: 1px solid var(--color-border); display: none; align-items: center; gap: 12px; margin-bottom: 4px;">
+                            <div class="mobile-clock-widget"
+                                style="padding: 12px 16px; border-bottom: 1px solid var(--color-border); display: none; align-items: center; gap: 12px; margin-bottom: 4px;">
                                 <i class="ph ph-clock" style="font-size: 20px; color: var(--color-primary);"></i>
                                 <div>
-                                    <div id="mobile-clock-time" style="font-size: 14px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">00:00</div>
-                                    <div id="mobile-clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">Carregando...</div>
+                                    <div id="mobile-clock-time"
+                                        style="font-size: 14px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">
+                                        00:00</div>
+                                    <div id="mobile-clock-date"
+                                        style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">
+                                        Carregando...</div>
                                 </div>
                             </div>
                             <div class="dropdown-item" onclick="window.location.href='configuracoes.html'">
@@ -301,7 +318,7 @@
                                         <th>Origem</th>
                                         <th>Interesse</th>
                                         <th>Status</th>
-                                        <th>Data de criação</th>
+                                        <th>Lead criado em:</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -332,13 +349,13 @@
     <script type="module" src="tutorial.js"></script>
     <script type="module" src="script.js"></script>
     <script>
-        window.initDashboard = async function() {
-            if(!window.dbAPI) return;
+        window.initDashboard = async function () {
+            if (!window.dbAPI) return;
             const leads = await window.dbAPI.fetchLeads();
-            
+
             // Atualizar contadores KPI
             document.getElementById('kpi-total').textContent = leads.length;
-            
+
             // Calcular tempo economizado (igual relatorios)
             let iaCount = 0;
             for (const lead of leads) {
@@ -355,23 +372,23 @@
 
             // Atualizar paginação
             const paginationEl = document.getElementById('dashboard-pagination-info');
-            if(paginationEl) paginationEl.textContent = `Mostrando ${Math.min(5, leads.length)} de ${leads.length} leads`;
+            if (paginationEl) paginationEl.textContent = `Mostrando ${Math.min(5, leads.length)} de ${leads.length} leads`;
 
             // Atualizar tabela
             const tbody = document.querySelector('.data-table tbody');
-            if(tbody) tbody.innerHTML = '';
-            
+            if (tbody) tbody.innerHTML = '';
+
             if (leads.length === 0 && tbody) {
                 tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 32px; color: var(--color-text-mut);">Nenhum lead encontrado.</td></tr>';
             } else {
                 leads.slice(0, 5).forEach(lead => {
                     let badgeClass = 'primary-light';
-                    if(lead.status === 'Fechado') badgeClass = 'success';
-                    else if(lead.status === 'Em Atendimento') badgeClass = 'warning';
-                    else if(lead.status === 'Perdido') badgeClass = 'danger';
+                    if (lead.status === 'Fechado') badgeClass = 'success';
+                    else if (lead.status === 'Em Atendimento') badgeClass = 'warning';
+                    else if (lead.status === 'Perdido') badgeClass = 'danger';
 
                     const date = new Date(lead.criado_em);
-                    const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                     tbody.innerHTML += `
                         <tr style="cursor: pointer;" onclick="window.location.href='leads.html'">
