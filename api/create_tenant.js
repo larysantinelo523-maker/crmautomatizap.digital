@@ -21,20 +21,7 @@ export default async function handler(req, res) {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     try {
-        // 1. Create User in Auth
-        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-            email: email,
-            password: password,
-            email_confirm: true
-        });
-
-        if (authError) {
-            return res.status(400).json({ error: authError.message });
-        }
-
-        const userId = authData.user.id;
-
-        // 2. Create Empresa
+        // 1. Create Empresa (Tenant)
         const { data: empresa, error: empError } = await supabase
             .from('empresas')
             .insert([{ nome: nome_empresa }])
@@ -42,14 +29,32 @@ export default async function handler(req, res) {
             .single();
 
         if (empError) {
-            // Rollback user creation ideally, but for now just return error
-            await supabase.auth.admin.deleteUser(userId);
             return res.status(400).json({ error: 'Erro ao criar empresa: ' + empError.message });
         }
 
         const empresaId = empresa.id;
 
-        // 3. Create Usuario Profile
+        // 2. Create User in Auth with user_metadata (for triggers if they exist)
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+            email: email,
+            password: password,
+            email_confirm: true,
+            user_metadata: {
+                id_empresa: empresaId,
+                tipo_usuario: 'usuário',
+                nome_completo: 'Admin ' + nome_empresa
+            }
+        });
+
+        if (authError) {
+            // Delete empresa if user creation fails
+            await supabase.from('empresas').delete().eq('id', empresaId);
+            return res.status(400).json({ error: authError.message });
+        }
+
+        const userId = authData.user.id;
+
+        // 3. Create/Update Usuario Profile
         const profileData = {
             id: userId,
             id_empresa: empresaId,
