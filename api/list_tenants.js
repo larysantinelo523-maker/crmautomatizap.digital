@@ -26,11 +26,11 @@ export default async function handler(req, res) {
         const result = [];
 
         for (const user of usuarios) {
-            // Pegar contagem de leads. Assumimos que a tabela leads usará user_id em vez de id_empresa
+            // Pegar contagem de leads. A tabela leads ainda usa a coluna id_empresa para armazenar o ID do usuário/empresa
             const { count: leadsCount, error: errLeads } = await supabase
                 .from('leads')
                 .select('*', { count: 'exact', head: true })
-                .eq('user_id', user.id); // Ajustado para user_id (se a tabela leads usar id_empresa, precisará ser alterado lá tbm)
+                .eq('id_empresa', user.id); // A coluna no banco ainda se chama id_empresa
 
             result.push({
                 id_empresa: user.id, // Mantemos a chave id_empresa para não quebrar o frontend imediatamente
