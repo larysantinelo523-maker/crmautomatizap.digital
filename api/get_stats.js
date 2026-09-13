@@ -15,10 +15,11 @@ export default async function handler(req, res) {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     try {
-        // Obter número total de empresas
+        // Obter número total de empresas (agora contado a partir de usuários normais)
         const { count: totalEmpresas, error: errEmp } = await supabase
-            .from('empresas')
-            .select('*', { count: 'exact', head: true });
+            .from('usuarios')
+            .select('*', { count: 'exact', head: true })
+            .neq('tipo_usuario', 'administrador');
 
         // Obter número total de leads (ignorando RLS porque usa service_role)
         const { count: totalLeads, error: errLeads } = await supabase

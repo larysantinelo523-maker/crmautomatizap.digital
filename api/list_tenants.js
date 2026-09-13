@@ -15,38 +15,29 @@ export default async function handler(req, res) {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     try {
-        // Obter todas as empresas
-        const { data: empresas, error: errEmp } = await supabase
-            .from('empresas')
-            .select('*');
+        // Obter todos os usuários (que são as empresas agora)
+        const { data: usuarios, error: errUser } = await supabase
+            .from('usuarios')
+            .select('*')
+            .neq('tipo_usuario', 'administrador');
 
-        if (errEmp) throw errEmp;
+        if (errUser) throw errUser;
 
-        // Para cada empresa, pegar o dono, status, data de vencimento e contagem de leads
         const result = [];
 
-        for (const emp of empresas) {
-            // Pegar o dono (usuário primário)
-            const { data: users, error: errUser } = await supabase
-                .from('usuarios')
-                .select('email, status_assinatura, data_vencimento')
-                .eq('id_empresa', emp.id)
-                .limit(1);
-            
-            const user = users && users.length > 0 ? users[0] : null;
-
-            // Pegar contagem de leads
+        for (const user of usuarios) {
+            // Pegar contagem de leads. Assumimos que a tabela leads usará user_id em vez de id_empresa
             const { count: leadsCount, error: errLeads } = await supabase
                 .from('leads')
                 .select('*', { count: 'exact', head: true })
-                .eq('id_empresa', emp.id);
+                .eq('user_id', user.id); // Ajustado para user_id (se a tabela leads usar id_empresa, precisará ser alterado lá tbm)
 
             result.push({
-                id_empresa: emp.id,
-                nome: emp.nome,
-                email: user ? user.email : 'N/A',
-                vencimento: user ? user.data_vencimento : 'N/A',
-                status: user ? user.status_assinatura : 'N/A',
+                id_empresa: user.id, // Mantemos a chave id_empresa para não quebrar o frontend imediatamente
+                nome: user.nome_completo || 'Sem Nome',
+                email: user.email || 'N/A',
+                vencimento: user.data_vencimento || 'N/A',
+                status: user.status_assinatura || 'N/A',
                 total_leads: leadsCount || 0
             });
         }

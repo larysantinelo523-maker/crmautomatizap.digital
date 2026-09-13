@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         const { data: leads, error: leadsError } = await supabase
             .from('leads')
             .select('criado_em, localizacao, nome, status, telefone')
-            .eq('id_empresa', id_empresa);
+            .eq('user_id', id_empresa); // id_empresa passed from frontend is now actually the user_id
 
         if (leadsError) throw leadsError;
 
