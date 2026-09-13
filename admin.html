@@ -202,15 +202,43 @@
                         </div>
 
                         <div class="table-responsive">
-                            <table class="data-table">
+                            <style>
+                                .admin-table {
+                                    display: block;
+                                    width: 100%;
+                                    border-collapse: collapse;
+                                }
+                                .admin-table thead, .admin-table tbody {
+                                    display: block;
+                                    width: 100%;
+                                }
+                                .admin-table tr {
+                                    display: grid;
+                                    grid-template-columns: 2fr 2fr 1.5fr 1fr 1fr 1.5fr;
+                                    align-items: center;
+                                    border-bottom: 1px solid var(--color-border);
+                                }
+                                .admin-table th, .admin-table td {
+                                    padding: 16px 24px;
+                                    text-align: left;
+                                    display: flex;
+                                    align-items: center;
+                                }
+                                .admin-table th {
+                                    color: var(--color-text-light);
+                                    font-weight: 600;
+                                    font-size: 14px;
+                                }
+                            </style>
+                            <table class="data-table admin-table">
                                 <thead>
                                     <tr>
-                                        <th style="width: 25%;">Empresa</th>
-                                        <th style="width: 25%;">Email Responsável</th>
-                                        <th style="width: 15%;">Data de Vencimento</th>
-                                        <th style="width: 10%;">Total de Leads</th>
-                                        <th style="width: 10%;">Status</th>
-                                        <th style="width: 15%;">Chave de API</th>
+                                        <th>Empresa</th>
+                                        <th>Email Responsável</th>
+                                        <th>Data de Vencimento</th>
+                                        <th>Total de Leads</th>
+                                        <th>Status</th>
+                                        <th>Chave de API</th>
                                     </tr>
                                 </thead>
                                 <tbody id="empresas-tbody">
