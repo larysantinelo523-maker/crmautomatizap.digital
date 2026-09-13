@@ -556,10 +556,8 @@ document.addEventListener('DOMContentLoaded', () => {
             rangeStart = new Date(cachedStart);
             rangeEnd = new Date(cachedEnd);
         } else {
-            // Default to current month
-            const now = new Date();
-            rangeStart = new Date(now.getFullYear(), now.getMonth(), 1);
-            rangeEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            rangeStart = null;
+            rangeEnd = null;
         }
         
         function updateMainFilterText() {
@@ -568,6 +566,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (rangeStart && rangeEnd) {
                 const startStr = `${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth() + 1).toString().padStart(2, '0')}/${rangeStart.getFullYear()}`;
                 const endStr = `${rangeEnd.getDate().toString().padStart(2, '0')}/${(rangeEnd.getMonth() + 1).toString().padStart(2, '0')}/${rangeEnd.getFullYear()}`;
+                dateText.textContent = `${startStr} - ${endStr}`;
+            } else {
+                const now = new Date();
+                const startM = new Date(now.getFullYear(), now.getMonth(), 1);
+                const endM = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                const startStr = `${startM.getDate().toString().padStart(2, '0')}/${(startM.getMonth() + 1).toString().padStart(2, '0')}/${startM.getFullYear()}`;
+                const endStr = `${endM.getDate().toString().padStart(2, '0')}/${(endM.getMonth() + 1).toString().padStart(2, '0')}/${endM.getFullYear()}`;
                 dateText.textContent = `${startStr} - ${endStr}`;
             }
         }
@@ -593,11 +598,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             clearBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const now = new Date();
-                rangeStart = new Date(now.getFullYear(), now.getMonth(), 1);
-                rangeEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
                 
-                if (selectionTxt) selectionTxt.textContent = `Período selecionado: ${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth() + 1).toString().padStart(2, '0')} até ${rangeEnd.getDate().toString().padStart(2, '0')}/${(rangeEnd.getMonth() + 1).toString().padStart(2, '0')}`;
+                rangeStart = null;
+                rangeEnd = null;
+                
+                if (selectionTxt) selectionTxt.textContent = `Nenhum período selecionado`;
                 
                 localStorage.removeItem('calendar_filter_start');
                 localStorage.removeItem('calendar_filter_end');
@@ -720,26 +725,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const applyBtn = document.getElementById('btn-apply-date');
         if (applyBtn) {
             applyBtn.addEventListener('click', () => {
-                const dateText = document.getElementById('date-filter-text');
                 if (rangeStart && rangeEnd) {
-                    const startStr = `${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth() + 1).toString().padStart(2, '0')}/${rangeStart.getFullYear()}`;
-                    const endStr = `${rangeEnd.getDate().toString().padStart(2, '0')}/${(rangeEnd.getMonth() + 1).toString().padStart(2, '0')}/${rangeEnd.getFullYear()}`;
-                    if (dateText) dateText.textContent = `${startStr} - ${endStr}`;
-                    
                     localStorage.setItem('calendar_filter_start', rangeStart.toISOString());
                     localStorage.setItem('calendar_filter_end', rangeEnd.toISOString());
                 } else if (rangeStart) {
-                    const startStr = `${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth() + 1).toString().padStart(2, '0')}/${rangeStart.getFullYear()}`;
-                    if (dateText) dateText.textContent = `A partir de ${startStr}`;
-                    
                     localStorage.setItem('calendar_filter_start', rangeStart.toISOString());
                     localStorage.removeItem('calendar_filter_end');
                 } else {
-                    if (dateText) dateText.textContent = `Sem limite de data`;
-                    
                     localStorage.removeItem('calendar_filter_start');
                     localStorage.removeItem('calendar_filter_end');
                 }
+                
+                updateMainFilterText();
                 dateDropdown.classList.remove('show');
             });
         }
