@@ -1,7 +1,7 @@
 import { supabase } from './supabase.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    
+
     // 1. Autenticação e Tema
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.body.classList.remove('dark-mode');
             localStorage.setItem('theme', 'light');
         }
-        
+
         // Se estivermos na aba de detalhes com gráficos, recarregamos
         if (currentTenantId) loadTenantDetails(currentTenantId, currentTenantName, currentTenantEmail);
     });
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
             const target = item.getAttribute('data-target');
-            
+
             navItems.forEach(n => n.classList.remove('active'));
             item.classList.add('active');
 
@@ -98,11 +98,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userMenuBtn = document.getElementById('user-menu-btn');
     const userDropdown = document.getElementById('user-dropdown');
     if (userMenuBtn && userDropdown) {
-        userMenuBtn.addEventListener('click', function(e) {
+        userMenuBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             userDropdown.classList.toggle('show');
         });
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (!userMenuBtn.contains(e.target)) {
                 userDropdown.classList.remove('show');
             }
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const res = await fetch('/api/get_stats');
             if (!res.ok) throw new Error("Erro na API (verifique chave Supabase na Vercel)");
             const stats = await res.json();
-            
+
             document.getElementById('kpi-empresas').innerHTML = stats.empresas;
             document.getElementById('kpi-pagos').innerHTML = stats.pagos;
             document.getElementById('kpi-inadimplentes').innerHTML = stats.inadimplentes;
@@ -132,6 +132,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadTenantsList();
 
     // 5. Carregar Lista de Empresas (Tenants)
+    let globalTenants = [];
+
     async function loadTenantsList() {
         const tbody = document.getElementById('empresas-tbody');
         tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 32px;"><div class="kpi-loading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;"><i class="ph ph-spinner-gap"></i><span style="font-size: 14px;">Carregando empresas...</span></div></td></tr>';
@@ -139,71 +141,81 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const res = await fetch('/api/list_tenants');
             if (!res.ok) throw new Error("Erro na API");
-            
-            const tenants = await res.json();
-            tbody.innerHTML = '';
 
-            if (tenants.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px;">Nenhuma empresa cadastrada.</td></tr>';
-                return;
-            }
+            globalTenants = await res.json();
+            renderTenants(globalTenants);
+        } catch (e) {
+            console.error(e);
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: red;">Erro ao carregar lista. Verifique a chave na Vercel.</td></tr>';
+        }
+    }
 
-            tenants.forEach(tenant => {
-                let statusBadge = '<span style="background-color: #10b981; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Pago</span>';
-                
-                if (tenant.status === 'inadimplente' || tenant.status === 'cancelado') {
-                    statusBadge = '<span style="background-color: #ef4444; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Inadimplente</span>';
-                } else if (tenant.vencimento && tenant.vencimento !== 'N/A') {
-                    const hoje = new Date();
-                    hoje.setHours(0,0,0,0);
-                    const parts = tenant.vencimento.split('-');
-                    if (parts.length === 3) {
-                        const venc = new Date(parts[0], parts[1] - 1, parts[2]);
-                        const diffTime = venc - hoje;
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                        
-                        if (diffDays < 0) {
-                            statusBadge = '<span style="background-color: #ef4444; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Inadimplente</span>';
-                        } else if (diffDays === 0) {
-                            statusBadge = '<span style="background-color: #f59e0b; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Vence Hoje</span>';
-                        } else if (diffDays <= 3) {
-                            statusBadge = `<span style="background-color: #f59e0b; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Vence em ${diffDays} dias</span>`;
-                        }
+    function renderTenants(tenantsList) {
+        const tbody = document.getElementById('empresas-tbody');
+        tbody.innerHTML = '';
+
+        if (tenantsList.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px;">Nenhuma empresa encontrada com os filtros atuais.</td></tr>';
+            return;
+        }
+
+        tenantsList.forEach(tenant => {
+            let statusBadge = '<span style="background-color: #10b981; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Pago</span>';
+
+            if (tenant.status === 'inadimplente' || tenant.status === 'cancelado') {
+                statusBadge = '<span style="background-color: #ef4444; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Inadimplente</span>';
+            } else if (tenant.vencimento && tenant.vencimento !== 'N/A') {
+                const hoje = new Date();
+                hoje.setHours(0, 0, 0, 0);
+                const parts = tenant.vencimento.split('-');
+                if (parts.length === 3) {
+                    const venc = new Date(parts[0], parts[1] - 1, parts[2]);
+                    const diffTime = venc - hoje;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays < 0) {
+                        statusBadge = '<span style="background-color: #ef4444; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Inadimplente</span>';
+                    } else if (diffDays === 0) {
+                        statusBadge = '<span style="background-color: #f59e0b; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Vence Hoje</span>';
+                    } else if (diffDays <= 3) {
+                        statusBadge = `<span style="background-color: #f59e0b; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Vence em ${diffDays} dias</span>`;
                     }
                 }
-                
-                // Formatar Data
-                let dataVenc = 'Não definido';
-                if (tenant.vencimento && tenant.vencimento !== 'N/A') {
-                    const [ano, mes, dia] = tenant.vencimento.split('-');
-                    dataVenc = `${dia}/${mes}/${ano}`;
-                }
+            }
 
-                const tr = document.createElement('tr');
-                tr.style.cursor = 'pointer';
-                tr.innerHTML = `
-                    <td>
-                        <div class="user-cell" style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">
-                                ${tenant.nome.charAt(0).toUpperCase()}
-                            </div>
-                            <span class="user-name" style="font-weight: 500;">${tenant.nome}</span>
-                        </div>
-                    </td>
-                    <td>${tenant.email}</td>
-                    <td>${dataVenc}</td>
-                    <td><strong>${tenant.total_leads}</strong> leads</td>
-                    <td>${statusBadge}</td>
-                    <td>
-                        <div style="display: inline-flex; align-items: center; gap: 8px; font-family: monospace; font-size: 12px; background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px;">
-                            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${tenant.id_empresa}</span>
-                            <button class="btn-copy-id" data-id="${tenant.id_empresa}" style="background: none; border: none; cursor: pointer; color: var(--color-primary);" title="Copiar Chave de API"><i class="ph ph-copy"></i></button>
-                        </div>
-                    </td>
-                `;
+            // Formatar Data
+            let dataVenc = 'Não definido';
+            if (tenant.vencimento && tenant.vencimento !== 'N/A') {
+                const [ano, mes, dia] = tenant.vencimento.split('-');
+                dataVenc = `${dia}/${mes}/${ano}`;
+            }
 
-                // Adiciona evento de copiar sem disparar o click da linha
-                const btnCopy = tr.querySelector('.btn-copy-id');
+            const tr = document.createElement('tr');
+            tr.style.cursor = 'pointer';
+            tr.innerHTML = `
+                <td>
+                    <div class="user-cell" style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">
+                            ${(tenant.nome || '?').charAt(0).toUpperCase()}
+                        </div>
+                        <span class="user-name" style="font-weight: 500;">${tenant.nome || 'Empresa'}</span>
+                    </div>
+                </td>
+                <td>${tenant.email || 'N/A'}</td>
+                <td>${dataVenc}</td>
+                <td><strong>${tenant.total_leads || 0}</strong> leads</td>
+                <td>${statusBadge}</td>
+                <td>
+                    <div style="display: inline-flex; align-items: center; gap: 8px; font-family: monospace; font-size: 12px; background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px;">
+                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${tenant.id_empresa}</span>
+                        <button class="btn-copy-id" data-id="${tenant.id_empresa}" style="background: none; border: none; cursor: pointer; color: var(--color-primary);" title="Copiar Chave de API"><i class="ph ph-copy"></i></button>
+                    </div>
+                </td>
+            `;
+
+            // Adiciona evento de copiar sem disparar o click da linha
+            const btnCopy = tr.querySelector('.btn-copy-id');
+            if (btnCopy) {
                 btnCopy.addEventListener('click', (e) => {
                     e.stopPropagation();
                     navigator.clipboard.writeText(tenant.id_empresa).then(() => {
@@ -216,18 +228,55 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }, 2000);
                     });
                 });
+            }
 
-                tr.addEventListener('click', () => {
-                    loadTenantDetails(tenant.id_empresa, tenant.nome, tenant.email);
-                });
-
-                tbody.appendChild(tr);
+            tr.addEventListener('click', () => {
+                loadTenantDetails(tenant.id_empresa, tenant.nome, tenant.email);
             });
 
-        } catch (e) {
-            console.error(e);
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: red;">Erro ao carregar lista. Verifique a chave na Vercel.</td></tr>';
-        }
+            tbody.appendChild(tr);
+        });
+    }
+
+    // --- Filtros Administrativos ---
+    const searchAdminInput = document.getElementById('search-empresas');
+    const dateAdminInput = document.getElementById('date-filter-empresas');
+    const btnClearAdminFilters = document.getElementById('btn-clear-admin-filters');
+
+    function applyAdminFilters() {
+        if (!searchAdminInput || !dateAdminInput) return;
+        const searchTerm = searchAdminInput.value.toLowerCase();
+        const searchDate = dateAdminInput.value; // YYYY-MM-DD
+
+        const filtered = globalTenants.filter(t => {
+            const nome = (t.nome || '').toLowerCase();
+            const email = (t.email || '').toLowerCase();
+            const matchesSearch = nome.includes(searchTerm) || email.includes(searchTerm);
+            
+            let matchesDate = true;
+            if (searchDate) {
+                // Compara a data de vencimento
+                if (t.vencimento && t.vencimento !== 'N/A') {
+                    matchesDate = t.vencimento === searchDate;
+                } else {
+                    matchesDate = false;
+                }
+            }
+            
+            return matchesSearch && matchesDate;
+        });
+
+        renderTenants(filtered);
+    }
+
+    if (searchAdminInput) searchAdminInput.addEventListener('input', applyAdminFilters);
+    if (dateAdminInput) dateAdminInput.addEventListener('change', applyAdminFilters);
+    if (btnClearAdminFilters) {
+        btnClearAdminFilters.addEventListener('click', () => {
+            if (searchAdminInput) searchAdminInput.value = '';
+            if (dateAdminInput) dateAdminInput.value = '';
+            applyAdminFilters();
+        });
     }
 
     // 6. Carregar Detalhes de um Tenant (Mini Dashboard)
@@ -257,9 +306,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const res = await fetch(`/api/get_tenant_stats?id_empresa=${id}`);
             if (!res.ok) throw new Error("Erro na API");
-            
+
             const data = await res.json();
-            
+
             renderAdminLineChart(data.lineChartData.categories, data.lineChartData.series);
             renderAdminMap(data.mapData);
 
@@ -311,8 +360,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const container = document.getElementById("admin-chart-line");
         container.innerHTML = '';
-        
-        if(adminChartInstance) adminChartInstance.destroy();
+
+        if (adminChartInstance) adminChartInstance.destroy();
         adminChartInstance = new ApexCharts(container, options);
         adminChartInstance.render();
     }
@@ -347,14 +396,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             }],
             credits: { enabled: false }
         };
-        
+
         Highcharts.mapChart('admin-map-container', mapConfig);
     }
 
     // Lógica do Modal de Cadastrar Empresa
     const modalCadastrar = document.getElementById('modal-cadastrar-empresa');
     const btnOpenCadastrar = document.getElementById('btn-open-cadastrar-modal');
-    
+
     if (btnOpenCadastrar && modalCadastrar) {
         btnOpenCadastrar.addEventListener('click', () => {
             modalCadastrar.classList.add('active');
@@ -363,8 +412,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Fechar ao clicar no "X" ou fora do modal
         const closeBtn = modalCadastrar.querySelector('.close-modal');
-        if(closeBtn) closeBtn.addEventListener('click', () => modalCadastrar.classList.remove('active'));
-        
+        if (closeBtn) closeBtn.addEventListener('click', () => modalCadastrar.classList.remove('active'));
+
         modalCadastrar.addEventListener('click', (e) => {
             if (e.target === modalCadastrar) {
                 modalCadastrar.classList.remove('active');
@@ -375,14 +424,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 7. Cadastrar Empresa via API
     document.getElementById('form-create-tenant').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const btn = document.getElementById('btn-submit-tenant');
         const msg = document.getElementById('tenant-msg');
-        
+
         btn.disabled = true;
         btn.innerHTML = '<i class="ph ph-spinner-gap" style="font-size: 20px; animation: spin 1s linear infinite;"></i> Criando ambiente...';
         msg.textContent = '';
-        
+
         const payload = {
             nome_empresa: document.getElementById('tenant-nome').value,
             email: document.getElementById('tenant-email').value,
@@ -403,11 +452,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 msg.style.color = '#00A884';
                 msg.textContent = '✅ Empresa cadastrada com sucesso!';
                 document.getElementById('form-create-tenant').reset();
-                
+
                 // Recarregar os dados na tela e fechar o modal
                 loadDashboardStats();
                 loadTenantsList();
-                
+
                 setTimeout(() => {
                     modalCadastrar.classList.remove('active');
                     msg.textContent = '';
@@ -432,7 +481,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
         const newPassword = document.getElementById('admin-new-password').value;
         const btn = document.getElementById('btn-change-password');
-        
+
         btn.disabled = true;
         btn.textContent = 'Atualizando...';
 
