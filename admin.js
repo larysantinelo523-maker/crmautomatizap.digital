@@ -270,11 +270,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (searchAdminInput) searchAdminInput.addEventListener('input', applyAdminFilters);
-    if (dateAdminInput) dateAdminInput.addEventListener('change', applyAdminFilters);
+    if (dateAdminInput) {
+        dateAdminInput.addEventListener('change', () => {
+            const dateText = document.getElementById('admin-date-text');
+            if (dateText && dateAdminInput.value) {
+                const parts = dateAdminInput.value.split('-');
+                if(parts.length === 3) dateText.textContent = `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            applyAdminFilters();
+        });
+    }
     if (btnClearAdminFilters) {
         btnClearAdminFilters.addEventListener('click', () => {
             if (searchAdminInput) searchAdminInput.value = '';
-            if (dateAdminInput) dateAdminInput.value = '';
+            if (dateAdminInput) {
+                dateAdminInput.value = '';
+                const dateText = document.getElementById('admin-date-text');
+                if (dateText) dateText.textContent = 'dd/mm/aaaa';
+            }
             applyAdminFilters();
         });
     }
