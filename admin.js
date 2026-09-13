@@ -144,27 +144,33 @@ document.addEventListener('DOMContentLoaded', async () => {
             tbody.innerHTML = '';
 
             if (tenants.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px;">Nenhuma empresa cadastrada.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px;">Nenhuma empresa cadastrada.</td></tr>';
                 return;
             }
 
             tenants.forEach(tenant => {
-                let isInadimplente = false;
+                let statusBadge = '<span style="background-color: #10b981; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Pago</span>';
+                
                 if (tenant.status === 'inadimplente' || tenant.status === 'cancelado') {
-                    isInadimplente = true;
+                    statusBadge = '<span style="background-color: #ef4444; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Inadimplente</span>';
                 } else if (tenant.vencimento && tenant.vencimento !== 'N/A') {
                     const hoje = new Date();
                     hoje.setHours(0,0,0,0);
                     const parts = tenant.vencimento.split('-');
                     if (parts.length === 3) {
                         const venc = new Date(parts[0], parts[1] - 1, parts[2]);
-                        if (venc < hoje) isInadimplente = true;
+                        const diffTime = venc - hoje;
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        
+                        if (diffDays < 0) {
+                            statusBadge = '<span style="background-color: #ef4444; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Inadimplente</span>';
+                        } else if (diffDays === 0) {
+                            statusBadge = '<span style="background-color: #f59e0b; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Vence Hoje</span>';
+                        } else if (diffDays <= 3) {
+                            statusBadge = `<span style="background-color: #f59e0b; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Vence em ${diffDays} dias</span>`;
+                        }
                     }
                 }
-                
-                let statusBadge = isInadimplente 
-                    ? '<span style="background-color: #ef4444; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Inadimplente</span>' 
-                    : '<span style="background-color: #10b981; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Pago</span>';
                 
                 // Formatar Data
                 let dataVenc = 'Não definido';
