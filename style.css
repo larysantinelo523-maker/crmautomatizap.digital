@@ -2988,6 +2988,20 @@ body.dark-mode .logo-img {
     font-weight: 500;
 }
 
+.due-date-danger {
+    background-color: #fecdd3 !important; /* Pastel Red */
+    color: #9f1239 !important;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.due-date-warning {
+    background-color: #fef08a !important; /* Pastel Yellow */
+    color: #854d0e !important;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
 @keyframes spin {
     100% {
         transform: rotate(360deg);

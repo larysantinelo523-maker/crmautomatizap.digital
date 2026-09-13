@@ -1,4 +1,19 @@
 // --- Verificação de Autenticação Global ---
+import { fetchUserData } from './data.js';
+
+let tenantVencDate = null;
+fetchUserData().then(user => {
+    if (user && user.data_vencimento && user.data_vencimento !== 'N/A') {
+        const parts = user.data_vencimento.split('-');
+        if (parts.length === 3) {
+            tenantVencDate = new Date(parts[0], parts[1] - 1, parts[2]);
+            tenantVencDate.setHours(0,0,0,0);
+            // Optionally re-render calendar if it's open, but it's typically fine
+            // because the data fetches quickly on page load.
+        }
+    }
+});
+
 window.getBrasiliaDate = function() {
     const str = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
     return new Date(str);
@@ -579,6 +594,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } else if (rangeStart && thisDate.getTime() === rangeStart.getTime()) {
                     dayDiv.classList.add('selected');
+                }
+
+                if (tenantVencDate) {
+                    const thisTime = thisDate.getTime();
+                    const vencTime = tenantVencDate.getTime();
+                    const diffTime = vencTime - thisTime;
+                    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays === 0) {
+                        dayDiv.classList.add('due-date-danger');
+                    } else if (diffDays > 0 && diffDays <= 3) {
+                        dayDiv.classList.add('due-date-warning');
+                    }
                 }
 
                 dayDiv.addEventListener('click', (e) => {
