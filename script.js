@@ -8,8 +8,7 @@ fetchUserData().then(user => {
         if (parts.length === 3) {
             tenantVencDate = new Date(parts[0], parts[1] - 1, parts[2]);
             tenantVencDate.setHours(0,0,0,0);
-            // Optionally re-render calendar if it's open, but it's typically fine
-            // because the data fetches quickly on page load.
+            window.dispatchEvent(new Event('tenantDateLoaded'));
         }
     }
 });
@@ -644,6 +643,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Primeiro render
+        window.addEventListener('tenantDateLoaded', () => {
+            if (typeof renderCalendar === 'function') {
+                renderCalendar();
+            }
+        });
+
         renderCalendar();
 
         const applyBtn = document.getElementById('btn-apply-date');
