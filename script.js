@@ -544,9 +544,69 @@ document.addEventListener('DOMContentLoaded', () => {
         const prevBtn = document.getElementById('cal-prev');
         const nextBtn = document.getElementById('cal-next');
         let currentDate = new Date();
-
+        
+        // Cache logic
         let rangeStart = null;
         let rangeEnd = null;
+        
+        const cachedStart = localStorage.getItem('calendar_filter_start');
+        const cachedEnd = localStorage.getItem('calendar_filter_end');
+        
+        if (cachedStart && cachedEnd) {
+            rangeStart = new Date(cachedStart);
+            rangeEnd = new Date(cachedEnd);
+        } else {
+            // Default to current month
+            const now = new Date();
+            rangeStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            rangeEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        }
+        
+        function updateMainFilterText() {
+            const dateText = document.getElementById('date-filter-text');
+            if (!dateText) return;
+            if (rangeStart && rangeEnd) {
+                const startStr = `${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth() + 1).toString().padStart(2, '0')}/${rangeStart.getFullYear()}`;
+                const endStr = `${rangeEnd.getDate().toString().padStart(2, '0')}/${(rangeEnd.getMonth() + 1).toString().padStart(2, '0')}/${rangeEnd.getFullYear()}`;
+                dateText.textContent = `${startStr} - ${endStr}`;
+            }
+        }
+        // Update on load
+        updateMainFilterText();
+        
+        // Inject Limpar Filtros button dynamically
+        const dateDropdownHeader = document.querySelector('.date-dropdown-header');
+        if (dateDropdownHeader && !document.getElementById('btn-clear-filters')) {
+            dateDropdownHeader.style.display = 'flex';
+            dateDropdownHeader.style.justifyContent = 'space-between';
+            dateDropdownHeader.style.alignItems = 'center';
+            
+            const clearBtn = document.createElement('button');
+            clearBtn.id = 'btn-clear-filters';
+            clearBtn.textContent = 'Limpar filtros';
+            clearBtn.style.background = 'none';
+            clearBtn.style.border = 'none';
+            clearBtn.style.color = 'var(--color-text-mut)';
+            clearBtn.style.fontSize = '11px';
+            clearBtn.style.cursor = 'pointer';
+            clearBtn.style.textDecoration = 'underline';
+            
+            clearBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const now = new Date();
+                rangeStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                rangeEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                
+                if (selectionTxt) selectionTxt.textContent = `Período selecionado: ${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth() + 1).toString().padStart(2, '0')} até ${rangeEnd.getDate().toString().padStart(2, '0')}/${(rangeEnd.getMonth() + 1).toString().padStart(2, '0')}`;
+                
+                localStorage.removeItem('calendar_filter_start');
+                localStorage.removeItem('calendar_filter_end');
+                
+                updateMainFilterText();
+                renderCalendar();
+            });
+            dateDropdownHeader.appendChild(clearBtn);
+        }
 
         function renderCalendar() {
             if (!calendarGrid) return;
@@ -662,14 +722,23 @@ document.addEventListener('DOMContentLoaded', () => {
             applyBtn.addEventListener('click', () => {
                 const dateText = document.getElementById('date-filter-text');
                 if (rangeStart && rangeEnd) {
-                    const startStr = `${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth() + 1).toString().padStart(2, '0')}`;
-                    const endStr = `${rangeEnd.getDate().toString().padStart(2, '0')}/${(rangeEnd.getMonth() + 1).toString().padStart(2, '0')}`;
+                    const startStr = `${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth() + 1).toString().padStart(2, '0')}/${rangeStart.getFullYear()}`;
+                    const endStr = `${rangeEnd.getDate().toString().padStart(2, '0')}/${(rangeEnd.getMonth() + 1).toString().padStart(2, '0')}/${rangeEnd.getFullYear()}`;
                     if (dateText) dateText.textContent = `${startStr} - ${endStr}`;
+                    
+                    localStorage.setItem('calendar_filter_start', rangeStart.toISOString());
+                    localStorage.setItem('calendar_filter_end', rangeEnd.toISOString());
                 } else if (rangeStart) {
-                    const startStr = `${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth() + 1).toString().padStart(2, '0')}`;
+                    const startStr = `${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth() + 1).toString().padStart(2, '0')}/${rangeStart.getFullYear()}`;
                     if (dateText) dateText.textContent = `A partir de ${startStr}`;
+                    
+                    localStorage.setItem('calendar_filter_start', rangeStart.toISOString());
+                    localStorage.removeItem('calendar_filter_end');
                 } else {
                     if (dateText) dateText.textContent = `Sem limite de data`;
+                    
+                    localStorage.removeItem('calendar_filter_start');
+                    localStorage.removeItem('calendar_filter_end');
                 }
                 dateDropdown.classList.remove('show');
             });
