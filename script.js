@@ -609,6 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 updateMainFilterText();
                 renderCalendar();
+                window.dispatchEvent(new Event('calendarFilterChanged'));
             });
             dateDropdownHeader.appendChild(clearBtn);
         }
@@ -738,6 +739,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 updateMainFilterText();
                 dateDropdown.classList.remove('show');
+                window.dispatchEvent(new Event('calendarFilterChanged'));
             });
         }
     }

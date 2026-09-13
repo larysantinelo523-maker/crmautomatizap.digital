@@ -325,7 +325,29 @@
     <script>
         window.initLeads = async function() {
             if(!window.dbAPI) return;
-            const leads = await window.dbAPI.fetchLeads();
+            let leads = await window.dbAPI.fetchLeads();
+            
+            // Filter by date
+            const filterStart = localStorage.getItem('calendar_filter_start');
+            const filterEnd = localStorage.getItem('calendar_filter_end');
+            
+            if (filterStart) {
+                const startDt = new Date(filterStart);
+                startDt.setHours(0,0,0,0);
+                leads = leads.filter(l => {
+                    const lDate = new Date(l.criado_em);
+                    return lDate >= startDt;
+                });
+            }
+            if (filterEnd) {
+                const endDt = new Date(filterEnd);
+                endDt.setHours(23,59,59,999);
+                leads = leads.filter(l => {
+                    const lDate = new Date(l.criado_em);
+                    return lDate <= endDt;
+                });
+            }
+
             const tbody = document.querySelector('.data-table tbody');
             if(tbody) tbody.innerHTML = '';
             
@@ -456,6 +478,12 @@
             const emptyMobile = document.getElementById('dossier-empty-state-mobile');
             if (emptyMobile) emptyMobile.style.display = 'flex';
         }
+        
+        window.addEventListener('calendarFilterChanged', () => {
+            if(typeof window.initLeads === 'function') {
+                window.initLeads();
+            }
+        });
     </script>
 </body>
 
