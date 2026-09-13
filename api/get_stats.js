@@ -15,32 +15,48 @@ export default async function handler(req, res) {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     try {
-        // Obter número total de empresas (agora contado a partir de usuários normais)
-        const { count: totalEmpresas, error: errEmp } = await supabase
+        // Obter todos os usuários (empresas)
+        const { data: empresas, error: errEmp } = await supabase
             .from('usuarios')
-            .select('*', { count: 'exact', head: true })
+            .select('*')
             .neq('tipo_usuario', 'administrador');
 
-        // Obter número total de leads (ignorando RLS porque usa service_role)
-        const { count: totalLeads, error: errLeads } = await supabase
-            .from('leads')
-            .select('*', { count: 'exact', head: true });
+        if (errEmp) throw errEmp;
 
-        // Obter número total de conversas (atendimentos)
-        const { count: totalConversas, error: errConv } = await supabase
-            .from('conversas')
-            .select('*', { count: 'exact', head: true });
+        let totalEmpresas = empresas.length;
+        let clientesPagos = 0;
+        let clientesInadimplentes = 0;
 
-        // Obter número total de usuarios
-        const { count: totalUsuarios, error: errUsers } = await supabase
-            .from('usuarios')
-            .select('*', { count: 'exact', head: true });
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+
+        empresas.forEach(emp => {
+            let isInadimplente = false;
+
+            if (emp.status_assinatura === 'inadimplente' || emp.status_assinatura === 'cancelado') {
+                isInadimplente = true;
+            } else if (emp.data_vencimento && emp.data_vencimento !== 'N/A') {
+                const parts = emp.data_vencimento.split('-'); // ex: 2026-10-12
+                if (parts.length === 3) {
+                    const venc = new Date(parts[0], parts[1] - 1, parts[2]);
+                    if (venc < hoje) {
+                        isInadimplente = true;
+                    }
+                }
+            }
+
+            if (isInadimplente) {
+                clientesInadimplentes++;
+            } else {
+                clientesPagos++;
+            }
+        });
 
         return res.status(200).json({
-            empresas: totalEmpresas || 0,
-            leads: totalLeads || 0,
-            conversas: totalConversas || 0,
-            usuarios: totalUsuarios || 0
+            empresas: totalEmpresas,
+            pagos: clientesPagos,
+            inadimplentes: clientesInadimplentes,
+            faturamento: 0 // Placeholder para a futura integração com Mercado Pago
         });
 
     } catch (err) {

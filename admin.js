@@ -117,9 +117,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const stats = await res.json();
             
             document.getElementById('kpi-empresas').innerHTML = stats.empresas;
-            document.getElementById('kpi-leads').innerHTML = stats.leads;
-            document.getElementById('kpi-conversas').innerHTML = stats.conversas;
-            document.getElementById('kpi-usuarios').innerHTML = stats.usuarios;
+            document.getElementById('kpi-pagos').innerHTML = stats.pagos;
+            document.getElementById('kpi-inadimplentes').innerHTML = stats.inadimplentes;
+            document.getElementById('kpi-faturamento').innerHTML = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.faturamento);
         } catch (e) {
             console.error(e);
             document.querySelectorAll('.kpi-content h2').forEach(el => {
