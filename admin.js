@@ -162,7 +162,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 }
                 
-                let statusBadge = isInadimplente ? '<span class="badge danger">Inadimplente</span>' : '<span class="badge success">Ativo</span>';
+                let statusBadge = isInadimplente 
+                    ? '<span style="background-color: #ef4444; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Inadimplente</span>' 
+                    : '<span style="background-color: #10b981; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Pago</span>';
                 
                 // Formatar Data
                 let dataVenc = 'Não definido';
