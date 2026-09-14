@@ -380,7 +380,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                             if (dropdown) dropdown.style.display = 'none';
                         }, 250);
                     });
-                });0);
                 });
                 
                 const closeDropdown = (ev) => {
