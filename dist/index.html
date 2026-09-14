@@ -355,7 +355,41 @@
     <script>
         window.initDashboard = async function () {
             if (!window.dbAPI) return;
-            const leads = await window.dbAPI.fetchLeads();
+            let leads = await window.dbAPI.fetchLeads();
+
+            // Filter by date
+            const filterStart = localStorage.getItem('calendar_filter_start');
+            const filterEnd = localStorage.getItem('calendar_filter_end');
+            
+            let startDt, endDt;
+            
+            if (filterStart && filterEnd) {
+                startDt = new Date(filterStart);
+                endDt = new Date(filterEnd);
+            } else if (filterStart) {
+                startDt = new Date(filterStart);
+                endDt = null;
+            } else {
+                // Se não tiver filtro (ou limpou), padrão é o mês atual!
+                const agora = new Date();
+                startDt = new Date(agora.getFullYear(), agora.getMonth(), 1);
+                endDt = new Date(agora.getFullYear(), agora.getMonth() + 1, 0);
+            }
+            
+            if (startDt) {
+                startDt.setHours(0,0,0,0);
+                leads = leads.filter(l => {
+                    const lDate = new Date(l.criado_em);
+                    return lDate >= startDt;
+                });
+            }
+            if (endDt) {
+                endDt.setHours(23,59,59,999);
+                leads = leads.filter(l => {
+                    const lDate = new Date(l.criado_em);
+                    return lDate <= endDt;
+                });
+            }
 
             // Atualizar contadores KPI
             document.getElementById('kpi-total').textContent = leads.length;
