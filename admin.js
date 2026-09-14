@@ -317,8 +317,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <label style="font-weight: 500; font-size: 14px; margin-bottom: 4px; text-align: left; display: block; color: var(--color-text-main);">Status da Empresa</label>
                     <select class="crm-select filter-status-select" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-bg-main); color: var(--color-text-main); font-family: inherit; font-size: 13px;">
                         <option value="Todos">Todos os status</option>
-                        <option value="Pago">Pago</option>
                         <option value="Inadimplente">Inadimplente</option>
+                        <option value="Aviso previo">Aviso previo</option>
+                        <option value="Pagos">Pagos</option>
                     </select>
                 `;
                 
@@ -330,7 +331,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 dropdown.addEventListener('click', (ev) => ev.stopPropagation());
                 
                 select.addEventListener('change', () => {
-                    const statusVal = select.value;
+                    const statusVal = select.value.toLowerCase();
                     
                     // Primeiro, restaura visibilidade pela busca (texto e data) original
                     applyAdminFilters();
@@ -339,14 +340,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const tableRows = document.querySelectorAll('.data-table tbody tr');
                     tableRows.forEach(row => {
                         if (row.style.display !== 'none') {
-                            if (statusVal === 'Todos') {
+                            if (statusVal === 'todos') {
                                 row.style.display = '';
                             } else {
                                 const cells = row.querySelectorAll('td');
                                 if (cells.length > 4) {
                                     const badge = cells[4].querySelector('.badge');
                                     const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[4].textContent.trim().toLowerCase();
-                                    if (rowStatus !== statusVal.toLowerCase()) {
+                                    
+                                    let match = false;
+                                    if (statusVal === 'pagos' && rowStatus === 'pago') {
+                                        match = true;
+                                    } else if (statusVal === 'aviso previo' && rowStatus.includes('vence')) {
+                                        match = true;
+                                    } else if (statusVal === rowStatus) {
+                                        match = true;
+                                    }
+                                    
+                                    if (!match) {
                                         row.style.display = 'none';
                                     }
                                 }

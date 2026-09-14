@@ -335,6 +335,14 @@ document.addEventListener('DOMContentLoaded', () => {
         notifBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             notifDropdown.classList.toggle('show');
+            
+            // Leitura automática: se o dropdown acabou de ser aberto, marca como lido
+            if (notifDropdown.classList.contains('show')) {
+                const btnReadAll = document.getElementById('btn-read-all');
+                if (btnReadAll && btnReadAll.style.display !== 'none') {
+                    btnReadAll.click();
+                }
+            }
 
             // Fecha o user dropdown se estiver aberto
             if (userDropdown) userDropdown.classList.remove('show');
