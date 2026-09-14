@@ -360,8 +360,11 @@
     <!-- Scripts -->
     <script type="module" src="tutorial.js"></script>
     <script type="module" src="script.js"></script>
-    <script>
-        function switchSettingsTab(tabName) {
+    <script type="module">
+        import { supabase } from './supabase.js';
+        
+        // Colocar switchSettingsTab e handleAvatarChange no escopo global para o HTML achar
+        window.switchSettingsTab = function(tabName) {
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
                 btn.style.borderBottomColor = 'transparent';
@@ -373,15 +376,18 @@
             });
 
             const activeBtn = document.getElementById(`tab-${tabName}`);
-            activeBtn.classList.add('active');
-            activeBtn.style.borderBottomColor = 'var(--color-primary)';
-            activeBtn.style.color = 'var(--color-primary)';
-            activeBtn.style.fontWeight = '600';
+            if(activeBtn) {
+                activeBtn.classList.add('active');
+                activeBtn.style.borderBottomColor = 'var(--color-primary)';
+                activeBtn.style.color = 'var(--color-primary)';
+                activeBtn.style.fontWeight = '600';
+            }
 
-            document.getElementById(`content-${tabName}`).style.display = 'block';
+            const activeContent = document.getElementById(`content-${tabName}`);
+            if(activeContent) activeContent.style.display = 'block';
         }
 
-        function handleAvatarChange(event) {
+        window.handleAvatarChange = function(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
