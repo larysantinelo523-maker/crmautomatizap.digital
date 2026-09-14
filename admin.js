@@ -293,208 +293,82 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    function createAdminModal(title, contentHtml, onApply) {
-        const overlay = document.createElement('div');
-        overlay.style.position = 'fixed';
-        overlay.style.top = '0';
-        overlay.style.left = '0';
-        overlay.style.width = '100vw';
-        overlay.style.height = '100vh';
-        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
-        overlay.style.backdropFilter = 'blur(4px)';
-        overlay.style.zIndex = '2000';
-        overlay.style.display = 'flex';
-        overlay.style.alignItems = 'center';
-        overlay.style.justifyContent = 'center';
-        overlay.style.opacity = '0';
-        overlay.style.transition = 'opacity 0.2s';
-
-        const modal = document.createElement('div');
-        modal.className = 'card';
-        modal.style.width = '90%';
-        modal.style.maxWidth = '400px';
-        modal.style.transform = 'scale(0.95)';
-        modal.style.transition = 'transform 0.2s';
-
-        let html = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="font-size: 18px; margin: 0;">${title}</h3>
-                <button class="btn-icon xs close-modal"><i class="ph ph-x"></i></button>
-            </div>
-            <div style="margin-bottom: 24px;">
-                ${contentHtml}
-            </div>
-            <div style="display: flex; justify-content: space-between; gap: 12px;">
-                <button class="btn btn--outline close-modal" style="flex: 1;" id="btn-modal-limpar">Limpar Filtros</button>
-                <button class="btn btn--primary apply-modal" style="flex: 1;">Aplicar Filtro</button>
-            </div>
-        `;
-        modal.innerHTML = html;
-        overlay.appendChild(modal);
-        document.body.appendChild(overlay);
-
-        requestAnimationFrame(() => {
-            overlay.style.opacity = '1';
-            modal.style.transform = 'scale(1)';
-        });
-
-        const close = () => {
-            overlay.style.opacity = '0';
-            modal.style.transform = 'scale(0.95)';
-            setTimeout(() => overlay.remove(), 200);
-        };
-
-        modal.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', close));
-        
-        const btnLimpar = modal.querySelector('#btn-modal-limpar');
-        if (btnLimpar) {
-            btnLimpar.addEventListener('click', () => {
-                if (searchAdminInput) searchAdminInput.value = '';
-                adminSelectedDate = null;
-                updateAdminDateText();
-                applyAdminFilters();
-                close();
-            });
-        }
-        
-        modal.querySelector('.apply-modal').addEventListener('click', () => {
-            onApply(modal);
-            close();
-        });
-        
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) close();
-        });
-    }
-
     if (btnClearAdminFilters) {
-        btnClearAdminFilters.addEventListener('click', () => {
-            const content = `
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <div>
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Status da Empresa</label>
-                        <select id="modal-status-select" class="crm-select" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: transparent; color: var(--color-text-main);">
-                            <option value="Todos">Todos os status</option>
-                            <option value="Pago">Pago</option>
-                            <option value="Inadimplente">Inadimplente</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Selecione uma data</label>
-                        <div class="calendar-header">
-                            <button class="btn-icon xs" id="modal-cal-prev"><i class="ph ph-caret-left"></i></button>
-                            <strong id="modal-cal-month-year">...</strong>
-                            <button class="btn-icon xs" id="modal-cal-next"><i class="ph ph-caret-right"></i></button>
-                        </div>
-                        <div class="calendar-grid" id="modal-calendar-grid">
-                            <span class="cal-day-name">D</span>
-                            <span class="cal-day-name">S</span>
-                            <span class="cal-day-name">T</span>
-                            <span class="cal-day-name">Q</span>
-                            <span class="cal-day-name">Q</span>
-                            <span class="cal-day-name">S</span>
-                            <span class="cal-day-name">S</span>
-                        </div>
-                        <div style="display: flex; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--color-text-sec);">
-                            <span id="modal-cal-selection-text">Nenhuma data selecionada</span>
-                        </div>
-                    </div>
-                </div>
-            `;
+        btnClearAdminFilters.addEventListener('click', (e) => {
+            e.stopPropagation();
+            let dropdown = btnClearAdminFilters.querySelector('.status-filter-dropdown');
             
-            createAdminModal('Filtros Avançados', content, (modal) => {
-                const statusVal = modal.querySelector('#modal-status-select').value;
-                if (window.mSelectedDate) {
-                    adminSelectedDate = new Date(window.mSelectedDate);
-                    updateAdminDateText();
-                }
+            if (!dropdown) {
+                dropdown = document.createElement('div');
+                dropdown.className = 'status-filter-dropdown card';
+                dropdown.style.position = 'absolute';
+                dropdown.style.top = '100%';
+                dropdown.style.right = '0';
+                dropdown.style.marginTop = '8px';
+                dropdown.style.minWidth = '200px';
+                dropdown.style.zIndex = '1000';
+                dropdown.style.padding = '12px';
+                dropdown.style.display = 'flex';
+                dropdown.style.flexDirection = 'column';
+                dropdown.style.gap = '8px';
+                dropdown.style.cursor = 'default';
                 
-                // Primeiro aplicamos a busca textual e data pelo pipeline existente
-                applyAdminFilters();
+                dropdown.innerHTML = `
+                    <label style="font-weight: 500; font-size: 14px; margin-bottom: 4px; text-align: left; display: block; color: var(--color-text-main);">Status da Empresa</label>
+                    <select class="crm-select filter-status-select" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-bg-main); color: var(--color-text-main); font-family: inherit; font-size: 13px;">
+                        <option value="Todos">Todos os status</option>
+                        <option value="Pago">Pago</option>
+                        <option value="Inadimplente">Inadimplente</option>
+                    </select>
+                `;
                 
-                // Depois filtramos as linhas visíveis baseadas no Status, in-place
-                const tableRows = document.querySelectorAll('.data-table tbody tr');
-                tableRows.forEach(row => {
-                    if (row.style.display !== 'none') {
-                        if (statusVal !== 'Todos') {
-                            const cells = row.querySelectorAll('td');
-                            if (cells.length > 4) {
-                                const badge = cells[4].querySelector('.badge');
-                                const rowStatus = badge ? badge.textContent.trim() : '';
-                                if (rowStatus !== statusVal) {
-                                    row.style.display = 'none';
+                btnClearAdminFilters.style.position = 'relative';
+                btnClearAdminFilters.appendChild(dropdown);
+                
+                const select = dropdown.querySelector('.filter-status-select');
+                
+                dropdown.addEventListener('click', (ev) => ev.stopPropagation());
+                
+                select.addEventListener('change', () => {
+                    const statusVal = select.value;
+                    
+                    // Primeiro, restaura visibilidade pela busca (texto e data) original
+                    applyAdminFilters();
+                    
+                    // Em seguida, varre as linhas que estão visíveis e aplica o status (in-place)
+                    const tableRows = document.querySelectorAll('.data-table tbody tr');
+                    tableRows.forEach(row => {
+                        if (row.style.display !== 'none') {
+                            if (statusVal === 'Todos') {
+                                row.style.display = '';
+                            } else {
+                                const cells = row.querySelectorAll('td');
+                                if (cells.length > 4) {
+                                    const badge = cells[4].querySelector('.badge');
+                                    const rowStatus = badge ? badge.textContent.trim() : cells[4].textContent.trim();
+                                    if (rowStatus !== statusVal) {
+                                        row.style.display = 'none';
+                                    }
                                 }
                             }
                         }
-                    }
-                });
-            });
-
-            // Lógica do Modal Calendar
-            const mCalendarGrid = document.getElementById('modal-calendar-grid');
-            const mMonthYearTxt = document.getElementById('modal-cal-month-year');
-            const mSelectionTxt = document.getElementById('modal-cal-selection-text');
-            const mPrevBtn = document.getElementById('modal-cal-prev');
-            const mNextBtn = document.getElementById('modal-cal-next');
-
-            let mCurrentDate = new Date();
-            window.mSelectedDate = adminSelectedDate ? new Date(adminSelectedDate) : null;
-
-            function renderModalCalendar() {
-                if (!mCalendarGrid) return;
-                const days = mCalendarGrid.querySelectorAll('.cal-day');
-                days.forEach(d => d.remove());
-                const empties = mCalendarGrid.querySelectorAll('.empty');
-                empties.forEach(e => e.remove());
-
-                const year = mCurrentDate.getFullYear();
-                const month = mCurrentDate.getMonth();
-                const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-                if (mMonthYearTxt) mMonthYearTxt.textContent = `${monthNames[month]} ${year}`;
-
-                const firstDay = new Date(year, month, 1).getDay();
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-                const hoje = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
-                const todayDate = hoje.getDate();
-                const todayMonth = hoje.getMonth();
-                const todayYear = hoje.getFullYear();
-
-                for (let i = 0; i < firstDay; i++) {
-                    const empty = document.createElement('div');
-                    empty.className = 'cal-day empty';
-                    mCalendarGrid.appendChild(empty);
-                }
-
-                for (let i = 1; i <= daysInMonth; i++) {
-                    const dayDiv = document.createElement('div');
-                    dayDiv.className = 'cal-day';
-                    dayDiv.textContent = i;
-                    const thisDate = new Date(year, month, i);
-
-                    if (i === todayDate && month === todayMonth && year === todayYear) {
-                        dayDiv.classList.add('today-date'); // Verde claro
-                    }
-
-                    if (window.mSelectedDate && thisDate.getTime() === window.mSelectedDate.getTime()) {
-                        dayDiv.classList.add('selected');
-                    }
-
-                    dayDiv.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        window.mSelectedDate = new Date(thisDate);
-                        if (mSelectionTxt) mSelectionTxt.textContent = `Data selecionada: ${i.toString().padStart(2, '0')}/${(month+1).toString().padStart(2, '0')}/${year}`;
-                        renderModalCalendar();
                     });
-
-                    mCalendarGrid.appendChild(dayDiv);
-                }
+                    
+                    setTimeout(() => {
+                        if (dropdown) dropdown.remove();
+                    }, 250);
+                });
+                
+                const closeDropdown = (ev) => {
+                    if (!btnClearAdminFilters.contains(ev.target)) {
+                        dropdown.remove();
+                        document.removeEventListener('click', closeDropdown);
+                    }
+                };
+                document.addEventListener('click', closeDropdown);
+            } else {
+                dropdown.remove();
             }
-
-            if (mPrevBtn) mPrevBtn.addEventListener('click', () => { mCurrentDate.setMonth(mCurrentDate.getMonth() - 1); renderModalCalendar(); });
-            if (mNextBtn) mNextBtn.addEventListener('click', () => { mCurrentDate.setMonth(mCurrentDate.getMonth() + 1); renderModalCalendar(); });
-
-            renderModalCalendar();
         });
     }
 

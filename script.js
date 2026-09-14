@@ -758,150 +758,78 @@ document.addEventListener('DOMContentLoaded', () => {
     filterBtns.forEach(btn => {
         // Verifica se é o botão com funil
         if (btn.querySelector('.ph-funnel')) {
-            btn.addEventListener('click', () => {
-                const content = `
-                    <div style="display: flex; flex-direction: column; gap: 16px;">
-                        <div>
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Status do Lead</label>
-                            <select id="modal-status-select" class="crm-select">
-                                <option value="Todos">Todos os status</option>
-                                <option value="Em atendimento">Em atendimento</option>
-                                <option value="Aguardando vendedor">Aguardando vendedor</option>
-                                <option value="Em negociação">Em negociação</option>
-                                <option value="Qualificado">Qualificado</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Selecione uma data</label>
-                            <div class="calendar-header">
-                                <button class="btn-icon xs" id="modal-cal-prev"><i class="ph ph-caret-left"></i></button>
-                                <strong id="modal-cal-month-year">...</strong>
-                                <button class="btn-icon xs" id="modal-cal-next"><i class="ph ph-caret-right"></i></button>
-                            </div>
-                            <div class="calendar-grid" id="modal-calendar-grid">
-                                <span class="cal-day-name">D</span>
-                                <span class="cal-day-name">S</span>
-                                <span class="cal-day-name">T</span>
-                                <span class="cal-day-name">Q</span>
-                                <span class="cal-day-name">Q</span>
-                                <span class="cal-day-name">S</span>
-                                <span class="cal-day-name">S</span>
-                            </div>
-                            <div style="display: flex; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--color-text-sec);">
-                                <span id="modal-cal-selection-text">Selecione a data inicial</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                createModal('Filtros Avançados', content, (modal) => {
-                    const statusVal = modal.querySelector('#modal-status-select').value;
-
-                    // A data selecionada estaria em mRangeStart e mRangeEnd (variáveis abaixo)
-
-                    // Lógica simples de filtro na tabela atual (por status)
-                    const tableRows = document.querySelectorAll('.data-table tbody tr');
-                    tableRows.forEach(row => {
-                        if (statusVal === 'Todos') {
-                            row.style.display = '';
-                        } else {
-                            // O status fica geralmente na 4ª coluna
-                            const cells = row.querySelectorAll('td');
-                            if (cells.length > 3) {
-                                const rowStatus = cells[3].textContent.trim();
-                                if (rowStatus === statusVal) {
-                                    row.style.display = '';
-                                } else {
-                                    row.style.display = 'none';
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                let dropdown = btn.querySelector('.status-filter-dropdown');
+                
+                if (!dropdown) {
+                    dropdown = document.createElement('div');
+                    dropdown.className = 'status-filter-dropdown card';
+                    dropdown.style.position = 'absolute';
+                    dropdown.style.top = '100%';
+                    dropdown.style.right = '0';
+                    dropdown.style.marginTop = '8px';
+                    dropdown.style.minWidth = '200px';
+                    dropdown.style.zIndex = '1000';
+                    dropdown.style.padding = '12px';
+                    dropdown.style.display = 'flex';
+                    dropdown.style.flexDirection = 'column';
+                    dropdown.style.gap = '8px';
+                    dropdown.style.cursor = 'default';
+                    
+                    dropdown.innerHTML = `
+                        <label style="font-weight: 500; font-size: 14px; margin-bottom: 4px; text-align: left; display: block; color: var(--color-text-main);">Status do Lead</label>
+                        <select class="crm-select filter-status-select" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-bg-main); color: var(--color-text-main); font-family: inherit; font-size: 13px;">
+                            <option value="Todos">Todos os status</option>
+                            <option value="Em atendimento">Em atendimento</option>
+                            <option value="Aguardando vendedor">Aguardando vendedor</option>
+                            <option value="Em negociação">Em negociação</option>
+                            <option value="Qualificado">Qualificado</option>
+                        </select>
+                    `;
+                    
+                    btn.style.position = 'relative';
+                    btn.appendChild(dropdown);
+                    
+                    const select = dropdown.querySelector('.filter-status-select');
+                    
+                    dropdown.addEventListener('click', (ev) => ev.stopPropagation());
+                    
+                    select.addEventListener('change', () => {
+                        const statusVal = select.value;
+                        const tableRows = document.querySelectorAll('.data-table tbody tr');
+                        tableRows.forEach(row => {
+                            if (statusVal === 'Todos') {
+                                row.style.display = '';
+                            } else {
+                                const cells = row.querySelectorAll('td');
+                                if (cells.length > 3) {
+                                    const badge = cells[3].querySelector('.badge');
+                                    const rowStatus = badge ? badge.textContent.trim() : cells[3].textContent.trim();
+                                    if (rowStatus === statusVal) {
+                                        row.style.display = '';
+                                    } else {
+                                        row.style.display = 'none';
+                                    }
                                 }
                             }
-                        }
-                    });
-                });
-
-                // --- Inicializa o calendário dentro do modal recém criado ---
-                const mCalendarGrid = document.getElementById('modal-calendar-grid');
-                const mMonthYearTxt = document.getElementById('modal-cal-month-year');
-                const mSelectionTxt = document.getElementById('modal-cal-selection-text');
-                const mPrevBtn = document.getElementById('modal-cal-prev');
-                const mNextBtn = document.getElementById('modal-cal-next');
-
-                let mCurrentDate = new Date();
-                let mRangeStart = null;
-                let mRangeEnd = null;
-
-                function renderModalCalendar() {
-                    if (!mCalendarGrid) return;
-
-                    const days = mCalendarGrid.querySelectorAll('.cal-day');
-                    days.forEach(d => d.remove());
-                    const empties = mCalendarGrid.querySelectorAll('.empty');
-                    empties.forEach(e => e.remove());
-
-                    const year = mCurrentDate.getFullYear();
-                    const month = mCurrentDate.getMonth();
-                    const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-                    if (mMonthYearTxt) mMonthYearTxt.textContent = `${monthNames[month]} ${year}`;
-
-                    const firstDay = new Date(year, month, 1).getDay();
-                    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-                    for (let i = 0; i < firstDay; i++) {
-                        const empty = document.createElement('div');
-                        empty.className = 'cal-day empty';
-                        mCalendarGrid.appendChild(empty);
-                    }
-
-                    for (let i = 1; i <= daysInMonth; i++) {
-                        const dayDiv = document.createElement('div');
-                        dayDiv.className = 'cal-day';
-                        dayDiv.textContent = i;
-
-                        const thisDate = new Date(year, month, i);
-
-                        if (mRangeStart && mRangeEnd) {
-                            if (thisDate.getTime() === mRangeStart.getTime()) dayDiv.classList.add('start-range');
-                            if (thisDate.getTime() === mRangeEnd.getTime()) dayDiv.classList.add('end-range');
-                            if (thisDate > mRangeStart && thisDate < mRangeEnd) dayDiv.classList.add('in-range');
-                        } else if (mRangeStart && thisDate.getTime() === mRangeStart.getTime()) {
-                            dayDiv.classList.add('selected');
-                        }
-
-                        dayDiv.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            if (!mRangeStart || (mRangeStart && mRangeEnd)) {
-                                mRangeStart = thisDate;
-                                mRangeEnd = null;
-                                if (mSelectionTxt) mSelectionTxt.textContent = `De: ${i} de ${monthNames[month]} - Selecione o fim`;
-                            } else if (mRangeStart && !mRangeEnd) {
-                                if (thisDate < mRangeStart) {
-                                    mRangeEnd = mRangeStart;
-                                    mRangeStart = thisDate;
-                                } else {
-                                    mRangeEnd = thisDate;
-                                }
-                                if (mSelectionTxt) mSelectionTxt.textContent = `Período selecionado: ${mRangeStart.getDate().toString().padStart(2, '0')}/${(mRangeStart.getMonth() + 1).toString().padStart(2, '0')} até ${mRangeEnd.getDate().toString().padStart(2, '0')}/${(mRangeEnd.getMonth() + 1).toString().padStart(2, '0')}`;
-                            }
-                            renderModalCalendar();
                         });
-
-                        mCalendarGrid.appendChild(dayDiv);
-                    }
+                        
+                        setTimeout(() => {
+                            if (dropdown) dropdown.remove();
+                        }, 250);
+                    });
+                    
+                    const closeDropdown = (ev) => {
+                        if (!btn.contains(ev.target)) {
+                            dropdown.remove();
+                            document.removeEventListener('click', closeDropdown);
+                        }
+                    };
+                    document.addEventListener('click', closeDropdown);
+                } else {
+                    dropdown.remove();
                 }
-
-                if (mPrevBtn) mPrevBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    mCurrentDate.setMonth(mCurrentDate.getMonth() - 1);
-                    renderModalCalendar();
-                });
-
-                if (mNextBtn) mNextBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    mCurrentDate.setMonth(mCurrentDate.getMonth() + 1);
-                    renderModalCalendar();
-                });
-
-                renderModalCalendar();
             });
         }
     });
