@@ -44,6 +44,7 @@ export default async function handler(req, res) {
 
                 // Calcula +1 mês baseado na data ATUAL do banco
                 let nextDate = new Date();
+                const now = new Date();
                 if (user.data_vencimento && user.data_vencimento !== 'N/A') {
                     const pts = user.data_vencimento.split('-');
                     let yr = parseInt(pts[0], 10), mo = parseInt(pts[1], 10) - 1, dy = parseInt(pts[2], 10);
@@ -51,6 +52,13 @@ export default async function handler(req, res) {
                     if (tMo > 11) { tMo = 0; tYr++; }
                     let mDy = new Date(tYr, tMo + 1, 0).getDate();
                     nextDate = new Date(tYr, tMo, Math.min(dy, mDy), 0, 0, 0, 0);
+                    
+                    // Se o cliente estava inadimplente há muito tempo e a nova data ainda fica no passado,
+                    // damos +1 mês a partir do dia de hoje para ser justo.
+                    if (nextDate < now) {
+                        nextDate = new Date(now);
+                        nextDate.setMonth(nextDate.getMonth() + 1);
+                    }
                 } else {
                     nextDate.setMonth(nextDate.getMonth() + 1);
                 }
