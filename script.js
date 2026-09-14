@@ -1,22 +1,133 @@
 // --- Verificação de Autenticação Global ---
 import { fetchUserData } from './data.js';
 
-let tenantVencDate = null;
-fetchUserData().then(user => {
-    if (user && user.data_vencimento && user.data_vencimento !== 'N/A') {
-        const parts = user.data_vencimento.split('-');
-        if (parts.length === 3) {
-            tenantVencDate = new Date(parts[0], parts[1] - 1, parts[2]);
-            tenantVencDate.setHours(0,0,0,0);
-            window.dispatchEvent(new Event('tenantDateLoaded'));
-        }
-    }
-});
-
 window.getBrasiliaDate = function() {
     const str = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
     return new Date(str);
 };
+
+window.calculateNextDueDate = function(baseDateStr) {
+    if (!baseDateStr || baseDateStr === 'N/A') return null;
+    const parts = baseDateStr.split('-');
+    if (parts.length !== 3) return null;
+    let year = parseInt(parts[0], 10);
+    let month = parseInt(parts[1], 10) - 1; // 0-11
+    let day = parseInt(parts[2], 10);
+    
+    let targetMonth = month + 1;
+    let targetYear = year;
+    if (targetMonth > 11) {
+        targetMonth = 0;
+        targetYear++;
+    }
+    
+    // Pega o maximo de dias do mes alvo para evitar overflow (ex: 31 Jan -> 28 Fev)
+    let maxDaysInTargetMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
+    let targetDay = Math.min(day, maxDaysInTargetMonth);
+    
+    return new Date(targetYear, targetMonth, targetDay, 0, 0, 0, 0);
+};
+
+window.simulatePaymentAndUnlock = async function(userId) {
+    // Para simular o Mercado Pago webhook: Avança a data +1 mes no banco
+    if (!window.tenantVencDateStr) return;
+    
+    const nextDate = window.calculateNextDueDate(window.tenantVencDateStr);
+    const newDateStr = `${nextDate.getFullYear()}-${String(nextDate.getMonth()+1).padStart(2,'0')}-${String(nextDate.getDate()).padStart(2,'0')}`;
+    
+    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
+    const supabaseUrl = 'https://tvkntfytymxyivtqndqf.supabase.co'; // Deve ser pego do data.js mas pra simplificar aqui.
+    // Como não temos import do supabase direto aqui sem init, vamos dar reload pro usuario ver se funciona:
+    
+    // Update local storage logic will fail here since we need the supabase client. 
+    // Wait, script.js already has `import { fetchUserData } from './data.js';`
+};
+
+let tenantVencDate = null;
+window.tenantVencDateStr = null;
+
+fetchUserData().then(user => {
+    if (user && user.data_vencimento && user.data_vencimento !== 'N/A') {
+        window.tenantVencDateStr = user.data_vencimento;
+        tenantVencDate = window.calculateNextDueDate(user.data_vencimento);
+        window.dispatchEvent(new Event('tenantDateLoaded'));
+        
+        // Verificação do Bloqueio Inadimplência!
+        if (tenantVencDate) {
+            const todayBRT = window.getBrasiliaDate();
+            todayBRT.setHours(0,0,0,0);
+            
+            const diffTime = tenantVencDate.getTime() - todayBRT.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 0) {
+                // Bloqueia o CRM inteiro
+                const blocker = document.createElement('div');
+                blocker.id = 'inadimplente-blocker';
+                blocker.style.position = 'fixed';
+                blocker.style.inset = '0';
+                blocker.style.zIndex = '999999999';
+                blocker.style.backdropFilter = 'blur(12px)';
+                blocker.style.backgroundColor = 'rgba(255,255,255,0.4)';
+                blocker.style.display = 'flex';
+                blocker.style.justifyContent = 'center';
+                blocker.style.alignItems = 'center';
+                blocker.innerHTML = `
+                    <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); max-width: 400px; width: 90%; text-align: center; border: 2px solid #ef4444;">
+                        <div style="width: 60px; height: 60px; background: #fee2e2; color: #ef4444; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px; font-size: 28px;">
+                            <i class="ph ph-warning-circle"></i>
+                        </div>
+                        <h2 style="font-size: 22px; color: #1f2937; margin-bottom: 12px; font-weight: 700;">Acesso Bloqueado</h2>
+                        <p style="color: #4b5563; font-size: 15px; margin-bottom: 24px; line-height: 1.5;">Sua mensalidade venceu no dia <strong>${tenantVencDate.toLocaleDateString('pt-BR')}</strong>. Efetue o pagamento para restaurar o acesso imediato ao seu CRM.</p>
+                        
+                        <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 24px;">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=mercado_pago_mock" style="width: 160px; height: 160px; margin: 0 auto; display: block;" />
+                            <button id="btn-blocker-pix" class="btn btn--primary" style="width: 100%; justify-content: center; margin-top: 16px; border-radius: 8px;">
+                                <i class="ph ph-copy"></i> Copiar Código PIX
+                            </button>
+                        </div>
+                        
+                        <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Simulador de pagamento autônomo (Para teste do Admin):</p>
+                        <button id="btn-simulate-payment" class="btn outline" style="width: 100%; justify-content: center; border-radius: 8px; border-color: #10b981; color: #10b981;">
+                            <i class="ph ph-check-circle"></i> Simular Pagamento Pago
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(blocker);
+                
+                document.getElementById('btn-blocker-pix').addEventListener('click', (e) => {
+                    navigator.clipboard.writeText('00020101021126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-4266141740005204000053039865802BR5913AutomatiZAP6009Sao Paulo62070503***6304A1B2');
+                    e.target.innerHTML = '<i class="ph ph-check"></i> Código Copiado!';
+                    e.target.style.background = '#166534';
+                    setTimeout(() => {
+                        e.target.innerHTML = '<i class="ph ph-copy"></i> Copiar Código PIX';
+                        e.target.style.background = '';
+                    }, 2000);
+                });
+                
+                document.getElementById('btn-simulate-payment').addEventListener('click', async (e) => {
+                    e.target.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Processando...';
+                    e.target.disabled = true;
+                    try {
+                        const { supabase } = await import('./supabase.js');
+                        const nextDate = window.calculateNextDueDate(window.tenantVencDateStr);
+                        const newDateStr = `${nextDate.getFullYear()}-${String(nextDate.getMonth()+1).padStart(2,'0')}-${String(nextDate.getDate()).padStart(2,'0')}`;
+                        
+                        const { error } = await supabase.from('usuarios').update({ data_vencimento: newDateStr }).eq('id', user.id);
+                        if(error) throw error;
+                        
+                        alert('Pagamento processado com sucesso! A tela será liberada agora.');
+                        window.location.reload();
+                    } catch(err) {
+                        alert('Erro ao processar simulação: ' + err.message);
+                        e.target.innerHTML = '<i class="ph ph-check-circle"></i> Simular Pagamento Pago';
+                        e.target.disabled = false;
+                    }
+                });
+            }
+        }
+    }
+});
 
 // --- Relógio da Sidebar em Tempo Real ---
 function updateSidebarClock() {

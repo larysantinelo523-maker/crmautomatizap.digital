@@ -162,15 +162,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         tenantsList.forEach(tenant => {
             let statusBadge = '<span style="background-color: #10b981; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Pago</span>';
 
+            // Função de cálculo autônomo replicada do script.js
+            const calcNextDue = (baseDateStr) => {
+                if (!baseDateStr || baseDateStr === 'N/A') return null;
+                const pts = baseDateStr.split('-');
+                if (pts.length !== 3) return null;
+                let yr = parseInt(pts[0], 10), mo = parseInt(pts[1], 10) - 1, dy = parseInt(pts[2], 10);
+                let tMo = mo + 1, tYr = yr;
+                if (tMo > 11) { tMo = 0; tYr++; }
+                let mDy = new Date(tYr, tMo + 1, 0).getDate();
+                return new Date(tYr, tMo, Math.min(dy, mDy), 0, 0, 0, 0);
+            };
+
+            let nextDate = null;
             if (tenant.status === 'inadimplente' || tenant.status === 'cancelado') {
                 statusBadge = '<span style="background-color: #ef4444; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Inadimplente</span>';
             } else if (tenant.vencimento && tenant.vencimento !== 'N/A') {
-                const hoje = new Date();
+                const hojeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
+                const hoje = new Date(hojeStr);
                 hoje.setHours(0, 0, 0, 0);
-                const parts = tenant.vencimento.split('-');
-                if (parts.length === 3) {
-                    const venc = new Date(parts[0], parts[1] - 1, parts[2]);
-                    const diffTime = venc - hoje;
+                
+                nextDate = calcNextDue(tenant.vencimento);
+                if (nextDate) {
+                    const diffTime = nextDate.getTime() - hoje.getTime();
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
                     if (diffDays < 0) {
@@ -183,9 +197,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
 
-            // Formatar Data
+            // Formatar Data (mostrar a próxima fatura)
             let dataVenc = 'Não definido';
-            if (tenant.vencimento && tenant.vencimento !== 'N/A') {
+            if (nextDate) {
+                dataVenc = nextDate.toLocaleDateString('pt-BR');
+            } else if (tenant.vencimento && tenant.vencimento !== 'N/A') {
                 const [ano, mes, dia] = tenant.vencimento.split('-');
                 dataVenc = `${dia}/${mes}/${ano}`;
             }

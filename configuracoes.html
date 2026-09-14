@@ -432,16 +432,21 @@
             const qrOverlay = document.getElementById('qr-overlay');
             const btnCopyPix = document.getElementById('btn-copy-pix');
 
-            let vDate = new Date(); // default to today if missing
+            let vDate = null;
             if (userData.data_vencimento) {
-                vDate = new Date(userData.data_vencimento + 'T00:00:00'); // fix timezone offset
-                subDueDate.textContent = vDate.toLocaleDateString('pt-BR');
+                // Usa a lógica global autônoma (+1 mês)
+                vDate = window.calculateNextDueDate(userData.data_vencimento); 
+                subDueDate.textContent = vDate ? vDate.toLocaleDateString('pt-BR') : '--/--/----';
             }
 
-            const today = new Date();
+            const today = window.getBrasiliaDate();
             today.setHours(0, 0, 0, 0);
-            const timeDiff = vDate.getTime() - today.getTime();
-            const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            
+            let daysLeft = 0;
+            if (vDate) {
+                const timeDiff = vDate.getTime() - today.getTime();
+                daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            }
 
             subDaysLeft.textContent = daysLeft;
 
