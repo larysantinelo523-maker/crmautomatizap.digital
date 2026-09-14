@@ -6,6 +6,16 @@ window.getBrasiliaDate = function() {
     return new Date(str);
 };
 
+window.parseExactDate = function(baseDateStr) {
+    if (!baseDateStr || baseDateStr === 'N/A') return null;
+    const parts = baseDateStr.split('-');
+    if (parts.length !== 3) return null;
+    let year = parseInt(parts[0], 10);
+    let month = parseInt(parts[1], 10) - 1; // 0-11
+    let day = parseInt(parts[2], 10);
+    return new Date(year, month, day, 0, 0, 0, 0);
+};
+
 window.calculateNextDueDate = function(baseDateStr) {
     if (!baseDateStr || baseDateStr === 'N/A') return null;
     const parts = baseDateStr.split('-');
@@ -49,7 +59,7 @@ window.tenantVencDateStr = null;
 fetchUserData().then(user => {
     if (user && user.data_vencimento && user.data_vencimento !== 'N/A') {
         window.tenantVencDateStr = user.data_vencimento;
-        tenantVencDate = window.calculateNextDueDate(user.data_vencimento);
+        tenantVencDate = window.parseExactDate(user.data_vencimento);
         window.dispatchEvent(new Event('tenantDateLoaded'));
         
         // Verificação do Bloqueio Inadimplência!
@@ -80,25 +90,62 @@ fetchUserData().then(user => {
                         <h2 style="font-size: 22px; color: #1f2937; margin-bottom: 12px; font-weight: 700;">Acesso Bloqueado</h2>
                         <p style="color: #4b5563; font-size: 15px; margin-bottom: 24px; line-height: 1.5;">Sua mensalidade venceu no dia <strong>${tenantVencDate.toLocaleDateString('pt-BR')}</strong>. Efetue o pagamento para restaurar o acesso imediato ao seu CRM.</p>
                         
-                        <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 24px;">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=mercado_pago_mock" style="width: 160px; height: 160px; margin: 0 auto; display: block;" />
-                            <button id="btn-blocker-pix" class="btn btn--primary" style="width: 100%; justify-content: center; margin-top: 16px; border-radius: 8px;">
-                                <i class="ph ph-copy"></i> Copiar Código PIX
-                            </button>
+                        <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 24px;" id="pix-container">
+                            <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                                <i class="ph ph-spinner ph-spin" style="font-size: 24px; color: #10b981;"></i>
+                                <span style="font-size: 14px; color: #64748b;">Gerando PIX Mercado Pago...</span>
+                            </div>
                         </div>
                     </div>
                 `;
                 document.body.appendChild(blocker);
                 
-                document.getElementById('btn-blocker-pix').addEventListener('click', (e) => {
-                    navigator.clipboard.writeText('00020101021126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-4266141740005204000053039865802BR5913AutomatiZAP6009Sao Paulo62070503***6304A1B2');
-                    e.target.innerHTML = '<i class="ph ph-check"></i> Código Copiado!';
-                    e.target.style.background = '#166534';
-                    setTimeout(() => {
-                        e.target.innerHTML = '<i class="ph ph-copy"></i> Copiar Código PIX';
-                        e.target.style.background = '';
-                    }, 2000);
+                // Fetch PIX real
+                let currentPixString = '';
+                fetch('/api/create_pix', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email: user.email, userId: user.id })
+                }).then(res => res.json()).then(data => {
+                    if(data.qr_code_base64) {
+                        currentPixString = data.qr_code;
+                        document.getElementById('pix-container').innerHTML = `
+                            <img src="data:image/png;base64,${data.qr_code_base64}" style="width: 160px; height: 160px; margin: 0 auto; display: block; border-radius: 8px; border: 1px solid #e2e8f0;" />
+                            <button id="btn-blocker-pix" class="btn btn--primary" style="width: 100%; justify-content: center; margin-top: 16px; border-radius: 8px;">
+                                <i class="ph ph-copy"></i> Copiar Código PIX
+                            </button>
+                        `;
+                        
+                        document.getElementById('btn-blocker-pix').addEventListener('click', (e) => {
+                            navigator.clipboard.writeText(currentPixString);
+                            e.target.innerHTML = '<i class="ph ph-check"></i> Código Copiado!';
+                            e.target.style.background = '#166534';
+                            setTimeout(() => {
+                                e.target.innerHTML = '<i class="ph ph-copy"></i> Copiar Código PIX';
+                                e.target.style.background = '';
+                            }, 2000);
+                        });
+                    } else {
+                        document.getElementById('pix-container').innerHTML = '<p style="color:red; font-size:12px;">Erro ao gerar PIX.</p>';
+                    }
+                }).catch(err => {
+                    document.getElementById('pix-container').innerHTML = '<p style="color:red; font-size:12px;">Erro de conexão com Mercado Pago.</p>';
                 });
+                
+                // Polling para desbloqueio imediato (webhook já atualizou BD)
+                let isPaid = false;
+                setInterval(async () => {
+                    if (isPaid) return;
+                    try {
+                        const { supabase } = await import('./supabase.js');
+                        const { data } = await supabase.from('usuarios').select('data_vencimento').eq('id', user.id).single();
+                        if (data && data.data_vencimento && data.data_vencimento !== window.tenantVencDateStr) {
+                            isPaid = true;
+                            alert('Pagamento Aprovado! Seu CRM foi desbloqueado com sucesso!');
+                            window.location.reload();
+                        }
+                    } catch(e) {}
+                }, 4000);
             }
         }
     }

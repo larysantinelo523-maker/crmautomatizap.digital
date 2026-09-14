@@ -162,16 +162,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         tenantsList.forEach(tenant => {
             let statusBadge = '<span style="background-color: #10b981; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Pago</span>';
 
-            // Função de cálculo autônomo replicada do script.js
+            // Função de cálculo autônomo (Lê a data exata)
             const calcNextDue = (baseDateStr) => {
                 if (!baseDateStr || baseDateStr === 'N/A') return null;
                 const pts = baseDateStr.split('-');
                 if (pts.length !== 3) return null;
                 let yr = parseInt(pts[0], 10), mo = parseInt(pts[1], 10) - 1, dy = parseInt(pts[2], 10);
-                let tMo = mo + 1, tYr = yr;
-                if (tMo > 11) { tMo = 0; tYr++; }
-                let mDy = new Date(tYr, tMo + 1, 0).getDate();
-                return new Date(tYr, tMo, Math.min(dy, mDy), 0, 0, 0, 0);
+                return new Date(yr, mo, dy, 0, 0, 0, 0);
             };
 
             let nextDate = null;

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Painel Admin - AutomatiZAP CRM</title>
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Highcharts -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <!-- Mapas Highcharts -->
+    <script src="https://code.highcharts.com/maps/modules/map.js"></script>
+    <script src="https://code.highcharts.com/mapdata/countries/br/br-all.js"></script>
+    
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- CSS -->
+    <style>
+        /* Ajustes específicos do Admin Master, caso precise */
+        .admin-section {
+            display: none;
+        }
+        .admin-section.active {
+            display: block;
+        }
+        /* Esconder dropdown de data no admin */
+        #date-wrapper {
+            display: none;
+        }
+    </style>
+  <script type="module" crossorigin src="/assets/admin-rNhteA9B.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-uXpcW-fO.css">
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <img src="/assets/logo-BxJ03jLZ.png" alt="AutomatiZAP CRM" class="logo-img">
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-target="dashboard">
+                    <i class="ph ph-squares-four"></i>
+                    <span>Visão Geral Master</span>
+                </a>
+
+                <a href="#" class="nav-item" data-target="configuracoes">
+                    <i class="ph ph-gear"></i>
+                    <span>Configurações</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-clock" id="sidebar-clock" style="margin-bottom: 12px; padding: 12px; background: var(--color-bg-main); border-radius: 8px; border: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px;">
+                    <i class="ph ph-clock" style="font-size: 20px; color: var(--color-primary);"></i>
+                    <div>
+                        <div id="clock-time" style="font-size: 15px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">00:00</div>
+                        <div id="clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">Carregando...</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-titles">
+                    <button class="mobile-menu-btn"><i class="ph ph-list"></i></button>
+                    <a href="admin.html" class="mobile-logo-header">
+                        <img src="/assets/logo-BxJ03jLZ.png" alt="AutomatiZAP CRM" class="logo-img">
+                    </a>
+                    <div class="desktop-header-title">
+                        <h1 id="page-title">Visão Geral Master</h1>
+                        <p id="page-subtitle">Acompanhe as métricas globais de todos os seus clientes SaaS.</p>
+                    </div>
+                </div>
+                <div class="header-actions" style="display: flex; align-items: center; gap: 16px;">
+                    <div class="date-wrapper" id="date-wrapper" style="margin-right: 16px;">
+                        <button class="date-filter" id="date-filter-btn">
+                            <i class="ph ph-calendar-blank"></i>
+                            <span id="date-filter-text">01/09/2026 - 30/09/2026</span>
+                            <i class="ph ph-caret-down"></i>
+                        </button>
+                        
+                        <!-- Date Dropdown -->
+                        <div class="date-dropdown" id="date-dropdown">
+                            <div class="date-dropdown-header" style="display: flex; justify-content: space-between; align-items: center;">
+                                <h4>Filtrar por Data</h4>
+                                <button id="btn-clear-date-filter" style="background: none; border: none; font-size: 11px; color: var(--color-text-mut); cursor: pointer; text-decoration: underline;">Limpar</button>
+                            </div>
+                            <div class="date-dropdown-body">
+                                <div class="calendar-header">
+                                    <button class="btn-icon xs" id="cal-prev"><i class="ph ph-caret-left"></i></button>
+                                    <strong id="cal-month-year">Setembro 2026</strong>
+                                    <button class="btn-icon xs" id="cal-next"><i class="ph ph-caret-right"></i></button>
+                                </div>
+                                <div class="calendar-grid" id="calendar-grid">
+                                    <span class="cal-day-name">D</span>
+                                    <span class="cal-day-name">S</span>
+                                    <span class="cal-day-name">T</span>
+                                    <span class="cal-day-name">Q</span>
+                                    <span class="cal-day-name">Q</span>
+                                    <span class="cal-day-name">S</span>
+                                    <span class="cal-day-name">S</span>
+                                    <!-- Dias injetados via JS -->
+                                </div>
+                                <div style="display: flex; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--color-text-sec);">
+                                    <span id="cal-selection-text">Selecione uma data</span>
+                                </div>
+                            </div>
+                            <div class="date-dropdown-footer">
+                                <button class="btn btn--primary" id="btn-apply-date" style="width: 100%;">Aplicar Filtro</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-menu" id="user-menu-btn">
+                        <div class="avatar dark">AD</div>
+                        <div class="user-info">
+                            <span class="user-name">AutomatiZAP Master</span>
+                            <span class="user-role">SaaS Admin</span>
+                        </div>
+                        <i class="ph ph-caret-down"></i>
+                        
+                        <!-- Dropdown do Usuário -->
+                        <div class="user-dropdown" id="user-dropdown">
+                            <div class="mobile-clock-widget" style="padding: 12px 16px; border-bottom: 1px solid var(--color-border); display: none; align-items: center; gap: 12px; margin-bottom: 4px;">
+                                <i class="ph ph-clock" style="font-size: 20px; color: var(--color-primary);"></i>
+                                <div>
+                                    <div id="mobile-clock-time" style="font-size: 14px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">00:00</div>
+                                    <div id="mobile-clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">Carregando...</div>
+                                </div>
+                            </div>
+                            <div class="dropdown-item theme-item" onclick="event.stopPropagation()">
+                                <span><i class="ph ph-moon"></i> Modo Escuro</span>
+                                <label class="theme-switch" title="Alternar Tema">
+                                    <input type="checkbox" id="theme-toggle-checkbox">
+                                    <span class="slider round">
+                                        <i class="ph-fill ph-sun icon-sun"></i>
+                                        <i class="ph-fill ph-moon icon-moon"></i>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-item" id="btn-logout" style="color: var(--color-danger);">
+                                <i class="ph ph-sign-out"></i> Sair
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid no-sidebar" style="padding: 24px;">
+
+                <!-- Secao Dashboard -->
+                <section id="sec-dashboard" class="admin-section active">
+                    <div class="kpis-section">
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div class="icon-wrapper green-light"><i class="ph ph-buildings text-primary"></i></div>
+                                <h3>Empresas Cadastradas</h3>
+                            </div>
+                            <div class="kpi-content">
+                                <h2 id="kpi-empresas">
+                                    <div class="kpi-loading">
+                                        <i class="ph ph-spinner-gap"></i>
+                                        <span>Atualizando...</span>
+                                    </div>
+                                </h2>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div class="icon-wrapper" style="background: #dcfce7; color: #16a34a;"><i class="ph ph-money"></i></div>
+                                <h3>Clientes Pagos</h3>
+                            </div>
+                            <div class="kpi-content">
+                                <h2 id="kpi-pagos">
+                                    <div class="kpi-loading">
+                                        <i class="ph ph-spinner-gap"></i>
+                                        <span>Atualizando...</span>
+                                    </div>
+                                </h2>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div class="icon-wrapper" style="background: #fee2e2; color: #dc2626;"><i class="ph ph-warning-circle"></i></div>
+                                <h3>Clientes Inadimplentes</h3>
+                            </div>
+                            <div class="kpi-content">
+                                <h2 id="kpi-inadimplentes" style="color: #dc2626;">
+                                    <div class="kpi-loading">
+                                        <i class="ph ph-spinner-gap"></i>
+                                        <span>Atualizando...</span>
+                                    </div>
+                                </h2>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div class="icon-wrapper green-light"><i class="ph ph-wallet text-primary"></i></div>
+                                <h3>Faturamento do Mês</h3>
+                            </div>
+                            <div class="kpi-content">
+                                <h2 id="kpi-faturamento">
+                                    <div class="kpi-loading">
+                                        <i class="ph ph-spinner-gap"></i>
+                                        <span>Atualizando...</span>
+                                    </div>
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card table-card" style="margin-top: 24px;">
+                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                            <div class="card-title">
+                                <i class="ph ph-buildings text-primary"></i>
+                                <div>
+                                    <h3>Lista de Empresas SaaS</h3>
+                                    <p>Clique em uma empresa para visualizar o painel detalhado dela.</p>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; gap: 16px; margin-left: auto;">
+                                <div class="table-controls" style="display: flex; align-items: center; gap: 12px;">
+                                    <div class="search-input" style="position: relative; display: flex; align-items: center;">
+                                        <i class="ph ph-magnifying-glass" style="position: absolute; left: 12px; color: var(--color-text-mut);"></i>
+                                        <input type="text" id="search-empresas" placeholder="Buscar por nome ou email..." style="padding: 8px 12px 8px 36px; border: none; border-radius: 8px; background: transparent; color: var(--color-text-main); font-size: 13px; outline: none; width: 260px;">
+                                    </div>
+                                    <button class="btn-icon outline" id="btn-clear-admin-filters" title="Limpar Filtros"><i class="ph ph-funnel"></i></button>
+                                </div>
+                                <button class="btn btn-primary" id="btn-open-cadastrar-modal">Cadastrar Empresa +</button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <style>
+                                .admin-table {
+                                    display: block;
+                                    width: 100%;
+                                    border-collapse: collapse;
+                                }
+                                .admin-table thead, .admin-table tbody {
+                                    display: block;
+                                    width: 100%;
+                                }
+                                .admin-table tr {
+                                    display: grid;
+                                    grid-template-columns: minmax(180px, 1.5fr) minmax(200px, 1.5fr) minmax(140px, 1fr) minmax(120px, 1fr) minmax(120px, 1fr) minmax(180px, 1fr);
+                                    gap: 32px;
+                                    align-items: center;
+                                    border-bottom: 1px solid var(--color-border);
+                                }
+                                .admin-table th, .admin-table td {
+                                    padding: 16px 24px;
+                                    text-align: left;
+                                    display: flex;
+                                    align-items: center;
+                                    border-bottom: none !important;
+                                }
+                                .admin-table th {
+                                    color: var(--color-text-light);
+                                    font-weight: 600;
+                                    font-size: 14px;
+                                }
+                            </style>
+                            <table class="data-table admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Empresa</th>
+                                        <th>Email Responsável</th>
+                                        <th>Data de Vencimento</th>
+                                        <th>Total de Leads</th>
+                                        <th>Status</th>
+                                        <th>Chave de API</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="empresas-tbody">
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; padding: 24px;">Carregando empresas...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Secao Detalhes da Empresa (Mini Dashboard) -->
+                <section id="sec-detalhes-empresa" class="admin-section">
+                    <button class="btn btn-outline" id="btn-voltar-empresas" style="margin-bottom: 24px;">
+                        <i class="ph ph-arrow-left"></i> Voltar para Lista
+                    </button>
+                    
+                    <div class="card" style="margin-bottom: 24px;">
+                        <h2 id="detalhe-nome-empresa" style="margin-bottom: 8px;">Empresa</h2>
+                        <p id="detalhe-email-empresa" style="color: var(--color-text-mut);">email@empresa.com</p>
+                    </div>
+
+                    <!-- Gráficos Idênticos aos Relatórios -->
+                    <div class="charts-row">
+                        <div class="card chart-card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i class="ph ph-trend-up text-primary"></i>
+                                    <div>
+                                        <h3>Leads ao longo do tempo</h3>
+                                        <p>Volume de leads recebidos da empresa.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chart-container" id="admin-chart-line" style="min-height: 300px; display: flex; align-items: center; justify-content: center; color: var(--color-text-mut);">
+                                Carregando gráfico...
+                            </div>
+                        </div>
+
+                        <div class="card chart-card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i class="ph ph-map-pin text-primary"></i>
+                                    <div>
+                                        <h3>Leads por Estado</h3>
+                                        <p>Distribuição geográfica.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chart-container" id="admin-map-container" style="min-height: 300px; display: flex; align-items: center; justify-content: center; color: var(--color-text-mut);">
+                                Carregando mapa...
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Secao Configuracoes -->
+                <section id="sec-configuracoes" class="admin-section">
+                    <div class="card" style="max-width: 600px; margin: 0 auto;">
+                        <h2 style="margin-bottom: 24px; color: var(--color-text-main);">Segurança Master</h2>
+                        <form id="form-change-password">
+                            <div class="form-group">
+                                <label style="color: var(--color-text-mut);">Nova Senha</label>
+                                <div class="input-wrapper">
+                                    <i class="ph ph-lock-key"></i>
+                                    <input type="password" id="admin-new-password" class="form-control" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="btn-change-password" style="width: 100%;">Atualizar Senha Master</button>
+                        </form>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Cadastrar Empresa -->
+    <div id="modal-cadastrar-empresa" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Cadastrar Nova Empresa (Tenant)</h2>
+                <button class="close-modal"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-create-tenant" class="login-form">
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Nome da Empresa</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-building"></i>
+                            <input type="text" id="tenant-nome" class="form-control" placeholder="Ex: Barbearia do João" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">E-mail de Login (Administrador da Empresa)</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-envelope-simple"></i>
+                            <input type="email" id="tenant-email" class="form-control" placeholder="contato@empresa.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Senha Inicial</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-lock-key"></i>
+                            <input type="password" id="tenant-senha" class="form-control" placeholder="Senha provisória" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Dia e Data de Vencimento Mensal</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-calendar"></i>
+                            <input type="date" id="tenant-vencimento" class="form-control" required>
+                        </div>
+                        <small style="color: var(--color-text-sec); display: block; margin-top: 8px;">Esta data definirá quando os avisos de fatura vão aparecer no CRM do cliente.</small>
+                    </div>
+                    
+                    <div class="form-actions" style="margin-top: 32px; display: flex; justify-content: flex-end;">
+                        <button type="submit" class="login-btn" id="btn-submit-tenant" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <i class="ph ph-check" style="font-size: 20px;"></i>
+                            Criar Empresa no Sistema
+                        </button>
+                    </div>
+                    <div id="tenant-msg" style="margin-top: 16px; font-weight: 600; text-align: center;"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Base -->
+</body>
+
+</html>

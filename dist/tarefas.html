@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AutomatiZAP - CRM Dashboard</title>
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- CSS -->
+  <script type="module" crossorigin src="/assets/supabase-DUkCiNAm.js"></script>
+  <script type="module" crossorigin src="/assets/data-CHxsLyLf.js"></script>
+  <script type="module" crossorigin src="/assets/script-6OfMpYOD.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-uXpcW-fO.css">
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <img src="/assets/logo-BxJ03jLZ.png" alt="AutomatiZAP CRM" class="logo-img">
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <i class="ph ph-squares-four"></i>
+                    <span>Visão geral</span>
+                </a>
+                <a href="leads.html" class="nav-item">
+                    <i class="ph ph-users"></i>
+                    <span>Leads</span>
+                </a>
+
+                <a href="conversas.html" class="nav-item">
+                    <i class="ph ph-chat-circle-dots"></i>
+                    <span>Conversas</span>
+                </a>
+                <a href="tarefas.html" class="nav-item active">
+                    <i class="ph ph-check-square-offset"></i>
+                    <span>Tarefas</span>
+                </a>
+                <a href="relatorios.html" class="nav-item">
+                    <i class="ph ph-chart-bar"></i>
+                    <span>Relatórios</span>
+                </a>
+
+            </nav>
+
+            <div class="sidebar-footer">
+                                <div class="sidebar-clock" id="sidebar-clock" style="margin-bottom: 12px; padding: 12px; background: var(--color-bg-main); border-radius: 8px; border: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px;">
+                    <i class="ph ph-clock" style="font-size: 20px; color: var(--color-primary);"></i>
+                    <div>
+                        <div id="clock-time" style="font-size: 15px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">00:00</div>
+                        <div id="clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">Carregando...</div>
+                    </div>
+                </div>
+                
+                <button class="btn-tutorial-sidebar" onclick="window.startPageTutorial()">
+                    <i class="ph ph-question"></i> Como utilizar o CRM
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-titles">
+                    <button class="mobile-menu-btn"><i class="ph ph-list"></i></button>
+                    <a href="index.html" class="mobile-logo-header">
+                        <img src="/assets/logo-BxJ03jLZ.png" alt="AutomatiZAP CRM" class="logo-img">
+                    </a>
+                    <div class="desktop-header-title">
+                        <h1>Tarefas</h1>
+                        <p>Organize suas atividades e follow-ups.</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="date-wrapper" id="date-wrapper">
+                        <button class="date-filter" id="date-filter-btn">
+                            <i class="ph ph-calendar-blank"></i>
+                            <span id="date-filter-text">01/09/2025 - 07/09/2025</span>
+                            <i class="ph ph-caret-down"></i>
+                        </button>
+                        
+                        <!-- Date Dropdown -->
+                        <div class="date-dropdown" id="date-dropdown">
+                            <div class="date-dropdown-header">
+                                <h4>Filtrar por Período</h4>
+                            </div>
+                            <div class="date-dropdown-body">
+                                <div class="calendar-header">
+                                    <button class="btn-icon xs" id="cal-prev"><i class="ph ph-caret-left"></i></button>
+                                    <strong id="cal-month-year">Setembro 2025</strong>
+                                    <button class="btn-icon xs" id="cal-next"><i class="ph ph-caret-right"></i></button>
+                                </div>
+                                <div class="calendar-grid" id="calendar-grid">
+                                    <span class="cal-day-name">D</span>
+                                    <span class="cal-day-name">S</span>
+                                    <span class="cal-day-name">T</span>
+                                    <span class="cal-day-name">Q</span>
+                                    <span class="cal-day-name">Q</span>
+                                    <span class="cal-day-name">S</span>
+                                    <span class="cal-day-name">S</span>
+                                    <!-- Dias injetados via JS -->
+                                </div>
+                                <div style="display: flex; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--color-text-sec);">
+                                    <span id="cal-selection-text">Selecione a data inicial</span>
+                                </div>
+                            </div>
+                            <div class="date-dropdown-footer">
+                                <button class="btn btn--primary" id="btn-apply-date" style="width: 100%;">Aplicar Filtro</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notification-wrapper" id="notification-wrapper">
+                        <button class="notification-btn" id="notification-btn">
+                            <i class="ph ph-bell"></i>
+                            <span class="notification-dot"></span>
+                        </button>
+                        
+                        <!-- Notification Dropdown -->
+                        <div class="notification-dropdown" id="notification-dropdown">
+                            <div class="notif-header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--color-border);">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <h4 style="margin: 0; font-size: 16px; font-weight: 600;">Notificações</h4>
+                                    <span class="badge primary-light" id="notif-badge" style="display: none; padding: 2px 8px; border-radius: 12px; font-size: 11px;"></span>
+                                </div>
+                                <button id="btn-read-all" style="background: none; border: none; font-size: 12px; color: var(--color-primary); cursor: pointer; display: none;">Marcar lidas</button>
+                            </div>
+                            <div class="notif-list" id="notif-list">
+                                <div style="padding: 20px; text-align: center; color: var(--color-text-mut); font-size: 13px;">Nenhuma notificação.</div>
+                            </div>
+                            <div class="notif-footer">
+                                <a href="notificacoes.html">Ver todas</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-menu" id="user-menu-btn">
+                        <div class="avatar dark">AD</div>
+                        <div class="user-info">
+                            <span class="user-name">AutomatiZAP Digital</span>
+                            <span class="user-role">Administrador</span>
+                        </div>
+                        <i class="ph ph-caret-down"></i>
+                        
+                        <!-- Dropdown do Usuário -->
+                        <div class="user-dropdown" id="user-dropdown">
+                            <div class="mobile-clock-widget" style="padding: 12px 16px; border-bottom: 1px solid var(--color-border); display: none; align-items: center; gap: 12px; margin-bottom: 4px;">
+                                <i class="ph ph-clock" style="font-size: 20px; color: var(--color-primary);"></i>
+                                <div>
+                                    <div id="mobile-clock-time" style="font-size: 14px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">00:00</div>
+                                    <div id="mobile-clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">Carregando...</div>
+                                </div>
+                            </div>
+                            <div class="dropdown-item" onclick="window.location.href='configuracoes.html'">
+                                <i class="ph ph-gear"></i> Configurações
+                            </div>
+                            <div class="dropdown-item theme-item" onclick="event.stopPropagation()">
+                                <span><i class="ph ph-moon"></i> Modo Escuro</span>
+                                <label class="theme-switch" title="Alternar Tema">
+                                    <input type="checkbox" id="theme-toggle-checkbox">
+                                    <span class="slider round">
+                                        <i class="ph-fill ph-sun icon-sun"></i>
+                                        <i class="ph-fill ph-moon icon-moon"></i>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-item" style="color: var(--color-danger);">
+                                <i class="ph ph-sign-out"></i> Sair
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <div class="main-column" style="flex: 1;">
+                    <section class="card">
+                        <div class="card-header" style="flex-direction: row; justify-content: space-between;">
+                            <div class="card-title">
+                                <i class="ph ph-check-square-offset text-primary"></i>
+                                <div>
+                                    <h3>Minhas Tarefas</h3>
+                                    <p>Atividades pendentes do dia.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="tasks-list" style="display: flex; flex-direction: column; gap: 12px;">
+                            <!-- Tarefas dinâmicas -->
+                        </div>
+                    </section>
+                </div>
+            </div>
+</main>
+    </div>
+
+    <!-- Dossiê Side Drawer -->
+    <div class="dossier-overlay" id="dossier-overlay"></div>
+    <div class="dossier-drawer" id="dossier-drawer">
+        <div class="dossier-header">
+            <div class="dossier-title">
+                <i class="ph ph-user-circle"></i>
+                <div>
+                    <h3 id="dossier-name">Nome do Lead</h3>
+                    <span id="dossier-status" class="badge warning-light">Em negociação</span>
+                </div>
+            </div>
+            <button class="btn-icon" id="dossier-close"><i class="ph ph-x"></i></button>
+        </div>
+        <div class="dossier-body">
+            <div class="dossier-card">
+                <h4><i class="ph ph-target"></i> O que o cliente busca</h4>
+                <p id="dossier-goal">Gostaria de saber mais sobre como a automação pode ajudar a minha agência.</p>
+            </div>
+            <div class="dossier-card">
+                <h4><i class="ph ph-warning-circle"></i> Dores / Necessidades</h4>
+                <p id="dossier-pain">Perdendo tempo respondendo leads manualmente. Precisa de agilidade.</p>
+            </div>
+            <div class="dossier-card">
+                <h4><i class="ph ph-currency-circle-dollar"></i> Orçamento</h4>
+                <p id="dossier-budget">Ainda não informado.</p>
+            </div>
+            <div class="dossier-card">
+                <h4><i class="ph ph-chat-text"></i> Resumo do Robô</h4>
+                <p id="dossier-summary">Lead muito interessado. Já perguntei sobre o volume de atendimento diário e aguardo resposta para fechar o diagnóstico.</p>
+            </div>
+        </div>
+        <div class="dossier-footer">
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // As tarefas serão criadas manualmente ou via n8n no futuro.
+        // Por ora, mostramos estado vazio.
+        document.addEventListener('DOMContentLoaded', () => {
+            const list = document.getElementById('tasks-list');
+            if(list && list.children.length === 0) {
+                list.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--color-text-mut);">
+                        <i class="ph ph-check-square-offset" style="font-size: 48px; opacity: 0.3; display: block; margin-bottom: 12px;"></i>
+                        <p style="font-size: 14px;">Nenhuma tarefa pendente.</p>
+                        <p style="font-size: 12px; margin-top: 4px;">As tarefas criadas pelo robô ou manualmente aparecerão aqui.</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+
+</html>
+

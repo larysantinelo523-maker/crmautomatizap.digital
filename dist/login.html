@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login - AutomatiZAP CRM</title>
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- CSS -->
+  <script type="module" crossorigin src="/assets/login-DfiClpwF.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-uXpcW-fO.css">
+</head>
+<body class="login-body">
+    
+    <div class="login-layout">
+        <!-- Formulário (Esquerdo) -->
+        <div class="login-form-container">
+            <div class="login-header">
+                <img src="/assets/logo-BxJ03jLZ.png" alt="AutomatiZAP CRM">
+                <h3>Bem vindo de volta!</h3>
+                <p>Insira seu Usuário e Senha para acessar o painel.</p>
+            </div>
+
+            <div class="login-error" id="login-error">
+                Usuário ou senha incorretos. Tente novamente.
+            </div>
+
+            <form class="login-form" id="login-form">
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <div class="input-wrapper">
+                        <i class="ph ph-envelope-simple"></i>
+                        <input type="text" id="email" placeholder="Digite seu e-mail ou usuário" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <div class="input-wrapper">
+                        <i class="ph ph-lock-key"></i>
+                        <input type="password" id="password" placeholder="Digite sua senha (ex: 000)" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn">Entrar</button>
+                <div style="text-align: center; margin-top: 16px;">
+                    <a href="#" style="color: var(--color-primary); font-size: 13px; font-weight: 600;">Esqueceu sua senha? Clique para recuperar</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Lado Visual (Direito) -->
+        <div class="login-visual" style="background: url('/assets/bg-login-BHmPV9Lg.png') no-repeat center center / cover;">
+            <img src="/assets/robot-D9NLbSsX.png" alt="Robô IA" class="login-robot">
+            
+            <div class="login-visual-content" style="margin-left: 200px;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 8px;">
+                    <h2 style="margin: 0; text-align: left; line-height: 1.1;">AutomatiZAP<br><span style="font-size: 24px; font-weight: 400; letter-spacing: 4px;">DIGITAL</span></h2>
+                </div>
+                <p style="font-size: 16px;">CRM integrado com agente de IA para whatsapp</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

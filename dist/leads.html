@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutomatiZAP - CRM Dashboard</title>
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- CSS -->
+  <script type="module" crossorigin src="/assets/supabase-DUkCiNAm.js"></script>
+  <script type="module" crossorigin src="/assets/data-CHxsLyLf.js"></script>
+  <script type="module" crossorigin src="/assets/script-6OfMpYOD.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-uXpcW-fO.css">
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <img src="/assets/logo-BxJ03jLZ.png" alt="AutomatiZAP CRM" class="logo-img">
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <i class="ph ph-squares-four"></i>
+                    <span>Visão geral</span>
+                </a>
+                <a href="leads.html" class="nav-item active">
+                    <i class="ph ph-users"></i>
+                    <span>Leads</span>
+                </a>
+
+                <a href="conversas.html" class="nav-item">
+                    <i class="ph ph-chat-circle-dots"></i>
+                    <span>Conversas</span>
+                </a>
+                <a href="tarefas.html" class="nav-item">
+                    <i class="ph ph-check-square-offset"></i>
+                    <span>Tarefas</span>
+                </a>
+                <a href="relatorios.html" class="nav-item">
+                    <i class="ph ph-chart-bar"></i>
+                    <span>Relatórios</span>
+                </a>
+
+            </nav>
+
+            <div class="sidebar-footer">
+                                <div class="sidebar-clock" id="sidebar-clock" style="margin-bottom: 12px; padding: 12px; background: var(--color-bg-main); border-radius: 8px; border: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px;">
+                    <i class="ph ph-clock" style="font-size: 20px; color: var(--color-primary);"></i>
+                    <div>
+                        <div id="clock-time" style="font-size: 15px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">00:00</div>
+                        <div id="clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">Carregando...</div>
+                    </div>
+                </div>
+                
+                <button class="btn-tutorial-sidebar" onclick="window.startPageTutorial()">
+                    <i class="ph ph-question"></i> Como utilizar o CRM
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-titles">
+                    <button class="mobile-menu-btn"><i class="ph ph-list"></i></button>
+                    <a href="index.html" class="mobile-logo-header">
+                        <img src="/assets/logo-BxJ03jLZ.png" alt="AutomatiZAP CRM" class="logo-img">
+                    </a>
+                    <div class="desktop-header-title">
+                        <h1>Gestão de Leads</h1>
+                        <p>Gerencie todos os seus contatos e clientes em potencial.</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="date-wrapper" id="date-wrapper">
+                        <button class="date-filter" id="date-filter-btn">
+                            <i class="ph ph-calendar-blank"></i>
+                            <span id="date-filter-text">01/09/2025 - 07/09/2025</span>
+                            <i class="ph ph-caret-down"></i>
+                        </button>
+                        
+                        <!-- Date Dropdown -->
+                        <div class="date-dropdown" id="date-dropdown">
+                            <div class="date-dropdown-header">
+                                <h4>Filtrar por Período</h4>
+                            </div>
+                            <div class="date-dropdown-body">
+                                <div class="calendar-header">
+                                    <button class="btn-icon xs" id="cal-prev"><i class="ph ph-caret-left"></i></button>
+                                    <strong id="cal-month-year">Setembro 2025</strong>
+                                    <button class="btn-icon xs" id="cal-next"><i class="ph ph-caret-right"></i></button>
+                                </div>
+                                <div class="calendar-grid" id="calendar-grid">
+                                    <span class="cal-day-name">D</span>
+                                    <span class="cal-day-name">S</span>
+                                    <span class="cal-day-name">T</span>
+                                    <span class="cal-day-name">Q</span>
+                                    <span class="cal-day-name">Q</span>
+                                    <span class="cal-day-name">S</span>
+                                    <span class="cal-day-name">S</span>
+                                    <!-- Dias injetados via JS -->
+                                </div>
+                                <div style="display: flex; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--color-text-sec);">
+                                    <span id="cal-selection-text">Selecione a data inicial</span>
+                                </div>
+                            </div>
+                            <div class="date-dropdown-footer">
+                                <button class="btn btn--primary" id="btn-apply-date" style="width: 100%;">Aplicar Filtro</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notification-wrapper" id="notification-wrapper">
+                        <button class="notification-btn" id="notification-btn">
+                            <i class="ph ph-bell"></i>
+                            <span class="notification-dot"></span>
+                        </button>
+                        
+                        <!-- Notification Dropdown -->
+                        <div class="notification-dropdown" id="notification-dropdown">
+                            <div class="notif-header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--color-border);">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <h4 style="margin: 0; font-size: 16px; font-weight: 600;">Notificações</h4>
+                                    <span class="badge primary-light" id="notif-badge" style="display: none; padding: 2px 8px; border-radius: 12px; font-size: 11px;"></span>
+                                </div>
+                                <button id="btn-read-all" style="background: none; border: none; font-size: 12px; color: var(--color-primary); cursor: pointer; display: none;">Marcar lidas</button>
+                            </div>
+                            <div class="notif-list" id="notif-list">
+                                <div style="padding: 20px; text-align: center; color: var(--color-text-mut); font-size: 13px;">Nenhuma notificação.</div>
+                            </div>
+                            <div class="notif-footer">
+                                <a href="notificacoes.html">Ver todas</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-menu" id="user-menu-btn">
+                        <div class="avatar dark">AD</div>
+                        <div class="user-info">
+                            <span class="user-name">AutomatiZAP Digital</span>
+                            <span class="user-role">Administrador</span>
+                        </div>
+                        <i class="ph ph-caret-down"></i>
+                        
+                        <!-- Dropdown do Usuário -->
+                        <div class="user-dropdown" id="user-dropdown">
+                            <div class="mobile-clock-widget" style="padding: 12px 16px; border-bottom: 1px solid var(--color-border); display: none; align-items: center; gap: 12px; margin-bottom: 4px;">
+                                <i class="ph ph-clock" style="font-size: 20px; color: var(--color-primary);"></i>
+                                <div>
+                                    <div id="mobile-clock-time" style="font-size: 14px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">00:00</div>
+                                    <div id="mobile-clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">Carregando...</div>
+                                </div>
+                            </div>
+                            <div class="dropdown-item" onclick="window.location.href='configuracoes.html'">
+                                <i class="ph ph-gear"></i> Configurações
+                            </div>
+                            <div class="dropdown-item theme-item" onclick="event.stopPropagation()">
+                                <span><i class="ph ph-moon"></i> Modo Escuro</span>
+                                <label class="theme-switch" title="Alternar Tema">
+                                    <input type="checkbox" id="theme-toggle-checkbox">
+                                    <span class="slider round">
+                                        <i class="ph-fill ph-sun icon-sun"></i>
+                                        <i class="ph-fill ph-moon icon-moon"></i>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-item" style="color: var(--color-danger);">
+                                <i class="ph ph-sign-out"></i> Sair
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <div class="main-column" style="flex: 1;">
+                    <section class="card table-card" style="border-top: none !important; padding-top: 24px !important;">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="ph ph-users text-primary"></i>
+                                <div>
+                                    <h3>Todos os Leads</h3>
+                                    <p>Lista completa de contatos registrados no sistema.</p>
+                                </div>
+                            </div>
+                            <div class="table-controls">
+                                <div class="search-input">
+                                    <i class="ph ph-magnifying-glass"></i>
+                                    <input type="text" placeholder="Digite o nome do seu cliente...">
+                                </div>
+                                <button class="btn-icon outline"><i class="ph ph-funnel"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Empty State Mobile -->
+                        <div id="dossier-empty-state-mobile" class="mobile-empty-state" style="display: none; align-items: center; gap: 8px; color: var(--color-text-mut); font-size: 13px; padding: 0 16px 16px;">
+                            <i class="ph ph-info"></i>
+                            <span>Selecione um cliente na tabela para atualizar as informações do card abaixo.</span>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Origem</th>
+                                        <th>Interesse</th>
+                                        <th>Status</th>
+                                        <th>Último contato</th>
+                                        <th style="text-align: right;">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dinâmico -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-footer">
+                            <span class="pagination-info" id="leads-pagination-info">Mostrando 0 leads</span>
+                            <div class="pagination">
+                                <button class="page-btn"><i class="ph ph-caret-left"></i></button>
+                                <button class="page-btn active">1</button>
+                                <button class="page-btn">2</button>
+                                <button class="page-btn">3</button>
+                                <button class="page-btn">4</button>
+                                <button class="page-btn">5</button>
+                                <button class="page-btn"><i class="ph ph-caret-right"></i></button>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+
+                <!-- Coluna Secundária (Direita) -->
+                <div class="side-column">
+
+                    <!-- Empty State (Aviso pequeno) -->
+                    <div id="dossier-empty-state" class="desktop-empty-state" style="display: flex; align-items: center; gap: 8px; color: var(--color-text-mut); font-size: 13px; padding: 0 4px;">
+                        <i class="ph ph-info"></i>
+                        <span>Selecione um cliente na tabela para atualizar as informações do card.</span>
+                    </div>
+
+                    <!-- Lead Destaque - Vazio por padrão -->
+                    <section class="card lead-highlight" id="lead-highlight-card" style="display: none;">
+                        <div class="highlight-header" style="position: relative;">
+                            <div class="title-with-icon">
+                                <i class="ph ph-user"></i>
+                                <span>Informações do lead</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="badge primary-light" id="lead-highlight-badge">--</span>
+                                <button onclick="fecharDossie()" style="background: none; border: none; cursor: pointer; color: var(--color-text-mut); display: flex; align-items: center; justify-content: center; padding: 4px;" title="Fechar"><i class="ph ph-x" style="font-size: 16px;"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="highlight-profile">
+                            <div class="avatar lg green-light" id="lead-highlight-avatar">--</div>
+                            <div class="profile-info">
+                                <h3 id="lead-highlight-name">--</h3>
+                                <div class="contact-info">
+                                    <i class="ph-fill ph-whatsapp-logo text-primary"></i>
+                                    <span id="lead-highlight-phone">--</span>
+                                </div>
+                                <div class="origin-info">
+                                    <i class="ph ph-globe"></i>
+                                    <span id="lead-highlight-origin">Origem: --</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="highlight-details">
+                            <div class="detail-item">
+                                <div class="detail-label"><i class="ph ph-user"></i> Interesse</div>
+                                <div class="detail-value" style="font-weight: 500;" id="lead-highlight-interest">--</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label"><i class="ph ph-currency-dollar"></i> Orçamento</div>
+                                <div class="detail-value" style="font-weight: 500;" id="lead-highlight-budget">--</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label"><i class="ph ph-star"></i> Qualificação</div>
+                                <div class="detail-value" style="font-weight: 500;" id="lead-highlight-qualification">--</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label"><i class="ph ph-check-circle"></i> Status</div>
+                                <div class="detail-value"><span class="badge primary-light" id="lead-highlight-status">--</span></div>
+                            </div>
+                        </div>
+
+                        <div class="highlight-summary" id="lead-highlight-summary-box" style="display:none;">
+                            <div class="summary-header">
+                                <i class="ph ph-robot"></i>
+                                <span>Resumo da conversa</span>
+                            </div>
+                            <p class="summary-text" id="lead-highlight-summary">Nenhum resumo disponível.</p>
+                        </div>
+
+                        <div class="action-buttons" id="lead-highlight-actions" style="margin-top: 16px;"></div>
+
+                        <div class="last-contact" id="lead-highlight-last-contact">
+                            <i class="ph ph-clock"></i> Último contato: --
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        window.initLeads = async function() {
+            if(!window.dbAPI) return;
+            let leads = await window.dbAPI.fetchLeads();
+            
+            // Filter by date
+            const filterStart = localStorage.getItem('calendar_filter_start');
+            const filterEnd = localStorage.getItem('calendar_filter_end');
+            
+            let startDt, endDt;
+            
+            if (filterStart && filterEnd) {
+                startDt = new Date(filterStart);
+                endDt = new Date(filterEnd);
+            } else if (filterStart) {
+                startDt = new Date(filterStart);
+                endDt = null;
+            } else {
+                // Se não tiver filtro (ou limpou), padrão é o mês atual!
+                const agora = new Date();
+                startDt = new Date(agora.getFullYear(), agora.getMonth(), 1);
+                endDt = new Date(agora.getFullYear(), agora.getMonth() + 1, 0);
+            }
+            
+            if (startDt) {
+                startDt.setHours(0,0,0,0);
+                leads = leads.filter(l => {
+                    const lDate = new Date(l.criado_em);
+                    return lDate >= startDt;
+                });
+            }
+            if (endDt) {
+                endDt.setHours(23,59,59,999);
+                leads = leads.filter(l => {
+                    const lDate = new Date(l.criado_em);
+                    return lDate <= endDt;
+                });
+            }
+
+            const tbody = document.querySelector('.data-table tbody');
+            if(tbody) tbody.innerHTML = '';
+            
+            // Atualizar paginação
+            const paginationEl = document.getElementById('leads-pagination-info');
+            if(paginationEl) paginationEl.textContent = `Mostrando ${leads.length} lead${leads.length !== 1 ? 's' : ''}`;
+            
+            if (leads.length === 0 && tbody) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 32px;">Nenhum lead encontrado.</td></tr>';
+            } else {
+                leads.forEach(lead => {
+                    let badgeClass = 'primary-light';
+                    if(lead.status === 'Fechado') badgeClass = 'success';
+                    else if(lead.status === 'Em Atendimento') badgeClass = 'warning';
+                    else if(lead.status === 'Perdido') badgeClass = 'danger';
+
+                    const date = new Date(lead.criado_em);
+                    const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>
+                            <div class="user-cell" style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0;">${lead.nome.charAt(0).toUpperCase()}</div>
+                                <span class="user-name" style="font-weight: 500; color: var(--color-text-main);">${lead.nome}</span>
+                            </div>
+                        </td>
+                        <td class="mobile-origem">${lead.origem || 'WhatsApp'}</td>
+                        <td class="mobile-interesse">${lead.interesse || 'Não informado'}</td>
+                        <td class="mobile-status"><span class="badge ${badgeClass}">${lead.status}</span></td>
+                        <td class="mobile-date">${formattedDate}</td>
+                        <td style="text-align: right;">
+                            <button class="btn-exibir-infos">
+                                <span class="desktop-text">Exibir Dossiê <i class="ph ph-caret-down"></i></span>
+                                <span class="mobile-text">Clique para Exibir Informações do Lead</span>
+                            </button>
+                        </td>
+                    `;
+                    const btnInfo = tr.querySelector('.btn-exibir-infos');
+                    if(btnInfo) {
+                        btnInfo.onclick = (e) => {
+                            e.stopPropagation();
+                            abrirDossie(lead, badgeClass, formattedDate);
+                        };
+                    }
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // Auto-abrir dossiê se vier da tela de conversas
+            const urlParams = new URLSearchParams(window.location.search);
+            const leadIdToOpen = urlParams.get('openLead');
+            if (leadIdToOpen) {
+                const leadToOpen = leads.find(l => l.id.toString() === leadIdToOpen);
+                if (leadToOpen) {
+                    let badgeClass = 'primary-light';
+                    if(leadToOpen.status === 'Fechado') badgeClass = 'success';
+                    else if(leadToOpen.status === 'Em Atendimento') badgeClass = 'warning';
+                    else if(leadToOpen.status === 'Perdido') badgeClass = 'danger';
+                    const date = new Date(leadToOpen.criado_em);
+                    const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    // Pequeno delay para garantir que a renderização termine
+                    setTimeout(() => {
+                        abrirDossie(leadToOpen, badgeClass, formattedDate);
+                    }, 100);
+                }
+            }
+        };
+
+        function abrirDossie(lead, badgeClass, dateStr) {
+            const emptyDesktop = document.getElementById('dossier-empty-state');
+            if (emptyDesktop) emptyDesktop.style.display = 'none';
+            const emptyMobile = document.getElementById('dossier-empty-state-mobile');
+            if (emptyMobile) emptyMobile.style.display = 'none';
+
+            const card = document.getElementById('lead-highlight-card');
+            card.style.display = 'block';
+
+            // Scroll suave para o dossiê (âncora)
+            setTimeout(() => {
+                card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+
+            // Preenche os dados
+            const initials = lead.nome.charAt(0).toUpperCase();
+            document.getElementById('lead-highlight-avatar').textContent = initials;
+            document.getElementById('lead-highlight-name').textContent = lead.nome;
+            document.getElementById('lead-highlight-phone').textContent = lead.telefone;
+            document.getElementById('lead-highlight-origin').textContent = 'Origem: ' + (lead.origem || 'WhatsApp');
+            document.getElementById('lead-highlight-badge').textContent = lead.status;
+            document.getElementById('lead-highlight-status').textContent = lead.status;
+            
+            document.getElementById('lead-highlight-interest').textContent = lead.interesse || 'Não informado';
+            document.getElementById('lead-highlight-budget').textContent = lead.orcamento || 'Não informado';
+            document.getElementById('lead-highlight-qualification').textContent = lead.qualificacao || 'Não informada';
+
+            const summaryBox = document.getElementById('lead-highlight-summary-box');
+            const summaryText = document.getElementById('lead-highlight-summary');
+            if (lead.resumo) {
+                summaryText.textContent = lead.resumo;
+                summaryBox.style.display = 'block';
+            } else {
+                summaryBox.style.display = 'none';
+            }
+            
+            document.getElementById('lead-highlight-last-contact').innerHTML = `<i class="ph ph-clock"></i> Último contato: ${dateStr}`;
+
+            // Botões de ação
+            document.getElementById('lead-highlight-actions').innerHTML = `
+                <button class="btn primary full-width" onclick="window.location.href='conversas.html?lead=${lead.id}'">
+                    <i class="ph ph-chat-teardrop-text"></i> Abrir Conversa
+                </button>
+            `;
+
+            // Rola a tela até o dossiê (útil para dispositivos móveis)
+            setTimeout(() => {
+                const dossierArea = document.querySelector('.highlight-section') || card;
+                dossierArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 50);
+        }
+        function fecharDossie() {
+            document.getElementById('lead-highlight-card').style.display = 'none';
+            
+            const emptyDesktop = document.getElementById('dossier-empty-state');
+            if (emptyDesktop) emptyDesktop.style.display = 'flex';
+            
+            const emptyMobile = document.getElementById('dossier-empty-state-mobile');
+            if (emptyMobile) emptyMobile.style.display = 'flex';
+        }
+        
+        window.addEventListener('calendarFilterChanged', () => {
+            if(typeof window.initLeads === 'function') {
+                window.initLeads();
+            }
+        });
+    </script>
+</body>
+
+</html>

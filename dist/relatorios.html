@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutomatiZAP - CRM Dashboard</title>
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- CSS -->
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Charts -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <style>
+        /* Ajustes de layout para a tela de relatórios */
+        .relatorios-kpis {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            width: 100%;
+        }
+
+        .relatorios-charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .map-container-flex {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            flex: 1;
+        }
+
+        /* Mobile Responsivo */
+        @media (max-width: 992px) {
+            .relatorios-kpis {
+                grid-template-columns: 1fr;
+            }
+
+            .relatorios-charts {
+                grid-template-columns: 1fr;
+            }
+
+            .map-container-flex {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            #mapLegend {
+                border-left: none !important;
+                padding-left: 0 !important;
+                border-top: 1px solid var(--color-border);
+                padding-top: 24px !important;
+                height: auto !important;
+                max-height: 250px;
+            }
+
+            .card {
+                padding: 16px !important;
+            }
+
+            #brazilMap {
+                height: 350px !important;
+                width: 100% !important;
+                display: block !important;
+                /* Remove flexbox que atrapalha o cálculo do Google Charts */
+            }
+
+            #mapLegend {
+                margin-top: 16px;
+                border-top: 1px solid var(--color-border) !important;
+            }
+        }
+    </style>
+  <script type="module" crossorigin src="/assets/supabase-DUkCiNAm.js"></script>
+  <script type="module" crossorigin src="/assets/data-CHxsLyLf.js"></script>
+  <script type="module" crossorigin src="/assets/script-6OfMpYOD.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-uXpcW-fO.css">
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <img src="/assets/logo-BxJ03jLZ.png" alt="AutomatiZAP CRM" class="logo-img">
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <i class="ph ph-squares-four"></i>
+                    <span>Visão geral</span>
+                </a>
+                <a href="leads.html" class="nav-item">
+                    <i class="ph ph-users"></i>
+                    <span>Leads</span>
+                </a>
+
+                <a href="conversas.html" class="nav-item">
+                    <i class="ph ph-chat-circle-dots"></i>
+                    <span>Conversas</span>
+                </a>
+                <a href="tarefas.html" class="nav-item">
+                    <i class="ph ph-check-square-offset"></i>
+                    <span>Tarefas</span>
+                </a>
+                <a href="relatorios.html" class="nav-item active">
+                    <i class="ph ph-chart-bar"></i>
+                    <span>Relatórios</span>
+                </a>
+
+            </nav>
+
+            <div class="sidebar-footer">
+                                <div class="sidebar-clock" id="sidebar-clock" style="margin-bottom: 12px; padding: 12px; background: var(--color-bg-main); border-radius: 8px; border: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px;">
+                    <i class="ph ph-clock" style="font-size: 20px; color: var(--color-primary);"></i>
+                    <div>
+                        <div id="clock-time" style="font-size: 15px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">00:00</div>
+                        <div id="clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">Carregando...</div>
+                    </div>
+                </div>
+                
+                <button class="btn-tutorial-sidebar" onclick="window.startPageTutorial()">
+                    <i class="ph ph-question"></i> Como utilizar o CRM
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-titles">
+                    <button class="mobile-menu-btn"><i class="ph ph-list"></i></button>
+                    <a href="index.html" class="mobile-logo-header">
+                        <img src="/assets/logo-BxJ03jLZ.png" alt="AutomatiZAP CRM" class="logo-img">
+                    </a>
+                    <div class="desktop-header-title">
+                        <h1>Relatórios e Métricas</h1>
+                        <p>Visão detalhada do desempenho de vendas e automações.</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="date-wrapper" id="date-wrapper">
+                        <button class="date-filter" id="date-filter-btn">
+                            <i class="ph ph-calendar-blank"></i>
+                            <span id="date-filter-text">01/09/2025 - 07/09/2025</span>
+                            <i class="ph ph-caret-down"></i>
+                        </button>
+
+                        <!-- Date Dropdown -->
+                        <div class="date-dropdown" id="date-dropdown">
+                            <div class="date-dropdown-header">
+                                <h4>Filtrar por Período</h4>
+                            </div>
+                            <div class="date-dropdown-body">
+                                <div class="calendar-header">
+                                    <button class="btn-icon xs" id="cal-prev"><i class="ph ph-caret-left"></i></button>
+                                    <strong id="cal-month-year">Setembro 2025</strong>
+                                    <button class="btn-icon xs" id="cal-next"><i class="ph ph-caret-right"></i></button>
+                                </div>
+                                <div class="calendar-grid" id="calendar-grid">
+                                    <span class="cal-day-name">D</span>
+                                    <span class="cal-day-name">S</span>
+                                    <span class="cal-day-name">T</span>
+                                    <span class="cal-day-name">Q</span>
+                                    <span class="cal-day-name">Q</span>
+                                    <span class="cal-day-name">S</span>
+                                    <span class="cal-day-name">S</span>
+                                    <!-- Dias injetados via JS -->
+                                </div>
+                                <div
+                                    style="display: flex; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--color-text-sec);">
+                                    <span id="cal-selection-text">Selecione a data inicial</span>
+                                </div>
+                            </div>
+                            <div class="date-dropdown-footer">
+                                <button class="btn btn--primary" id="btn-apply-date" style="width: 100%;">Aplicar
+                                    Filtro</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notification-wrapper" id="notification-wrapper">
+                        <button class="notification-btn" id="notification-btn">
+                            <i class="ph ph-bell"></i>
+                            <span class="notification-dot"></span>
+                        </button>
+
+                        <!-- Notification Dropdown -->
+                        <div class="notification-dropdown" id="notification-dropdown">
+                            <div class="notif-header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--color-border);">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <h4 style="margin: 0; font-size: 16px; font-weight: 600;">Notificações</h4>
+                                    <span class="badge primary-light" id="notif-badge" style="display: none; padding: 2px 8px; border-radius: 12px; font-size: 11px;"></span>
+                                </div>
+                                <button id="btn-read-all" style="background: none; border: none; font-size: 12px; color: var(--color-primary); cursor: pointer; display: none;">Marcar lidas</button>
+                            </div>
+                            <div class="notif-list" id="notif-list">
+                                <div style="padding: 20px; text-align: center; color: var(--color-text-mut); font-size: 13px;">Nenhuma notificação.</div>
+                            </div>
+                            <div class="notif-footer">
+                                <a href="notificacoes.html">Ver todas</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-menu" id="user-menu-btn">
+                        <div class="avatar dark">AD</div>
+                        <div class="user-info">
+                            <span class="user-name">AutomatiZAP Digital</span>
+                            <span class="user-role">Administrador</span>
+                        </div>
+                        <i class="ph ph-caret-down"></i>
+
+                        <!-- Dropdown do Usuário -->
+                        <div class="user-dropdown" id="user-dropdown">
+                            <div class="mobile-clock-widget" style="padding: 12px 16px; border-bottom: 1px solid var(--color-border); display: none; align-items: center; gap: 12px; margin-bottom: 4px;">
+                                <i class="ph ph-clock" style="font-size: 20px; color: var(--color-primary);"></i>
+                                <div>
+                                    <div id="mobile-clock-time" style="font-size: 14px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">00:00</div>
+                                    <div id="mobile-clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">Carregando...</div>
+                                </div>
+                            </div>
+                            <div class="dropdown-item" onclick="window.location.href='configuracoes.html'">
+                                <i class="ph ph-gear"></i> Configurações
+                            </div>
+                            <div class="dropdown-item theme-item" onclick="event.stopPropagation()">
+                                <span><i class="ph ph-moon"></i> Modo Escuro</span>
+                                <label class="theme-switch" title="Alternar Tema">
+                                    <input type="checkbox" id="theme-toggle-checkbox">
+                                    <span class="slider round">
+                                        <i class="ph-fill ph-sun icon-sun"></i>
+                                        <i class="ph-fill ph-moon icon-moon"></i>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-item" style="color: var(--color-danger);">
+                                <i class="ph ph-sign-out"></i> Sair
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid no-sidebar">
+                <div class="main-column" style="flex: 1;">
+                    <section class="kpis-section relatorios-kpis">
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div class="icon-wrapper green-light"><i class="ph ph-funnel text-primary"></i></div>
+                                <h3>Total de Leads</h3>
+                            </div>
+                            <div class="kpi-content">
+                                <h2 id="rel-total-leads">
+                                    <div class="kpi-loading">
+                                        <i class="ph ph-spinner-gap"></i>
+                                        <span>Atualizando dados...</span>
+                                    </div>
+                                </h2>
+                                <div class="kpi-trend positive"><i class="ph ph-arrow-up"></i>
+                                    <div class="trend-text"><span>no banco de dados</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div class="icon-wrapper green-light"><i class="ph ph-clock text-primary"></i></div>
+                                <h3>Tempo Economizado</h3>
+                            </div>
+                            <div class="kpi-content">
+                                <h2 id="rel-atendimentos">
+                                    <div class="kpi-loading">
+                                        <i class="ph ph-spinner-gap"></i>
+                                        <span>Atualizando dados...</span>
+                                    </div>
+                                </h2>
+                                <div class="kpi-trend positive"><i class="ph ph-arrow-up"></i>
+                                    <div class="trend-text"><span>em horas</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div class="icon-wrapper green-light"><i class="ph ph-currency-dollar text-primary"></i>
+                                </div>
+                                <h3>Vendas Fechadas</h3>
+                            </div>
+                            <div class="kpi-content">
+                                <h2 id="rel-fechados">
+                                    <div class="kpi-loading">
+                                        <i class="ph ph-spinner-gap"></i>
+                                        <span>Atualizando dados...</span>
+                                    </div>
+                                </h2>
+                                <div class="kpi-trend positive"><i class="ph ph-arrow-up"></i>
+                                    <div class="trend-text"><span>leads com status fechado</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <div class="icon-wrapper green-light"><i class="ph ph-calendar-plus text-primary"></i>
+                                </div>
+                                <h3>Reuniões Agendadas</h3>
+                            </div>
+                            <div class="kpi-content">
+                                <h2 id="rel-reunioes">
+                                    <div class="kpi-loading">
+                                        <i class="ph ph-spinner-gap"></i>
+                                        <span>Atualizando dados...</span>
+                                    </div>
+                                </h2>
+                                <div class="kpi-trend positive"><i class="ph ph-arrow-up"></i>
+                                    <div class="trend-text"><span>leads com reunião marcada</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <div class="relatorios-charts">
+
+                        <!-- Gráfico de Linha (Área) -->
+                        <section class="card"
+                            style="padding: 32px; background: var(--color-bg-card); border-radius: 16px; border: 1px solid var(--color-border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); position: relative; overflow: hidden;">
+                            <h3
+                                style="margin-bottom: 32px; font-weight: 600; color: var(--color-text-main); font-size: 20px; position: relative; z-index: 1;">
+                                Performance de Vendas e Atendimentos</h3>
+                            <div style="height: 380px; width: 100%; position: relative; z-index: 1;">
+                                <div id="chartLoading" style="position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 2; background: var(--color-bg-card);">
+                                    <div class="kpi-loading" style="align-items: center; gap: 8px;">
+                                        <i class="ph ph-spinner-gap" style="font-size: 32px; margin: 0;"></i>
+                                        <span style="font-size: 13px;">Carregando gráfico...</span>
+                                    </div>
+                                </div>
+                                <canvas id="statusChart"></canvas>
+                            </div>
+                        </section>
+
+                        <!-- Gráfico de Mapa -->
+                        <section class="card"
+                            style="padding: 32px; background: var(--color-bg-card); border-radius: 16px; border: 1px solid var(--color-border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                            <h3
+                                style="margin-bottom: 24px; font-weight: 600; color: var(--color-text-main); font-size: 20px;">
+                                Distribuição Geográfica por Estado</h3>
+
+                            <div class="map-container-flex">
+                                <!-- Mapa com Wrapper de Zoom -->
+                                <div
+                                    style="position: relative; flex: 2; height: 350px; min-width: 0; width: 100%; border-radius: 12px; overflow: hidden; background: var(--color-bg-main);">
+                                    <div id="brazilMap"
+                                        style="width: 100%; height: 100%; display: block; touch-action: none;">
+                                        <div style="display:flex; justify-content:center; align-items:center; height:100%; width:100%;">
+                                            <div class="kpi-loading" style="align-items: center; gap: 8px;">
+                                                <i class="ph ph-spinner-gap" style="font-size: 32px; margin: 0;"></i>
+                                                <span style="font-size: 13px;">Carregando mapa geográfico...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="position: absolute; bottom: 16px; right: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 10;">
+                                        <button id="mapZoomIn"
+                                            style="width: 36px; height: 36px; border-radius: 8px; background: #fff; border: 1px solid var(--color-border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; cursor: pointer; color: var(--color-text); font-size: 20px; transition: all 0.2s;"><i
+                                                class="ph ph-plus"></i></button>
+                                        <button id="mapZoomOut"
+                                            style="width: 36px; height: 36px; border-radius: 8px; background: #fff; border: 1px solid var(--color-border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; cursor: pointer; color: var(--color-text); font-size: 20px; transition: all 0.2s;"><i
+                                                class="ph ph-minus"></i></button>
+                                    </div>
+                                </div>
+
+                                <!-- Legenda Lateral -->
+                                <div id="mapLegend"
+                                    style="flex: 1; height: 350px; overflow-y: auto; overflow-x: hidden; padding-left: 16px; border-left: 1px solid var(--color-border); display: flex; flex-direction: column; gap: 12px;">
+                                    <span
+                                        style="color: var(--color-text-mut); font-size: 14px; text-align: center; margin-top: auto; margin-bottom: auto;">Analisando
+                                        localizações...</span>
+                                </div>
+                            </div>
+                        </section>
+
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Preenche dados de relatórios com dados reais do Supabase
+        document.addEventListener('DOMContentLoaded', () => {
+            // Aguarda o dbAPI estar disponível (carregado pelo script.js via auth)
+            const tryInit = setInterval(async () => {
+                if (window.dbAPI) {
+                    clearInterval(tryInit);
+                    const leads = await window.dbAPI.fetchLeads();
+                    document.getElementById('rel-total-leads').textContent = leads.length;
+                    const fechados = leads.filter(l => l.status === 'Fechado').length;
+                    document.getElementById('rel-fechados').textContent = fechados;
+
+                    // Busca mensagens da IA
+                    let iaCount = 0;
+                    for (const lead of leads) {
+                        const conversas = await window.dbAPI.fetchConversations(lead.id);
+                        iaCount += conversas.filter(c => c.enviado_por === 'IA').length;
+                    }
+                    
+                    // Calcula o tempo poupado (2 minutos por mensagem IA), transformando em horas (1 casa decimal)
+                    const tempoPoupadoHoras = Math.round(((iaCount * 2) / 60) * 10) / 10;
+                    
+                    document.getElementById('rel-atendimentos').textContent = `${tempoPoupadoHoras}h`;
+
+                    // Prepara dados fixos para o gráfico conforme solicitado
+                    const countNovos = leads.filter(l => l.status === 'Novo' || !l.status).length;
+                    const countAtendimentos = leads.filter(l => l.status === 'Em Atendimento').length;
+                    const countVendas = leads.filter(l => l.status === 'Fechado').length;
+                    const countReunioes = leads.filter(l => l.status && l.status.toLowerCase().includes('reuni')).length;
+
+                    const reunioesEl = document.getElementById('rel-reunioes');
+                    if (reunioesEl) reunioesEl.textContent = countReunioes;
+
+                    // Textos multilinhas (arrays) para evitar que o gráfico fique espremido horizontalmente no mobile
+                    const chartLabels = [
+                        ['Total', 'de Leads'],
+                        ['Vendas', '(Fechados)'],
+                        ['Reuniões', 'Agendadas'],
+                        ['Tempo Poupado', '(Horas)']
+                    ];
+                    // Usamos leads.length para o Total de Leads
+                    const chartData = [leads.length, countVendas, countReunioes, tempoPoupadoHoras];
+
+                    // Cores mais vivas para um efeito bonito
+                    const chartColors = [
+                        '#00a884', // Verde (Total de Leads)
+                        '#8b5cf6', // Roxo (Vendas)
+                        '#f59e0b', // Laranja (Reuniões)
+                        '#ec4899'  // Rosa (Tempo Poupado)
+                    ];
+
+                    const ctx = document.getElementById('statusChart').getContext('2d');
+
+                    // Adiciona um efeitinho visual de sombra via CSS ao canvas
+                    ctx.canvas.style.filter = "drop-shadow(0px 8px 16px rgba(0,0,0,0.1))";
+
+                    // Criação de um gradiente para o fundo do gráfico de área
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                    gradient.addColorStop(0, 'rgba(0, 168, 132, 0.5)'); // Verde AutomatiZAP translúcido
+                    gradient.addColorStop(1, 'rgba(0, 168, 132, 0.0)'); // Transparente no fundo
+
+                    // Oculta o loading do gráfico antes de renderizar
+                    const chartLoading = document.getElementById('chartLoading');
+                    if (chartLoading) chartLoading.style.display = 'none';
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: chartLabels,
+                            datasets: [{
+                                label: 'Total',
+                                data: chartData,
+                                backgroundColor: gradient,
+                                borderColor: '#00a884',
+                                borderWidth: 4,
+                                pointBackgroundColor: '#ffffff',
+                                pointBorderColor: '#00a884',
+                                pointBorderWidth: 3,
+                                pointRadius: 6,
+                                pointHoverRadius: 8,
+                                fill: true,
+                                tension: 0.4 // Linhas curvas e suaves
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            animation: {
+                                duration: 2000,
+                                easing: 'easeOutQuart'
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                    titleColor: '#64748b',
+                                    bodyColor: '#0f172a',
+                                    titleFont: { family: 'Poppins', size: 13, weight: '500' },
+                                    bodyFont: { family: 'Poppins', size: 16, weight: 'bold' },
+                                    padding: 16,
+                                    cornerRadius: 12,
+                                    borderColor: 'rgba(0,0,0,0.1)',
+                                    borderWidth: 1,
+                                    displayColors: false
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    grid: { display: false },
+                                    ticks: {
+                                        color: '#64748b',
+                                        font: { family: 'Poppins', size: window.innerWidth <= 768 ? 10 : 12, weight: '500' },
+                                        maxRotation: 0,
+                                        autoSkip: false
+                                    },
+                                    border: { display: false }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(0, 0, 0, 0.05)',
+                                        drawBorder: false
+                                    },
+                                    ticks: {
+                                        color: '#94a3b8',
+                                        font: { family: 'Poppins', size: 12 },
+                                        stepSize: 1,
+                                        precision: 0
+                                    },
+                                    border: { display: false }
+                                }
+                            }
+                        }
+                    });
+
+                    // --- LÓGICA DO MAPA DE DDD ---
+                    const getUFByDDD = (telefone) => {
+                        if (!telefone) return null;
+                        const limpo = telefone.replace(/\D/g, ''); // Remove ( ) - etc
+                        if (limpo.length < 10) return null;
+                        // Pegar os primeiros dois dígitos úteis
+                        let dddStr = limpo.substring(0, 2);
+                        // Se o número começar com 55 (código do brasil), pega os dois depois
+                        if (limpo.startsWith('55') && limpo.length >= 12) dddStr = limpo.substring(2, 4);
+
+                        const ddd = parseInt(dddStr);
+                        if (ddd >= 11 && ddd <= 19) return 'BR-SP';
+                        if (ddd >= 21 && ddd <= 24) return 'BR-RJ';
+                        if (ddd >= 27 && ddd <= 28) return 'BR-ES';
+                        if (ddd >= 31 && ddd <= 38) return 'BR-MG';
+                        if (ddd >= 41 && ddd <= 46) return 'BR-PR';
+                        if (ddd >= 47 && ddd <= 49) return 'BR-SC';
+                        if (ddd >= 51 && ddd <= 55) return 'BR-RS';
+                        if (ddd === 61) return 'BR-DF';
+                        if (ddd >= 62 && ddd <= 64 && ddd !== 63) return 'BR-GO';
+                        if (ddd === 63) return 'BR-TO';
+                        if (ddd >= 65 && ddd <= 66) return 'BR-MT';
+                        if (ddd === 67) return 'BR-MS';
+                        if (ddd === 68) return 'BR-AC';
+                        if (ddd === 69) return 'BR-RO';
+                        if (ddd >= 71 && ddd <= 77) return 'BR-BA';
+                        if (ddd === 79) return 'BR-SE';
+                        if (ddd === 81 || ddd === 87) return 'BR-PE';
+                        if (ddd === 82) return 'BR-AL';
+                        if (ddd === 83) return 'BR-PB';
+                        if (ddd === 84) return 'BR-RN';
+                        if (ddd >= 85 && ddd <= 88) return 'BR-CE';
+                        if (ddd === 89 || ddd === 86) return 'BR-PI';
+                        if (ddd >= 91 && ddd <= 94) return 'BR-PA';
+                        if (ddd === 95) return 'BR-RR';
+                        if (ddd === 96) return 'BR-AP';
+                        if (ddd === 92 || ddd === 97) return 'BR-AM';
+                        if (ddd === 98 || ddd === 99) return 'BR-MA';
+                        return null;
+                    };
+
+                    const ufCounts = {};
+                    leads.forEach(l => {
+                        const uf = getUFByDDD(l.telefone);
+                        if (uf) {
+                            ufCounts[uf] = (ufCounts[uf] || 0) + 1;
+                        }
+                    });
+
+                    const estadoNomes = {
+                        'SP': 'São Paulo', 'RJ': 'Rio de Janeiro', 'ES': 'Espírito Santo', 'MG': 'Minas Gerais',
+                        'PR': 'Paraná', 'SC': 'Santa Catarina', 'RS': 'Rio Grande do Sul', 'DF': 'Distrito Federal',
+                        'GO': 'Goiás', 'MT': 'Mato Grosso', 'MS': 'Mato Grosso do Sul', 'AC': 'Acre', 'RO': 'Rondônia',
+                        'BA': 'Bahia', 'SE': 'Sergipe', 'PE': 'Pernambuco', 'AL': 'Alagoas', 'PB': 'Paraíba',
+                        'RN': 'Rio Grande do Norte', 'CE': 'Ceará', 'PI': 'Piauí', 'PA': 'Pará', 'RR': 'Roraima',
+                        'AP': 'Amapá', 'AM': 'Amazonas', 'MA': 'Maranhão', 'TO': 'Tocantins'
+                    };
+
+                    // CSS: esconde label BR-XX no mapa e garante pointer-events:none no tooltip nativo
+                    if (!document.getElementById('map-style-override')) {
+                        const style = document.createElement('style');
+                        style.id = 'map-style-override';
+                        style.innerHTML = `
+                            #brazilMap svg text, #brazilMap text, #brazilMap tspan { display: none !important; }
+                            div.google-visualization-tooltip { pointer-events: none !important; max-width: calc(100vw - 16px) !important; box-sizing: border-box !important; }
+                        `;
+                        document.head.appendChild(style);
+                    }
+
+                    // Corrige posição do tooltip para não sair do viewport (mobile fix)
+                    if (!window._mapTooltipObserver) {
+                        window._mapTooltipObserver = new MutationObserver(() => {
+                            const tt = document.querySelector('div.google-visualization-tooltip');
+                            if (!tt || tt.offsetParent === null) return;
+
+                            // Pequeno delay para o Google Charts terminar de posicionar
+                            requestAnimationFrame(() => {
+                                const rect = tt.getBoundingClientRect();
+                                const vw = window.innerWidth;
+                                const vh = window.innerHeight;
+                                const margin = 8;
+
+                                let left = parseFloat(tt.style.left) || rect.left;
+                                let top = parseFloat(tt.style.top) || rect.top;
+
+                                // Impede saída pela direita
+                                if (left + rect.width > vw - margin) {
+                                    left = vw - rect.width - margin;
+                                }
+                                // Impede saída pela esquerda
+                                if (left < margin) {
+                                    left = margin;
+                                }
+                                // Impede saída por baixo
+                                if (top + rect.height > vh - margin) {
+                                    top = vh - rect.height - margin;
+                                }
+                                // Impede saída por cima
+                                if (top < margin) {
+                                    top = margin;
+                                }
+
+                                tt.style.left = left + 'px';
+                                tt.style.top = top + 'px';
+                            });
+                        });
+                        window._mapTooltipObserver.observe(document.body, {
+                            childList: true,
+                            subtree: true,
+                            attributes: true,
+                            attributeFilter: ['style', 'class']
+                        });
+                    }
+
+                    // Carrega o Google Charts com o callback direto
+                    google.charts.load('current', {
+                        packages: ['geochart'],
+                        callback: () => {
+                            const dataTable = new google.visualization.DataTable();
+                            dataTable.addColumn('string', 'Estado');
+                            dataTable.addColumn('number', 'Leads');
+                            dataTable.addColumn({ type: 'string', role: 'tooltip', p: { html: true } });
+
+                            const ufArray = [];
+
+                            for (const ufSigla of Object.keys(estadoNomes)) {
+                                const uf = 'BR-' + ufSigla;
+                                const nomeEstado = estadoNomes[ufSigla];
+                                const count = ufCounts[uf] || 0;
+
+                                const dot = count > 0 ? '#00a884' : '#94a3b8';
+                                const tooltipHtml = `
+                                    <div style="padding:12px 16px;background:var(--color-bg-card);border-radius:12px;font-family:'Poppins',sans-serif;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,0.12);border:1px solid var(--color-border);">
+                                        <div style="font-size:11px;color:var(--color-text-mut);font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.6px;">${ufSigla} | ${nomeEstado}</div>
+                                        <div style="display:flex;align-items:center;gap:8px;">
+                                            <div style="width:10px;height:10px;border-radius:50%;background:${dot};flex-shrink:0;"></div>
+                                            <span style="font-size:20px;font-weight:700;color:var(--color-text-main);">${count} <span style="font-size:13px;font-weight:500;color:var(--color-text-sec);">leads</span></span>
+                                        </div>
+                                    </div>
+                                `;
+
+                                dataTable.addRow([uf, count, tooltipHtml]);
+
+                                if (count > 0) {
+                                    ufArray.push({ uf: ufSigla, nome: nomeEstado, count });
+                                }
+                            }
+
+                            const mapEl = document.getElementById('brazilMap');
+                            const chart = new google.visualization.GeoChart(mapEl);
+
+                            const drawChart = () => {
+                                const isMobile = window.innerWidth <= 992;
+                                // No mobile subtrai as margens/paddings da tela. No desktop usa o flex.
+                                const w = isMobile ? (window.innerWidth - 48) : (mapEl.clientWidth || 500);
+                                const h = isMobile ? 320 : (mapEl.clientHeight || 350);
+
+                                // Se não houver leads, o máximo é 1 para não bugar o degradê e forçar o valor 0 na primeira cor
+                                const maxCount = ufArray.length > 0 ? Math.max(...ufArray.map(u => u.count)) : 1;
+
+                                chart.draw(dataTable, {
+                                    region: 'BR',
+                                    resolution: 'provinces',
+                                    colorAxis: { 
+                                        minValue: 0, 
+                                        maxValue: maxCount, 
+                                        colors: ['#ccfbf1', '#00a884', '#042f2e'] 
+                                    },
+                                    backgroundColor: 'transparent',
+                                    datalessRegionColor: '#f8fafc',
+                                    defaultColor: '#f1f5f9',
+                                    tooltip: { isHtml: true, trigger: isMobile ? 'selection' : 'focus' }, // Hover no desktop, Click no mobile
+                                    legend: 'none',
+                                    width: w,
+                                    height: h,
+                                    keepAspectRatio: true
+                                });
+                            };
+
+                            // Desenha o mapa inicialmente
+                            drawChart();
+
+                            // Redesenha o mapa automaticamente quando a tela for redimensionada (ex: mobile)
+                            window.addEventListener('resize', () => {
+                                // Pequeno delay para garantir que o container já atualizou o CSS
+                                setTimeout(drawChart, 100);
+                            });
+
+                            // --- LÓGICA DE ZOOM E PAN (ARRASTO) ---
+                            let mapZoom = 1;
+                            let mapPanX = 0;
+                            let mapPanY = 0;
+                            let isDragging = false;
+                            let startX = 0, startY = 0;
+
+                            const applyMapTransform = () => {
+                                // O Google Charts mapeia os eventos de clique na div[dir="ltr"] que engloba o SVG.
+                                // Se dermos zoom nela, os cliques continuam precisos e o tooltip (que fica fora dela) não infla!
+                                const eventContainer = mapEl.querySelector('div[dir="ltr"]');
+                                if (eventContainer) {
+                                    eventContainer.style.transform = `translate(${mapPanX}px, ${mapPanY}px) scale(${mapZoom})`;
+                                    eventContainer.style.transformOrigin = 'center center';
+                                    eventContainer.style.transition = isDragging ? 'none' : 'transform 0.2s ease-out';
+                                }
+                            };
+
+                            // Garante que o zoom seja aplicado após o gráfico desenhar
+                            google.visualization.events.addListener(chart, 'ready', applyMapTransform);
+
+                            document.getElementById('mapZoomIn').addEventListener('click', () => {
+                                mapZoom = Math.min(mapZoom + 0.5, 4); // Max zoom de 4x
+                                mapEl.style.cursor = 'grab';
+                                applyMapTransform();
+                            });
+
+                            document.getElementById('mapZoomOut').addEventListener('click', () => {
+                                mapZoom = Math.max(mapZoom - 0.5, 1); // Min zoom de 1x
+                                if (mapZoom === 1) {
+                                    mapPanX = 0; mapPanY = 0; // reseta posição
+                                    mapEl.style.cursor = 'default';
+                                }
+                                applyMapTransform();
+                            });
+
+                            // Mouse (Desktop)
+                            mapEl.addEventListener('mousedown', (e) => {
+                                if (mapZoom > 1) {
+                                    isDragging = true;
+                                    startX = e.clientX - mapPanX;
+                                    startY = e.clientY - mapPanY;
+                                    mapEl.style.cursor = 'grabbing';
+                                }
+                            });
+                            window.addEventListener('mousemove', (e) => {
+                                if (isDragging) {
+                                    mapPanX = e.clientX - startX;
+                                    mapPanY = e.clientY - startY;
+                                    applyMapTransform();
+                                }
+                            });
+                            window.addEventListener('mouseup', () => {
+                                if (isDragging) {
+                                    isDragging = false;
+                                    mapEl.style.cursor = mapZoom > 1 ? 'grab' : 'default';
+                                    applyMapTransform();
+                                }
+                            });
+
+                            // Touch (Mobile)
+                            mapEl.addEventListener('touchstart', (e) => {
+                                if (mapZoom > 1 && e.touches.length === 1) {
+                                    isDragging = true;
+                                    startX = e.touches[0].clientX - mapPanX;
+                                    startY = e.touches[0].clientY - mapPanY;
+                                }
+                            }, { passive: false });
+                            window.addEventListener('touchmove', (e) => {
+                                if (isDragging) {
+                                    e.preventDefault(); // Evita scrollar a tela do celular enquanto arrasta o mapa
+                                    mapPanX = e.touches[0].clientX - startX;
+                                    mapPanY = e.touches[0].clientY - startY;
+                                    applyMapTransform();
+                                }
+                            }, { passive: false });
+                            window.addEventListener('touchend', () => {
+                                if (isDragging) {
+                                    isDragging = false;
+                                    applyMapTransform();
+                                }
+                            });
+
+                            // Popula a legenda lateral
+                            const legendEl = document.getElementById('mapLegend');
+                            if (ufArray.length === 0) {
+                                legendEl.innerHTML = '<span style="color:var(--color-text-mut);font-size:14px;">Nenhum lead com DDD válido encontrado.</span>';
+                                return;
+                            }
+
+                            ufArray.sort((a, b) => b.count - a.count);
+
+                            let legendHtml = '<h4 style="font-size:14px;font-weight:600;color:var(--color-text-sec);margin-bottom:8px;">Rank de estados atendidos pela IA:</h4>';
+                            ufArray.forEach(item => {
+                                legendHtml += `
+                                    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--color-bg-main);border-radius:8px;transition:transform 0.2s;cursor:default;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                                        <div style="display:flex;align-items:center;gap:8px;">
+                                            <div style="width:8px;height:8px;border-radius:50%;background:#00a884;"></div>
+                                            <div style="display:flex;flex-direction:column;">
+                                                <span style="font-size:14px;font-weight:600;color:var(--color-text);line-height:1.2;">${item.uf}</span>
+                                                <span style="font-size:11px;font-weight:500;color:var(--color-text-mut);line-height:1.2;">${item.nome}</span>
+                                            </div>
+                                        </div>
+                                        <span style="font-size:15px;font-weight:700;color:var(--color-primary);">${item.count}</span>
+                                    </div>
+                                `;
+                            });
+                            legendEl.innerHTML = legendHtml;
+                        }
+                    });
+
+                }
+            }, 500);
+        });
+    </script>
+</body>
+
+</html>
