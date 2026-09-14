@@ -1374,6 +1374,27 @@ body.dark-mode .accordion-content {
     font-weight: 600;
 }
 
+/* Custom Admin Dropdown Colors */
+.custom-option.admin-opt-inadimplente:hover {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #ef4444 !important;
+}
+.custom-option.admin-opt-inadimplente.selected {
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #dc2626 !important;
+    font-weight: 600;
+}
+
+.custom-option.admin-opt-aviso:hover {
+    background: rgba(234, 179, 8, 0.15) !important;
+    color: #eab308 !important;
+}
+.custom-option.admin-opt-aviso.selected {
+    background: rgba(234, 179, 8, 0.2) !important;
+    color: #ca8a04 !important;
+    font-weight: 600;
+}
+
 .table-responsive {
     overflow-x: auto;
 }

@@ -317,8 +317,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <label style="font-weight: 500; font-size: 14px; margin-bottom: 8px; text-align: left; display: block; color: var(--color-text-main);">Status da Empresa</label>
                     <div class="custom-select-container" style="display: flex; flex-direction: column; gap: 4px;">
                         <div class="custom-option selected" data-value="Todos">Todos os status</div>
-                        <div class="custom-option" data-value="Inadimplente">Inadimplente</div>
-                        <div class="custom-option" data-value="Aviso previo">Aviso previo</div>
+                        <div class="custom-option admin-opt-inadimplente" data-value="Inadimplente">Inadimplente</div>
+                        <div class="custom-option admin-opt-aviso" data-value="Aviso previo">Aviso previo</div>
                         <div class="custom-option" data-value="Pagos">Pagos</div>
                     </div>
                 `;
