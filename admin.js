@@ -244,9 +244,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnClearAdminFilters = document.getElementById('btn-clear-admin-filters');
 
     function applyAdminFilters() {
-        if (!searchAdminInput || !dateAdminInput) return;
+        if (!searchAdminInput) return;
         const searchTerm = searchAdminInput.value.toLowerCase();
-        const searchDate = dateAdminInput.value; // YYYY-MM-DD
 
         const filtered = globalTenants.filter(t => {
             const nome = (t.nome || '').toLowerCase();
@@ -254,10 +253,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const matchesSearch = nome.includes(searchTerm) || email.includes(searchTerm);
             
             let matchesDate = true;
-            if (searchDate) {
-                // Compara a data de vencimento
+            if (adminSelectedDate) {
+                // Compara a data de vencimento (vencimento formato YYYY-MM-DD)
                 if (t.vencimento && t.vencimento !== 'N/A') {
-                    matchesDate = t.vencimento === searchDate;
+                    const selStr = `${adminSelectedDate.getFullYear()}-${(adminSelectedDate.getMonth()+1).toString().padStart(2, '0')}-${adminSelectedDate.getDate().toString().padStart(2, '0')}`;
+                    matchesDate = t.vencimento === selStr;
                 } else {
                     matchesDate = false;
                 }
@@ -270,26 +270,142 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (searchAdminInput) searchAdminInput.addEventListener('input', applyAdminFilters);
-    if (dateAdminInput) {
-        dateAdminInput.addEventListener('change', () => {
-            const dateText = document.getElementById('admin-date-text');
-            if (dateText && dateAdminInput.value) {
-                const parts = dateAdminInput.value.split('-');
-                if(parts.length === 3) dateText.textContent = `${parts[2]}/${parts[1]}/${parts[0]}`;
-            }
-            applyAdminFilters();
-        });
-    }
+    if (searchAdminInput) searchAdminInput.addEventListener('input', applyAdminFilters);
     if (btnClearAdminFilters) {
         btnClearAdminFilters.addEventListener('click', () => {
             if (searchAdminInput) searchAdminInput.value = '';
-            if (dateAdminInput) {
-                dateAdminInput.value = '';
-                const dateText = document.getElementById('admin-date-text');
-                if (dateText) dateText.textContent = 'dd/mm/aaaa';
-            }
+            // Limpar data
+            adminSelectedDate = null;
+            updateAdminDateText();
             applyAdminFilters();
         });
+    }
+
+    // --- Lógica do Calendário Customizado do Admin ---
+    let adminSelectedDate = null;
+    const dateBtn = document.getElementById('date-filter-btn');
+    const dateDropdown = document.getElementById('date-dropdown');
+    
+    if (dateBtn && dateDropdown) {
+        dateBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dateDropdown.classList.toggle('show');
+            const userDropdown = document.getElementById('user-dropdown');
+            if (userDropdown) userDropdown.classList.remove('show');
+            renderAdminCalendar();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!dateBtn.contains(e.target) && !dateDropdown.contains(e.target)) {
+                dateDropdown.classList.remove('show');
+            }
+        });
+
+        const calendarGrid = document.getElementById('calendar-grid');
+        const monthYearTxt = document.getElementById('cal-month-year');
+        const selectionTxt = document.getElementById('cal-selection-text');
+        const prevBtn = document.getElementById('cal-prev');
+        const nextBtn = document.getElementById('cal-next');
+        let currentCalDate = new Date(); // Mês atual visível
+
+        function updateAdminDateText() {
+            const dateText = document.getElementById('date-filter-text');
+            if (!dateText) return;
+            if (adminSelectedDate) {
+                const dStr = `${adminSelectedDate.getDate().toString().padStart(2, '0')}/${(adminSelectedDate.getMonth() + 1).toString().padStart(2, '0')}/${adminSelectedDate.getFullYear()}`;
+                dateText.textContent = dStr;
+            } else {
+                dateText.textContent = "Selecione uma data";
+            }
+        }
+
+        updateAdminDateText(); // Setup inicial
+
+        function renderAdminCalendar() {
+            const year = currentCalDate.getFullYear();
+            const month = currentCalDate.getMonth();
+            
+            const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            if (monthYearTxt) monthYearTxt.textContent = `${monthNames[month]} ${year}`;
+
+            // Remove todos os dias anteriores (mantendo os dias da semana)
+            const daysToRemove = calendarGrid.querySelectorAll('.cal-day');
+            daysToRemove.forEach(d => d.remove());
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Espaços vazios antes do dia 1
+            for (let i = 0; i < firstDay; i++) {
+                const emptySpan = document.createElement('span');
+                emptySpan.className = 'cal-day empty';
+                calendarGrid.appendChild(emptySpan);
+            }
+
+            const today = window.getBrasiliaDate ? window.getBrasiliaDate() : new Date();
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const daySpan = document.createElement('span');
+                daySpan.className = 'cal-day';
+                daySpan.textContent = i;
+                
+                const cellDate = new Date(year, month, i);
+
+                // Highlight today
+                if (cellDate.getDate() === today.getDate() && cellDate.getMonth() === today.getMonth() && cellDate.getFullYear() === today.getFullYear()) {
+                    daySpan.classList.add('today'); // Verde claro
+                }
+
+                // Highlight selected
+                if (adminSelectedDate && cellDate.getTime() === adminSelectedDate.getTime()) {
+                    daySpan.classList.add('selected');
+                }
+
+                daySpan.addEventListener('click', () => {
+                    adminSelectedDate = new Date(cellDate);
+                    if (selectionTxt) {
+                        selectionTxt.textContent = `Data selecionada: ${i.toString().padStart(2, '0')}/${(month+1).toString().padStart(2, '0')}/${year}`;
+                    }
+                    renderAdminCalendar(); // Re-render para atualizar os 'selected'
+                });
+
+                calendarGrid.appendChild(daySpan);
+            }
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                currentCalDate.setMonth(currentCalDate.getMonth() - 1);
+                renderAdminCalendar();
+            });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                currentCalDate.setMonth(currentCalDate.getMonth() + 1);
+                renderAdminCalendar();
+            });
+        }
+
+        const btnApply = document.getElementById('btn-apply-date');
+        if (btnApply) {
+            btnApply.addEventListener('click', () => {
+                updateAdminDateText();
+                dateDropdown.classList.remove('show');
+                applyAdminFilters();
+            });
+        }
+
+        const btnClearDate = document.getElementById('btn-clear-date-filter');
+        if (btnClearDate) {
+            btnClearDate.addEventListener('click', (e) => {
+                e.stopPropagation();
+                adminSelectedDate = null;
+                if (selectionTxt) selectionTxt.textContent = "Nenhuma data selecionada";
+                renderAdminCalendar();
+            });
+        }
     }
 
     // 6. Carregar Detalhes de um Tenant (Mini Dashboard)
