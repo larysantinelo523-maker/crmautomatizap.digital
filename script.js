@@ -816,19 +816,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                         
                         setTimeout(() => {
-                            if (dropdown) dropdown.remove();
+                            if (dropdown) dropdown.style.display = 'none';
                         }, 250);
                     });
                     
                     const closeDropdown = (ev) => {
                         if (!btn.contains(ev.target)) {
-                            dropdown.remove();
-                            document.removeEventListener('click', closeDropdown);
+                            dropdown.style.display = 'none';
                         }
                     };
                     document.addEventListener('click', closeDropdown);
                 } else {
-                    dropdown.remove();
+                    dropdown.style.display = dropdown.style.display === 'none' ? 'flex' : 'none';
                 }
             });
         }
