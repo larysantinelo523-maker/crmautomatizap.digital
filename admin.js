@@ -300,6 +300,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             adminSelectedDate = null;
             updateAdminDateText();
             applyAdminFilters();
+            
+            const icon = btnClearAdminFilters.querySelector('i');
+            if (icon) {
+                icon.className = 'ph ph-check';
+                icon.style.color = 'var(--color-primary)';
+                setTimeout(() => {
+                    icon.className = 'ph ph-funnel';
+                    icon.style.color = '';
+                }, 1000);
+            }
         });
     }
 

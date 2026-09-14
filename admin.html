@@ -89,43 +89,41 @@
                     </div>
                 </div>
                 <div class="header-actions" style="display: flex; align-items: center; gap: 16px;">
-                    <div class="admin-filters" style="display: flex; align-items: center; margin-right: 16px;">
-                        <div class="date-wrapper" id="date-wrapper">
-                            <button class="date-filter" id="date-filter-btn">
-                                <i class="ph ph-calendar-blank"></i>
-                                <span id="date-filter-text">01/09/2026 - 30/09/2026</span>
-                                <i class="ph ph-caret-down"></i>
-                            </button>
-                            
-                            <!-- Date Dropdown -->
-                            <div class="date-dropdown" id="date-dropdown">
-                                <div class="date-dropdown-header" style="display: flex; justify-content: space-between; align-items: center;">
-                                    <h4>Filtrar por Data</h4>
-                                    <button id="btn-clear-date-filter" style="background: none; border: none; font-size: 11px; color: var(--color-text-mut); cursor: pointer; text-decoration: underline;">Limpar</button>
+                    <div class="date-wrapper" id="date-wrapper" style="margin-right: 16px;">
+                        <button class="date-filter" id="date-filter-btn">
+                            <i class="ph ph-calendar-blank"></i>
+                            <span id="date-filter-text">01/09/2026 - 30/09/2026</span>
+                            <i class="ph ph-caret-down"></i>
+                        </button>
+                        
+                        <!-- Date Dropdown -->
+                        <div class="date-dropdown" id="date-dropdown">
+                            <div class="date-dropdown-header" style="display: flex; justify-content: space-between; align-items: center;">
+                                <h4>Filtrar por Data</h4>
+                                <button id="btn-clear-date-filter" style="background: none; border: none; font-size: 11px; color: var(--color-text-mut); cursor: pointer; text-decoration: underline;">Limpar</button>
+                            </div>
+                            <div class="date-dropdown-body">
+                                <div class="calendar-header">
+                                    <button class="btn-icon xs" id="cal-prev"><i class="ph ph-caret-left"></i></button>
+                                    <strong id="cal-month-year">Setembro 2026</strong>
+                                    <button class="btn-icon xs" id="cal-next"><i class="ph ph-caret-right"></i></button>
                                 </div>
-                                <div class="date-dropdown-body">
-                                    <div class="calendar-header">
-                                        <button class="btn-icon xs" id="cal-prev"><i class="ph ph-caret-left"></i></button>
-                                        <strong id="cal-month-year">Setembro 2026</strong>
-                                        <button class="btn-icon xs" id="cal-next"><i class="ph ph-caret-right"></i></button>
-                                    </div>
-                                    <div class="calendar-grid" id="calendar-grid">
-                                        <span class="cal-day-name">D</span>
-                                        <span class="cal-day-name">S</span>
-                                        <span class="cal-day-name">T</span>
-                                        <span class="cal-day-name">Q</span>
-                                        <span class="cal-day-name">Q</span>
-                                        <span class="cal-day-name">S</span>
-                                        <span class="cal-day-name">S</span>
-                                        <!-- Dias injetados via JS -->
-                                    </div>
-                                    <div style="display: flex; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--color-text-sec);">
-                                        <span id="cal-selection-text">Selecione uma data</span>
-                                    </div>
+                                <div class="calendar-grid" id="calendar-grid">
+                                    <span class="cal-day-name">D</span>
+                                    <span class="cal-day-name">S</span>
+                                    <span class="cal-day-name">T</span>
+                                    <span class="cal-day-name">Q</span>
+                                    <span class="cal-day-name">Q</span>
+                                    <span class="cal-day-name">S</span>
+                                    <span class="cal-day-name">S</span>
+                                    <!-- Dias injetados via JS -->
                                 </div>
-                                <div class="date-dropdown-footer">
-                                    <button class="btn btn--primary" id="btn-apply-date" style="width: 100%;">Aplicar Filtro</button>
+                                <div style="display: flex; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--color-text-sec);">
+                                    <span id="cal-selection-text">Selecione uma data</span>
                                 </div>
+                            </div>
+                            <div class="date-dropdown-footer">
+                                <button class="btn btn--primary" id="btn-apply-date" style="width: 100%;">Aplicar Filtro</button>
                             </div>
                         </div>
                     </div>
@@ -422,7 +420,7 @@
     </div>
 
     <!-- Script Base -->
-    <script type="module" src="admin.js?v=2.1"></script>
+    <script type="module" src="admin.js?v=2.2"></script>
 </body>
 
 </html>
