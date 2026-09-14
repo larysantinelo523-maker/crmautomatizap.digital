@@ -805,8 +805,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 const cells = row.querySelectorAll('td');
                                 if (cells.length > 3) {
                                     const badge = cells[3].querySelector('.badge');
-                                    const rowStatus = badge ? badge.textContent.trim() : cells[3].textContent.trim();
-                                    if (rowStatus === statusVal) {
+                                    const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[3].textContent.trim().toLowerCase();
+                                    if (rowStatus === statusVal.toLowerCase()) {
                                         row.style.display = '';
                                     } else {
                                         row.style.display = 'none';

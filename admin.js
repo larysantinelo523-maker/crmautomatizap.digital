@@ -345,8 +345,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 const cells = row.querySelectorAll('td');
                                 if (cells.length > 4) {
                                     const badge = cells[4].querySelector('.badge');
-                                    const rowStatus = badge ? badge.textContent.trim() : cells[4].textContent.trim();
-                                    if (rowStatus !== statusVal) {
+                                    const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[4].textContent.trim().toLowerCase();
+                                    if (rowStatus !== statusVal.toLowerCase()) {
                                         row.style.display = 'none';
                                     }
                                 }
