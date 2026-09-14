@@ -751,6 +751,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateMainFilterText();
                 renderCalendar();
                 window.dispatchEvent(new Event('calendarFilterChanged'));
+                
+                // Forçar atualização direta caso o event listener falhe
+                if (typeof window.initDashboard === 'function') window.initDashboard();
+                if (typeof window.initLeads === 'function') window.initLeads();
+                if (typeof window.initRelatorios === 'function') window.initRelatorios();
             });
             dateDropdownHeader.appendChild(clearBtn);
         }
@@ -889,6 +894,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateMainFilterText();
                 dateDropdown.classList.remove('show');
                 window.dispatchEvent(new Event('calendarFilterChanged'));
+                
+                // Forçar atualização direta caso o event listener falhe
+                if (typeof window.initDashboard === 'function') window.initDashboard();
+                if (typeof window.initLeads === 'function') window.initLeads();
+                if (typeof window.initRelatorios === 'function') window.initRelatorios();
             });
         }
     }
