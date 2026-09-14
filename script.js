@@ -86,11 +86,6 @@ fetchUserData().then(user => {
                                 <i class="ph ph-copy"></i> Copiar Código PIX
                             </button>
                         </div>
-                        
-                        <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Simulador de pagamento autônomo (Para teste do Admin):</p>
-                        <button id="btn-simulate-payment" class="btn outline" style="width: 100%; justify-content: center; border-radius: 8px; border-color: #10b981; color: #10b981;">
-                            <i class="ph ph-check-circle"></i> Simular Pagamento Pago
-                        </button>
                     </div>
                 `;
                 document.body.appendChild(blocker);
@@ -103,26 +98,6 @@ fetchUserData().then(user => {
                         e.target.innerHTML = '<i class="ph ph-copy"></i> Copiar Código PIX';
                         e.target.style.background = '';
                     }, 2000);
-                });
-                
-                document.getElementById('btn-simulate-payment').addEventListener('click', async (e) => {
-                    e.target.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Processando...';
-                    e.target.disabled = true;
-                    try {
-                        const { supabase } = await import('./supabase.js');
-                        const nextDate = window.calculateNextDueDate(window.tenantVencDateStr);
-                        const newDateStr = `${nextDate.getFullYear()}-${String(nextDate.getMonth()+1).padStart(2,'0')}-${String(nextDate.getDate()).padStart(2,'0')}`;
-                        
-                        const { error } = await supabase.from('usuarios').update({ data_vencimento: newDateStr }).eq('id', user.id);
-                        if(error) throw error;
-                        
-                        alert('Pagamento processado com sucesso! A tela será liberada agora.');
-                        window.location.reload();
-                    } catch(err) {
-                        alert('Erro ao processar simulação: ' + err.message);
-                        e.target.innerHTML = '<i class="ph ph-check-circle"></i> Simular Pagamento Pago';
-                        e.target.disabled = false;
-                    }
                 });
             }
         }
