@@ -270,7 +270,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (searchAdminInput) searchAdminInput.addEventListener('input', applyAdminFilters);
-    if (searchAdminInput) searchAdminInput.addEventListener('input', applyAdminFilters);
+    
+    // --- Lógica do Calendário Customizado do Admin ---
+    let adminSelectedDate = null;
+    const dateBtn = document.getElementById('date-filter-btn');
+    const dateDropdown = document.getElementById('date-dropdown');
+    const calendarGrid = document.getElementById('calendar-grid');
+    const monthYearTxt = document.getElementById('cal-month-year');
+    const selectionTxt = document.getElementById('cal-selection-text');
+    const prevBtn = document.getElementById('cal-prev');
+    const nextBtn = document.getElementById('cal-next');
+    let currentCalDate = new Date(); // Mês atual visível
+
+    function updateAdminDateText() {
+        const dateText = document.getElementById('date-filter-text');
+        if (!dateText) return;
+        if (adminSelectedDate) {
+            const dStr = `${adminSelectedDate.getDate().toString().padStart(2, '0')}/${(adminSelectedDate.getMonth() + 1).toString().padStart(2, '0')}/${adminSelectedDate.getFullYear()}`;
+            dateText.textContent = dStr;
+        } else {
+            dateText.textContent = "Selecione uma data";
+        }
+    }
+
     if (btnClearAdminFilters) {
         btnClearAdminFilters.addEventListener('click', () => {
             if (searchAdminInput) searchAdminInput.value = '';
@@ -281,10 +303,60 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // --- Lógica do Calendário Customizado do Admin ---
-    let adminSelectedDate = null;
-    const dateBtn = document.getElementById('date-filter-btn');
-    const dateDropdown = document.getElementById('date-dropdown');
+    updateAdminDateText(); // Setup inicial
+
+    function renderAdminCalendar() {
+        if (!calendarGrid) return;
+        const year = currentCalDate.getFullYear();
+        const month = currentCalDate.getMonth();
+        
+        const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        if (monthYearTxt) monthYearTxt.textContent = `${monthNames[month]} ${year}`;
+
+        // Remove todos os dias anteriores (mantendo os dias da semana)
+        const daysToRemove = calendarGrid.querySelectorAll('.cal-day');
+        daysToRemove.forEach(d => d.remove());
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // Espaços vazios antes do dia 1
+        for (let i = 0; i < firstDay; i++) {
+            const emptySpan = document.createElement('span');
+            emptySpan.className = 'cal-day empty';
+            calendarGrid.appendChild(emptySpan);
+        }
+
+        const today = window.getBrasiliaDate ? window.getBrasiliaDate() : new Date();
+
+        for (let i = 1; i <= daysInMonth; i++) {
+            const daySpan = document.createElement('span');
+            daySpan.className = 'cal-day';
+            daySpan.textContent = i;
+            
+            const cellDate = new Date(year, month, i);
+
+            // Highlight today
+            if (cellDate.getDate() === today.getDate() && cellDate.getMonth() === today.getMonth() && cellDate.getFullYear() === today.getFullYear()) {
+                daySpan.classList.add('today'); // Verde claro
+            }
+
+            // Highlight selected
+            if (adminSelectedDate && cellDate.getTime() === adminSelectedDate.getTime()) {
+                daySpan.classList.add('selected');
+            }
+
+            daySpan.addEventListener('click', () => {
+                adminSelectedDate = new Date(cellDate);
+                if (selectionTxt) {
+                    selectionTxt.textContent = `Data selecionada: ${i.toString().padStart(2, '0')}/${(month+1).toString().padStart(2, '0')}/${year}`;
+                }
+                renderAdminCalendar(); // Re-render para atualizar os 'selected'
+            });
+
+            calendarGrid.appendChild(daySpan);
+        }
+    }
     
     if (dateBtn && dateDropdown) {
         dateBtn.addEventListener('click', (e) => {
@@ -300,78 +372,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 dateDropdown.classList.remove('show');
             }
         });
-
-        const calendarGrid = document.getElementById('calendar-grid');
-        const monthYearTxt = document.getElementById('cal-month-year');
-        const selectionTxt = document.getElementById('cal-selection-text');
-        const prevBtn = document.getElementById('cal-prev');
-        const nextBtn = document.getElementById('cal-next');
-        let currentCalDate = new Date(); // Mês atual visível
-
-        function updateAdminDateText() {
-            const dateText = document.getElementById('date-filter-text');
-            if (!dateText) return;
-            if (adminSelectedDate) {
-                const dStr = `${adminSelectedDate.getDate().toString().padStart(2, '0')}/${(adminSelectedDate.getMonth() + 1).toString().padStart(2, '0')}/${adminSelectedDate.getFullYear()}`;
-                dateText.textContent = dStr;
-            } else {
-                dateText.textContent = "Selecione uma data";
-            }
-        }
-
-        updateAdminDateText(); // Setup inicial
-
-        function renderAdminCalendar() {
-            const year = currentCalDate.getFullYear();
-            const month = currentCalDate.getMonth();
-            
-            const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-            if (monthYearTxt) monthYearTxt.textContent = `${monthNames[month]} ${year}`;
-
-            // Remove todos os dias anteriores (mantendo os dias da semana)
-            const daysToRemove = calendarGrid.querySelectorAll('.cal-day');
-            daysToRemove.forEach(d => d.remove());
-
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            // Espaços vazios antes do dia 1
-            for (let i = 0; i < firstDay; i++) {
-                const emptySpan = document.createElement('span');
-                emptySpan.className = 'cal-day empty';
-                calendarGrid.appendChild(emptySpan);
-            }
-
-            const today = window.getBrasiliaDate ? window.getBrasiliaDate() : new Date();
-
-            for (let i = 1; i <= daysInMonth; i++) {
-                const daySpan = document.createElement('span');
-                daySpan.className = 'cal-day';
-                daySpan.textContent = i;
-                
-                const cellDate = new Date(year, month, i);
-
-                // Highlight today
-                if (cellDate.getDate() === today.getDate() && cellDate.getMonth() === today.getMonth() && cellDate.getFullYear() === today.getFullYear()) {
-                    daySpan.classList.add('today'); // Verde claro
-                }
-
-                // Highlight selected
-                if (adminSelectedDate && cellDate.getTime() === adminSelectedDate.getTime()) {
-                    daySpan.classList.add('selected');
-                }
-
-                daySpan.addEventListener('click', () => {
-                    adminSelectedDate = new Date(cellDate);
-                    if (selectionTxt) {
-                        selectionTxt.textContent = `Data selecionada: ${i.toString().padStart(2, '0')}/${(month+1).toString().padStart(2, '0')}/${year}`;
-                    }
-                    renderAdminCalendar(); // Re-render para atualizar os 'selected'
-                });
-
-                calendarGrid.appendChild(daySpan);
-            }
-        }
 
         if (prevBtn) {
             prevBtn.addEventListener('click', (e) => {
