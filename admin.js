@@ -314,67 +314,73 @@ document.addEventListener('DOMContentLoaded', async () => {
                 dropdown.style.cursor = 'default';
                 
                 dropdown.innerHTML = `
-                    <label style="font-weight: 500; font-size: 14px; margin-bottom: 4px; text-align: left; display: block; color: var(--color-text-main);">Status da Empresa</label>
-                    <select class="crm-select filter-status-select" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-bg-main); color: var(--color-text-main); font-family: inherit; font-size: 13px;">
-                        <option value="Todos">Todos os status</option>
-                        <option value="Inadimplente">Inadimplente</option>
-                        <option value="Aviso previo">Aviso previo</option>
-                        <option value="Pagos">Pagos</option>
-                    </select>
+                    <label style="font-weight: 500; font-size: 14px; margin-bottom: 8px; text-align: left; display: block; color: var(--color-text-main);">Status da Empresa</label>
+                    <div class="custom-select-container" style="display: flex; flex-direction: column; gap: 4px;">
+                        <div class="custom-option selected" data-value="Todos">Todos os status</div>
+                        <div class="custom-option" data-value="Inadimplente">Inadimplente</div>
+                        <div class="custom-option" data-value="Aviso previo">Aviso previo</div>
+                        <div class="custom-option" data-value="Pagos">Pagos</div>
+                    </div>
                 `;
                 
                 btnClearAdminFilters.style.position = 'relative';
                 btnClearAdminFilters.appendChild(dropdown);
                 
-                const select = dropdown.querySelector('.filter-status-select');
-                
                 dropdown.addEventListener('click', (ev) => ev.stopPropagation());
                 
-                select.addEventListener('change', () => {
-                    const statusVal = select.value.toLowerCase();
-                    
-                    // Efeito visual de filtro ativo no botão de funil
-                    if (statusVal === 'todos') {
-                        btnClearAdminFilters.classList.remove('filter-active');
-                    } else {
-                        btnClearAdminFilters.classList.add('filter-active');
-                    }
-                    
-                    // Primeiro, restaura visibilidade pela busca (texto e data) original
-                    applyAdminFilters();
-                    
-                    // Em seguida, varre as linhas que estão visíveis e aplica o status (in-place)
-                    const tableRows = document.querySelectorAll('.data-table tbody tr');
-                    tableRows.forEach(row => {
-                        if (row.style.display !== 'none') {
-                            if (statusVal === 'todos') {
-                                row.style.display = '';
-                            } else {
-                                const cells = row.querySelectorAll('td');
-                                if (cells.length > 4) {
-                                    const badge = cells[4].querySelector('.badge');
-                                    const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[4].textContent.trim().toLowerCase();
-                                    
-                                    let match = false;
-                                    if (statusVal === 'pagos' && rowStatus === 'pago') {
-                                        match = true;
-                                    } else if (statusVal === 'aviso previo' && rowStatus.includes('vence')) {
-                                        match = true;
-                                    } else if (statusVal === rowStatus) {
-                                        match = true;
-                                    }
-                                    
-                                    if (!match) {
-                                        row.style.display = 'none';
+                const options = dropdown.querySelectorAll('.custom-option');
+                options.forEach(opt => {
+                    opt.addEventListener('click', (ev) => {
+                        // Atualiza a seleção visual das opções
+                        options.forEach(o => o.classList.remove('selected'));
+                        opt.classList.add('selected');
+                        
+                        const statusVal = opt.getAttribute('data-value').toLowerCase();
+                        
+                        // Efeito visual de filtro ativo no botão de funil
+                        if (statusVal === 'todos') {
+                            btnClearAdminFilters.classList.remove('filter-active');
+                        } else {
+                            btnClearAdminFilters.classList.add('filter-active');
+                        }
+                        
+                        // Primeiro, restaura visibilidade pela busca (texto e data) original
+                        applyAdminFilters();
+                        
+                        // Em seguida, varre as linhas que estão visíveis e aplica o status (in-place)
+                        const tableRows = document.querySelectorAll('.data-table tbody tr');
+                        tableRows.forEach(row => {
+                            if (row.style.display !== 'none') {
+                                if (statusVal === 'todos') {
+                                    row.style.display = '';
+                                } else {
+                                    const cells = row.querySelectorAll('td');
+                                    if (cells.length > 4) {
+                                        const badge = cells[4].querySelector('.badge');
+                                        const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[4].textContent.trim().toLowerCase();
+                                        
+                                        let match = false;
+                                        if (statusVal === 'pagos' && rowStatus === 'pago') {
+                                            match = true;
+                                        } else if (statusVal === 'aviso previo' && rowStatus.includes('vence')) {
+                                            match = true;
+                                        } else if (statusVal === rowStatus) {
+                                            match = true;
+                                        }
+                                        
+                                        if (!match) {
+                                            row.style.display = 'none';
+                                        }
                                     }
                                 }
                             }
-                        }
+                        });
+                        
+                        setTimeout(() => {
+                            if (dropdown) dropdown.style.display = 'none';
+                        }, 250);
                     });
-                    
-                    setTimeout(() => {
-                        if (dropdown) dropdown.style.display = 'none';
-                    }, 250);
+                });0);
                 });
                 
                 const closeDropdown = (ev) => {

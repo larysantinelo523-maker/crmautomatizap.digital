@@ -1352,6 +1352,28 @@ body.dark-mode .accordion-content {
     background: rgba(34, 197, 94, 0.25) !important;
 }
 
+/* Custom Dropdown Options */
+.custom-option {
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--color-text-main);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.custom-option:hover {
+    background: rgba(34, 197, 94, 0.15); /* Hover verde claro suave */
+    color: #16a34a;
+}
+.custom-option.selected {
+    background: rgba(34, 197, 94, 0.2);
+    color: #15803d;
+    font-weight: 600;
+}
+
 .table-responsive {
     overflow-x: auto;
 }

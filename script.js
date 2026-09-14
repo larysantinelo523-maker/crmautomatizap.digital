@@ -786,54 +786,59 @@ document.addEventListener('DOMContentLoaded', () => {
                     dropdown.style.cursor = 'default';
                     
                     dropdown.innerHTML = `
-                        <label style="font-weight: 500; font-size: 14px; margin-bottom: 4px; text-align: left; display: block; color: var(--color-text-main);">Status do Lead</label>
-                        <select class="crm-select filter-status-select" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-bg-main); color: var(--color-text-main); font-family: inherit; font-size: 13px;">
-                            <option value="Todos">Todos os status</option>
-                            <option value="Em atendimento">Em atendimento</option>
-                            <option value="Aguardando vendedor">Aguardando vendedor</option>
-                            <option value="Em negociação">Em negociação</option>
-                            <option value="Qualificado">Qualificado</option>
-                        </select>
+                        <label style="font-weight: 500; font-size: 14px; margin-bottom: 8px; text-align: left; display: block; color: var(--color-text-main);">Status do Lead</label>
+                        <div class="custom-select-container" style="display: flex; flex-direction: column; gap: 4px;">
+                            <div class="custom-option selected" data-value="Todos">Todos os status</div>
+                            <div class="custom-option" data-value="Em atendimento">Em atendimento</div>
+                            <div class="custom-option" data-value="Aguardando vendedor">Aguardando vendedor</div>
+                            <div class="custom-option" data-value="Em negociação">Em negociação</div>
+                            <div class="custom-option" data-value="Qualificado">Qualificado</div>
+                        </div>
                     `;
                     
                     btn.style.position = 'relative';
                     btn.appendChild(dropdown);
                     
-                    const select = dropdown.querySelector('.filter-status-select');
-                    
                     dropdown.addEventListener('click', (ev) => ev.stopPropagation());
                     
-                    select.addEventListener('change', () => {
-                        const statusVal = select.value;
-                        
-                        // Efeito visual de filtro ativo no botão de funil
-                        if (statusVal === 'Todos') {
-                            btn.classList.remove('filter-active');
-                        } else {
-                            btn.classList.add('filter-active');
-                        }
-                        
-                        const tableRows = document.querySelectorAll('.data-table tbody tr');
-                        tableRows.forEach(row => {
+                    const options = dropdown.querySelectorAll('.custom-option');
+                    options.forEach(opt => {
+                        opt.addEventListener('click', (ev) => {
+                            // Atualiza a seleção visual das opções
+                            options.forEach(o => o.classList.remove('selected'));
+                            opt.classList.add('selected');
+                            
+                            const statusVal = opt.getAttribute('data-value');
+                            
+                            // Efeito visual de filtro ativo no botão de funil
                             if (statusVal === 'Todos') {
-                                row.style.display = '';
+                                btn.classList.remove('filter-active');
                             } else {
-                                const cells = row.querySelectorAll('td');
-                                if (cells.length > 3) {
-                                    const badge = cells[3].querySelector('.badge');
-                                    const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[3].textContent.trim().toLowerCase();
-                                    if (rowStatus === statusVal.toLowerCase()) {
-                                        row.style.display = '';
-                                    } else {
-                                        row.style.display = 'none';
+                                btn.classList.add('filter-active');
+                            }
+                            
+                            const tableRows = document.querySelectorAll('.data-table tbody tr');
+                            tableRows.forEach(row => {
+                                if (statusVal === 'Todos') {
+                                    row.style.display = '';
+                                } else {
+                                    const cells = row.querySelectorAll('td');
+                                    if (cells.length > 3) {
+                                        const badge = cells[3].querySelector('.badge');
+                                        const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[3].textContent.trim().toLowerCase();
+                                        if (rowStatus === statusVal.toLowerCase()) {
+                                            row.style.display = '';
+                                        } else {
+                                            row.style.display = 'none';
+                                        }
                                     }
                                 }
-                            }
+                            });
+                            
+                            setTimeout(() => {
+                                if (dropdown) dropdown.style.display = 'none';
+                            }, 250);
                         });
-                        
-                        setTimeout(() => {
-                            if (dropdown) dropdown.style.display = 'none';
-                        }, 250);
                     });
                     
                     const closeDropdown = (ev) => {
