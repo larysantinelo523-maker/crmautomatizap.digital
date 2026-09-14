@@ -805,6 +805,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     select.addEventListener('change', () => {
                         const statusVal = select.value;
+                        
+                        // Efeito visual de filtro ativo no botão de funil
+                        if (statusVal === 'Todos') {
+                            btn.classList.remove('filter-active');
+                        } else {
+                            btn.classList.add('filter-active');
+                        }
+                        
                         const tableRows = document.querySelectorAll('.data-table tbody tr');
                         tableRows.forEach(row => {
                             if (statusVal === 'Todos') {

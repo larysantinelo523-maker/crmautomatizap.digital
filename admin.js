@@ -333,6 +333,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 select.addEventListener('change', () => {
                     const statusVal = select.value.toLowerCase();
                     
+                    // Efeito visual de filtro ativo no botão de funil
+                    if (statusVal === 'todos') {
+                        btnClearAdminFilters.classList.remove('filter-active');
+                    } else {
+                        btnClearAdminFilters.classList.add('filter-active');
+                    }
+                    
                     // Primeiro, restaura visibilidade pela busca (texto e data) original
                     applyAdminFilters();
                     
