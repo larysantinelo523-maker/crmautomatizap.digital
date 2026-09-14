@@ -141,8 +141,24 @@ fetchUserData().then(user => {
                         const { data } = await supabase.from('usuarios').select('data_vencimento').eq('id', user.id).single();
                         if (data && data.data_vencimento && data.data_vencimento !== window.tenantVencDateStr) {
                             isPaid = true;
-                            alert('Pagamento Aprovado! Seu CRM foi desbloqueado com sucesso!');
-                            window.location.reload();
+                            
+                            // Remove o bloqueio vermelho suavemente e mostra sucesso
+                            const blockOverlay = document.getElementById('tenant-block-overlay');
+                            if (blockOverlay) {
+                                blockOverlay.innerHTML = `
+                                    <div class="card" style="width: 90%; max-width: 400px; text-align: center; padding: 40px 20px;">
+                                        <div style="width: 80px; height: 80px; background: #dcfce7; color: #166534; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto 20px auto;">
+                                            <i class="ph ph-check-circle"></i>
+                                        </div>
+                                        <h2 style="margin: 0 0 10px 0; color: var(--color-text);">Pagamento Aprovado!</h2>
+                                        <p style="color: var(--color-text-mut); margin: 0;">Seu CRM foi desbloqueado com sucesso. Entrando no sistema...</p>
+                                    </div>
+                                `;
+                            }
+                            
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 3000);
                         }
                     } catch(e) {}
                 }, 4000);
