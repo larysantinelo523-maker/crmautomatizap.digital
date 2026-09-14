@@ -473,7 +473,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const thisDate = new Date(year, month, i);
 
                     if (i === todayDate && month === todayMonth && year === todayYear) {
-                        dayDiv.classList.add('today'); // Verde claro
+                        dayDiv.classList.add('today-date'); // Verde claro
                     }
 
                     if (window.mSelectedDate && thisDate.getTime() === window.mSelectedDate.getTime()) {
@@ -533,7 +533,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Highlight today
             if (cellDate.getDate() === today.getDate() && cellDate.getMonth() === today.getMonth() && cellDate.getFullYear() === today.getFullYear()) {
-                daySpan.classList.add('today'); // Verde claro
+                daySpan.classList.add('today-date'); // Verde claro
             }
 
             // Highlight selected
