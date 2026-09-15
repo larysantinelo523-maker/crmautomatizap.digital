@@ -89,13 +89,29 @@ fetchUserData().then(user => {
                             <i class="ph ph-warning-circle"></i>
                         </div>
                         <h2 style="font-size: 22px; color: #1f2937; margin-bottom: 12px; font-weight: 700;">Acesso Bloqueado</h2>
-                        <p style="color: #4b5563; font-size: 15px; margin-bottom: 24px; line-height: 1.5;">Sua mensalidade venceu no dia <strong>${tenantVencDate.toLocaleDateString('pt-BR')}</strong>. Efetue o pagamento para restaurar o acesso imediato ao seu CRM.</p>
+                        <p style="color: #4b5563; font-size: 15px; margin-bottom: 16px; line-height: 1.5;">Sua assinatura do <strong>AutomatiZAP CRM</strong> venceu no dia <strong>${tenantVencDate.toLocaleDateString('pt-BR')}</strong>.</p>
                         
-                        <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 24px;" id="pix-container">
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 24px; text-align: left;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="color: #64748b; font-size: 14px;">Plano Mensal</span>
+                                <span style="color: #0f172a; font-weight: 600; font-size: 14px;">R$ 147,90</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid #e2e8f0;">
+                                <span style="color: #0f172a; font-weight: 700; font-size: 16px;">Total a pagar</span>
+                                <span style="color: #10b981; font-weight: 700; font-size: 16px;">R$ 147,90</span>
+                            </div>
+                        </div>
+
+                        <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 20px;" id="pix-container">
                             <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
                                 <i class="ph ph-spinner ph-spin" style="font-size: 24px; color: #10b981;"></i>
                                 <span style="font-size: 14px; color: #64748b;">Gerando PIX Mercado Pago...</span>
                             </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            <i class="ph ph-shield-check" style="color: #10b981; font-size: 18px;"></i>
+                            <span style="font-size: 12px; color: #64748b;">Pagamento 100% seguro processado pelo <strong>Mercado Pago</strong></span>
                         </div>
                     </div>
                 `;
