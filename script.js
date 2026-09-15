@@ -94,11 +94,11 @@ fetchUserData().then(user => {
                         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 24px; text-align: left;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                 <span style="color: #64748b; font-size: 14px;">Plano Mensal</span>
-                                <span style="color: #0f172a; font-weight: 600; font-size: 14px;">R$ 147,90</span>
+                                <span style="color: #0f172a; font-weight: 600; font-size: 14px;">R$ 0,01</span>
                             </div>
                             <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid #e2e8f0;">
                                 <span style="color: #0f172a; font-weight: 700; font-size: 16px;">Total a pagar</span>
-                                <span style="color: #10b981; font-weight: 700; font-size: 16px;">R$ 147,90</span>
+                                <span style="color: #10b981; font-weight: 700; font-size: 16px;">R$ 0,01</span>
                             </div>
                         </div>
 

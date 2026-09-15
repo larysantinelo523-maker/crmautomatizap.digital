@@ -22,7 +22,7 @@ export default async function handler(req, res) {
 
         const response = await payment.create({
             body: {
-                transaction_amount: 147.90,
+                transaction_amount: 0.01,
                 description: 'Mensalidade AutomatiZAP CRM',
                 payment_method_id: 'pix',
                 payer: {
