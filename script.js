@@ -71,6 +71,7 @@ fetchUserData().then(user => {
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             
             if (diffDays < 0) {
+                localStorage.setItem('was_inadimplente', 'true');
                 // Bloqueia o CRM inteiro
                 const blocker = document.createElement('div');
                 blocker.id = 'inadimplente-blocker';
@@ -143,25 +144,93 @@ fetchUserData().then(user => {
                             isPaid = true;
                             
                             // Remove o bloqueio vermelho suavemente e mostra sucesso
-                            const blockOverlay = document.getElementById('tenant-block-overlay');
+                            const blockOverlay = document.getElementById('inadimplente-blocker');
                             if (blockOverlay) {
                                 blockOverlay.innerHTML = `
-                                    <div class="card" style="width: 90%; max-width: 400px; text-align: center; padding: 40px 20px;">
-                                        <div style="width: 80px; height: 80px; background: #dcfce7; color: #166534; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto 20px auto;">
+                                    <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); max-width: 400px; width: 90%; text-align: center; border: 2px solid #22c55e;">
+                                        <div style="width: 60px; height: 60px; background: #dcfce7; color: #16a34a; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px; font-size: 28px;">
                                             <i class="ph ph-check-circle"></i>
                                         </div>
-                                        <h2 style="margin: 0 0 10px 0; color: var(--color-text);">Pagamento Aprovado!</h2>
-                                        <p style="color: var(--color-text-mut); margin: 0;">Seu CRM foi desbloqueado com sucesso. Entrando no sistema...</p>
+                                        <h2 style="font-size: 22px; color: #1f2937; margin-bottom: 12px; font-weight: 700;">Pagamento Processado!</h2>
+                                        <p style="color: #4b5563; font-size: 15px; margin-bottom: 24px; line-height: 1.5;">Pagamento processado pelo Mercado Pago. Você já pode voltar a usar nossos serviços!</p>
+                                        
+                                        <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 10px;">
+                                            <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                                                <i class="ph ph-spinner ph-spin" style="font-size: 24px; color: #10b981;"></i>
+                                                <span style="font-size: 14px; color: #64748b;">Redirecionando para o seu CRM...</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 `;
+                                
+                                // Injetar script de confetti
+                                const script = document.createElement('script');
+                                script.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js';
+                                script.onload = () => {
+                                    confetti({
+                                        particleCount: 150,
+                                        spread: 70,
+                                        origin: { y: 0.6 },
+                                        zIndex: 9999999999
+                                    });
+                                };
+                                document.head.appendChild(script);
                             }
                             
                             setTimeout(() => {
                                 window.location.reload();
-                            }, 3000);
+                            }, 5000);
                         }
                     } catch(e) {}
                 }, 4000);
+            } else {
+                if (localStorage.getItem('was_inadimplente') === 'true') {
+                    localStorage.removeItem('was_inadimplente');
+                    
+                    const successBlocker = document.createElement('div');
+                    successBlocker.id = 'success-blocker-reload';
+                    successBlocker.style.position = 'fixed';
+                    successBlocker.style.inset = '0';
+                    successBlocker.style.zIndex = '999999999';
+                    successBlocker.style.backdropFilter = 'blur(12px)';
+                    successBlocker.style.backgroundColor = 'rgba(255,255,255,0.4)';
+                    successBlocker.style.display = 'flex';
+                    successBlocker.style.justifyContent = 'center';
+                    successBlocker.style.alignItems = 'center';
+                    successBlocker.innerHTML = `
+                        <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); max-width: 400px; width: 90%; text-align: center; border: 2px solid #22c55e;">
+                            <div style="width: 60px; height: 60px; background: #dcfce7; color: #16a34a; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px; font-size: 28px;">
+                                <i class="ph ph-check-circle"></i>
+                            </div>
+                            <h2 style="font-size: 22px; color: #1f2937; margin-bottom: 12px; font-weight: 700;">Pagamento Processado!</h2>
+                            <p style="color: #4b5563; font-size: 15px; margin-bottom: 24px; line-height: 1.5;">Pagamento processado pelo Mercado Pago. Você já pode voltar a usar nossos serviços!</p>
+                            
+                            <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 10px;">
+                                <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                                    <i class="ph ph-spinner ph-spin" style="font-size: 24px; color: #10b981;"></i>
+                                    <span style="font-size: 14px; color: #64748b;">Entrando no sistema...</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(successBlocker);
+
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js';
+                    script.onload = () => {
+                        confetti({
+                            particleCount: 150,
+                            spread: 70,
+                            origin: { y: 0.6 },
+                            zIndex: 9999999999
+                        });
+                    };
+                    document.head.appendChild(script);
+
+                    setTimeout(() => {
+                        successBlocker.remove();
+                    }, 5000);
+                }
             }
         }
     }

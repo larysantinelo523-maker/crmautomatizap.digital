@@ -13,7 +13,7 @@ export default async function handler(req, res) {
             if (!paymentId) return res.status(200).send('OK');
 
             const client = new MercadoPagoConfig({ 
-                accessToken: 'APP_USR-6868985718529176-091416-d62094d20cd66eb239b77b3938f3b383-3690859454' 
+                accessToken: 'APP_USR-5121029731142512-091416-44ec7bdf36a55ab8f244f0d84bebbf11-1370822621' 
             });
             const payment = new Payment(client);
             const paymentInfo = await payment.get({ id: paymentId });

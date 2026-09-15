@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 
     try {
         const client = new MercadoPagoConfig({ 
-            accessToken: 'APP_USR-6868985718529176-091416-d62094d20cd66eb239b77b3938f3b383-3690859454' 
+            accessToken: 'APP_USR-5121029731142512-091416-44ec7bdf36a55ab8f244f0d84bebbf11-1370822621' 
         });
         
         const payment = new Payment(client);
@@ -22,13 +22,14 @@ export default async function handler(req, res) {
         
         const response = await payment.create({
             body: {
-                transaction_amount: 147.90, // Valor da mensalidade
+                transaction_amount: 0.01, // VALOR DE TESTE - NÃO ESQUECER DE VOLTAR PARA 147.90
                 description: 'Mensalidade AutomatiZAP CRM',
                 payment_method_id: 'pix',
                 payer: {
                     email: email
                 },
-                external_reference: userId // Vincula ao usuário para o webhook
+                external_reference: userId, // Vincula ao usuário para o webhook
+                notification_url: 'https://crmautomatizap-digital.vercel.app/api/mp_webhook'
             },
             requestOptions: { idempotencyKey }
         });
