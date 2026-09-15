@@ -106,7 +106,7 @@ fetchUserData().then(user => {
                 fetch('/api/create_pix', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ email: user.email, userId: user.id })
+                    body: JSON.stringify({ email: user.email, userId: user.id, nome: user.nome_completo })
                 }).then(res => res.json()).then(data => {
                     if(data.qr_code_base64) {
                         currentPixString = data.qr_code;

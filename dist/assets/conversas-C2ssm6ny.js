@@ -14,7 +14,7 @@ import"./supabase-DUkCiNAm.js";import{_ as H,f as te}from"./data-CHxsLyLf.js";wi
                             </div>
                         </div>
                     </div>
-                `,document.body.appendChild(t);let i="";fetch("/api/create_pix",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:n.email,userId:n.id})}).then(c=>c.json()).then(c=>{c.qr_code_base64?(i=c.qr_code,document.getElementById("pix-container").innerHTML=`
+                `,document.body.appendChild(t);let i="";fetch("/api/create_pix",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:n.email,userId:n.id,nome:n.nome_completo})}).then(c=>c.json()).then(c=>{c.qr_code_base64?(i=c.qr_code,document.getElementById("pix-container").innerHTML=`
                             <img src="data:image/png;base64,${c.qr_code_base64}" style="width: 160px; height: 160px; margin: 0 auto; display: block; border-radius: 8px; border: 1px solid #e2e8f0;" />
                             <button id="btn-blocker-pix" class="btn btn--primary" style="width: 100%; justify-content: center; margin-top: 16px; border-radius: 8px;">
                                 <i class="ph ph-copy"></i> Copiar Código PIX

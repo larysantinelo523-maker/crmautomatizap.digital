@@ -5,7 +5,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    const { email, userId } = req.body;
+    const { email, userId, nome } = req.body;
 
     if (!email || !userId) {
         return res.status(400).json({ error: 'Missing email or userId' });
@@ -26,7 +26,8 @@ export default async function handler(req, res) {
                 description: 'Mensalidade AutomatiZAP CRM',
                 payment_method_id: 'pix',
                 payer: {
-                    email: email
+                    email: email,
+                    first_name: nome || 'Cliente CRM'
                 },
                 external_reference: userId, // Vincula ao usuário para o webhook
                 notification_url: 'https://crmautomatizap-digital.vercel.app/api/mp_webhook'
