@@ -20,6 +20,10 @@ export default async function handler(req, res) {
 
         const idempotencyKey = `PAY-${userId}-${Date.now()}`;
 
+        const nameParts = (nome || 'Cliente CRM').trim().split(' ');
+        const firstName = nameParts[0];
+        const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : ' ';
+
         const response = await payment.create({
             body: {
                 transaction_amount: 0.01,
@@ -27,7 +31,8 @@ export default async function handler(req, res) {
                 payment_method_id: 'pix',
                 payer: {
                     email: email,
-                    first_name: nome || 'Cliente CRM'
+                    first_name: firstName,
+                    last_name: lastName
                 },
                 external_reference: userId, // Vincula ao usuário para o webhook
                 notification_url: 'https://crmautomatizap-digital.vercel.app/api/mp_webhook'
