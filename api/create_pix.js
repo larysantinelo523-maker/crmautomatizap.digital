@@ -12,17 +12,17 @@ export default async function handler(req, res) {
     }
 
     try {
-        const client = new MercadoPagoConfig({ 
-            accessToken: 'APP_USR-5121029731142512-091416-44ec7bdf36a55ab8f244f0d84bebbf11-1370822621' 
+        const client = new MercadoPagoConfig({
+            accessToken: 'APP_USR-5121029731142512-091416-44ec7bdf36a55ab8f244f0d84bebbf11-1370822621'
         });
-        
+
         const payment = new Payment(client);
-        
+
         const idempotencyKey = `PAY-${userId}-${Date.now()}`;
-        
+
         const response = await payment.create({
             body: {
-                transaction_amount: 0.01, // VALOR DE TESTE - NÃO ESQUECER DE VOLTAR PARA 147.90
+                transaction_amount: 0.01, // VALOR DE TESTE - NÃO ESQUECER DE VOLTAR PARA R$647.90
                 description: 'Mensalidade AutomatiZAP CRM',
                 payment_method_id: 'pix',
                 payer: {

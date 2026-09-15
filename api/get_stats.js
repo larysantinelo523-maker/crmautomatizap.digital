@@ -1,4 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
+const { MercadoPagoConfig, Payment } = require('mercadopago');
 
 export default async function handler(req, res) {
     if (req.method !== 'GET') {
@@ -52,11 +53,38 @@ export default async function handler(req, res) {
             }
         });
 
+        let faturamentoReal = 0;
+        try {
+            const client = new MercadoPagoConfig({ 
+                accessToken: 'APP_USR-5121029731142512-091416-44ec7bdf36a55ab8f244f0d84bebbf11-1370822621' 
+            });
+            const payment = new Payment(client);
+            
+            const firstDay = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString();
+            const lastDay = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0, 23, 59, 59).toISOString();
+            
+            const searchResult = await payment.search({
+                options: {
+                    begin_date: firstDay,
+                    end_date: lastDay,
+                    status: 'approved'
+                }
+            });
+            
+            if (searchResult && searchResult.results) {
+                searchResult.results.forEach(p => {
+                    faturamentoReal += p.transaction_amount;
+                });
+            }
+        } catch (mpErr) {
+            console.error("Erro ao buscar faturamento no Mercado Pago:", mpErr);
+        }
+
         return res.status(200).json({
             empresas: totalEmpresas,
             pagos: clientesPagos,
             inadimplentes: clientesInadimplentes,
-            faturamento: 0 // Placeholder para a futura integração com Mercado Pago
+            faturamento: faturamentoReal
         });
 
     } catch (err) {
