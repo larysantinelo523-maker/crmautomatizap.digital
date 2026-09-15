@@ -266,11 +266,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             const matchesSearch = nome.includes(searchTerm) || email.includes(searchTerm);
             
             let matchesDate = true;
-            if (adminSelectedDate) {
+            if (adminStartDate || adminEndDate) {
                 // Compara a data de vencimento (vencimento formato YYYY-MM-DD)
                 if (t.vencimento && t.vencimento !== 'N/A') {
-                    const selStr = `${adminSelectedDate.getFullYear()}-${(adminSelectedDate.getMonth()+1).toString().padStart(2, '0')}-${adminSelectedDate.getDate().toString().padStart(2, '0')}`;
-                    matchesDate = t.vencimento === selStr;
+                    const [y, m, d] = t.vencimento.split('-');
+                    const rowDate = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+                    
+                    if (adminStartDate && adminEndDate) {
+                        matchesDate = rowDate >= adminStartDate && rowDate <= adminEndDate;
+                    } else if (adminStartDate) {
+                        matchesDate = rowDate.getTime() === adminStartDate.getTime();
+                    }
                 } else {
                     matchesDate = false;
                 }
@@ -285,7 +291,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (searchAdminInput) searchAdminInput.addEventListener('input', applyAdminFilters);
     
     // --- Lógica do Calendário Customizado do Admin ---
-    let adminSelectedDate = null;
+    let adminStartDate = null;
+    let adminEndDate = null;
     const dateBtn = document.getElementById('date-filter-btn');
     const dateDropdown = document.getElementById('date-dropdown');
     const calendarGrid = document.getElementById('calendar-grid');
@@ -298,11 +305,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     function updateAdminDateText() {
         const dateText = document.getElementById('date-filter-text');
         if (!dateText) return;
-        if (adminSelectedDate) {
-            const dStr = `${adminSelectedDate.getDate().toString().padStart(2, '0')}/${(adminSelectedDate.getMonth() + 1).toString().padStart(2, '0')}/${adminSelectedDate.getFullYear()}`;
-            dateText.textContent = dStr;
+        if (adminStartDate && adminEndDate) {
+            const d1Str = `${adminStartDate.getDate().toString().padStart(2, '0')}/${(adminStartDate.getMonth() + 1).toString().padStart(2, '0')}/${adminStartDate.getFullYear()}`;
+            const d2Str = `${adminEndDate.getDate().toString().padStart(2, '0')}/${(adminEndDate.getMonth() + 1).toString().padStart(2, '0')}/${adminEndDate.getFullYear()}`;
+            dateText.textContent = `${d1Str} - ${d2Str}`;
         } else {
-            dateText.textContent = "Selecione uma data";
+            // Se nenhum selecionado, default para o mês atual
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            const d1Str = `${firstDay.getDate().toString().padStart(2, '0')}/${(firstDay.getMonth() + 1).toString().padStart(2, '0')}/${firstDay.getFullYear()}`;
+            const d2Str = `${lastDay.getDate().toString().padStart(2, '0')}/${(lastDay.getMonth() + 1).toString().padStart(2, '0')}/${lastDay.getFullYear()}`;
+            dateText.textContent = `${d1Str} - ${d2Str}`;
         }
     }
 
@@ -445,21 +459,63 @@ document.addEventListener('DOMContentLoaded', async () => {
                 daySpan.classList.add('today-date'); // Verde claro
             }
 
-            // Highlight selected
-            if (adminSelectedDate && cellDate.getTime() === adminSelectedDate.getTime()) {
+            // Highlight selected range
+            if (adminStartDate && adminEndDate) {
+                if (cellDate.getTime() === adminStartDate.getTime()) daySpan.classList.add('start-range');
+                if (cellDate.getTime() === adminEndDate.getTime()) daySpan.classList.add('end-range');
+                if (cellDate > adminStartDate && cellDate < adminEndDate) daySpan.classList.add('in-range');
+            } else if (adminStartDate && cellDate.getTime() === adminStartDate.getTime()) {
                 daySpan.classList.add('selected');
             }
 
-            daySpan.addEventListener('click', () => {
-                adminSelectedDate = new Date(cellDate);
-                if (selectionTxt) {
-                    selectionTxt.textContent = `Data selecionada: ${i.toString().padStart(2, '0')}/${(month+1).toString().padStart(2, '0')}/${year}`;
+            daySpan.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!adminStartDate || (adminStartDate && adminEndDate)) {
+                    // Start new range
+                    adminStartDate = new Date(cellDate);
+                    adminEndDate = null;
+                    if (selectionTxt) {
+                        selectionTxt.textContent = `De: ${i.toString().padStart(2, '0')} de ${monthNames[month]} - Selecione o fim`;
+                    }
+                } else if (adminStartDate && !adminEndDate) {
+                    if (cellDate < adminStartDate) {
+                        adminEndDate = adminStartDate;
+                        adminStartDate = new Date(cellDate);
+                    } else {
+                        adminEndDate = new Date(cellDate);
+                    }
+                    if (selectionTxt) {
+                        selectionTxt.textContent = `Período selecionado: ${adminStartDate.getDate().toString().padStart(2, '0')}/${(adminStartDate.getMonth()+1).toString().padStart(2, '0')} até ${adminEndDate.getDate().toString().padStart(2, '0')}/${(adminEndDate.getMonth()+1).toString().padStart(2, '0')}`;
+                    }
                 }
                 renderAdminCalendar(); // Re-render para atualizar os 'selected'
             });
 
             calendarGrid.appendChild(daySpan);
         }
+    }
+
+    const btnClearDateFilter = document.getElementById('btn-clear-date-filter');
+    if (btnClearDateFilter) {
+        btnClearDateFilter.addEventListener('click', (e) => {
+            e.stopPropagation();
+            adminStartDate = null;
+            adminEndDate = null;
+            if (selectionTxt) selectionTxt.textContent = "Nenhum período selecionado";
+            updateAdminDateText();
+            applyAdminFilters();
+            renderAdminCalendar();
+        });
+    }
+
+    const btnApplyDate = document.getElementById('btn-apply-date');
+    if (btnApplyDate) {
+        btnApplyDate.addEventListener('click', (e) => {
+            e.stopPropagation();
+            updateAdminDateText();
+            applyAdminFilters();
+            dateDropdown.classList.remove('show');
+        });
     }
     
     if (dateBtn && dateDropdown) {
