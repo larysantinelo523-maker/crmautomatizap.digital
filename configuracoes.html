@@ -468,10 +468,16 @@
                 subStatusBadge.style.color = '#991b1b';
                 subDaysLeft.style.color = '#991b1b';
                 subDaysLeft.textContent = '0';
+            } else if (daysLeft <= 3) {
+                subStatusBadge.textContent = 'Aviso Prévio';
+                subStatusBadge.style.background = '#fef3c7'; // yellow-100
+                subStatusBadge.style.color = '#b45309'; // amber-700
+                subDaysLeft.style.color = '#d97706'; // amber-600
             } else {
                 subStatusBadge.textContent = 'Ativo';
                 subStatusBadge.style.background = '#dcfce7';
                 subStatusBadge.style.color = '#166534';
+                subDaysLeft.style.color = '#10b981'; // default green
             }
 
             const isPaymentAllowed = (userData.status_assinatura === 'vencido' || userData.status_assinatura === 'inadimplente' || daysLeft <= 3);

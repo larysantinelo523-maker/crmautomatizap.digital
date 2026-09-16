@@ -199,6 +199,43 @@ fetchUserData().then(user => {
                         }
                     } catch(e) {}
                 }, 4000);
+            } else if (diffDays >= 0 && diffDays <= 3 && !sessionStorage.getItem('aviso_previo_shown')) {
+                sessionStorage.setItem('aviso_previo_shown', 'true');
+                
+                const warningPopup = document.createElement('div');
+                warningPopup.id = 'aviso-previo-popup';
+                warningPopup.style.position = 'fixed';
+                warningPopup.style.inset = '0';
+                warningPopup.style.zIndex = '999999999';
+                warningPopup.style.backdropFilter = 'blur(4px)';
+                warningPopup.style.backgroundColor = 'rgba(0,0,0,0.3)';
+                warningPopup.style.display = 'flex';
+                warningPopup.style.justifyContent = 'center';
+                warningPopup.style.alignItems = 'center';
+                warningPopup.innerHTML = `
+                    <div style="background: white; padding: 32px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 400px; width: 90%; text-align: center; border: 2px solid #f59e0b; position: relative; animation: scaleIn 0.3s ease-out forwards;">
+                        <button id="close-warning" style="position: absolute; top: 12px; right: 12px; background: none; border: none; font-size: 20px; color: #6b7280; cursor: pointer; padding: 4px;"><i class="ph ph-x"></i></button>
+                        <div style="width: 56px; height: 56px; background: #fef3c7; color: #d97706; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 16px; font-size: 28px;">
+                            <i class="ph ph-warning"></i>
+                        </div>
+                        <h2 style="font-size: 20px; color: #1f2937; margin-bottom: 12px; font-weight: 700;">Aviso de Vencimento</h2>
+                        <p style="color: #4b5563; font-size: 14px; margin-bottom: 20px; line-height: 1.5;">Sua mensalidade vence em <strong>${diffDays === 0 ? 'hoje' : diffDays + ' dia(s)'}</strong>. Para garantir que seu CRM e suas automações continuem funcionando sem interrupções, realize o pagamento via PIX acessando suas configurações.</p>
+                        
+                        <button onclick="window.location.href='configuracoes.html'" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; background: #f59e0b; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: background 0.2s;">
+                            Pagar agora <i class="ph ph-arrow-right"></i>
+                        </button>
+                    </div>
+                    <style>
+                        @keyframes scaleIn {
+                            from { transform: scale(0.95); opacity: 0; }
+                            to { transform: scale(1); opacity: 1; }
+                        }
+                    </style>
+                `;
+                document.body.appendChild(warningPopup);
+                document.getElementById('close-warning').addEventListener('click', () => {
+                    warningPopup.remove();
+                });
             } else {
                 if (localStorage.getItem('was_inadimplente') === 'true') {
                     localStorage.removeItem('was_inadimplente');
