@@ -200,8 +200,6 @@ fetchUserData().then(user => {
                     } catch(e) {}
                 }, 4000);
             } else if (diffDays >= 0 && diffDays <= 3 && !sessionStorage.getItem('aviso_previo_shown')) {
-                sessionStorage.setItem('aviso_previo_shown', 'true');
-                
                 const warningPopup = document.createElement('div');
                 warningPopup.id = 'aviso-previo-popup';
                 warningPopup.style.position = 'fixed';
@@ -221,7 +219,7 @@ fetchUserData().then(user => {
                         <h2 style="font-size: 20px; color: #1f2937; margin-bottom: 12px; font-weight: 700;">Aviso de Vencimento</h2>
                         <p style="color: #4b5563; font-size: 14px; margin-bottom: 20px; line-height: 1.5;">Sua mensalidade vence em <strong>${diffDays === 0 ? 'hoje' : diffDays + ' dia(s)'}</strong>. Para garantir que seu CRM e suas automações continuem funcionando sem interrupções, realize o pagamento via PIX acessando suas configurações.</p>
                         
-                        <button onclick="window.location.href='configuracoes.html'" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; background: #f59e0b; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: background 0.2s;">
+                        <button id="btn-pay-warning" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; background: #f59e0b; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: background 0.2s;">
                             Pagar agora <i class="ph ph-arrow-right"></i>
                         </button>
                     </div>
@@ -233,8 +231,15 @@ fetchUserData().then(user => {
                     </style>
                 `;
                 document.body.appendChild(warningPopup);
+                
                 document.getElementById('close-warning').addEventListener('click', () => {
+                    sessionStorage.setItem('aviso_previo_shown', 'true');
                     warningPopup.remove();
+                });
+                
+                document.getElementById('btn-pay-warning').addEventListener('click', () => {
+                    sessionStorage.setItem('aviso_previo_shown', 'true');
+                    window.location.href = 'configuracoes.html';
                 });
             } else {
                 if (localStorage.getItem('was_inadimplente') === 'true') {
