@@ -205,11 +205,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const diffTime = nextDate.getTime() - hoje.getTime();
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 if (diffDays > 0) {
-                    diasRestantesText = `<br><span style="font-size: 12px; color: var(--color-text-mut);">${diffDays} ${diffDays === 1 ? 'dia restante' : 'dias restantes'}</span>`;
+                    diasRestantesText = `<span style="color: var(--color-success); font-weight: 500;">${diffDays} ${diffDays === 1 ? 'dia' : 'dias'}</span>`;
                 } else if (diffDays === 0) {
-                    diasRestantesText = `<br><span style="font-size: 12px; color: #f59e0b; font-weight: 500;">Vence hoje</span>`;
+                    diasRestantesText = `<span style="color: #f59e0b; font-weight: 500;">Vence hoje</span>`;
                 } else {
-                    diasRestantesText = `<br><span style="font-size: 12px; color: #ef4444; font-weight: 500;">Atrasado</span>`;
+                    diasRestantesText = `<span style="color: #ef4444; font-weight: 500;">Atrasado</span>`;
                 }
             } else if (tenant.vencimento && tenant.vencimento !== 'N/A') {
                 const [ano, mes, dia] = tenant.vencimento.split('-');
@@ -228,7 +228,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                 </td>
                 <td>${tenant.email || 'N/A'}</td>
-                <td style="line-height: 1.4;">${dataVenc}${diasRestantesText}</td>
+                <td>${dataVenc}</td>
+                <td>${diasRestantesText}</td>
                 <td><span><strong>${tenant.total_leads || 0}</strong> leads</span></td>
                 <td>${statusBadge}</td>
                 <td>

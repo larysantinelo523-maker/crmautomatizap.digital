@@ -37,7 +37,7 @@
             display: block;
         }
     </style>
-  <script type="module" crossorigin src="/assets/admin-CIBHfH4e.js"></script>
+  <script type="module" crossorigin src="/assets/admin-BKsTWcgm.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
   <link rel="stylesheet" crossorigin href="/assets/conversas-C3AUUnG_.css">
 </head>
@@ -275,8 +275,8 @@
                                     }
                                     .admin-table tr {
                                         display: grid;
-                                        grid-template-columns: minmax(180px, 1.5fr) minmax(200px, 1.5fr) minmax(140px, 1fr) minmax(120px, 1fr) minmax(120px, 1fr) minmax(180px, 1fr);
-                                        gap: 32px;
+                                        grid-template-columns: minmax(180px, 1.5fr) minmax(200px, 1.5fr) minmax(140px, 1fr) minmax(140px, 1fr) minmax(120px, 1fr) minmax(120px, 1fr) minmax(180px, 1fr);
+                                        gap: 24px;
                                         align-items: center;
                                         border-bottom: 1px solid var(--color-border);
                                     }
@@ -296,16 +296,17 @@
                                 @media (max-width: 768px) {
                                     .admin-table td:nth-child(2)::before { content: "Email Responsável"; }
                                     .admin-table td:nth-child(3)::before { content: "Data de Vencimento"; }
-                                    .admin-table td:nth-child(4)::before { content: "Total de Leads"; }
-                                    .admin-table td:nth-child(5)::before { content: "Status"; }
-                                    .admin-table td:nth-child(6)::before { content: "Chave de API"; }
+                                    .admin-table td:nth-child(4)::before { content: "Dias Restantes"; }
+                                    .admin-table td:nth-child(5)::before { content: "Total de Leads"; }
+                                    .admin-table td:nth-child(6)::before { content: "Status"; }
+                                    .admin-table td:nth-child(7)::before { content: "Chave de API"; }
                                     
-                                    .admin-table td:nth-child(6) {
+                                    .admin-table td:nth-child(7) {
                                         display: flex;
                                         justify-content: space-between;
                                         align-items: center;
                                     }
-                                    .admin-table td:nth-child(6) .btn-copy-id {
+                                    .admin-table td:nth-child(7) .btn-copy-id {
                                         position: relative !important;
                                         right: auto !important;
                                     }
@@ -317,6 +318,7 @@
                                         <th>Empresa</th>
                                         <th>Email Responsável</th>
                                         <th>Data de Vencimento</th>
+                                        <th>Dias Restantes</th>
                                         <th>Total de Leads</th>
                                         <th>Status</th>
                                         <th>Chave de API</th>
