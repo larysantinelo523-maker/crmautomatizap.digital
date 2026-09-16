@@ -57,6 +57,53 @@ let tenantVencDate = null;
 window.tenantVencDateStr = null;
 
 fetchUserData().then(user => {
+    // Bem-vindo logic
+    if (user && !localStorage.getItem('welcome_seen')) {
+        const welcomePopup = document.createElement('div');
+        welcomePopup.id = 'welcome-popup';
+        welcomePopup.style.position = 'fixed';
+        welcomePopup.style.inset = '0';
+        welcomePopup.style.zIndex = '999999999';
+        welcomePopup.style.backdropFilter = 'blur(4px)';
+        welcomePopup.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        welcomePopup.style.display = 'flex';
+        welcomePopup.style.justifyContent = 'center';
+        welcomePopup.style.alignItems = 'center';
+        welcomePopup.innerHTML = `
+            <div style="background: white; padding: 32px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 400px; width: 90%; text-align: center; position: relative; animation: scaleIn 0.3s ease-out forwards;">
+                <button id="close-welcome" style="position: absolute; top: 12px; right: 12px; background: none; border: none; font-size: 20px; color: #6b7280; cursor: pointer; padding: 4px;"><i class="ph ph-x"></i></button>
+                <div style="width: 56px; height: 56px; background: #e8feef; color: #10b981; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 16px; font-size: 28px;">
+                    <i class="ph ph-hand-waving"></i>
+                </div>
+                <h2 style="font-size: 20px; color: #1f2937; margin-bottom: 12px; font-weight: 700;">Olá, ${user.nome_completo ? user.nome_completo.split(' ')[0] : 'Parceiro'}!</h2>
+                <p style="color: #4b5563; font-size: 14px; margin-bottom: 20px; line-height: 1.5;">Parabéns por virar um parceiro da AutomatiZAP. Preparamos um breve tutorial para você conhecer todas as funcionalidades do sistema.</p>
+                <button id="btn-start-tutorial-welcome" class="btn btn--primary" style="width: 100%; justify-content: center; border-radius: 8px;">
+                    Iniciar Tutorial
+                </button>
+            </div>
+            <style>
+                @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+            </style>
+        `;
+        document.body.appendChild(welcomePopup);
+        document.body.classList.add('no-scroll');
+        
+        document.getElementById('close-welcome').addEventListener('click', () => {
+            welcomePopup.remove();
+            document.body.classList.remove('no-scroll');
+            localStorage.setItem('welcome_seen', 'true');
+        });
+        
+        document.getElementById('btn-start-tutorial-welcome').addEventListener('click', () => {
+            welcomePopup.remove();
+            document.body.classList.remove('no-scroll');
+            localStorage.setItem('welcome_seen', 'true');
+            if (typeof window.startPageTutorial === 'function') {
+                window.startPageTutorial();
+            }
+        });
+    }
+
     if (user && user.data_vencimento && user.data_vencimento !== 'N/A') {
         window.tenantVencDateStr = user.data_vencimento;
         tenantVencDate = window.parseExactDate(user.data_vencimento);
@@ -1103,7 +1150,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         headerDiv.style.justifyContent = 'space-between';
                         headerDiv.style.alignItems = 'center';
                         headerDiv.innerHTML = `
-                            <h3 style="font-size: 16px; margin: 0; color: var(--color-text-main);">Filtros</h3>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <h3 style="font-size: 16px; margin: 0; color: var(--color-text-main);">Filtros</h3>
+                                <div class="card-tooltip-container mobile-only-tooltip" style="position: relative; cursor: pointer; top: auto; right: auto; margin-top: 2px;" onclick="this.classList.toggle('show')">
+                                    <div class="tooltip-icon-btn" style="width: 20px; height: 20px; font-size: 12px;"><i class="ph ph-question"></i></div>
+                                    <div class="tooltip-box-content" style="left: 0; right: auto; width: 230px; font-weight: 400; text-align: left;">
+                                        <div style="margin-bottom: 6px;"><strong style="color: #eab308;">Datas em Amarelo:</strong> Faltam 3 dias ou menos para o vencimento do lead.</div>
+                                        <div><strong style="color: #ef4444;">Datas em Vermelho:</strong> Assinatura vencida.</div>
+                                    </div>
+                                </div>
+                            </div>
                             <button id="close-mobile-modal" style="background: none; border: none; font-size: 20px; color: var(--color-text-mut); cursor: pointer;"><i class="ph ph-x"></i></button>
                         `;
                         modalContent.appendChild(headerDiv);

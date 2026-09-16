@@ -2525,6 +2525,68 @@ body.dark-mode .accordion-content {
 /* ==========================================================================
    Chat Input & Teclado iOS Simulado
    ========================================================================== */
+/* ==========================================================================
+   Tooltips (Dicas) nos Cards
+   ========================================================================== */
+.card-tooltip-container {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 10;
+}
+
+.tooltip-icon-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--color-primary-light);
+    color: var(--color-primary-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.tooltip-box-content {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 220px;
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    box-shadow: var(--shadow-card);
+    font-size: 12px;
+    color: var(--color-text-sec);
+    line-height: 1.4;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-5px);
+    transition: all 0.2s ease;
+    z-index: 100;
+}
+
+.card-tooltip-container.show .tooltip-box-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Ocultar elementos específicos no desktop ou mobile */
+@media (min-width: 769px) {
+    .mobile-only-tooltip {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .btn-tutorial-mobile-full {
+        display: none !important;
+    }
+}
 
 .fake-chat-input-container {
     background-color: #f0f2f5;
