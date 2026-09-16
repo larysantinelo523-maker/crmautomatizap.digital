@@ -724,6 +724,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    const inputMensalidade = document.getElementById('tenant-mensalidade');
+    if (inputMensalidade) {
+        inputMensalidade.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value === '') {
+                e.target.value = '';
+                return;
+            }
+            value = (parseInt(value, 10) / 100).toFixed(2) + '';
+            value = value.replace('.', ',');
+            value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+            e.target.value = 'R$ ' + value;
+        });
+    }
+
     // 7. Cadastrar Empresa via API
     document.getElementById('form-create-tenant').addEventListener('submit', async (e) => {
         e.preventDefault();
