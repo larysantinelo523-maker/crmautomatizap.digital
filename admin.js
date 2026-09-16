@@ -204,8 +204,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 hoje.setHours(0, 0, 0, 0);
                 const diffTime = nextDate.getTime() - hoje.getTime();
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                if (diffDays > 0) {
-                    diasRestantesText = `<span style="color: var(--color-success); font-weight: 500;">${diffDays} ${diffDays === 1 ? 'dia' : 'dias'}</span>`;
+                if (diffDays > 3) {
+                    diasRestantesText = `<span style="color: #10b981; font-weight: 500;">${diffDays} dias</span>`;
+                } else if (diffDays > 0 && diffDays <= 3) {
+                    diasRestantesText = `<span style="color: #f59e0b; font-weight: 500;">${diffDays} ${diffDays === 1 ? 'dia' : 'dias'}</span>`;
                 } else if (diffDays === 0) {
                     diasRestantesText = `<span style="color: #f59e0b; font-weight: 500;">Vence hoje</span>`;
                 } else {
