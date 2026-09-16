@@ -245,8 +245,8 @@
                                     </div>
                                     <button class="btn-icon outline" id="btn-clear-admin-filters" title="Limpar Filtros"><i class="ph ph-funnel"></i></button>
                                 </div>
-                                <button class="btn" id="btn-open-cadastrar-modal" style="background: transparent; color: #10b981; border: none; flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 16px;">
-                                    <span class="admin-btn-text" style="color: var(--color-text-main); font-weight: 500;">Cadastrar Empresa</span>
+                                <button class="btn btn-cadastrar-desktop" id="btn-open-cadastrar-modal" style="border: none; flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                    <span class="admin-btn-text" style="font-weight: 500;">Cadastrar Empresa</span>
                                     <i class="ph ph-plus" style="font-weight: bold; font-size: 20px;"></i>
                                 </button>
                             </div>
@@ -255,6 +255,14 @@
                         <div class="table-responsive">
                             <style>
                                 @media (max-width: 768px) {
+                                    .btn-cadastrar-desktop {
+                                        background: transparent !important;
+                                        color: var(--color-primary) !important;
+                                        padding: 8px !important;
+                                    }
+                                    .btn-cadastrar-desktop .ph-plus {
+                                        color: var(--color-primary) !important;
+                                    }
                                     .admin-btn-text {
                                         display: none;
                                     }
@@ -267,6 +275,17 @@
                                     border-collapse: collapse;
                                 }
                                 @media (min-width: 769px) {
+                                    .btn-cadastrar-desktop {
+                                        background-color: var(--color-primary) !important;
+                                        color: white !important;
+                                        border-radius: 6px !important;
+                                        padding: 8px 16px !important;
+                                    }
+                                    .btn-cadastrar-desktop .admin-btn-text,
+                                    .btn-cadastrar-desktop .ph-plus {
+                                        color: white !important;
+                                    }
+                                    
                                     .admin-table, .admin-table thead, .admin-table tbody {
                                         display: block;
                                         width: 100%;
