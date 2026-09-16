@@ -352,8 +352,12 @@
                         <!-- Gráfico de Linha (Área) -->
                         <section class="card"
                             style="padding: 32px; background: var(--color-bg-card); border-radius: 16px; border: 1px solid var(--color-border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); position: relative; overflow: hidden;">
+                            <div class="card-tooltip-container mobile-only-tooltip" onclick="this.classList.toggle('show')">
+                                <div class="tooltip-icon-btn"><i class="ph ph-question"></i></div>
+                                <div class="tooltip-box-content">Visualize a conversão do seu funil: desde a quantidade total de Leads até o Tempo Poupado em formato de linha.</div>
+                            </div>
                             <h3
-                                style="margin-bottom: 32px; font-weight: 600; color: var(--color-text-main); font-size: 20px; position: relative; z-index: 1;">
+                                style="margin-bottom: 32px; font-weight: 600; color: var(--color-text-main); font-size: 20px; position: relative; z-index: 1; padding-right: 28px;">
                                 Performance de Vendas e Atendimentos</h3>
                             <div style="height: 380px; width: 100%; position: relative; z-index: 1;">
                                 <div id="chartLoading" style="position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 2; background: var(--color-bg-card);">
@@ -369,8 +373,12 @@
                         <!-- Gráfico de Mapa -->
                         <section class="card"
                             style="padding: 32px; background: var(--color-bg-card); border-radius: 16px; border: 1px solid var(--color-border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                            <div class="card-tooltip-container mobile-only-tooltip" onclick="this.classList.toggle('show')">
+                                <div class="tooltip-icon-btn"><i class="ph ph-question"></i></div>
+                                <div class="tooltip-box-content">Clique no estado para ver de onde seus Leads estão vindo com mais frequência e dê zoom para ver detalhes.</div>
+                            </div>
                             <h3
-                                style="margin-bottom: 24px; font-weight: 600; color: var(--color-text-main); font-size: 20px;">
+                                style="margin-bottom: 24px; font-weight: 600; color: var(--color-text-main); font-size: 20px; padding-right: 28px;">
                                 Distribuição Geográfica por Estado</h3>
 
                             <div class="map-container-flex">
