@@ -179,7 +179,7 @@ window.startPageTutorial = function() {
     if (pathname.includes('index.html') || pathname.endsWith('/')) {
         steps = [
             {
-                selector: '.sidebar',
+                selector: window.innerWidth <= 768 ? '.mobile-bottom-bar' : '.sidebar',
                 title: 'Menu de Navegação',
                 text: 'Aqui ficam todas as ferramentas do CRM. Você pode acessar seus Leads, Conversas, Tarefas e Relatórios com apenas um clique.'
             },
@@ -309,7 +309,7 @@ window.startPageTutorial = function() {
                 text: 'Aqui em cima você pode filtrar informações e acompanhar os dados da sua operação.'
             },
             {
-                selector: '.sidebar',
+                selector: window.innerWidth <= 768 ? '.mobile-bottom-bar' : '.sidebar',
                 title: 'Navegação',
                 text: 'Use o menu lateral para transitar entre as diferentes abas do sistema.'
             }
