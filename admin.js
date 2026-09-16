@@ -196,8 +196,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Formatar Data (mostrar a próxima fatura)
             let dataVenc = 'Não definido';
+            let diasRestantesText = '';
             if (nextDate) {
                 dataVenc = nextDate.toLocaleDateString('pt-BR');
+                const hojeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
+                const hoje = new Date(hojeStr);
+                hoje.setHours(0, 0, 0, 0);
+                const diffTime = nextDate.getTime() - hoje.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays > 0) {
+                    diasRestantesText = `<br><span style="font-size: 12px; color: var(--color-text-mut);">${diffDays} ${diffDays === 1 ? 'dia restante' : 'dias restantes'}</span>`;
+                } else if (diffDays === 0) {
+                    diasRestantesText = `<br><span style="font-size: 12px; color: #f59e0b; font-weight: 500;">Vence hoje</span>`;
+                } else {
+                    diasRestantesText = `<br><span style="font-size: 12px; color: #ef4444; font-weight: 500;">Atrasado</span>`;
+                }
             } else if (tenant.vencimento && tenant.vencimento !== 'N/A') {
                 const [ano, mes, dia] = tenant.vencimento.split('-');
                 dataVenc = `${dia}/${mes}/${ano}`;
@@ -215,8 +228,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                 </td>
                 <td>${tenant.email || 'N/A'}</td>
-                <td>${dataVenc}</td>
-                <td><strong>${tenant.total_leads || 0}</strong> leads</td>
+                <td style="line-height: 1.4;">${dataVenc}${diasRestantesText}</td>
+                <td><span><strong>${tenant.total_leads || 0}</strong> leads</span></td>
                 <td>${statusBadge}</td>
                 <td>
                     <div style="display: inline-flex; align-items: center; gap: 8px; font-family: monospace; font-size: 12px; background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px;">
