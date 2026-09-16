@@ -286,14 +286,18 @@
                                                 id="pix-qr-code"
                                                 style="width: 160px; height: 160px; filter: blur(6px); opacity: 0.3; transition: all 0.3s;">
                                             <div id="qr-overlay"
-                                                style="position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 16px; text-align: center; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(2px);">
+                                                style="position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 16px; text-align: center; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(2px); transition: all 0.3s;">
                                                 <i class="ph ph-lock-key"
                                                     style="font-size: 28px; color: var(--color-text-sec); margin-bottom: 8px;"></i>
-                                                <span
+                                                <span id="qr-overlay-text"
                                                     style="font-size: 13px; color: var(--color-text-main); font-weight: 600; line-height: 1.4;">Fatura
                                                     ainda não disponível.</span>
                                             </div>
                                         </div>
+                                        <button id="btn-generate-pix" class="btn btn--primary"
+                                            style="display: none; width: 100%; margin-top: 4px; border-radius: 8px; justify-content: center; font-size: 13px;">
+                                            <i class="ph ph-arrows-clockwise"></i> Gerar Pagamento
+                                        </button>
                                         <button id="btn-copy-pix" class="btn btn--primary"
                                             style="display: none; width: 100%; margin-top: 4px; border-radius: 8px; justify-content: center; font-size: 13px;">
                                             <i class="ph ph-copy"></i> Copiar Código PIX
@@ -436,6 +440,8 @@
             const subDaysLeft = document.getElementById('sub-days-left');
             const qrContainer = document.getElementById('pix-qr-code');
             const qrOverlay = document.getElementById('qr-overlay');
+            const qrOverlayText = document.getElementById('qr-overlay-text');
+            const btnGeneratePix = document.getElementById('btn-generate-pix');
             const btnCopyPix = document.getElementById('btn-copy-pix');
 
             let vDate = null;
@@ -462,57 +468,79 @@
                 subStatusBadge.style.color = '#991b1b';
                 subDaysLeft.style.color = '#991b1b';
                 subDaysLeft.textContent = '0';
-
-                qrContainer.style.filter = 'none';
-                qrContainer.style.opacity = '1';
-                qrOverlay.style.display = 'none';
-                btnCopyPix.style.display = 'flex';
             } else {
                 subStatusBadge.textContent = 'Ativo';
                 subStatusBadge.style.background = '#dcfce7';
                 subStatusBadge.style.color = '#166534';
+            }
 
-                if (daysLeft <= 3) {
-                    qrContainer.style.filter = 'none';
-                    qrContainer.style.opacity = '1';
-                    qrOverlay.style.display = 'none';
-                    btnCopyPix.style.display = 'flex';
-                } else {
-                    qrContainer.style.filter = 'blur(5px)';
-                    qrContainer.style.opacity = '0.5';
-                    qrOverlay.style.display = 'flex';
-                    btnCopyPix.style.display = 'none';
-                }
+            const isPaymentAllowed = (userData.status_assinatura === 'vencido' || userData.status_assinatura === 'inadimplente' || daysLeft <= 3);
+
+            if (isPaymentAllowed) {
+                qrContainer.style.filter = 'blur(6px)';
+                qrContainer.style.opacity = '0.3';
+                qrOverlay.style.display = 'flex';
+                if(qrOverlayText) qrOverlayText.style.display = 'none'; // Only show lock
+                
+                btnGeneratePix.style.display = 'flex';
+                btnCopyPix.style.display = 'none';
+            } else {
+                qrContainer.style.filter = 'blur(6px)';
+                qrContainer.style.opacity = '0.3';
+                qrOverlay.style.display = 'flex';
+                if(qrOverlayText) qrOverlayText.style.display = 'block';
+                
+                btnGeneratePix.style.display = 'none';
+                btnCopyPix.style.display = 'none';
             }
 
             // Ação de copiar PIX e gerar PIX real
-            if (btnCopyPix && (userData.status_assinatura === 'vencido' || userData.status_assinatura === 'inadimplente' || daysLeft <= 3)) {
+            if (isPaymentAllowed) {
                 let currentPixString = '';
                 
-                // Fetch PIX real
-                fetch('/api/create_pix', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ email: userData.email, userId: userData.id, nome: userData.nome_completo, mensalidade: userData.mensalidade })
-                }).then(res => res.json()).then(data => {
-                    if (data.qr_code_base64) {
-                        currentPixString = data.qr_code;
-                        qrContainer.src = `data:image/png;base64,${data.qr_code_base64}`;
-                    }
-                }).catch(console.error);
+                btnGeneratePix.addEventListener('click', () => {
+                    const originalBtnText = btnGeneratePix.innerHTML;
+                    btnGeneratePix.innerHTML = '<i class="ph ph-spinner-gap"></i> Gerando...';
+                    btnGeneratePix.disabled = true;
+
+                    fetch('/api/create_pix', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ email: userData.email, userId: userData.id, nome: userData.nome_completo, mensalidade: userData.mensalidade })
+                    }).then(res => res.json()).then(data => {
+                        if (data.qr_code_base64) {
+                            currentPixString = data.qr_code;
+                            qrContainer.src = `data:image/png;base64,${data.qr_code_base64}`;
+                            
+                            // Efeito suave
+                            qrContainer.style.filter = 'none';
+                            qrContainer.style.opacity = '1';
+                            qrOverlay.style.opacity = '0';
+                            
+                            setTimeout(() => {
+                                qrOverlay.style.display = 'none';
+                            }, 300);
+
+                            btnGeneratePix.style.display = 'none';
+                            btnCopyPix.style.display = 'flex';
+                        }
+                    }).catch(err => {
+                        console.error(err);
+                        btnGeneratePix.innerHTML = originalBtnText;
+                        btnGeneratePix.disabled = false;
+                        alert("Erro ao gerar o PIX. Tente novamente.");
+                    });
+                });
 
                 btnCopyPix.addEventListener('click', () => {
-                    if (!currentPixString) {
-                        alert("Aguarde, gerando PIX...");
-                        return;
-                    }
+                    if (!currentPixString) return;
                     navigator.clipboard.writeText(currentPixString);
                     const originalText = btnCopyPix.innerHTML;
                     btnCopyPix.innerHTML = '<i class="ph ph-check"></i> Código Copiado!';
                     btnCopyPix.style.background = '#166534'; // Sucesso (verde)
                     setTimeout(() => {
                         btnCopyPix.innerHTML = originalText;
-                        btnCopyPix.style.background = '';
+                        btnCopyPix.style.background = ''; // reset default
                     }, 2000);
                 });
             }

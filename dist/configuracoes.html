@@ -15,7 +15,7 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <!-- CSS -->
-  <script type="module" crossorigin src="/assets/configuracoes-CpC8u6Tb.js"></script>
+  <script type="module" crossorigin src="/assets/configuracoes-D8gu_v3h.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
   <link rel="modulepreload" crossorigin href="/assets/data-CHxsLyLf.js">
   <link rel="modulepreload" crossorigin href="/assets/script-CctV06in.js">
@@ -290,14 +290,18 @@
                                                 id="pix-qr-code"
                                                 style="width: 160px; height: 160px; filter: blur(6px); opacity: 0.3; transition: all 0.3s;">
                                             <div id="qr-overlay"
-                                                style="position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 16px; text-align: center; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(2px);">
+                                                style="position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 16px; text-align: center; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(2px); transition: all 0.3s;">
                                                 <i class="ph ph-lock-key"
                                                     style="font-size: 28px; color: var(--color-text-sec); margin-bottom: 8px;"></i>
-                                                <span
+                                                <span id="qr-overlay-text"
                                                     style="font-size: 13px; color: var(--color-text-main); font-weight: 600; line-height: 1.4;">Fatura
                                                     ainda não disponível.</span>
                                             </div>
                                         </div>
+                                        <button id="btn-generate-pix" class="btn btn--primary"
+                                            style="display: none; width: 100%; margin-top: 4px; border-radius: 8px; justify-content: center; font-size: 13px;">
+                                            <i class="ph ph-arrows-clockwise"></i> Gerar Pagamento
+                                        </button>
                                         <button id="btn-copy-pix" class="btn btn--primary"
                                             style="display: none; width: 100%; margin-top: 4px; border-radius: 8px; justify-content: center; font-size: 13px;">
                                             <i class="ph ph-copy"></i> Copiar Código PIX
