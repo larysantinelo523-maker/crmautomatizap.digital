@@ -1053,50 +1053,167 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btn.querySelector('.ph-funnel')) {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                let dropdown = btn.querySelector('.status-filter-dropdown');
                 
-                if (!dropdown) {
-                    dropdown = document.createElement('div');
-                    dropdown.className = 'status-filter-dropdown card';
-                    dropdown.style.position = 'absolute';
-                    dropdown.style.top = '100%';
-                    dropdown.style.right = '0';
-                    dropdown.style.marginTop = '8px';
-                    dropdown.style.minWidth = '200px';
-                    dropdown.style.zIndex = '1000';
-                    dropdown.style.padding = '12px';
-                    dropdown.style.display = 'flex';
-                    dropdown.style.flexDirection = 'column';
-                    dropdown.style.gap = '8px';
-                    dropdown.style.cursor = 'default';
+                if (window.innerWidth <= 768) {
+                    // Lógica para Mobile: Modal Pop-up com Calendário e Status
+                    let mobileModal = document.getElementById('mobile-filter-modal');
                     
-                    dropdown.innerHTML = `
-                        <label style="font-weight: 500; font-size: 14px; margin-bottom: 8px; text-align: left; display: block; color: var(--color-text-main);">Status do Lead</label>
-                        <div class="custom-select-container" style="display: flex; flex-direction: column; gap: 4px;">
-                            <div class="custom-option selected" data-value="Todos">Todos os status</div>
-                            <div class="custom-option" data-value="Em atendimento">Em atendimento</div>
-                            <div class="custom-option" data-value="Aguardando vendedor">Aguardando vendedor</div>
-                            <div class="custom-option" data-value="Em negociação">Em negociação</div>
-                            <div class="custom-option" data-value="Qualificado">Qualificado</div>
-                        </div>
-                    `;
-                    
-                    btn.style.position = 'relative';
-                    btn.appendChild(dropdown);
-                    
-                    dropdown.addEventListener('click', (ev) => ev.stopPropagation());
-                    
-                    const options = dropdown.querySelectorAll('.custom-option');
-                    options.forEach(opt => {
-                        opt.addEventListener('click', (ev) => {
-                            // Atualiza a seleção visual das opções
-                            options.forEach(o => o.classList.remove('selected'));
-                            opt.classList.add('selected');
+                    if (!mobileModal) {
+                        // Criação do overlay do modal
+                        mobileModal = document.createElement('div');
+                        mobileModal.id = 'mobile-filter-modal';
+                        mobileModal.style.position = 'fixed';
+                        mobileModal.style.top = '0';
+                        mobileModal.style.left = '0';
+                        mobileModal.style.width = '100vw';
+                        mobileModal.style.height = '100vh';
+                        mobileModal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                        mobileModal.style.backdropFilter = 'blur(4px)';
+                        mobileModal.style.zIndex = '99999';
+                        mobileModal.style.display = 'flex';
+                        mobileModal.style.alignItems = 'center';
+                        mobileModal.style.justifyContent = 'center';
+                        mobileModal.style.opacity = '0';
+                        mobileModal.style.visibility = 'hidden';
+                        mobileModal.style.transition = 'all 0.3s ease';
+
+                        // Container principal do modal
+                        const modalContent = document.createElement('div');
+                        modalContent.style.backgroundColor = 'var(--color-bg-card)';
+                        modalContent.style.width = '90%';
+                        modalContent.style.maxWidth = '360px';
+                        modalContent.style.borderRadius = 'var(--radius-lg)';
+                        modalContent.style.padding = '20px';
+                        modalContent.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
+                        modalContent.style.maxHeight = '90vh';
+                        modalContent.style.overflowY = 'auto';
+                        modalContent.style.display = 'flex';
+                        modalContent.style.flexDirection = 'column';
+                        modalContent.style.gap = '16px';
+
+                        // Título e botão fechar
+                        const headerDiv = document.createElement('div');
+                        headerDiv.style.display = 'flex';
+                        headerDiv.style.justifyContent = 'space-between';
+                        headerDiv.style.alignItems = 'center';
+                        headerDiv.innerHTML = `
+                            <h3 style="font-size: 16px; margin: 0; color: var(--color-text-main);">Filtros</h3>
+                            <button id="close-mobile-modal" style="background: none; border: none; font-size: 20px; color: var(--color-text-mut); cursor: pointer;"><i class="ph ph-x"></i></button>
+                        `;
+                        modalContent.appendChild(headerDiv);
+
+                        // Move o calendário existente para dentro do modal apenas visualmente
+                        const originalDateDropdown = document.getElementById('date-dropdown');
+                        let calendarClone = null;
+                        
+                        // Para não quebrar o calendário original, vamos usar o original e devolvê-lo depois?
+                        // Ou melhor: O DateDropdown atual já é perfeito. Vamos apenas movê-lo para o modal no mobile!
+                        const dateDropdownWrapper = document.createElement('div');
+                        dateDropdownWrapper.id = 'mobile-calendar-wrapper';
+                        dateDropdownWrapper.style.border = '1px solid var(--color-border)';
+                        dateDropdownWrapper.style.borderRadius = 'var(--radius-md)';
+                        dateDropdownWrapper.style.overflow = 'hidden';
+                        modalContent.appendChild(dateDropdownWrapper);
+
+                        // Sanfona de Status
+                        const statusAccordion = document.createElement('div');
+                        statusAccordion.style.border = '1px solid var(--color-border)';
+                        statusAccordion.style.borderRadius = 'var(--radius-md)';
+                        statusAccordion.style.overflow = 'hidden';
+                        
+                        const statusHeader = document.createElement('div');
+                        statusHeader.style.padding = '12px 16px';
+                        statusHeader.style.display = 'flex';
+                        statusHeader.style.justifyContent = 'space-between';
+                        statusHeader.style.alignItems = 'center';
+                        statusHeader.style.backgroundColor = 'rgba(0,0,0,0.02)';
+                        statusHeader.style.fontWeight = '500';
+                        statusHeader.style.fontSize = '14px';
+                        statusHeader.innerHTML = `<span>Status do Lead</span> <i class="ph ph-caret-down" style="transition: transform 0.3s"></i>`;
+                        
+                        const statusBody = document.createElement('div');
+                        statusBody.style.padding = '12px 16px';
+                        statusBody.style.display = 'none';
+                        statusBody.style.flexDirection = 'column';
+                        statusBody.style.gap = '8px';
+                        statusBody.innerHTML = `
+                            <div class="custom-option selected mobile-opt" data-value="Todos" style="padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px;">Todos os status</div>
+                            <div class="custom-option mobile-opt" data-value="Em atendimento" style="padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px;">Em atendimento</div>
+                            <div class="custom-option mobile-opt" data-value="Aguardando vendedor" style="padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px;">Aguardando vendedor</div>
+                            <div class="custom-option mobile-opt" data-value="Em negociação" style="padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px;">Em negociação</div>
+                            <div class="custom-option mobile-opt" data-value="Qualificado" style="padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px;">Qualificado</div>
+                        `;
+
+                        statusHeader.addEventListener('click', () => {
+                            const isHidden = statusBody.style.display === 'none';
+                            statusBody.style.display = isHidden ? 'flex' : 'none';
+                            statusHeader.querySelector('i').style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+                        });
+
+                        statusAccordion.appendChild(statusHeader);
+                        statusAccordion.appendChild(statusBody);
+                        modalContent.appendChild(statusAccordion);
+
+                        // Botão Aplicar
+                        const applyBtn = document.createElement('button');
+                        applyBtn.className = 'btn primary full-width';
+                        applyBtn.style.marginTop = '8px';
+                        applyBtn.textContent = 'Aplicar Filtros';
+                        modalContent.appendChild(applyBtn);
+
+                        mobileModal.appendChild(modalContent);
+                        document.body.appendChild(mobileModal);
+
+                        // Funcionalidade de seleção de status no mobile
+                        const mobileOpts = modalContent.querySelectorAll('.mobile-opt');
+                        let selectedMobileStatus = 'Todos';
+                        
+                        mobileOpts.forEach(opt => {
+                            opt.addEventListener('click', (ev) => {
+                                mobileOpts.forEach(o => {
+                                    o.classList.remove('selected');
+                                    o.style.backgroundColor = '';
+                                    o.style.color = '';
+                                    o.style.fontWeight = '';
+                                });
+                                opt.classList.add('selected');
+                                opt.style.backgroundColor = '#22c55e33';
+                                opt.style.color = '#15803d';
+                                opt.style.fontWeight = '600';
+                                selectedMobileStatus = opt.getAttribute('data-value');
+                            });
+                        });
+
+                        // Eventos para fechar o modal
+                        const closeModal = () => {
+                            mobileModal.style.opacity = '0';
+                            mobileModal.style.visibility = 'hidden';
                             
-                            const statusVal = opt.getAttribute('data-value');
+                            // Devolver o date-dropdown ao pai original
+                            const origDateDropdown = document.getElementById('date-dropdown');
+                            const dateWrapper = document.querySelector('.date-wrapper');
+                            if (origDateDropdown && dateWrapper) {
+                                origDateDropdown.style.position = 'absolute';
+                                origDateDropdown.style.width = '340px';
+                                origDateDropdown.style.opacity = '0';
+                                origDateDropdown.style.visibility = 'hidden';
+                                origDateDropdown.style.transform = 'translateY(-12px)';
+                                origDateDropdown.classList.remove('show');
+                                dateWrapper.appendChild(origDateDropdown);
+                            }
+                        };
+
+                        headerDiv.querySelector('#close-mobile-modal').addEventListener('click', closeModal);
+                        mobileModal.addEventListener('click', (ev) => {
+                            if (ev.target === mobileModal) closeModal();
+                        });
+
+                        // Lógica do botão Aplicar
+                        applyBtn.addEventListener('click', () => {
+                            // O calendário já atualizou o local storage ao clicar nos dias,
+                            // Só precisamos disparar o filtro de status na tabela
                             
-                            // Efeito visual de filtro ativo no botão de funil
-                            if (statusVal === 'Todos') {
+                            if (selectedMobileStatus === 'Todos') {
                                 btn.classList.remove('filter-active');
                             } else {
                                 btn.classList.add('filter-active');
@@ -1104,14 +1221,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             
                             const tableRows = document.querySelectorAll('.data-table tbody tr');
                             tableRows.forEach(row => {
-                                if (statusVal === 'Todos') {
+                                if (selectedMobileStatus === 'Todos') {
                                     row.style.display = '';
                                 } else {
                                     const cells = row.querySelectorAll('td');
                                     if (cells.length > 3) {
                                         const badge = cells[3].querySelector('.badge');
                                         const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[3].textContent.trim().toLowerCase();
-                                        if (rowStatus === statusVal.toLowerCase()) {
+                                        if (rowStatus === selectedMobileStatus.toLowerCase()) {
                                             row.style.display = '';
                                         } else {
                                             row.style.display = 'none';
@@ -1120,20 +1237,118 @@ document.addEventListener('DOMContentLoaded', () => {
                                 }
                             });
                             
-                            setTimeout(() => {
-                                if (dropdown) dropdown.style.display = 'none';
-                            }, 250);
+                            // Dispara atualização geral para as datas
+                            window.dispatchEvent(new Event('calendarFilterChanged'));
+                            if (typeof window.initDashboard === 'function') window.initDashboard();
+                            if (typeof window.initLeads === 'function') window.initLeads();
+                            if (typeof window.initRelatorios === 'function') window.initRelatorios();
+                            
+                            closeModal();
                         });
-                    });
+                    }
+
+                    // Prepara e exibe o modal
+                    const origDateDropdown = document.getElementById('date-dropdown');
+                    if (origDateDropdown) {
+                        origDateDropdown.style.position = 'static';
+                        origDateDropdown.style.width = '100%';
+                        origDateDropdown.style.boxShadow = 'none';
+                        origDateDropdown.style.opacity = '1';
+                        origDateDropdown.style.visibility = 'visible';
+                        origDateDropdown.style.transform = 'none';
+                        
+                        // Esconder o botão de fechar original do calendário se existir, ou o footer
+                        const calFooter = origDateDropdown.querySelector('.date-dropdown-footer');
+                        if (calFooter) calFooter.style.display = 'none'; // Esconde para o modal (pois temos o botão aplicar lá embaixo)
+
+                        document.getElementById('mobile-calendar-wrapper').appendChild(origDateDropdown);
+                    }
                     
-                    const closeDropdown = (ev) => {
-                        if (!btn.contains(ev.target)) {
-                            dropdown.style.display = 'none';
-                        }
-                    };
-                    document.addEventListener('click', closeDropdown);
+                    mobileModal.style.opacity = '1';
+                    mobileModal.style.visibility = 'visible';
+                    
                 } else {
-                    dropdown.style.display = dropdown.style.display === 'none' ? 'flex' : 'none';
+                    // Lógica Desktop Original
+                    let dropdown = btn.querySelector('.status-filter-dropdown');
+                    
+                    if (!dropdown) {
+                        dropdown = document.createElement('div');
+                        dropdown.className = 'status-filter-dropdown card';
+                        dropdown.style.position = 'absolute';
+                        dropdown.style.top = '100%';
+                        dropdown.style.right = '0';
+                        dropdown.style.marginTop = '8px';
+                        dropdown.style.minWidth = '200px';
+                        dropdown.style.zIndex = '1000';
+                        dropdown.style.padding = '12px';
+                        dropdown.style.display = 'flex';
+                        dropdown.style.flexDirection = 'column';
+                        dropdown.style.gap = '8px';
+                        dropdown.style.cursor = 'default';
+                        
+                        dropdown.innerHTML = `
+                            <label style="font-weight: 500; font-size: 14px; margin-bottom: 8px; text-align: left; display: block; color: var(--color-text-main);">Status do Lead</label>
+                            <div class="custom-select-container" style="display: flex; flex-direction: column; gap: 4px;">
+                                <div class="custom-option selected" data-value="Todos">Todos os status</div>
+                                <div class="custom-option" data-value="Em atendimento">Em atendimento</div>
+                                <div class="custom-option" data-value="Aguardando vendedor">Aguardando vendedor</div>
+                                <div class="custom-option" data-value="Em negociação">Em negociação</div>
+                                <div class="custom-option" data-value="Qualificado">Qualificado</div>
+                            </div>
+                        `;
+                        
+                        btn.style.position = 'relative';
+                        btn.appendChild(dropdown);
+                        
+                        dropdown.addEventListener('click', (ev) => ev.stopPropagation());
+                        
+                        const options = dropdown.querySelectorAll('.custom-option');
+                        options.forEach(opt => {
+                            opt.addEventListener('click', (ev) => {
+                                options.forEach(o => o.classList.remove('selected'));
+                                opt.classList.add('selected');
+                                
+                                const statusVal = opt.getAttribute('data-value');
+                                
+                                if (statusVal === 'Todos') {
+                                    btn.classList.remove('filter-active');
+                                } else {
+                                    btn.classList.add('filter-active');
+                                }
+                                
+                                const tableRows = document.querySelectorAll('.data-table tbody tr');
+                                tableRows.forEach(row => {
+                                    if (statusVal === 'Todos') {
+                                        row.style.display = '';
+                                    } else {
+                                        const cells = row.querySelectorAll('td');
+                                        if (cells.length > 3) {
+                                            const badge = cells[3].querySelector('.badge');
+                                            const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[3].textContent.trim().toLowerCase();
+                                            if (rowStatus === statusVal.toLowerCase()) {
+                                                row.style.display = '';
+                                            } else {
+                                                row.style.display = 'none';
+                                            }
+                                        }
+                                    }
+                                });
+                                
+                                setTimeout(() => {
+                                    if (dropdown) dropdown.style.display = 'none';
+                                }, 250);
+                            });
+                        });
+                        
+                        const closeDropdown = (ev) => {
+                            if (!btn.contains(ev.target)) {
+                                dropdown.style.display = 'none';
+                            }
+                        };
+                        document.addEventListener('click', closeDropdown);
+                    } else {
+                        dropdown.style.display = dropdown.style.display === 'none' ? 'flex' : 'none';
+                    }
                 }
             });
         }
