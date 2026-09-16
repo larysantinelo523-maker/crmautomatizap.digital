@@ -11,6 +11,19 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Missing email or userId' });
     }
 
+    let parsedAmount = 0.01;
+    if (mensalidade) {
+        if (typeof mensalidade === 'string') {
+            const cleanStr = mensalidade.replace(/[^\d,-]/g, '').replace(',', '.');
+            const floatVal = parseFloat(cleanStr);
+            if (!isNaN(floatVal) && floatVal > 0) {
+                parsedAmount = floatVal;
+            }
+        } else if (typeof mensalidade === 'number' && mensalidade > 0) {
+            parsedAmount = mensalidade;
+        }
+    }
+
     try {
         const client = new MercadoPagoConfig({
             accessToken: 'APP_USR-5121029731142512-091416-44ec7bdf36a55ab8f244f0d84bebbf11-1370822621'
@@ -26,7 +39,7 @@ export default async function handler(req, res) {
 
         const response = await payment.create({
             body: {
-                transaction_amount: Number(mensalidade) > 0 ? Number(mensalidade) : 0.01,
+                transaction_amount: parsedAmount,
                 description: 'Mensalidade AutomatiZAP CRM',
                 payment_method_id: 'pix',
                 payer: {

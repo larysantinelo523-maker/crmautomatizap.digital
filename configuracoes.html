@@ -523,12 +523,17 @@
 
                             btnGeneratePix.style.display = 'none';
                             btnCopyPix.style.display = 'flex';
+                        } else {
+                            console.error('API Error:', data);
+                            btnGeneratePix.innerHTML = originalBtnText;
+                            btnGeneratePix.disabled = false;
+                            alert(data.error || "Erro ao gerar o PIX. Tente novamente.");
                         }
                     }).catch(err => {
                         console.error(err);
                         btnGeneratePix.innerHTML = originalBtnText;
                         btnGeneratePix.disabled = false;
-                        alert("Erro ao gerar o PIX. Tente novamente.");
+                        alert("Erro de conexão ao gerar o PIX. Tente novamente.");
                     });
                 });
 
