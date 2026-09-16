@@ -249,7 +249,7 @@
                                 </div>
                                 <button class="btn btn-cadastrar-desktop" id="btn-open-cadastrar-modal" style="border: none; flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 8px;">
                                     <span class="admin-btn-text" style="font-weight: 500;">Cadastrar Empresa</span>
-                                    <i class="ph ph-plus" style="font-weight: bold; font-size: 20px;"></i>
+                                    <i class="ph ph-plus" style="font-weight: bold;"></i>
                                 </button>
                             </div>
                         </div>
@@ -264,6 +264,7 @@
                                     }
                                     .btn-cadastrar-desktop .ph-plus {
                                         color: var(--color-primary) !important;
+                                        font-size: 20px;
                                     }
                                     .admin-btn-text {
                                         display: none;
@@ -283,9 +284,12 @@
                                         border-radius: 6px !important;
                                         padding: 8px 16px !important;
                                     }
-                                    .btn-cadastrar-desktop .admin-btn-text,
+                                    .btn-cadastrar-desktop .admin-btn-text {
+                                        color: white !important;
+                                    }
                                     .btn-cadastrar-desktop .ph-plus {
                                         color: white !important;
+                                        font-size: 15px;
                                     }
                                     
                                     .admin-table, .admin-table thead, .admin-table tbody {
