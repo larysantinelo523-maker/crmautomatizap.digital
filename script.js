@@ -199,7 +199,7 @@ fetchUserData().then(user => {
                         }
                     } catch(e) {}
                 }, 4000);
-            } else if (diffDays >= 0 && diffDays <= 3) {
+            } else if (diffDays >= 0 && diffDays <= 3 && !window.location.pathname.includes('configuracoes.html')) {
                 const warningPopup = document.createElement('div');
                 warningPopup.id = 'aviso-previo-popup';
                 warningPopup.style.position = 'fixed';
@@ -237,7 +237,7 @@ fetchUserData().then(user => {
                 });
                 
                 document.getElementById('btn-pay-warning').addEventListener('click', () => {
-                    window.location.href = 'configuracoes.html';
+                    window.location.href = 'configuracoes.html?tab=assinatura';
                 });
             } else {
                 if (localStorage.getItem('was_inadimplente') === 'true') {
