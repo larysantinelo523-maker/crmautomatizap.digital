@@ -164,7 +164,7 @@
             </header>
 
             <!-- Dashboard Grid -->
-            <div class="dashboard-grid no-sidebar" style="padding: 24px;">
+            <div class="dashboard-grid no-sidebar">
 
                 <!-- Secao Dashboard -->
                 <section id="sec-dashboard" class="admin-section active">
@@ -227,8 +227,8 @@
                         </div>
                     </div>
 
-                    <div class="card table-card" style="margin-top: 24px;">
-                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                    <div class="card table-card">
+                        <div class="card-header">
                             <div class="card-title">
                                 <i class="ph ph-buildings text-primary"></i>
                                 <div>
@@ -237,15 +237,15 @@
                                 </div>
                             </div>
                             
-                            <div style="display: flex; align-items: center; gap: 16px; margin-left: auto;">
-                                <div class="table-controls" style="display: flex; align-items: center; gap: 12px;">
-                                    <div class="search-input" style="position: relative; display: flex; align-items: center;">
+                            <div class="table-controls-wrapper" style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px;">
+                                <div class="table-controls" style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                                    <div class="search-input" style="position: relative; display: flex; align-items: center; flex: 1;">
                                         <i class="ph ph-magnifying-glass" style="position: absolute; left: 12px; color: var(--color-text-mut);"></i>
-                                        <input type="text" id="search-empresas" placeholder="Buscar por nome ou email..." style="padding: 8px 12px 8px 36px; border: none; border-radius: 8px; background: transparent; color: var(--color-text-main); font-size: 13px; outline: none; width: 260px;">
+                                        <input type="text" id="search-empresas" placeholder="Buscar por nome ou email..." style="padding: 8px 12px 8px 36px; border: none; border-radius: 8px; background: transparent; color: var(--color-text-main); font-size: 13px; outline: none; width: 100%;">
                                     </div>
                                     <button class="btn-icon outline" id="btn-clear-admin-filters" title="Limpar Filtros"><i class="ph ph-funnel"></i></button>
                                 </div>
-                                <button class="btn btn-primary" id="btn-open-cadastrar-modal">Cadastrar Empresa +</button>
+                                <button class="btn btn-primary" id="btn-open-cadastrar-modal" style="flex-shrink: 0;">Cadastrar Empresa +</button>
                             </div>
                         </div>
 
