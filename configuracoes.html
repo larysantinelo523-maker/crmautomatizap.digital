@@ -682,6 +682,14 @@
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('tab') === 'assinatura') {
                 switchSettingsTab('assinatura');
+                if (window.location.hash === '#payment-area') {
+                    setTimeout(() => {
+                        const target = document.getElementById('payment-area');
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }, 300);
+                }
             }
         };
     </script>
