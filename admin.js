@@ -172,25 +172,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
 
             let nextDate = null;
+            if (tenant.vencimento && tenant.vencimento !== 'N/A') {
+                nextDate = calcNextDue(tenant.vencimento);
+            }
+
             if (tenant.status === 'inadimplente' || tenant.status === 'cancelado' || tenant.status === 'vencida') {
                 statusBadge = '<span style="background-color: #ef4444; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Inadimplente</span>';
-            } else if (tenant.vencimento && tenant.vencimento !== 'N/A') {
+            } else if (nextDate) {
                 const hojeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
                 const hoje = new Date(hojeStr);
                 hoje.setHours(0, 0, 0, 0);
                 
-                nextDate = calcNextDue(tenant.vencimento);
-                if (nextDate) {
-                    const diffTime = nextDate.getTime() - hoje.getTime();
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const diffTime = nextDate.getTime() - hoje.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                    if (diffDays < 0) {
-                        statusBadge = '<span style="background-color: #ef4444; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Inadimplente</span>';
-                    } else if (diffDays === 0) {
-                        statusBadge = '<span style="background-color: #f59e0b; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Vence Hoje</span>';
-                    } else if (diffDays <= 3) {
-                        statusBadge = `<span style="background-color: #f59e0b; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Vence em ${diffDays} dias</span>`;
-                    }
+                if (diffDays < 0) {
+                    statusBadge = '<span style="background-color: #ef4444; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Inadimplente</span>';
+                } else if (diffDays === 0) {
+                    statusBadge = '<span style="background-color: #f59e0b; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Vence Hoje</span>';
+                } else if (diffDays <= 3) {
+                    statusBadge = `<span style="background-color: #f59e0b; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Vence em ${diffDays} dias</span>`;
                 }
             }
 
