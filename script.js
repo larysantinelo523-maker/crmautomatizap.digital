@@ -116,7 +116,7 @@ fetchUserData().then(user => {
                     </div>
                 `;
                 document.body.appendChild(blocker);
-                document.body.style.overflow = 'hidden';
+                document.body.classList.add('no-scroll');
                 
                 // Fetch PIX real
                 let currentPixString = '';
@@ -232,16 +232,16 @@ fetchUserData().then(user => {
                     </style>
                 `;
                 document.body.appendChild(warningPopup);
-                document.body.style.overflow = 'hidden';
+                document.body.classList.add('no-scroll');
                 
                 document.getElementById('close-warning').addEventListener('click', () => {
                     warningPopup.remove();
-                    document.body.style.overflow = '';
+                    document.body.classList.remove('no-scroll');
                 });
                 
                 document.getElementById('btn-pay-warning').addEventListener('click', () => {
                     warningPopup.remove();
-                    document.body.style.overflow = '';
+                    document.body.classList.remove('no-scroll');
                     window.location.href = 'configuracoes.html?tab=assinatura';
                 });
             } else {
@@ -275,7 +275,7 @@ fetchUserData().then(user => {
                         </div>
                     `;
                     document.body.appendChild(successBlocker);
-                    document.body.style.overflow = 'hidden';
+                    document.body.classList.add('no-scroll');
 
                     const script = document.createElement('script');
                     script.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js';
@@ -291,7 +291,7 @@ fetchUserData().then(user => {
 
                     setTimeout(() => {
                         successBlocker.remove();
-                        document.body.style.overflow = '';
+                        document.body.classList.remove('no-scroll');
                     }, 5000);
                 }
             }
@@ -1194,7 +1194,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const closeModal = () => {
                             mobileModal.style.opacity = '0';
                             mobileModal.style.visibility = 'hidden';
-                            document.body.style.overflow = '';
+                            document.body.classList.remove('no-scroll');
                             
                             // Devolver o date-dropdown ao pai original
                             const origDateDropdown = document.getElementById('date-dropdown');
@@ -1273,7 +1273,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     mobileModal.style.opacity = '1';
                     mobileModal.style.visibility = 'visible';
-                    document.body.style.overflow = 'hidden';
+                    document.body.classList.add('no-scroll');
                     
                 } else {
                     // Lógica Desktop Original
@@ -1388,6 +1388,7 @@ function openDossier(title) {
         document.getElementById('dossier-name').innerText = title;
         dossierDrawer.classList.add('open');
         dossierOverlay.classList.add('open');
+        document.body.classList.add('no-scroll');
     }
 }
 
@@ -1395,6 +1396,7 @@ function closeDossier() {
     if (dossierDrawer && dossierOverlay) {
         dossierDrawer.classList.remove('open');
         dossierOverlay.classList.remove('open');
+        document.body.classList.remove('no-scroll');
     }
 }
 

@@ -99,6 +99,10 @@ body {
     /* clip não quebra o position: sticky como o hidden faz */
 }
 
+body.no-scroll {
+    overflow: hidden !important;
+}
+
 body {
     font: var(--font-body);
     color: var(--color-text-main);
