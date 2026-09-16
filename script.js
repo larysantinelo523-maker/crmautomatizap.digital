@@ -116,6 +116,7 @@ fetchUserData().then(user => {
                     </div>
                 `;
                 document.body.appendChild(blocker);
+                document.body.style.overflow = 'hidden';
                 
                 // Fetch PIX real
                 let currentPixString = '';
@@ -231,13 +232,16 @@ fetchUserData().then(user => {
                     </style>
                 `;
                 document.body.appendChild(warningPopup);
+                document.body.style.overflow = 'hidden';
                 
                 document.getElementById('close-warning').addEventListener('click', () => {
                     warningPopup.remove();
+                    document.body.style.overflow = '';
                 });
                 
                 document.getElementById('btn-pay-warning').addEventListener('click', () => {
                     warningPopup.remove();
+                    document.body.style.overflow = '';
                     window.location.href = 'configuracoes.html?tab=assinatura';
                 });
             } else {
@@ -271,6 +275,7 @@ fetchUserData().then(user => {
                         </div>
                     `;
                     document.body.appendChild(successBlocker);
+                    document.body.style.overflow = 'hidden';
 
                     const script = document.createElement('script');
                     script.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js';
@@ -286,6 +291,7 @@ fetchUserData().then(user => {
 
                     setTimeout(() => {
                         successBlocker.remove();
+                        document.body.style.overflow = '';
                     }, 5000);
                 }
             }
@@ -1188,6 +1194,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const closeModal = () => {
                             mobileModal.style.opacity = '0';
                             mobileModal.style.visibility = 'hidden';
+                            document.body.style.overflow = '';
                             
                             // Devolver o date-dropdown ao pai original
                             const origDateDropdown = document.getElementById('date-dropdown');
@@ -1266,6 +1273,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     mobileModal.style.opacity = '1';
                     mobileModal.style.visibility = 'visible';
+                    document.body.style.overflow = 'hidden';
                     
                 } else {
                     // Lógica Desktop Original
