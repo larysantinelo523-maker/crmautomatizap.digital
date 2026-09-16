@@ -410,7 +410,7 @@
             // Fetch current user data
             const { data: userData, error } = await supabase
                 .from('usuarios')
-                .select('nome_completo, avatar_url, status_assinatura, data_vencimento')
+                .select('nome_completo, avatar_url, status_assinatura, data_vencimento, email, mensalidade')
                 .eq('id', userId)
                 .single();
 
@@ -493,7 +493,7 @@
                 fetch('/api/create_pix', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ email: userData.email, userId: userData.id })
+                    body: JSON.stringify({ email: userData.email, userId: userData.id, nome: userData.nome_completo, mensalidade: userData.mensalidade })
                 }).then(res => res.json()).then(data => {
                     if (data.qr_code_base64) {
                         currentPixString = data.qr_code;
