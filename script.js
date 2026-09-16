@@ -199,7 +199,7 @@ fetchUserData().then(user => {
                         }
                     } catch(e) {}
                 }, 4000);
-            } else if (diffDays >= 0 && diffDays <= 3 && !sessionStorage.getItem('aviso_previo_shown')) {
+            } else if (diffDays >= 0 && diffDays <= 3) {
                 const warningPopup = document.createElement('div');
                 warningPopup.id = 'aviso-previo-popup';
                 warningPopup.style.position = 'fixed';
@@ -233,12 +233,10 @@ fetchUserData().then(user => {
                 document.body.appendChild(warningPopup);
                 
                 document.getElementById('close-warning').addEventListener('click', () => {
-                    sessionStorage.setItem('aviso_previo_shown', 'true');
                     warningPopup.remove();
                 });
                 
                 document.getElementById('btn-pay-warning').addEventListener('click', () => {
-                    sessionStorage.setItem('aviso_previo_shown', 'true');
                     window.location.href = 'configuracoes.html';
                 });
             } else {
