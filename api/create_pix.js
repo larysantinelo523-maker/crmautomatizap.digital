@@ -5,7 +5,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    const { email, userId, nome } = req.body;
+    const { email, userId, nome, mensalidade } = req.body;
 
     if (!email || !userId) {
         return res.status(400).json({ error: 'Missing email or userId' });
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
 
         const response = await payment.create({
             body: {
-                transaction_amount: 0.01,
+                transaction_amount: Number(mensalidade) > 0 ? Number(mensalidade) : 0.01,
                 description: 'Mensalidade AutomatiZAP CRM',
                 payment_method_id: 'pix',
                 payer: {

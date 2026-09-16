@@ -94,11 +94,11 @@ fetchUserData().then(user => {
                         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 24px; text-align: left;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                 <span style="color: #64748b; font-size: 14px;">Plano Mensal</span>
-                                <span style="color: #0f172a; font-weight: 600; font-size: 14px;">R$ 0,01</span>
+                                <span style="color: #0f172a; font-weight: 600; font-size: 14px;">R$ ${Number(user.mensalidade || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                             </div>
                             <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid #e2e8f0;">
                                 <span style="color: #0f172a; font-weight: 700; font-size: 16px;">Total a pagar</span>
-                                <span style="color: #10b981; font-weight: 700; font-size: 16px;">R$ 0,01</span>
+                                <span style="color: #10b981; font-weight: 700; font-size: 16px;">R$ ${Number(user.mensalidade || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                             </div>
                         </div>
 
@@ -122,7 +122,7 @@ fetchUserData().then(user => {
                 fetch('/api/create_pix', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ email: user.email, userId: user.id, nome: user.nome_completo })
+                    body: JSON.stringify({ email: user.email, userId: user.id, nome: user.nome_completo, mensalidade: Number(user.mensalidade || 0) })
                 }).then(res => res.json()).then(data => {
                     if(data.qr_code_base64) {
                         currentPixString = data.qr_code;

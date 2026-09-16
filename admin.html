@@ -443,7 +443,7 @@
     <div id="modal-cadastrar-empresa" class="modal">
         <div class="modal-content" style="max-width: 500px;">
             <div class="modal-header">
-                <h2>Cadastrar Nova Empresa (Tenant)</h2>
+                <h2>Cadastrar Nova Empresa</h2>
                 <button class="close-modal"><i class="ph ph-x"></i></button>
             </div>
             <div class="modal-body">
@@ -476,6 +476,13 @@
                             <input type="date" id="tenant-vencimento" class="form-control" required>
                         </div>
                         <small style="color: var(--color-text-sec); display: block; margin-top: 8px;">Esta data definirá quando os avisos de fatura vão aparecer no CRM do cliente.</small>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Definir Valor da Cobrança</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-currency-dollar"></i>
+                            <input type="text" id="tenant-mensalidade" class="form-control" placeholder="R$ 297,00" required>
+                        </div>
                     </div>
                     
                     <div class="form-actions" style="margin-top: 32px; display: flex; justify-content: flex-end;">

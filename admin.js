@@ -735,11 +735,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         btn.innerHTML = '<i class="ph ph-spinner-gap" style="font-size: 20px; animation: spin 1s linear infinite;"></i> Criando ambiente...';
         msg.textContent = '';
 
+        let rawMensalidade = document.getElementById('tenant-mensalidade').value || '0';
+        rawMensalidade = rawMensalidade.replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');
+        const mensalidadeNum = parseFloat(rawMensalidade) || 0;
+
         const payload = {
             nome_empresa: document.getElementById('tenant-nome').value,
             email: document.getElementById('tenant-email').value,
             password: document.getElementById('tenant-senha').value,
-            data_vencimento: document.getElementById('tenant-vencimento').value
+            data_vencimento: document.getElementById('tenant-vencimento').value,
+            mensalidade: mensalidadeNum
         };
 
         try {
