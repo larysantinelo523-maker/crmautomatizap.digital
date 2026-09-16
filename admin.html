@@ -252,32 +252,50 @@
                         <div class="table-responsive">
                             <style>
                                 .admin-table {
-                                    display: block;
                                     width: 100%;
                                     border-collapse: collapse;
                                 }
-                                .admin-table thead, .admin-table tbody {
-                                    display: block;
-                                    width: 100%;
+                                @media (min-width: 769px) {
+                                    .admin-table, .admin-table thead, .admin-table tbody {
+                                        display: block;
+                                        width: 100%;
+                                    }
+                                    .admin-table tr {
+                                        display: grid;
+                                        grid-template-columns: minmax(180px, 1.5fr) minmax(200px, 1.5fr) minmax(140px, 1fr) minmax(120px, 1fr) minmax(120px, 1fr) minmax(180px, 1fr);
+                                        gap: 32px;
+                                        align-items: center;
+                                        border-bottom: 1px solid var(--color-border);
+                                    }
+                                    .admin-table th, .admin-table td {
+                                        padding: 16px 24px;
+                                        text-align: left;
+                                        display: flex;
+                                        align-items: center;
+                                        border-bottom: none !important;
+                                    }
+                                    .admin-table th {
+                                        color: var(--color-text-light);
+                                        font-weight: 600;
+                                        font-size: 14px;
+                                    }
                                 }
-                                .admin-table tr {
-                                    display: grid;
-                                    grid-template-columns: minmax(180px, 1.5fr) minmax(200px, 1.5fr) minmax(140px, 1fr) minmax(120px, 1fr) minmax(120px, 1fr) minmax(180px, 1fr);
-                                    gap: 32px;
-                                    align-items: center;
-                                    border-bottom: 1px solid var(--color-border);
-                                }
-                                .admin-table th, .admin-table td {
-                                    padding: 16px 24px;
-                                    text-align: left;
-                                    display: flex;
-                                    align-items: center;
-                                    border-bottom: none !important;
-                                }
-                                .admin-table th {
-                                    color: var(--color-text-light);
-                                    font-weight: 600;
-                                    font-size: 14px;
+                                @media (max-width: 768px) {
+                                    .admin-table td:nth-child(2)::before { content: "Email Responsável"; }
+                                    .admin-table td:nth-child(3)::before { content: "Data de Vencimento"; }
+                                    .admin-table td:nth-child(4)::before { content: "Total de Leads"; }
+                                    .admin-table td:nth-child(5)::before { content: "Status"; }
+                                    .admin-table td:nth-child(6)::before { content: "Chave de API"; }
+                                    
+                                    .admin-table td:nth-child(6) {
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                    }
+                                    .admin-table td:nth-child(6) .btn-copy-id {
+                                        position: relative !important;
+                                        right: auto !important;
+                                    }
                                 }
                             </style>
                             <table class="data-table admin-table">
