@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
 
             let nextDate = null;
-            if (tenant.status === 'inadimplente' || tenant.status === 'cancelado') {
+            if (tenant.status === 'inadimplente' || tenant.status === 'cancelado' || tenant.status === 'vencida') {
                 statusBadge = '<span style="background-color: #ef4444; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Inadimplente</span>';
             } else if (tenant.vencimento && tenant.vencimento !== 'N/A') {
                 const hojeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
