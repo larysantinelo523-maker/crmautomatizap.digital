@@ -301,10 +301,25 @@
                                     .admin-table td:nth-child(6)::before { content: "Status"; }
                                     .admin-table td:nth-child(7)::before { content: "Chave de API"; }
                                     
+                                    .admin-table td:nth-child(6) {
+                                        position: static !important;
+                                        width: 100% !important;
+                                        margin: 0 !important;
+                                        padding: 6px 0 !important;
+                                        border-radius: 0 !important;
+                                        display: flex !important;
+                                        justify-content: space-between !important;
+                                        align-items: center !important;
+                                        overflow: visible !important;
+                                    }
+                                    
                                     .admin-table td:nth-child(7) {
                                         display: flex;
                                         justify-content: space-between;
                                         align-items: center;
+                                        border-top: 1px solid var(--color-border);
+                                        padding-top: 12px;
+                                        margin-top: 6px;
                                     }
                                     .admin-table td:nth-child(7) .btn-copy-id {
                                         position: relative !important;
