@@ -3781,7 +3781,67 @@ body.dark-mode .logo-img {
 
 
 /* State Classes */
-.desktop-bot-actions button.active { opacity: 1 !important; cursor: default !important; pointer-events: none !important; }
-.desktop-bot-actions button.inactive { opacity: 0.5 !important; cursor: pointer !important; pointer-events: auto !important; }
-.desktop-bot-actions button.inactive:hover { opacity: 0.8 !important; }
+.desktop-bot-actions button.active {
+    opacity: 1 !important;
+    cursor: default !important;
+}
+.desktop-bot-actions button.inactive {
+    opacity: 0.5 !important;
+    cursor: pointer !important;
+}
+.desktop-bot-actions button.inactive:hover {
+    opacity: 0.8 !important;
+}
 
+/* Custom Tooltips */
+.desktop-bot-actions button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.desktop-bot-actions button::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    background: #333;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 1.4;
+    white-space: normal;
+    width: max-content;
+    max-width: 220px;
+    text-align: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 1000;
+    pointer-events: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.desktop-bot-actions button::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    border-width: 0 6px 6px 6px;
+    border-style: solid;
+    border-color: transparent transparent #333 transparent;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 1000;
+    pointer-events: none;
+}
+.desktop-bot-actions button:hover::after,
+.desktop-bot-actions button:hover::before {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}

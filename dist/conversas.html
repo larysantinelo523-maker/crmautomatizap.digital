@@ -16,11 +16,11 @@
 
     <!-- CSS -->
     <!-- CSS -->
-  <script type="module" crossorigin src="/assets/conversas-Bn8uLbH8.js"></script>
+  <script type="module" crossorigin src="/assets/conversas-Cs42Ipio.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
   <link rel="modulepreload" crossorigin href="/assets/data-CxKWx1uh.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-BRvz8qLH.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-COYsqXOF.css">
 </head>
 
 <body>
@@ -293,8 +293,12 @@
                                         </label>
                                     </div>
                                     <div class="desktop-bot-actions" id="desktop-bot-actions">
-                                        <button class="btn-intervencao" id="btn-intervencao" title="Pausa o robô e permite que você assuma o controle do atendimento manualmente.">Intervenção Humana</button>
-                                        <button class="btn-ativacao" id="btn-ativacao" title="Reativa o robô de inteligência artificial para continuar o atendimento automaticamente.">Ativar Agente</button>
+                                        <button class="btn-intervencao" id="btn-intervencao" data-tooltip="Pausa o robô e permite que você assuma o controle do atendimento manualmente.">
+                                            <i class="ph ph-user"></i> Intervenção Humana
+                                        </button>
+                                        <button class="btn-ativacao" id="btn-ativacao" data-tooltip="Reativa o robô de inteligência artificial para continuar o atendimento automaticamente.">
+                                            <i class="ph ph-robot"></i> Ativar Agente
+                                        </button>
                                     </div>
                                 </div>
 
@@ -490,12 +494,16 @@
             }
             if(btnIntervencao) {
                 btnIntervencao.addEventListener('click', function() {
-                    toggleBotLogic(false);
+                    if (!this.classList.contains('active')) {
+                        toggleBotLogic(false);
+                    }
                 });
             }
             if(btnAtivacao) {
                 btnAtivacao.addEventListener('click', function() {
-                    toggleBotLogic(true);
+                    if (!this.classList.contains('active')) {
+                        toggleBotLogic(true);
+                    }
                 });
             }
         };
