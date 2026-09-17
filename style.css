@@ -3618,12 +3618,12 @@ body.dark-mode .logo-img {
     }
     .mockup-container {
         padding: 0 16px 16px 16px !important;
-        height: calc(100vh - 120px) !important;
+        height: 100% !important;
     }
     
     .chat-layout > .card {
-        margin: 0 0 16px 0 !important;
-        height: calc(100vh - 120px) !important;
+        margin: 0 !important;
+        height: 100% !important;
     }
     
     /* Full Screen Chat */
