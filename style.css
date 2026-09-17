@@ -3312,7 +3312,6 @@ body.dark-mode .logo-img {
     display: flex;
     flex-direction: column;
     padding: 24px;
-    overflow: hidden;
 }
 
 .summary-header {
@@ -3537,14 +3536,19 @@ body.dark-mode .logo-img {
     position: absolute;
     top: 16px;
     right: 16px;
-    color: var(--color-text-mut);
+    color: var(--color-text-main);
+    opacity: 0.5;
     cursor: help;
-    font-size: 16px;
-    z-index: 10;
-    transition: color 0.2s;
+    font-size: 20px;
+    z-index: 50;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 .info-tooltip:hover {
     color: var(--color-task-green);
+    opacity: 1;
 }
 .kpi-card .info-tooltip,
 .summary-kpi-card .info-tooltip {
