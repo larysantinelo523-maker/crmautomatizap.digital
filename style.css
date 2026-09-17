@@ -3617,7 +3617,7 @@ body.dark-mode .logo-img {
         position: static !important;
     }
     .mockup-container {
-        padding: 0 16px 16px 16px !important;
+        padding: 0 !important;
         height: 100% !important;
     }
     
