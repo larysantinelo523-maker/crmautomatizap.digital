@@ -533,11 +533,13 @@
             const btnIntervencao = document.getElementById('btn-intervencao');
             const btnAtivacao = document.getElementById('btn-ativacao');
             if (isBotActive) {
-                if(btnIntervencao) { btnIntervencao.classList.add('active'); btnIntervencao.classList.remove('inactive'); }
-                if(btnAtivacao) { btnAtivacao.classList.add('inactive'); btnAtivacao.classList.remove('active'); }
-            } else {
+                // Bot is active -> Ativação state is active
                 if(btnIntervencao) { btnIntervencao.classList.add('inactive'); btnIntervencao.classList.remove('active'); }
                 if(btnAtivacao) { btnAtivacao.classList.add('active'); btnAtivacao.classList.remove('inactive'); }
+            } else {
+                // Human is active -> Intervenção state is active
+                if(btnIntervencao) { btnIntervencao.classList.add('active'); btnIntervencao.classList.remove('inactive'); }
+                if(btnAtivacao) { btnAtivacao.classList.add('inactive'); btnAtivacao.classList.remove('active'); }
             }
 
             let html = '';
