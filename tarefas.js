@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const sumDateText = document.getElementById('summary-date-text');
     const sumAtend = document.getElementById('sum-atendimentos');
     const sumReunioes = document.getElementById('sum-reunioes');
-    const sumVendas = document.getElementById('sum-vendas');
     const sumTasksList = document.getElementById('summary-tasks-list');
 
     // Mês atual fixo para Setembro de 2026 como base
@@ -167,7 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data) {
             sumAtend.textContent = data.kpis.atendimentos;
             sumReunioes.textContent = data.kpis.reunioes;
-            sumVendas.textContent = data.kpis.vendas;
             
             let listHtml = '';
             data.tasks.forEach(t => {
