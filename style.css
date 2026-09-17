@@ -3143,19 +3143,33 @@ body.dark-mode .logo-img {
 /* ==========================================================================
    TAREFAS PAGE (Calendário Interativo)
    ========================================================================== */
+
+/* Cores específicas da página */
+:root {
+    --color-task-green: #22C55E;
+    --color-task-green-light: #E8FAF1;
+    --color-task-green-text: #16A34A;
+    --color-task-blue: #3B82F6;
+    --color-task-blue-light: #EFF6FF;
+    --color-task-purple: #A855F7;
+    --color-task-purple-light: #FAF5FF;
+    --color-task-yellow: #EAB308;
+    --color-task-yellow-light: #FEFCE8;
+}
+
 .tarefas-container {
     display: flex;
-    gap: 24px;
+    gap: 24px; /* Gap exato da referência */
     height: calc(100vh - 120px);
     width: 100%;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s ease-in-out;
 }
 
 .tarefas-calendar-col {
     flex: 1;
     min-width: 0;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s ease-in-out;
     display: flex;
     flex-direction: column;
 }
@@ -3165,12 +3179,15 @@ body.dark-mode .logo-img {
     opacity: 0;
     transform: translateX(40px);
     visibility: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s ease-in-out;
     flex-shrink: 0;
 }
 
+/* Quando o painel está ativo */
 .tarefas-container.summary-active .tarefas-summary-col {
-    width: 420px;
+    flex-basis: 29.2%;
+    min-width: 400px;
+    max-width: 560px;
     opacity: 1;
     transform: translateX(0);
     visibility: visible;
@@ -3196,10 +3213,9 @@ body.dark-mode .logo-img {
     grid-template-columns: repeat(7, 1fr);
     text-align: center;
     font-weight: 600;
-    color: var(--color-text-main);
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--color-border);
-    margin-bottom: 12px;
+    color: var(--color-text-mut);
+    font-size: 14px;
+    padding-bottom: 16px;
 }
 
 .cal-main-body {
@@ -3220,23 +3236,23 @@ body.dark-mode .logo-img {
     overflow: hidden;
     cursor: pointer;
     transition: all 0.2s;
-    background: #fff;
+    background: var(--color-bg-card);
 }
 
 .cal-day-cell:hover {
-    border-color: var(--color-primary);
-    box-shadow: 0 4px 12px rgba(0, 168, 132, 0.1);
+    border-color: var(--color-task-green);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.1);
 }
 
 .cal-day-cell.active {
-    border-color: var(--color-primary);
+    border-color: var(--color-task-green);
     border-width: 2px;
-    padding: 7px;
-    background: #f8fafc;
+    padding: 7px; /* Compensa borda mais grossa */
+    background: var(--color-bg-main); /* #f8fafc */
 }
 
 .cal-day-cell.empty-month {
-    background: #f8fafc;
+    background: var(--color-bg-main);
     opacity: 0.5;
 }
 
@@ -3258,13 +3274,14 @@ body.dark-mode .logo-img {
     width: 2px;
 }
 .cal-day-tasks::-webkit-scrollbar-thumb {
-    background: #e2e8f0;
+    background: var(--color-border);
 }
 
 .cal-task-pill {
-    font-size: 11px;
-    padding: 4px 6px;
-    border-radius: 4px;
+    height: 32px;
+    font-size: 12px;
+    padding: 0 8px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -3274,23 +3291,15 @@ body.dark-mode .logo-img {
     font-weight: 500;
 }
 .cal-task-pill i {
-    font-size: 12px;
+    font-size: 14px;
 }
 .cal-task-pill.green {
-    background: #e8feef;
-    color: var(--color-primary-dark);
+    background: var(--color-task-green-light);
+    color: var(--color-task-green-text);
 }
 .cal-task-pill.blue {
-    background: #eff6ff;
-    color: #2563eb;
-}
-.cal-task-pill.purple {
-    background: #faf5ff;
-    color: #9333ea;
-}
-.cal-task-pill.yellow {
-    background: #fefce8;
-    color: #ca8a04;
+    background: var(--color-task-blue-light);
+    color: var(--color-task-blue);
 }
 
 
@@ -3316,20 +3325,22 @@ body.dark-mode .logo-img {
 }
 .summary-title i {
     font-size: 24px;
-    color: var(--color-primary);
-    background: #f1f5f9;
+    color: var(--color-task-green-text);
+    background: var(--color-task-green-light);
     padding: 8px;
     border-radius: 8px;
 }
 .summary-title h3 {
     margin: 0;
-    font-size: 18px;
+    font-size: 24px; /* Referência bold */
+    font-weight: 700;
     color: var(--color-text-main);
 }
 .summary-title p {
     margin: 4px 0 0;
-    font-size: 13px;
-    color: var(--color-text-sec);
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--color-text-mut);
 }
 
 .summary-kpis {
@@ -3342,23 +3353,32 @@ body.dark-mode .logo-img {
 .summary-kpi-card {
     border: 1px solid var(--color-border);
     border-radius: 8px;
-    padding: 12px;
+    padding: 16px;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    background: var(--color-bg-card);
 }
 .summary-kpi-card h4 {
-    font-size: 18px;
+    font-size: 24px;
+    font-weight: 700;
     margin: 8px 0 4px;
     color: var(--color-text-main);
 }
 .summary-kpi-card span {
-    font-size: 11px;
-    color: var(--color-text-sec);
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color-text-mut);
     line-height: 1.2;
 }
+
+/* Cores dos Ícones de KPI */
+.summary-kpi-card.green-light .icon-wrapper { color: var(--color-task-green-text); background: var(--color-task-green-light); border-radius: 8px; padding: 4px; }
+.summary-kpi-card.blue-light .icon-wrapper { color: var(--color-task-blue); background: var(--color-task-blue-light); border-radius: 8px; padding: 4px; }
+.summary-kpi-card.purple-light .icon-wrapper { color: var(--color-task-purple); background: var(--color-task-purple-light); border-radius: 8px; padding: 4px; }
+.summary-kpi-card.warning-light .icon-wrapper { color: var(--color-task-yellow); background: var(--color-task-yellow-light); border-radius: 8px; padding: 4px; }
 
 /* Listagem de atendimentos no resumo */
 .summary-list {
@@ -3371,17 +3391,17 @@ body.dark-mode .logo-img {
     width: 4px;
 }
 .summary-list::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: var(--color-border);
     border-radius: 4px;
 }
 
 .day-task-item {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
-    padding-bottom: 12px;
+    gap: 16px;
+    padding-bottom: 16px;
     border-bottom: 1px solid var(--color-border);
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 }
 .day-task-item:last-child {
     border-bottom: none;
@@ -3393,8 +3413,8 @@ body.dark-mode .logo-img {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: #f1f5f9;
-    color: #64748b;
+    background: var(--color-bg-main);
+    color: var(--color-text-mut);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -3416,19 +3436,20 @@ body.dark-mode .logo-img {
 .dt-content-header h5 {
     margin: 0;
     font-size: 14px;
+    font-weight: 600;
     color: var(--color-text-main);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .dt-content-header span {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--color-text-mut);
     white-space: nowrap;
 }
 .dt-text {
     font-size: 12px;
-    color: var(--color-text-sec);
+    color: var(--color-text-mut);
     line-height: 1.4;
     margin-bottom: 8px;
     display: -webkit-box;
@@ -3437,28 +3458,31 @@ body.dark-mode .logo-img {
     overflow: hidden;
 }
 
+/* Chips de status */
 .dt-badge {
-    font-size: 10px;
-    padding: 4px 8px;
+    height: 24px;
+    font-size: 12px;
+    padding: 0 12px;
     border-radius: 12px;
     font-weight: 500;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
 }
 .dt-badge.green {
-    background: #e8feef;
-    color: var(--color-primary-dark);
+    background: var(--color-task-green-light);
+    color: var(--color-task-green-text);
 }
 .dt-badge.blue {
-    background: #eff6ff;
-    color: #2563eb;
+    background: var(--color-task-blue-light);
+    color: var(--color-task-blue);
 }
 .dt-badge.purple {
-    background: #faf5ff;
-    color: #9333ea;
+    background: var(--color-task-purple-light);
+    color: var(--color-task-purple);
 }
 .dt-badge.yellow {
-    background: #fefce8;
-    color: #ca8a04;
+    background: var(--color-task-yellow-light);
+    color: var(--color-task-yellow);
 }
 
 .summary-footer {
@@ -3473,6 +3497,7 @@ body.dark-mode .logo-img {
     }
     .tarefas-summary-col {
         width: 100%;
+        max-width: 100%;
         transform: translateX(0);
         transform: translateY(40px);
     }
