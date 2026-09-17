@@ -3162,6 +3162,7 @@ body.dark-mode .logo-img {
     gap: 24px; /* Gap exato da referência */
     height: calc(100vh - 120px);
     width: 100%;
+    padding: 24px; /* Adiciona espaçamento nas bordas */
     overflow: hidden;
     transition: all 0.4s ease-in-out;
 }
