@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mapeando algumas datas (ex: chaves de 1 a 30)
     const mockData = {
         1: {
-            kpis: { atendimentos: 12, reunioes: 5, qualificados: 3, vendas: 2 },
+            kpis: { atendimentos: 12, reunioes: 5 },
             tasks: [
                 { type: 'atendimento', client: 'Fernanda Costa', time: '08:24', text: 'A cliente Fernanda Costa ficou interessada e gostaria de saber mais sobre nossos serviços.', status: 'Atendido' },
                 { type: 'atendimento', client: 'Bruna Martins', time: '09:12', text: 'A cliente Bruna Martins pediu mais informações sobre os planos e agendou uma conversa.', status: 'Atendido' },
@@ -27,43 +27,43 @@ document.addEventListener('DOMContentLoaded', () => {
             ]
         },
         7: {
-            kpis: { atendimentos: 8, reunioes: 2, qualificados: 1, vendas: 0 },
+            kpis: { atendimentos: 8, reunioes: 2 },
             tasks: [
                 { type: 'reuniao', client: 'Studio Beleza', time: '11:00', text: 'O Studio Beleza agendou uma apresentação formal.', status: 'Reunião marcada' },
                 { type: 'atendimento', client: 'Vanessa Martins', time: '16:45', text: 'A cliente Vanessa Martins tirou dúvidas sobre o plano e ficou de pensar.', status: 'Atendido' }
             ]
         },
         14: {
-            kpis: { atendimentos: 20, reunioes: 4, qualificados: 8, vendas: 1 },
+            kpis: { atendimentos: 20, reunioes: 4 },
             tasks: [
-                { type: 'atendimento', client: 'Tatiana Alves', time: '09:00', text: 'A cliente Tatiana Alves gostou dos preços e quer prosseguir.', status: 'Lead qualificado' },
+                { type: 'atendimento', client: 'Tatiana Alves', time: '09:00', text: 'A cliente Tatiana Alves gostou dos preços e quer prosseguir.', status: 'Atendido' },
                 { type: 'atendimento', client: 'Rafael Pereira', time: '10:15', text: 'O cliente Rafael Pereira pediu contato para amanhã.', status: 'Atendido' },
                 { type: 'reuniao', client: 'Agência PR', time: '14:00', text: 'Reunião confirmada com a Agência PR.', status: 'Reunião marcada' }
             ]
         },
         16: {
-            kpis: { atendimentos: 15, reunioes: 3, qualificados: 5, vendas: 1 },
+            kpis: { atendimentos: 15, reunioes: 3 },
             tasks: [
                 { type: 'atendimento', client: 'João Silva', time: '08:24', text: 'O cliente João Silva ficou interessado e gostaria de saber mais sobre nossos serviços.', status: 'Atendido' },
                 { type: 'atendimento', client: 'Maria Clara', time: '09:12', text: 'A cliente Maria Clara pediu mais informações sobre os planos e agendou uma conversa.', status: 'Atendido' },
                 { type: 'reuniao', client: 'Rafael Lima', time: '10:37', text: 'O cliente Rafael Lima demonstrou interesse e solicitou o agendamento de uma reunião.', status: 'Reunião marcada' },
                 { type: 'atendimento', client: 'Ana Fernandes', time: '11:03', text: 'A cliente Ana Fernandes solicitou um orçamento personalizado.', status: 'Atendido' },
                 { type: 'atendimento', client: 'Pedro Paulo', time: '14:26', text: 'O cliente Pedro Paulo confirmou a reunião para o dia 17.', status: 'Atendido' },
-                { type: 'atendimento', client: 'Luana Souza', time: '16:18', text: 'A cliente Luana Souza tirou dúvidas sobre o plano e fez a compra.', status: 'Venda' }
+                { type: 'atendimento', client: 'Luana Souza', time: '16:18', text: 'A cliente Luana Souza tirou dúvidas sobre o plano e fez a compra.', status: 'Atendido' }
             ]
         },
         21: {
-            kpis: { atendimentos: 5, reunioes: 1, qualificados: 0, vendas: 0 },
+            kpis: { atendimentos: 5, reunioes: 1 },
             tasks: [
                 { type: 'atendimento', client: 'Vanessa Souza', time: '10:00', text: 'A cliente Vanessa Souza pediu um orçamento.', status: 'Atendido' },
                 { type: 'reuniao', client: 'Loja do Pão', time: '15:30', text: 'Reunião de alinhamento marcada.', status: 'Reunião marcada' }
             ]
         },
         30: {
-            kpis: { atendimentos: 10, reunioes: 2, qualificados: 4, vendas: 3 },
+            kpis: { atendimentos: 10, reunioes: 2 },
             tasks: [
-                { type: 'atendimento', client: 'Wagner Silva', time: '08:30', text: 'O cliente Wagner Silva aprovou a proposta.', status: 'Venda' },
-                { type: 'atendimento', client: 'Juliana Mendes', time: '11:20', text: 'A cliente Juliana Mendes solicitou contrato.', status: 'Lead qualificado' }
+                { type: 'atendimento', client: 'Wagner Silva', time: '08:30', text: 'O cliente Wagner Silva aprovou a proposta.', status: 'Atendido' },
+                { type: 'atendimento', client: 'Juliana Mendes', time: '11:20', text: 'A cliente Juliana Mendes solicitou contrato.', status: 'Atendido' }
             ]
         }
     };
@@ -189,9 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Estado vazio
             sumAtend.textContent = '0';
             sumReunioes.textContent = '0';
-            sumQualificados.textContent = '0';
-            sumVendas.textContent = '0';
-            sumTasksList.innerHTML = `
+                                    sumTasksList.innerHTML = `
                 <div style="text-align: center; padding: 24px 0; color: var(--color-text-mut);">
                     Nenhuma atividade registrada neste dia.
                 </div>
