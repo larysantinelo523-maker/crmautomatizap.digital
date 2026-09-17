@@ -16,11 +16,11 @@
 
     <!-- CSS -->
     <!-- CSS -->
-  <script type="module" crossorigin src="/assets/conversas-B5Bbrq6r.js"></script>
+  <script type="module" crossorigin src="/assets/conversas-Bn8uLbH8.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
   <link rel="modulepreload" crossorigin href="/assets/data-CxKWx1uh.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-NxExZVq_.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-BRvz8qLH.css">
 </head>
 
 <body>
@@ -533,11 +533,11 @@
             const btnIntervencao = document.getElementById('btn-intervencao');
             const btnAtivacao = document.getElementById('btn-ativacao');
             if (isBotActive) {
-                if(btnIntervencao) { btnIntervencao.style.opacity = '1'; btnIntervencao.style.cursor = 'default'; }
-                if(btnAtivacao) { btnAtivacao.style.opacity = '0.5'; btnAtivacao.style.cursor = 'pointer'; }
+                if(btnIntervencao) { btnIntervencao.classList.add('active'); btnIntervencao.classList.remove('inactive'); }
+                if(btnAtivacao) { btnAtivacao.classList.add('inactive'); btnAtivacao.classList.remove('active'); }
             } else {
-                if(btnIntervencao) { btnIntervencao.style.opacity = '0.5'; btnIntervencao.style.cursor = 'pointer'; }
-                if(btnAtivacao) { btnAtivacao.style.opacity = '1'; btnAtivacao.style.cursor = 'default'; }
+                if(btnIntervencao) { btnIntervencao.classList.add('inactive'); btnIntervencao.classList.remove('active'); }
+                if(btnAtivacao) { btnAtivacao.classList.add('active'); btnAtivacao.classList.remove('inactive'); }
             }
 
             let html = '';

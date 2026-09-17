@@ -3747,6 +3747,9 @@ body.dark-mode .logo-img {
 .desktop-bot-actions {
     display: none; /* hidden on mobile by default */
 }
+.btn-intervencao, .btn-ativacao {
+    transition: all 0.2s;
+}
 .btn-intervencao {
     background: #0f5b46;
     color: white;
@@ -3756,9 +3759,8 @@ body.dark-mode .logo-img {
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.2s;
 }
-.btn-intervencao:hover {
+.btn-intervencao:not(.active):hover {
     background: #0c4d3b;
 }
 .btn-ativacao {
@@ -3770,12 +3772,16 @@ body.dark-mode .logo-img {
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.2s;
 }
-.btn-ativacao:hover {
+.btn-ativacao:not(.active):hover {
     background: #f0fdf4;
 }
 
-
 @media (min-width: 992px) { .dashboard-grid.chat-layout { grid-template-columns: 25% 75% !important; height: calc(100vh - 120px) !important; overflow: hidden !important; } }
+
+
+/* State Classes */
+.desktop-bot-actions button.active { opacity: 1 !important; cursor: default !important; pointer-events: none !important; }
+.desktop-bot-actions button.inactive { opacity: 0.5 !important; cursor: pointer !important; pointer-events: auto !important; }
+.desktop-bot-actions button.inactive:hover { opacity: 0.8 !important; }
 
