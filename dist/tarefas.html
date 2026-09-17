@@ -15,11 +15,12 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <!-- CSS -->
-  <script type="module" crossorigin src="/assets/supabase-DUkCiNAm.js"></script>
-  <script type="module" crossorigin src="/assets/data-CxKWx1uh.js"></script>
-  <script type="module" crossorigin src="/assets/script-DwWBpYaY.js"></script>
+  <script type="module" crossorigin src="/assets/tarefas-C527G9qY.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
+  <link rel="modulepreload" crossorigin href="/assets/data-CxKWx1uh.js">
+  <link rel="modulepreload" crossorigin href="/assets/script-DwWBpYaY.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-DdWhAPK0.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-vpVZJioG.css">
 </head>
 
 <body>
@@ -82,8 +83,8 @@
                         <img src="/assets/logo-BxJ03jLZ.png" alt="AutomatiZAP CRM" class="logo-img">
                     </a>
                     <div class="desktop-header-title">
-                        <h1>Tarefas</h1>
-                        <p>Organize suas atividades e follow-ups.</p>
+                        <h1>Tarefas Realizadas</h1>
+                        <p>Acompanhe o trabalho diário do seu agente.</p>
                     </div>
                 </div>
                 <div class="header-actions">
@@ -187,25 +188,89 @@
             </header>
 
             <!-- Dashboard Grid -->
-            <div class="dashboard-grid">
-                <div class="main-column" style="flex: 1;">
-                    <section class="card">
-                        <div class="card-header" style="flex-direction: row; justify-content: space-between;">
-                            <div class="card-title">
-                                <i class="ph ph-check-square-offset text-primary"></i>
-                                <div>
-                                    <h3>Minhas Tarefas</h3>
-                                    <p>Atividades pendentes do dia.</p>
-                                </div>
+            <div class="tarefas-container" id="tarefas-wrapper">
+                
+                <!-- Coluna do Calendário -->
+                <div class="tarefas-calendar-col" id="tarefas-calendar-col">
+                    <section class="card calendar-full">
+                        <div class="card-header" style="flex-direction: row; align-items: center; justify-content: flex-start; padding-bottom: 24px;">
+                            <button class="btn-icon" id="cal-main-prev"><i class="ph ph-caret-left"></i></button>
+                            <button class="btn-icon" id="cal-main-next" style="margin-right: 16px;"><i class="ph ph-caret-right"></i></button>
+                            <h3 id="cal-main-month-year" style="margin: 0; font-size: 20px; color: var(--color-text-main);">Setembro 2026</h3>
+                        </div>
+                        
+                        <div class="calendar-main-grid">
+                            <div class="cal-main-header">
+                                <span>Dom</span>
+                                <span>Seg</span>
+                                <span>Ter</span>
+                                <span>Qua</span>
+                                <span>Qui</span>
+                                <span>Sex</span>
+                                <span>Sáb</span>
+                            </div>
+                            <div class="cal-main-body" id="cal-main-body">
+                                <!-- Dias gerados via JS -->
                             </div>
                         </div>
-                        <div id="tasks-list" style="display: flex; flex-direction: column; gap: 12px;">
-                            <!-- Tarefas dinâmicas -->
+                    </section>
+                </div>
+
+                <!-- Coluna do Resumo do Dia -->
+                <div class="tarefas-summary-col" id="tarefas-summary-col">
+                    <section class="card summary-panel">
+                        <div class="summary-header">
+                            <div class="summary-title">
+                                <i class="ph ph-calendar-blank"></i>
+                                <div>
+                                    <h3>Resumo do dia</h3>
+                                    <p id="summary-date-text">Ter, 01 de setembro de 2026</p>
+                                </div>
+                            </div>
+                            <button class="btn-icon" id="summary-close-btn"><i class="ph ph-x"></i></button>
+                        </div>
+
+                        <!-- KPIs do Dia -->
+                        <div class="summary-kpis">
+                            <div class="summary-kpi-card green-light">
+                                <div class="icon-wrapper green-light" style="width: 32px; height: 32px; font-size: 16px;"><i class="ph ph-whatsapp-logo text-primary"></i></div>
+                                <h4 id="sum-atendimentos">12</h4>
+                                <span>Atendimentos</span>
+                            </div>
+                            <div class="summary-kpi-card blue-light">
+                                <div class="icon-wrapper blue-light" style="width: 32px; height: 32px; font-size: 16px;"><i class="ph ph-calendar-blank" style="color: #3b82f6;"></i></div>
+                                <h4 id="sum-reunioes">5</h4>
+                                <span>Reuniões marcadas</span>
+                            </div>
+                            <div class="summary-kpi-card purple-light">
+                                <div class="icon-wrapper purple-light" style="width: 32px; height: 32px; font-size: 16px;"><i class="ph ph-user" style="color: #a855f7;"></i></div>
+                                <h4 id="sum-qualificados">3</h4>
+                                <span>Leads qualificados</span>
+                            </div>
+                            <div class="summary-kpi-card warning-light">
+                                <div class="icon-wrapper warning-light" style="width: 32px; height: 32px; font-size: 16px;"><i class="ph ph-currency-dollar" style="color: #eab308;"></i></div>
+                                <h4 id="sum-vendas">2</h4>
+                                <span>Vendas</span>
+                            </div>
+                        </div>
+
+                        <!-- Lista de Atendimentos do Dia -->
+                        <div class="summary-list">
+                            <h4 style="font-size: 14px; font-weight: 600; color: var(--color-text-main); margin-bottom: 16px;">Atendimentos do dia</h4>
+                            <div id="summary-tasks-list" style="display: flex; flex-direction: column; gap: 12px;">
+                                <!-- Preenchido via JS -->
+                            </div>
+                        </div>
+                        
+                        <div class="summary-footer">
+                            <button class="btn btn--primary" style="width: 100%; justify-content: center; background: #e8feef; color: var(--color-primary-dark); border: none;">
+                                <i class="ph ph-whatsapp-logo"></i> Ver todos os atendimentos
+                            </button>
                         </div>
                     </section>
                 </div>
             </div>
-</main>
+        </main>
     </div>
 
     <!-- Dossiê Side Drawer -->
@@ -245,22 +310,6 @@
     </div>
 
     <!-- Scripts -->
-    <script>
-        // As tarefas serão criadas manualmente ou via n8n no futuro.
-        // Por ora, mostramos estado vazio.
-        document.addEventListener('DOMContentLoaded', () => {
-            const list = document.getElementById('tasks-list');
-            if(list && list.children.length === 0) {
-                list.innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; color: var(--color-text-mut);">
-                        <i class="ph ph-check-square-offset" style="font-size: 48px; opacity: 0.3; display: block; margin-bottom: 12px;"></i>
-                        <p style="font-size: 14px;">Nenhuma tarefa pendente.</p>
-                        <p style="font-size: 12px; margin-top: 4px;">As tarefas criadas pelo robô ou manualmente aparecerão aqui.</p>
-                    </div>
-                `;
-            }
-        });
-    </script>
 </body>
 
 </html>
