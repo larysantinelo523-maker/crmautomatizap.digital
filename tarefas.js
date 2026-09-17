@@ -174,13 +174,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="day-task-item">
                         <div class="dt-avatar">${getInitials(t.client)}</div>
                         <div class="dt-content">
-                            <div class="dt-content-header">
-                                <h5>${t.client}</h5>
-                                <span>${t.time}</span>
-                            </div>
+                            <h5>${t.client}</h5>
                             <div class="dt-text">${t.text}</div>
-                            <div class="dt-badge ${badgeColor}">${t.status}</div>
                         </div>
+                        <div class="dt-badge ${badgeColor}">${t.status}</div>
+                        <i class="ph ph-caret-right dt-caret"></i>
                     </div>
                 `;
             });
