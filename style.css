@@ -3762,3 +3762,6 @@ body.dark-mode .logo-img {
     background: #f0fdf4;
 }
 
+
+@media (min-width: 992px) { .dashboard-grid.chat-layout { grid-template-columns: 25% 75% !important; height: calc(100vh - 120px) !important; overflow: hidden !important; } }
+
