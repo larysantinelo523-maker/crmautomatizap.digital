@@ -3185,9 +3185,9 @@ body.dark-mode .logo-img {
 
 /* Quando o painel está ativo */
 .tarefas-container.summary-active .tarefas-summary-col {
-    flex-basis: 29.2%;
-    min-width: 400px;
-    max-width: 560px;
+    flex-basis: 38%;
+    min-width: 500px;
+    max-width: 650px;
     opacity: 1;
     transform: translateX(0);
     visibility: visible;
@@ -3486,8 +3486,19 @@ body.dark-mode .logo-img {
 }
 
 .summary-footer {
-    padding-top: 16px;
-    border-top: 1px solid var(--color-border);
+    padding-top: 24px;
+    border-top: none; /* Removendo borda caso haja na ref 3 */
+}
+.summary-footer .btn {
+    background: var(--color-task-green);
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    justify-content: space-between; /* Para o texto e a setinha se houver */
+    padding: 12px 24px;
+}
+.summary-footer .btn:hover {
+    background: #16a34a;
 }
 
 @media (max-width: 1024px) {

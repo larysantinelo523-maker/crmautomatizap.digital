@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     let icon = t.type === 'reuniao' ? 'ph-calendar-blank' : 'ph-whatsapp-logo';
                     html += `
                         <div class="cal-task-pill ${pillClass}">
-                            <i class="ph ${icon}"></i> Cliente: ${t.client.split(' ')[0]}
+                            <i class="ph ${icon}"></i> ${t.client.split(' ')[0]}
                         </div>
                     `;
                 });
