@@ -3376,11 +3376,18 @@ body.dark-mode .logo-img {
     white-space: nowrap;
 }
 
-/* Cores dos Ícones de KPI */
+/* Cores dos Ícones e Números de KPI */
 .summary-kpi-card.green-light .icon-wrapper { color: var(--color-task-green-text); background: var(--color-task-green-light); border-radius: 8px; padding: 4px; }
+.summary-kpi-card.green-light h4 { color: var(--color-task-green-text); }
+
 .summary-kpi-card.blue-light .icon-wrapper { color: var(--color-task-blue); background: var(--color-task-blue-light); border-radius: 8px; padding: 4px; }
+.summary-kpi-card.blue-light h4 { color: var(--color-task-blue); }
+
 .summary-kpi-card.purple-light .icon-wrapper { color: var(--color-task-purple); background: var(--color-task-purple-light); border-radius: 8px; padding: 4px; }
+.summary-kpi-card.purple-light h4 { color: var(--color-task-purple); }
+
 .summary-kpi-card.warning-light .icon-wrapper { color: var(--color-task-yellow); background: var(--color-task-yellow-light); border-radius: 8px; padding: 4px; }
+.summary-kpi-card.warning-light h4 { color: var(--color-task-yellow); }
 
 /* Listagem de atendimentos no resumo */
 .summary-list {
