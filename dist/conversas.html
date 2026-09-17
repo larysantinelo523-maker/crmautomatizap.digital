@@ -16,11 +16,11 @@
 
     <!-- CSS -->
     <!-- CSS -->
-  <script type="module" crossorigin src="/assets/conversas-B3SqBtto.js"></script>
+  <script type="module" crossorigin src="/assets/conversas-Cou7F5kR.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
   <link rel="modulepreload" crossorigin href="/assets/data-CxKWx1uh.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-BFqPaVOm.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-B1swTv1K.css">
 </head>
 
 <body>
@@ -294,12 +294,8 @@
                                     </div>
                                     <div class="desktop-bot-actions" id="desktop-bot-actions">
                                         <button class="btn-intervencao" id="btn-intervencao">Intervenção Humana</button>
-                                        <button class="btn-ativacao" id="btn-ativacao" style="display: none;">Ativação Humana</button>
+                                        <button class="btn-ativacao" id="btn-ativacao">Ativação Humana</button>
                                     </div>
-                                    <button id="btn-lead-info" title="Ver Dossiê do Lead" style="background: transparent; border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; margin-left: 4px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-                                        <i class="ph ph-identification-card" style="font-size: 24px;"></i>
-                                    </button>
-                                    <i class="ph ph-dots-three-vertical" style="font-size: 20px;"></i>
                                 </div>
 
                                 <!-- Corpo do Chat -->
@@ -308,13 +304,13 @@
                                     <!-- Mensagens carregadas dinamicamente -->
                                 </div>
 
-                                <!-- Barra de Digitação Falsa -->
+                                <!-- Barra de Digitação Falsa e Real -->
                                 <div class="fake-chat-input-container">
-                                    <i class="ph ph-paperclip" style="font-size: 20px; color: var(--color-text-mut); margin-right: 8px;"></i>
                                     <div id="fake-chat-input" class="fake-chat-input" tabindex="0" style="flex: 1;">
                                         <span class="placeholder" id="fake-placeholder">Digite uma mensagem...</span>
                                         <span class="typing-text" id="fake-typing-text"></span>
                                     </div>
+                                    <input type="text" id="real-chat-input" class="real-chat-input" placeholder="Digite uma mensagem..." style="display: none; flex: 1; border: none; padding: 12px 16px; border-radius: 8px; outline: none;">
                                     <div style="display: flex; gap: 6px; align-items: center; margin-left: 8px;">
                                         <div id="btn-send-message"
                                             style="width: 26px; height: 26px; background: #00a884; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s;">
@@ -537,11 +533,11 @@
             const btnIntervencao = document.getElementById('btn-intervencao');
             const btnAtivacao = document.getElementById('btn-ativacao');
             if (isBotActive) {
-                if(btnIntervencao) btnIntervencao.style.display = 'block';
-                if(btnAtivacao) btnAtivacao.style.display = 'none';
+                if(btnIntervencao) { btnIntervencao.style.opacity = '1'; btnIntervencao.style.cursor = 'default'; }
+                if(btnAtivacao) { btnAtivacao.style.opacity = '0.5'; btnAtivacao.style.cursor = 'pointer'; }
             } else {
-                if(btnIntervencao) btnIntervencao.style.display = 'none';
-                if(btnAtivacao) btnAtivacao.style.display = 'block';
+                if(btnIntervencao) { btnIntervencao.style.opacity = '0.5'; btnIntervencao.style.cursor = 'pointer'; }
+                if(btnAtivacao) { btnAtivacao.style.opacity = '1'; btnAtivacao.style.cursor = 'default'; }
             }
 
             let html = '';
@@ -586,11 +582,13 @@
         async function enviarMensagemDigitada() {
             if(!currentLeadId) return;
             const typingSpan = document.getElementById('fake-typing-text');
-            const text = typingSpan ? typingSpan.textContent.trim() : '';
+            const realInput = document.getElementById('real-chat-input');
+            const text = typingSpan && typingSpan.textContent.trim() !== '' ? typingSpan.textContent.trim() : (realInput ? realInput.value.trim() : '');
             if(!text) return;
 
             // Limpa o campo
             if(typingSpan) typingSpan.textContent = '';
+            if(realInput) realInput.value = '';
             const placeholder = document.getElementById('fake-placeholder');
             if(placeholder) placeholder.style.display = 'inline';
             
@@ -609,6 +607,17 @@
             carregarMensagens({ id: currentLeadId, nome: document.getElementById('chat-header-name').innerText, status: '' });
         }
 
+        // Envio via Enter no desktop
+        const realInputBox = document.getElementById('real-chat-input');
+        if (realInputBox) {
+            realInputBox.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    enviarMensagemDigitada();
+                }
+            });
+        }
+        
         // Inicializa se tiver lead pre-selecionado (pode vir de outra página)
         if (currentLeadId) {
             carregarMensagens({ id: currentLeadId, nome: document.getElementById('chat-header-name').innerText, status: '' });

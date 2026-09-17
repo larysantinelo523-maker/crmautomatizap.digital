@@ -3618,6 +3618,12 @@ body.dark-mode .logo-img {
     }
     .mockup-container {
         padding: 0 16px 16px 16px !important;
+        height: calc(100vh - 120px) !important;
+    }
+    
+    .chat-layout > .card {
+        margin: 0 0 16px 0 !important;
+        height: calc(100vh - 120px) !important;
     }
     
     /* Full Screen Chat */
@@ -3664,6 +3670,8 @@ body.dark-mode .logo-img {
     #chat-messages-container {
         background-color: #f0f2f5 !important; /* WhatsApp Web BG */
         background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png') !important;
+        background-size: 400px !important;
+        background-repeat: repeat !important;
         padding: 24px !important;
     }
 
@@ -3672,6 +3680,12 @@ body.dark-mode .logo-img {
         background: #f0f2f5 !important;
         padding: 12px 24px !important;
         border-top: none !important;
+    }
+    #fake-chat-input {
+        display: none !important;
+    }
+    #real-chat-input {
+        display: block !important;
     }
     .fake-chat-input {
         background: #fff !important;
