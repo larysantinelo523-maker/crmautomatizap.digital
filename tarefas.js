@@ -105,10 +105,17 @@ document.addEventListener('DOMContentLoaded', () => {
             calBody.appendChild(emptyCell);
         }
 
+        const realToday = new Date();
+        const isThisMonth = realToday.getFullYear() === currentYear && realToday.getMonth() === currentMonth;
+        const todayDate = realToday.getDate();
+
         // Dias do mês atual
         for (let i = 1; i <= daysInMonth; i++) {
             const cell = document.createElement('div');
             cell.className = 'cal-day-cell';
+            if (isThisMonth && i === todayDate) {
+                cell.classList.add('today');
+            }
             cell.dataset.day = i;
             
             let html = `<div class="cal-day-number">${i}</div>`;

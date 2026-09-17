@@ -3252,6 +3252,14 @@ body.dark-mode .logo-img {
     background: var(--color-bg-main); /* #f8fafc */
 }
 
+.cal-day-cell.today {
+    border-color: var(--color-task-green);
+}
+.cal-day-cell.today .cal-day-number {
+    color: var(--color-task-green);
+    font-weight: 700;
+}
+
 .cal-day-cell.empty-month {
     background: var(--color-bg-main);
     opacity: 0.5;
