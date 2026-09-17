@@ -290,11 +290,19 @@
                                         </label>
                                     </div>
                                     <div class="desktop-bot-actions" id="desktop-bot-actions">
-                                        <button class="btn-intervencao" id="btn-intervencao" data-tooltip="Pausa o robô e permite que você assuma o controle do atendimento manualmente.">
-                                            <i class="ph ph-user"></i> Intervenção Humana
+                                        <button class="btn-intervencao" id="btn-intervencao">
+                                            <i class="ph ph-user"></i> <span id="text-intervencao">Intervenção Humana</span>
+                                            <div class="custom-tooltip">
+                                                <div class="tooltip-title">Dica</div>
+                                                <div><strong>Intervenção Humana:</strong> Pausa o robô e permite que você assuma o controle do atendimento manualmente.</div>
+                                            </div>
                                         </button>
-                                        <button class="btn-ativacao" id="btn-ativacao" data-tooltip="Reativa o robô de inteligência artificial para continuar o atendimento automaticamente.">
-                                            <i class="ph ph-robot"></i> Ativar Agente
+                                        <button class="btn-ativacao" id="btn-ativacao">
+                                            <i class="ph ph-robot"></i> <span id="text-ativacao">Ativar Agente</span>
+                                            <div class="custom-tooltip">
+                                                <div class="tooltip-title">Dica</div>
+                                                <div><strong>Ativar Agente:</strong> Reativa o robô de inteligência artificial para continuar o atendimento automaticamente.</div>
+                                            </div>
                                         </button>
                                     </div>
                                 </div>
@@ -537,14 +545,22 @@
             
             const btnIntervencao = document.getElementById('btn-intervencao');
             const btnAtivacao = document.getElementById('btn-ativacao');
+            const textAtivacao = document.getElementById('text-ativacao');
+            
             if (isBotActive) {
                 // Bot is active -> Ativação state is active
                 if(btnIntervencao) { btnIntervencao.classList.add('inactive'); btnIntervencao.classList.remove('active'); }
-                if(btnAtivacao) { btnAtivacao.classList.add('active'); btnAtivacao.classList.remove('inactive'); }
+                if(btnAtivacao) { 
+                    btnAtivacao.classList.add('active'); btnAtivacao.classList.remove('inactive'); 
+                    if(textAtivacao) textAtivacao.innerText = 'Agente Ativado';
+                }
             } else {
                 // Human is active -> Intervenção state is active
                 if(btnIntervencao) { btnIntervencao.classList.add('active'); btnIntervencao.classList.remove('inactive'); }
-                if(btnAtivacao) { btnAtivacao.classList.add('inactive'); btnAtivacao.classList.remove('active'); }
+                if(btnAtivacao) { 
+                    btnAtivacao.classList.add('inactive'); btnAtivacao.classList.remove('active'); 
+                    if(textAtivacao) textAtivacao.innerText = 'Ativar Agente';
+                }
             }
 
             let html = '';

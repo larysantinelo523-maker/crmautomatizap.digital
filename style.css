@@ -3800,47 +3800,63 @@ body.dark-mode .logo-img {
     align-items: center;
     gap: 6px;
 }
-.desktop-bot-actions button::after {
-    content: attr(data-tooltip);
+.custom-tooltip {
     position: absolute;
     top: calc(100% + 8px);
     left: 50%;
     transform: translateX(-50%) translateY(5px);
-    background: #333;
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 12px;
+    background: #ffffff;
+    color: #333333;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 13px;
     font-weight: normal;
-    line-height: 1.4;
+    line-height: 1.5;
     white-space: normal;
     width: max-content;
-    max-width: 220px;
-    text-align: center;
+    max-width: 250px;
+    text-align: left;
     opacity: 0;
     visibility: hidden;
     transition: all 0.2s ease;
     z-index: 1000;
     pointer-events: none;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    border: 1px solid #eaeaea;
 }
-.desktop-bot-actions button::before {
+.custom-tooltip::before {
     content: '';
     position: absolute;
-    top: 100%;
+    bottom: 100%;
     left: 50%;
-    transform: translateX(-50%) translateY(5px);
-    border-width: 0 6px 6px 6px;
+    transform: translateX(-50%);
+    border-width: 0 8px 8px 8px;
     border-style: solid;
-    border-color: transparent transparent #333 transparent;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s ease;
-    z-index: 1000;
-    pointer-events: none;
+    border-color: transparent transparent #ffffff transparent;
 }
-.desktop-bot-actions button:hover::after,
-.desktop-bot-actions button:hover::before {
+.custom-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 9px 9px 9px;
+    border-style: solid;
+    border-color: transparent transparent #eaeaea transparent;
+    z-index: -1;
+}
+.tooltip-title {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: #111;
+}
+.custom-tooltip strong {
+    font-weight: 700;
+    font-size: 14px;
+    color: #0f5b46; /* Using the primary brand color for the bold text */
+}
+.desktop-bot-actions button:hover .custom-tooltip {
     opacity: 1;
     visibility: visible;
     transform: translateX(-50%) translateY(0);
