@@ -3868,3 +3868,6 @@ body.dark-mode .logo-img {
 .btn-ativacao .custom-tooltip::before { left: auto !important; right: 20px !important; transform: none !important; }
 .btn-ativacao .custom-tooltip::after { left: auto !important; right: 19px !important; transform: none !important; }
 
+
+.desktop-bot-actions button { pointer-events: auto !important; }
+

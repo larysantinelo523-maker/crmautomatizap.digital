@@ -499,16 +499,12 @@
             }
             if(btnIntervencao) {
                 btnIntervencao.addEventListener('click', function() {
-                    if (!this.classList.contains('active')) {
-                        toggleBotLogic(false);
-                    }
+                    toggleBotLogic(false);
                 });
             }
             if(btnAtivacao) {
                 btnAtivacao.addEventListener('click', function() {
-                    if (!this.classList.contains('active')) {
-                        toggleBotLogic(true);
-                    }
+                    toggleBotLogic(true);
                 });
             }
         };
