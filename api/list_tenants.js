@@ -26,18 +26,58 @@ export default async function handler(req, res) {
         const result = [];
 
         for (const user of usuarios) {
+            let currentStatus = user.status_assinatura || 'vencido';
+            
+            // Avaliar o status com base na data de vencimento
+            if (user.data_vencimento) {
+                // Remove o timezone para comparar apenas a data (considerando UTC/Brasil)
+                const dataVenc = new Date(user.data_vencimento);
+                const hoje = new Date();
+                
+                // Zera as horas para comparar apenas os dias
+                dataVenc.setHours(0, 0, 0, 0);
+                hoje.setHours(0, 0, 0, 0);
+
+                const diffTime = dataVenc.getTime() - hoje.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                let evaluatedStatus = 'vencido';
+                if (diffDays < 0) {
+                    evaluatedStatus = 'vencido';
+                } else if (diffDays >= 0 && diffDays <= 3) {
+                    evaluatedStatus = 'Aviso prévio';
+                } else {
+                    evaluatedStatus = 'pago';
+                }
+
+                // Se o status real for diferente do que está no banco, atualiza o banco
+                if (evaluatedStatus !== currentStatus) {
+                    currentStatus = evaluatedStatus;
+                    // Atualiza em background no banco
+                    await supabase
+                        .from('usuarios')
+                        .update({ status_assinatura: currentStatus })
+                        .eq('id', user.id);
+                }
+            }
+
             // Pegar contagem de leads. A tabela leads ainda usa a coluna id_empresa para armazenar o ID do usuário/empresa
-            const { count: leadsCount, error: errLeads } = await supabase
-                .from('leads')
-                .select('*', { count: 'exact', head: true })
-                .eq('id_empresa', user.id); // A coluna no banco ainda se chama id_empresa
+            let leadsCount = user.quantidade_leads; // Usa a nova coluna se existir
+            
+            if (leadsCount === undefined || leadsCount === null) {
+                const { count, error: errLeads } = await supabase
+                    .from('leads')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('id_empresa', user.id);
+                leadsCount = count;
+            }
 
             result.push({
                 id_empresa: user.id, // Mantemos a chave id_empresa para não quebrar o frontend imediatamente
                 nome: user.nome_completo || 'Sem Nome',
                 email: user.email || 'N/A',
                 vencimento: user.data_vencimento || 'N/A',
-                status: user.status_assinatura || 'N/A',
+                status: currentStatus,
                 total_leads: leadsCount || 0
             });
         }

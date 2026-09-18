@@ -176,8 +176,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 nextDate = calcNextDue(tenant.vencimento);
             }
 
-            if (tenant.status === 'inadimplente' || tenant.status === 'cancelado' || tenant.status === 'vencida') {
-                statusBadge = '<span style="background-color: #ef4444; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Inadimplente</span>';
+            if (tenant.status === 'vencido' || tenant.status === 'inadimplente' || tenant.status === 'cancelado') {
+                statusBadge = '<span style="background-color: #ef4444; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Vencido</span>';
+            } else if (tenant.status === 'Aviso prévio') {
+                statusBadge = '<span style="background-color: #fef3c7; color: #b45309; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Aviso prévio</span>';
+            } else if (tenant.status === 'pago' || tenant.status === 'Ativo') {
+                statusBadge = '<span style="background-color: #22c55e; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Pago</span>';
             } else if (nextDate) {
                 const hojeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
                 const hoje = new Date(hojeStr);

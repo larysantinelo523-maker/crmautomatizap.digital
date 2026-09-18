@@ -403,7 +403,7 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                         }
 
                         // Bloqueio por falta de pagamento
-                        if (userData.status_assinatura === 'inadimplente' && window.location.pathname.indexOf('configuracoes.html') === -1) {
+                        if ((userData.status_assinatura === 'inadimplente' || userData.status_assinatura === 'vencido') && window.location.pathname.indexOf('configuracoes.html') === -1) {
                             window.location.href = 'configuracoes.html?tab=assinatura';
                             return;
                         }
