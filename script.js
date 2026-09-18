@@ -412,7 +412,7 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                     const userId = data.session.user.id;
                     const { data: userData, error } = await supabase
                         .from('usuarios')
-                        .select('nome_completo, tipo_usuario, avatar_url, status_assinatura, data_vencimento')
+                        .select('nome_completo, tipo_usuario, avatar_url, status_assinatura, data_vencimento, mensalidade')
                         .eq('id', userId)
                         .single();
 
