@@ -125,8 +125,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const kpis = mockData[i].kpis;
                 if (kpis) {
                     html += `
-                        <div class="cal-day-indicator">
-                            <span style="color: var(--color-success);">${kpis.atendimentos}</span> / 
+                        <div class="cal-day-indicator" style="color: var(--color-text-main);">
+                            <span style="color: #22c55e;">${kpis.atendimentos}</span> / 
                             <span style="color: #3b82f6;">${kpis.reunioes}</span>
                         </div>
                     `;
