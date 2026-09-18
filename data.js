@@ -91,30 +91,41 @@ export async function toggleBotState(leadId, isActive) {
     const id_empresa = await fetchCompanyId();
     if (!id_empresa) return null;
 
-    // Remove todas as mensagens de sistema anteriores deste lead para não poluir o histórico
-    const { error: deleteError } = await supabase
+    const mensagemStr = isActive ? 'Bot foi reativado pelo administrador.' : 'Bot foi pausado pelo administrador.';
+
+    // Verifica se já existe uma mensagem de sistema para este lead
+    const { data: existingMsgs, error: checkError } = await supabase
         .from('conversas')
-        .delete()
+        .select('id')
         .eq('id_lead', leadId)
         .eq('enviado_por', 'Sistema');
 
-    if (deleteError) {
-        console.error('Erro ao deletar msgs antigas:', deleteError);
-    }
+    if (existingMsgs && existingMsgs.length > 0) {
+        // Se já existe, apenas ATUALIZA a(s) linha(s) existente(s) em vez de criar novas
+        const { error } = await supabase
+            .from('conversas')
+            .update({
+                mensagem: mensagemStr,
+                bot_ativo: isActive,
+                criado_em: new Date().toISOString() // atualiza a data para ir pro fim da lista
+            })
+            .eq('id_lead', leadId)
+            .eq('enviado_por', 'Sistema');
+            
+        if (error) console.error('Erro ao atualizar msg de sistema:', error);
+    } else {
+        // Se não existe, cria a primeira mensagem de sistema
+        const { error } = await supabase
+            .from('conversas')
+            .insert([{
+                id_empresa: id_empresa,
+                id_lead: leadId,
+                mensagem: mensagemStr,
+                enviado_por: 'Sistema',
+                bot_ativo: isActive
+            }]);
 
-    // Insere a nova mensagem de sistema com o estado atual
-    const { data, error } = await supabase
-        .from('conversas')
-        .insert([{
-            id_empresa: id_empresa,
-            id_lead: leadId,
-            mensagem: isActive ? 'Bot foi reativado pelo administrador.' : 'Bot foi pausado pelo administrador.',
-            enviado_por: 'Sistema',
-            bot_ativo: isActive
-        }]);
-
-    if (error) {
-        console.error('Erro ao alternar bot:', error);
+        if (error) console.error('Erro ao inserir msg de sistema:', error);
     }
 }
 
