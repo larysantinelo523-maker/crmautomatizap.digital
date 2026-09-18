@@ -27,12 +27,17 @@ export default async function handler(req, res) {
 
         for (const user of usuarios) {
             let currentStatus = user.status_assinatura || 'vencido';
+            let evaluatedStatus = currentStatus;
             
             // Avaliar o status com base na data de vencimento
             if (user.data_vencimento) {
-                // Remove o timezone para comparar apenas a data (considerando UTC/Brasil)
-                const dataVenc = new Date(user.data_vencimento);
-                const hoje = new Date();
+                // Considerando UTC/Brasil para pegar o 'hoje' correto
+                const dataVencStr = user.data_vencimento.split('T')[0]; // Pega só a data se houver tempo
+                const [yr, mo, dy] = dataVencStr.split('-');
+                const dataVenc = new Date(yr, mo - 1, dy, 0, 0, 0);
+                
+                const hojeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
+                const hoje = new Date(hojeStr);
                 
                 // Zera as horas para comparar apenas os dias
                 dataVenc.setHours(0, 0, 0, 0);
@@ -41,7 +46,6 @@ export default async function handler(req, res) {
                 const diffTime = dataVenc.getTime() - hoje.getTime();
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                let evaluatedStatus = 'vencido';
                 if (diffDays < 0) {
                     evaluatedStatus = 'vencido';
                 } else if (diffDays >= 0 && diffDays <= 3) {
@@ -77,7 +81,7 @@ export default async function handler(req, res) {
                 nome: user.nome_completo || 'Sem Nome',
                 email: user.email || 'N/A',
                 vencimento: user.data_vencimento || 'N/A',
-                status: currentStatus,
+                status: evaluatedStatus,
                 total_leads: leadsCount || 0
             });
         }
