@@ -1456,8 +1456,8 @@ body.dark-mode .accordion-content {
 }
 
 .avatar.dark {
-    background: var(--color-text-main);
-    color: white;
+    background: var(--color-primary);
+    color: #ffffff;
     width: 36px;
     height: 36px;
 }
@@ -3664,7 +3664,7 @@ body.dark-mode .logo-img {
 
     /* Adjust Chat Header for Desktop */
     .mockup-screen > div:first-child {
-        background: #fff !important;
+        background: var(--color-surface) !important;
         color: var(--color-text-main) !important;
         padding: 16px 24px !important;
         border-bottom: 1px solid var(--color-border) !important;
@@ -3731,7 +3731,7 @@ body.dark-mode .logo-img {
     
     /* Chat Contact Items (Left List) */
     .chat-contact-item {
-        background: #fff;
+        background: var(--color-surface);
         border-radius: 12px;
         margin: 8px 16px;
         border: 1px solid var(--color-border) !important;
