@@ -3569,6 +3569,14 @@ body.dark-mode .logo-img {
     background: #16a34a;
 }
 
+/* Base styles for new structures */
+.mobile-day-name { display: none; }
+.cal-day-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
 @media (max-width: 1024px) {
     .tarefas-container {
         flex-direction: column;
@@ -3577,25 +3585,64 @@ body.dark-mode .logo-img {
     
     /* CALENDAR RESPONSIVENESS */
     .calendar-main-grid {
-        overflow-x: auto;
+        overflow-x: visible !important;
+        padding-bottom: 0 !important;
+    }
+    .cal-main-header {
+        display: none !important;
+    }
+    .cal-main-body {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory;
+        padding-bottom: 8px !important;
+        gap: 16px !important;
         -webkit-overflow-scrolling: touch;
-        padding-bottom: 8px; /* Room for scrollbar */
-    }
-    .cal-main-header, 
-    .cal-main-body {
-        min-width: 840px !important;
-        grid-template-columns: repeat(7, 1fr) !important;
-    }
-    .cal-main-body {
-        gap: 8px !important;
-        grid-template-rows: auto !important;
-        grid-auto-rows: 1fr !important;
     }
     .cal-day-cell {
-        padding: 8px !important;
-        min-height: 80px; /* Comfortable height */
-        border-radius: 8px !important;
+        flex: 0 0 115px !important; /* ~3 cards visíveis na tela */
+        scroll-snap-align: start;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        min-height: auto !important;
     }
+    .cal-day-cell.active {
+        border: none !important;
+        padding: 0 !important;
+        background: transparent !important;
+    }
+    .cal-day-cell:hover {
+        box-shadow: none !important;
+        border: none !important;
+    }
+    
+    .mobile-day-name {
+        display: block !important;
+        text-align: center;
+        font-weight: 600;
+        color: var(--color-text-mut);
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+    .cal-day-card {
+        background: var(--color-bg-card) !important;
+        border: 1px solid var(--color-border) !important;
+        border-radius: 8px !important;
+        padding: 12px !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 110px !important;
+    }
+    .cal-day-cell.active .cal-day-card {
+        border-color: var(--color-task-green) !important;
+        border-width: 2px !important;
+        padding: 11px !important; /* compensa borda para não mover conteúdo */
+    }
+    
     /* DAY HEADER & INDICATOR */
     .cal-day-header {
         display: flex !important;

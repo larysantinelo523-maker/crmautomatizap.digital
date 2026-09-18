@@ -105,13 +105,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
         const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
         
+        let k = 0;
+        const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        
         // Dias do mês anterior
         const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
         for (let i = 0; i < firstDayIndex; i++) {
             const emptyCell = document.createElement('div');
             emptyCell.className = 'cal-day-cell empty-month';
-            emptyCell.innerHTML = `<div class="cal-day-number">${prevMonthDays - firstDayIndex + i + 1}</div>`;
+            emptyCell.innerHTML = `
+                <div class="mobile-day-name">${dayNames[k % 7]}</div>
+                <div class="cal-day-card">
+                    <div class="cal-day-number">${prevMonthDays - firstDayIndex + i + 1}</div>
+                </div>
+            `;
             calBody.appendChild(emptyCell);
+            k++;
         }
 
         const realToday = new Date();
@@ -127,7 +136,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             cell.dataset.day = i;
             
-            let html = `<div class="cal-day-header">`;
+            let html = `<div class="mobile-day-name">${dayNames[k % 7]}</div>`;
+            html += `<div class="cal-day-card">`;
+            html += `<div class="cal-day-header">`;
             html += `<div class="cal-day-number">${i}</div>`;
             
             // Injetar tasks mockadas se houver
@@ -157,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `</div><div class="cal-day-tasks">`;
             }
             
-            html += `</div>`;
+            html += `</div></div>`;
             cell.innerHTML = html;
             
             // Evento de clique
@@ -168,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             
             calBody.appendChild(cell);
+            k++;
         }
         
         // Completar a grid (para dar 35 células totais - 5 semanas de 7 dias)
@@ -176,8 +188,14 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 1; i <= remainingCells; i++) {
             const emptyCell = document.createElement('div');
             emptyCell.className = 'cal-day-cell empty-month';
-            emptyCell.innerHTML = `<div class="cal-day-number">${i}</div>`;
+            emptyCell.innerHTML = `
+                <div class="mobile-day-name">${dayNames[k % 7]}</div>
+                <div class="cal-day-card">
+                    <div class="cal-day-number">${i}</div>
+                </div>
+            `;
             calBody.appendChild(emptyCell);
+            k++;
         }
     }
 
