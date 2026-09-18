@@ -3715,6 +3715,9 @@ body.dark-mode .logo-img {
         min-height: 0 !important;
         grid-template-columns: unset !important;
         grid-template-rows: unset !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        touch-action: pan-x pan-y !important;
     }
 
     .cal-main-body::-webkit-scrollbar {
