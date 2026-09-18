@@ -845,6 +845,8 @@ body.dark-mode .notif-item.unread {
     width: 90%;
     max-width: 500px;
     padding: 24px;
+    max-height: 90vh;
+    overflow-y: auto;
     transform: scale(0.95);
     transition: transform 0.3s ease;
     box-shadow: 0 15px 35px rgba(0,0,0,0.2);
@@ -2466,7 +2468,17 @@ body.dark-mode .accordion-content {
         overflow: visible;
     }
 
-    .chat-layout>.card {
+    .modal-content {
+        padding: 16px;
+        max-height: 95vh;
+        overflow-y: auto;
+    }
+
+    .login-form .form-group {
+        margin-bottom: 16px;
+    }
+
+    .stat-card, .kpi-card {
         margin-bottom: 16px;
         border-right: none !important;
         border-bottom: 1px solid var(--color-border);
