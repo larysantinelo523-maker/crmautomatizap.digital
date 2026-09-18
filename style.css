@@ -3582,10 +3582,13 @@ body.dark-mode .logo-img {
     }
     .cal-main-body {
         gap: 4px !important;
+        grid-template-rows: auto !important;
+        grid-auto-rows: 1fr !important;
     }
     .cal-day-cell {
         padding: 4px !important;
-        min-height: 90px;
+        min-height: 55px;
+        border-radius: 4px !important;
     }
     .cal-day-number {
         font-size: 12px !important;
