@@ -76,8 +76,9 @@ export default async function handler(req, res) {
             });
             const payment = new Payment(client);
             
-            const firstDay = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString();
-            const lastDay = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0, 23, 59, 59).toISOString();
+            const hojeMP = new Date();
+            const firstDay = new Date(hojeMP.getFullYear(), hojeMP.getMonth(), 1).toISOString();
+            const lastDay = new Date(hojeMP.getFullYear(), hojeMP.getMonth() + 1, 0, 23, 59, 59).toISOString();
             
             const searchResult = await payment.search({
                 options: {
