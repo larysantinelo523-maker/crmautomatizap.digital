@@ -480,33 +480,40 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                         let notifCount = 0;
 
                         // 1. Verificar Vencimento da Mensalidade
-                        if (currentUserData && currentUserData.data_vencimento) {
-                            const vencDate = new Date(currentUserData.data_vencimento);
-                            const now = window.getBrasiliaDate();
-                            const diffTime = vencDate - now;
-                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                            
-                            let notifText = '';
-                            let isExpired = false;
+                        if (currentUserData && currentUserData.data_vencimento && currentUserData.data_vencimento !== 'N/A') {
+                            const vencDate = window.parseExactDate(currentUserData.data_vencimento);
+                            if (vencDate) {
+                                const now = window.getBrasiliaDate();
+                                now.setHours(0, 0, 0, 0);
+                                const diffTime = vencDate.getTime() - now.getTime();
+                                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                
+                                let notifText = '';
+                                let isExpired = false;
+                                let isRenewed = false;
 
-                            if (diffDays < 0) {
-                                isExpired = true;
-                                if (diffDays === -1) notifText = "Sua assinatura venceu ontem. Renove agora para evitar o bloqueio.";
-                                else notifText = `Sua assinatura venceu há ${Math.abs(diffDays)} dias. Renove agora para evitar o bloqueio.`;
-                            } else if (diffDays === 0) {
-                                notifText = "Sua assinatura vence hoje! Renove agora para evitar a suspensão.";
-                            } else if (diffDays === 1) {
-                                notifText = "Atenção: Falta 1 dia para o vencimento da sua assinatura.";
-                            } else if (diffDays <= 5) {
-                                notifText = `Atenção: Faltam ${diffDays} dias para o vencimento da sua assinatura.`;
-                            }
+                                if (diffDays < 0) {
+                                    isExpired = true;
+                                    if (diffDays === -1) notifText = "Sua assinatura venceu ontem. Renove agora para evitar o bloqueio.";
+                                    else notifText = `Sua assinatura venceu há ${Math.abs(diffDays)} dias. Renove agora para evitar o bloqueio.`;
+                                } else if (diffDays === 0) {
+                                    notifText = "Sua assinatura vence hoje! Renove agora para evitar a suspensão.";
+                                } else if (diffDays === 1) {
+                                    notifText = "Atenção: Falta 1 dia para o vencimento da sua assinatura.";
+                                } else if (diffDays <= 3) {
+                                    notifText = `Atenção: Faltam ${diffDays} dias para o vencimento da sua assinatura.`;
+                                } else if (diffDays > 3) {
+                                    isRenewed = true;
+                                    notifText = "Sua assinatura foi renovada no valor de R$ 97,00";
+                                }
 
-                            if (notifText) {
-                                html += `<div style="padding: 12px; border-bottom: 1px solid var(--color-border); cursor: pointer;" onclick="window.location.href='configuracoes.html?tab=assinatura'">
-                                    <div style="font-weight: 600; font-size: 13px; color: ${isExpired ? 'var(--color-danger)' : 'var(--color-warning)'}; margin-bottom: 4px;"><i class="ph ${isExpired ? 'ph-warning-circle' : 'ph-warning'}"></i> ${isExpired ? 'Assinatura Vencida' : 'Vencimento Próximo'}</div>
-                                    <div style="font-size: 12px; color: var(--color-text-mut);">${notifText}</div>
-                                </div>`;
-                                notifCount++;
+                                if (notifText) {
+                                    html += `<div style="padding: 12px; border-bottom: 1px solid var(--color-border); cursor: pointer;" onclick="window.location.href='configuracoes.html?tab=assinatura'">
+                                        <div style="font-weight: 600; font-size: 13px; color: ${isExpired ? 'var(--color-danger)' : (isRenewed ? 'var(--color-success)' : 'var(--color-warning)')}; margin-bottom: 4px;"><i class="ph ${isExpired ? 'ph-warning-circle' : (isRenewed ? 'ph-check-circle' : 'ph-warning')}"></i> ${isExpired ? 'Assinatura Vencida' : (isRenewed ? 'Você renovou sua assinatura' : 'Aviso Prévio')}</div>
+                                        <div style="font-size: 12px; color: var(--color-text-mut);">${notifText}</div>
+                                    </div>`;
+                                    notifCount++;
+                                }
                             }
                         }
 
