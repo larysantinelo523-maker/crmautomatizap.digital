@@ -666,8 +666,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Lógica do Modo Escuro (Dark Mode) ---
     const themeCheckbox = document.getElementById('theme-toggle-checkbox');
 
+    function getUserThemeKey() {
+        let themeKey = 'theme';
+        try {
+            const tokenStr = localStorage.getItem('sb-qosgrqdfeqzxnzhmwomv-auth-token');
+            if (tokenStr) {
+                const token = JSON.parse(tokenStr);
+                if (token && token.user && token.user.id) {
+                    themeKey = 'theme_' + token.user.id;
+                }
+            }
+        } catch(e) {}
+        return themeKey;
+    }
+    const currentThemeKey = getUserThemeKey();
+
     // Verifica preferência salva
-    if (localStorage.getItem('theme') === 'dark') {
+    if (localStorage.getItem(currentThemeKey) === 'dark') {
         document.body.classList.add('dark-mode');
         if (themeCheckbox) themeCheckbox.checked = true;
     }
@@ -695,10 +710,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isDark) {
                 document.body.classList.add('dark-mode');
-                localStorage.setItem('theme', 'dark');
+                localStorage.setItem(currentThemeKey, 'dark');
             } else {
                 document.body.classList.remove('dark-mode');
-                localStorage.setItem('theme', 'light');
+                localStorage.setItem(currentThemeKey, 'light');
             }
         });
     }

@@ -21,8 +21,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Configurar Tema
+    function getUserThemeKey() {
+        let themeKey = 'theme';
+        try {
+            const tokenStr = localStorage.getItem('sb-qosgrqdfeqzxnzhmwomv-auth-token');
+            if (tokenStr) {
+                const token = JSON.parse(tokenStr);
+                if (token && token.user && token.user.id) {
+                    themeKey = 'theme_' + token.user.id;
+                }
+            }
+        } catch(e) {}
+        return themeKey;
+    }
+    const currentThemeKey = getUserThemeKey();
+
     const themeCheckbox = document.getElementById('theme-toggle-checkbox');
-    const savedTheme = localStorage.getItem('theme');
+    const savedTheme = localStorage.getItem(currentThemeKey);
     if (savedTheme === 'dark') {
         document.body.classList.add('dark-mode');
         themeCheckbox.checked = true;
@@ -31,10 +46,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     themeCheckbox.addEventListener('change', (e) => {
         if (e.target.checked) {
             document.body.classList.add('dark-mode');
-            localStorage.setItem('theme', 'dark');
+            localStorage.setItem(currentThemeKey, 'dark');
         } else {
             document.body.classList.remove('dark-mode');
-            localStorage.setItem('theme', 'light');
+            localStorage.setItem(currentThemeKey, 'light');
         }
 
         // Se estivermos na aba de detalhes com gráficos, recarregamos
