@@ -846,7 +846,9 @@ body.dark-mode .notif-item.unread {
     max-width: 500px;
     padding: 24px;
     max-height: 90vh;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     transform: scale(0.95);
     transition: transform 0.3s ease;
     box-shadow: 0 15px 35px rgba(0,0,0,0.2);
@@ -861,6 +863,13 @@ body.dark-mode .notif-item.unread {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
+    flex-shrink: 0;
+}
+
+.modal-body {
+    overflow-y: auto;
+    flex-grow: 1;
+    padding-right: 4px;
 }
 
 .modal-header h2 {
@@ -2471,7 +2480,10 @@ body.dark-mode .accordion-content {
     .modal-content {
         padding: 16px;
         max-height: 80vh;
-        overflow-y: auto;
+    }
+    
+    .modal-header {
+        margin-bottom: 16px;
     }
 
     .login-form .form-group {
