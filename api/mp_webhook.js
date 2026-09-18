@@ -68,7 +68,7 @@ export default async function handler(req, res) {
                 // Atualiza o banco
                 const { error: updateError } = await supabase
                     .from('usuarios')
-                    .update({ data_vencimento: newDateStr })
+                    .update({ data_vencimento: newDateStr, status_assinatura: 'pago' })
                     .eq('id', userId);
 
                 if (updateError) throw updateError;

@@ -504,7 +504,11 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                                     notifText = `Atenção: Faltam ${diffDays} dias para o vencimento da sua assinatura.`;
                                 } else if (diffDays > 3) {
                                     isRenewed = true;
-                                    notifText = "Sua assinatura foi renovada no valor de R$ 97,00";
+                                    let paidValue = '97,00';
+                                    if (currentUserData.mensalidade !== undefined && currentUserData.mensalidade !== null) {
+                                        paidValue = Number(currentUserData.mensalidade).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                                    }
+                                    notifText = `Sua assinatura foi renovada no valor de R$ ${paidValue}`;
                                 }
 
                                 if (notifText) {
