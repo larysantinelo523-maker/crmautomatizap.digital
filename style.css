@@ -2470,7 +2470,7 @@ body.dark-mode .accordion-content {
 
     .modal-content {
         padding: 16px;
-        max-height: 95vh;
+        max-height: 80vh;
         overflow-y: auto;
     }
 
