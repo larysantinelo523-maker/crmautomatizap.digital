@@ -3255,6 +3255,7 @@ body.dark-mode .logo-img {
 }
 
 .cal-day-cell {
+    position: relative;
     border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: 8px;
@@ -3264,6 +3265,22 @@ body.dark-mode .logo-img {
     cursor: pointer;
     transition: all 0.2s;
     background: var(--color-bg-card);
+}
+
+.cal-day-indicator {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--color-bg-main);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-sec);
+    display: flex;
+    gap: 2px;
+    align-items: center;
 }
 
 .cal-day-cell:hover {

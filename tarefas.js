@@ -119,10 +119,20 @@ document.addEventListener('DOMContentLoaded', () => {
             cell.dataset.day = i;
             
             let html = `<div class="cal-day-number">${i}</div>`;
-            html += `<div class="cal-day-tasks">`;
             
             // Injetar tasks mockadas se houver
             if (mockData[i]) {
+                const kpis = mockData[i].kpis;
+                if (kpis) {
+                    html += `
+                        <div class="cal-day-indicator">
+                            <span style="color: var(--color-success);">${kpis.atendimentos}</span> / 
+                            <span style="color: var(--color-primary-dark);">${kpis.reunioes}</span>
+                        </div>
+                    `;
+                }
+
+                html += `<div class="cal-day-tasks">`;
                 const tasks = mockData[i].tasks;
                 tasks.forEach(t => {
                     let pillClass = t.type === 'reuniao' ? 'blue' : 'green';
@@ -133,6 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     `;
                 });
+            } else {
+                html += `<div class="cal-day-tasks">`;
             }
             
             html += `</div>`;
