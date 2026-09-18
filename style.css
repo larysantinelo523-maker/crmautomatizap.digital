@@ -3596,31 +3596,45 @@ body.dark-mode .logo-img {
         min-height: 80px; /* Comfortable height */
         border-radius: 8px !important;
     }
-    .cal-day-number {
-        font-size: 12px !important;
+    /* DAY HEADER & INDICATOR */
+    .cal-day-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: flex-start !important;
         margin-bottom: 4px !important;
     }
-    
-    /* INDICATOR */
+    .cal-day-number {
+        font-size: 14px !important;
+        margin-bottom: 0 !important;
+    }
     .cal-day-indicator {
         position: static !important;
-        justify-content: center !important;
-        width: 100% !important;
-        padding: 2px !important;
-        margin-bottom: 4px !important;
+        width: auto !important;
+        padding: 1px 4px !important;
+        margin-bottom: 0 !important;
+        font-size: 8px !important;
+        border: none !important;
+        background: transparent !important;
     }
+    .cal-day-indicator .ind-green { color: #22c55e !important; }
+    .cal-day-indicator .ind-blue { color: #3b82f6 !important; }
+    .cal-day-indicator .ind-slash { color: var(--color-border) !important; margin: 0 1px; }
     
     /* PILLS */
     .cal-task-pill {
-        padding: 0 4px !important;
-        font-size: 10px !important;
-        height: 20px !important;
-        min-height: 20px !important;
+        padding: 0 2px !important;
+        height: 6px !important;
+        min-height: 6px !important;
         margin-bottom: 4px !important;
+        justify-content: flex-start !important;
     }
     .cal-task-pill i {
-        font-size: 12px !important;
-        margin-right: 2px !important;
+        font-size: 6px !important;
+        margin-right: 0 !important;
+        margin-left: 2px !important;
+    }
+    .cal-task-pill .pill-text {
+        display: none !important;
     }
     
     /* SUMMARY COL */

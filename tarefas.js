@@ -127,19 +127,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             cell.dataset.day = i;
             
-            let html = `<div class="cal-day-number">${i}</div>`;
+            let html = `<div class="cal-day-header">`;
+            html += `<div class="cal-day-number">${i}</div>`;
             
             // Injetar tasks mockadas se houver
             if (mockData[i]) {
                 const kpis = mockData[i].kpis;
                 if (kpis) {
                     html += `
-                        <div class="cal-day-indicator" style="color: var(--color-text-main);">
-                            <span style="color: #22c55e;">${kpis.atendimentos}</span> / 
-                            <span style="color: #3b82f6;">${kpis.reunioes}</span>
+                        <div class="cal-day-indicator">
+                            <span class="ind-green">${kpis.atendimentos}</span><span class="ind-slash"> / </span><span class="ind-blue">${kpis.reunioes}</span>
                         </div>
                     `;
                 }
+                html += `</div>`; // fecha header
 
                 html += `<div class="cal-day-tasks">`;
                 const tasks = mockData[i].tasks;
@@ -148,12 +149,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     let icon = t.type === 'reuniao' ? 'ph-calendar-blank' : 'ph-whatsapp-logo';
                     html += `
                         <div class="cal-task-pill ${pillClass}">
-                            <i class="ph ${icon}"></i> ${t.client.split(' ')[0]}
+                            <i class="ph ${icon}"></i> <span class="pill-text">${t.client.split(' ')[0]}</span>
                         </div>
                     `;
                 });
             } else {
-                html += `<div class="cal-day-tasks">`;
+                html += `</div><div class="cal-day-tasks">`;
             }
             
             html += `</div>`;
