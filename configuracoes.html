@@ -460,24 +460,30 @@
                 daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
             }
 
-            subDaysLeft.textContent = daysLeft;
-
-            if (userData.status_assinatura === 'vencido' || userData.status_assinatura === 'inadimplente' || daysLeft <= 0) {
+            if (userData.status_assinatura === 'vencido' || userData.status_assinatura === 'inadimplente' || daysLeft < 0) {
                 subStatusBadge.textContent = 'Vencido';
                 subStatusBadge.style.background = '#fee2e2';
                 subStatusBadge.style.color = '#991b1b';
                 subDaysLeft.style.color = '#991b1b';
-                subDaysLeft.textContent = '0';
-            } else if (daysLeft <= 3) {
-                subStatusBadge.textContent = 'Aviso Prévio';
+                subDaysLeft.textContent = '0 dias';
+            } else if (daysLeft === 0) {
+                subStatusBadge.textContent = 'Aviso prévio';
                 subStatusBadge.style.background = '#fef3c7'; // yellow-100
                 subStatusBadge.style.color = '#b45309'; // amber-700
                 subDaysLeft.style.color = '#d97706'; // amber-600
+                subDaysLeft.textContent = 'Vence hoje!';
+            } else if (daysLeft <= 3) {
+                subStatusBadge.textContent = 'Aviso prévio';
+                subStatusBadge.style.background = '#fef3c7'; // yellow-100
+                subStatusBadge.style.color = '#b45309'; // amber-700
+                subDaysLeft.style.color = '#d97706'; // amber-600
+                subDaysLeft.textContent = daysLeft + ' dias';
             } else {
                 subStatusBadge.textContent = 'Ativo';
                 subStatusBadge.style.background = '#dcfce7';
                 subStatusBadge.style.color = '#166534';
                 subDaysLeft.style.color = '#10b981'; // default green
+                subDaysLeft.textContent = daysLeft + ' dias';
             }
 
             const isPaymentAllowed = (userData.status_assinatura === 'vencido' || userData.status_assinatura === 'inadimplente' || daysLeft <= 3);

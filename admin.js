@@ -159,6 +159,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        // Ordena a lista de empresas pelo status: 1 - pago, 2 - aviso prévio, 3 - vencido
+        const getStatusWeight = (status) => {
+            const s = (status || '').toLowerCase();
+            if (s === 'pago' || s === 'ativo') return 1;
+            if (s === 'aviso prévio' || s === 'aviso previo') return 2;
+            if (s === 'vencido' || s === 'inadimplente') return 3;
+            return 4;
+        };
+
+        tenantsList.sort((a, b) => getStatusWeight(a.status) - getStatusWeight(b.status));
+
         tenantsList.forEach(tenant => {
             let statusBadge = '<span style="background-color: #10b981; color: white; padding: 4px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;">Pago</span>';
 
@@ -365,9 +376,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <label style="font-weight: 500; font-size: 14px; margin-bottom: 8px; text-align: left; display: block; color: var(--color-text-main);">Status da Empresa</label>
                     <div class="custom-select-container" style="display: flex; flex-direction: column; gap: 4px;">
                         <div class="custom-option selected" data-value="Todos">Todos os status</div>
-                        <div class="custom-option admin-opt-inadimplente" data-value="Inadimplente">Inadimplente</div>
-                        <div class="custom-option admin-opt-aviso" data-value="Aviso previo">Aviso previo</div>
                         <div class="custom-option" data-value="Pagos">Pagos</div>
+                        <div class="custom-option admin-opt-aviso" data-value="Aviso previo">Aviso prévio</div>
+                        <div class="custom-option admin-opt-inadimplente" data-value="Inadimplente">Vencido</div>
                     </div>
                 `;
                 
@@ -403,14 +414,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                                     row.style.display = '';
                                 } else {
                                     const cells = row.querySelectorAll('td');
-                                    if (cells.length > 4) {
-                                        const badge = cells[4].querySelector('.badge');
-                                        const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[4].textContent.trim().toLowerCase();
+                                    if (cells.length > 5) { // O status badge está na célula 5 (índice 5)
+                                        const badge = cells[5].querySelector('span');
+                                        const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[5].textContent.trim().toLowerCase();
                                         
                                         let match = false;
-                                        if (statusVal === 'pagos' && rowStatus === 'pago') {
+                                        if (statusVal === 'pagos' && (rowStatus === 'pago' || rowStatus === 'ativo')) {
                                             match = true;
-                                        } else if (statusVal === 'aviso previo' && rowStatus.includes('vence')) {
+                                        } else if (statusVal === 'aviso previo' && (rowStatus.includes('aviso prévio') || rowStatus.includes('aviso previo'))) {
+                                            match = true;
+                                        } else if (statusVal === 'inadimplente' && (rowStatus === 'vencido' || rowStatus === 'inadimplente')) {
                                             match = true;
                                         } else if (statusVal === rowStatus) {
                                             match = true;
