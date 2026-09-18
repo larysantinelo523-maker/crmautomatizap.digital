@@ -124,6 +124,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Função para animar números
+    function animateValue(id, start, end, duration, isCurrency = false) {
+        const obj = document.getElementById(id);
+        if (!obj) return;
+        
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            
+            // Easing function (easeOutQuad)
+            const easeProgress = progress * (2 - progress);
+            const currentVal = start + (end - start) * easeProgress;
+            
+            if (isCurrency) {
+                obj.innerHTML = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentVal);
+            } else {
+                obj.innerHTML = Math.round(currentVal);
+            }
+
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            } else {
+                if (isCurrency) {
+                    obj.innerHTML = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(end);
+                } else {
+                    obj.innerHTML = Math.round(end);
+                }
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
     // 4. Carregar Métricas Globais (Visão Geral)
     async function loadDashboardStats() {
         try {
@@ -146,10 +179,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!res.ok) throw new Error("Erro na API (verifique chave Supabase na Vercel)");
             const stats = await res.json();
 
-            document.getElementById('kpi-empresas').innerHTML = stats.empresas;
-            document.getElementById('kpi-pagos').innerHTML = stats.pagos;
-            document.getElementById('kpi-inadimplentes').innerHTML = stats.inadimplentes;
-            document.getElementById('kpi-faturamento').innerHTML = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.faturamento);
+            animateValue('kpi-empresas', 0, stats.empresas || 0, 1500);
+            animateValue('kpi-pagos', 0, stats.pagos || 0, 1500);
+            animateValue('kpi-inadimplentes', 0, stats.inadimplentes || 0, 1500);
+            animateValue('kpi-faturamento', 0, stats.faturamento || 0, 1500, true);
         } catch (e) {
             console.error(e);
             document.querySelectorAll('.kpi-content h2').forEach(el => {
