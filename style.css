@@ -646,12 +646,14 @@ body.dark-mode .cal-day.in-range {
         left: 16px;
         width: auto;
     }
+
     .user-dropdown {
         position: fixed;
         top: 70px;
         right: 16px;
         width: 260px;
     }
+
     .mobile-clock-widget {
         display: flex !important;
     }
@@ -823,7 +825,7 @@ body.dark-mode .notif-item.unread {
     width: 100%;
     height: 100%;
     height: 100dvh;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
     z-index: 9999;
     display: flex;
@@ -852,7 +854,7 @@ body.dark-mode .notif-item.unread {
     overflow: hidden;
     transform: scale(0.95);
     transition: transform 0.3s ease;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
 }
 
 .modal.active .modal-content {
@@ -1357,14 +1359,17 @@ body.dark-mode .accordion-content {
     color: var(--color-text-sec);
     transition: all 0.3s ease;
 }
+
 .btn-icon.outline:hover {
     background: var(--color-hover);
 }
+
 .btn-icon.outline.filter-active {
     background: rgba(34, 197, 94, 0.15) !important;
     border-color: rgba(34, 197, 94, 0.4) !important;
     color: #22c55e !important;
 }
+
 .btn-icon.outline.filter-active:hover {
     background: rgba(34, 197, 94, 0.25) !important;
 }
@@ -1381,10 +1386,13 @@ body.dark-mode .accordion-content {
     align-items: center;
     justify-content: space-between;
 }
+
 .custom-option:hover {
-    background: rgba(34, 197, 94, 0.15); /* Hover verde claro suave */
+    background: rgba(34, 197, 94, 0.15);
+    /* Hover verde claro suave */
     color: #16a34a;
 }
+
 .custom-option.selected {
     background: rgba(34, 197, 94, 0.2);
     color: #15803d;
@@ -1396,6 +1404,7 @@ body.dark-mode .accordion-content {
     background: rgba(239, 68, 68, 0.15) !important;
     color: #ef4444 !important;
 }
+
 .custom-option.admin-opt-inadimplente.selected {
     background: rgba(239, 68, 68, 0.2) !important;
     color: #dc2626 !important;
@@ -1406,6 +1415,7 @@ body.dark-mode .accordion-content {
     background: rgba(234, 179, 8, 0.15) !important;
     color: #eab308 !important;
 }
+
 .custom-option.admin-opt-aviso.selected {
     background: rgba(234, 179, 8, 0.2) !important;
     color: #ca8a04 !important;
@@ -2352,36 +2362,6 @@ body.dark-mode .accordion-content {
     }
 
     .data-table td:nth-child(5)::before {
-        content: "Último contato";
-    }
-
-    .data-table td:nth-child(6) {
-        position: relative;
-        top: auto;
-        right: auto;
-        padding: 0;
-        width: calc(100% + 32px);
-        margin-left: -16px;
-        margin-right: -16px;
-        margin-bottom: -16px;
-        margin-top: 16px;
-        border-bottom-left-radius: 12px;
-        border-bottom-right-radius: 12px;
-        overflow: hidden;
-    }
-
-    .data-table td:nth-child(6) .btn-exibir-infos {
-        width: 100%;
-        background-color: var(--color-primary);
-        /* verde do sistema */
-        color: white !important;
-        padding: 14px;
-        border-radius: 0;
-        justify-content: center;
-        font-weight: 500;
-    }
-
-    .data-table td:nth-child(6) .desktop-text {
         display: none;
     }
 
@@ -2482,7 +2462,7 @@ body.dark-mode .accordion-content {
         padding: 16px;
         max-height: 80vh;
     }
-    
+
     .modal-header {
         margin-bottom: 16px;
     }
@@ -2491,7 +2471,8 @@ body.dark-mode .accordion-content {
         margin-bottom: 16px;
     }
 
-    .stat-card, .kpi-card {
+    .stat-card,
+    .kpi-card {
         margin-bottom: 16px;
         border-right: none !important;
         border-bottom: 1px solid var(--color-border);
@@ -2701,7 +2682,8 @@ body.dark-mode .accordion-content {
 .autocorrect-bar {
     display: flex;
     align-items: center;
-    background-color: #d1d5db; /* Mesmo fundo do teclado */
+    background-color: #d1d5db;
+    /* Mesmo fundo do teclado */
     border-bottom: 1px solid #b5b8bc;
     height: 38px;
     width: 100%;
@@ -3147,14 +3129,16 @@ body.dark-mode .logo-img {
 }
 
 .due-date-danger {
-    background-color: #fecdd3 !important; /* Pastel Red */
+    background-color: #fecdd3 !important;
+    /* Pastel Red */
     color: #9f1239 !important;
     border-radius: 4px;
     font-weight: bold;
 }
 
 .due-date-warning {
-    background-color: #fef08a !important; /* Pastel Yellow */
+    background-color: #fef08a !important;
+    /* Pastel Yellow */
     color: #854d0e !important;
     border-radius: 4px;
     font-weight: bold;
@@ -3185,10 +3169,12 @@ body.dark-mode .logo-img {
 
 .tarefas-container {
     display: flex;
-    gap: 24px; /* Gap exato da referência */
+    gap: 24px;
+    /* Gap exato da referência */
     height: calc(100vh - 120px);
     width: 100%;
-    padding: 24px; /* Adiciona espaçamento nas bordas */
+    padding: 24px;
+    /* Adiciona espaçamento nas bordas */
     overflow: hidden;
     transition: all 0.4s ease-in-out;
 }
@@ -3294,13 +3280,16 @@ body.dark-mode .logo-img {
 .cal-day-cell.active {
     border-color: var(--color-task-green);
     border-width: 2px;
-    padding: 7px; /* Compensa borda mais grossa */
-    background: var(--color-bg-main); /* #f8fafc */
+    padding: 7px;
+    /* Compensa borda mais grossa */
+    background: var(--color-bg-main);
+    /* #f8fafc */
 }
 
 .cal-day-cell.today {
     border-color: var(--color-task-green);
 }
+
 .cal-day-cell.today .cal-day-number {
     color: var(--color-task-green);
     font-weight: 700;
@@ -3313,8 +3302,8 @@ body.dark-mode .logo-img {
 
 .cal-day-number {
     font-size: 14px;
-    font-weight: 500;
-    color: var(--color-text-mut);
+    font-weight: 600;
+    color: var(--color-text-main);
     margin-bottom: 8px;
 }
 
@@ -3325,9 +3314,11 @@ body.dark-mode .logo-img {
     flex-direction: column;
     gap: 4px;
 }
+
 .cal-day-tasks::-webkit-scrollbar {
     width: 2px;
 }
+
 .cal-day-tasks::-webkit-scrollbar-thumb {
     background: var(--color-border);
 }
@@ -3347,13 +3338,16 @@ body.dark-mode .logo-img {
     text-overflow: ellipsis;
     font-weight: 500;
 }
+
 .cal-task-pill i {
     font-size: 14px;
 }
+
 .cal-task-pill.green {
     background: var(--color-task-green-light);
     color: var(--color-task-green-text);
 }
+
 .cal-task-pill.blue {
     background: var(--color-task-blue-light);
     color: var(--color-task-blue);
@@ -3374,11 +3368,13 @@ body.dark-mode .logo-img {
     align-items: flex-start;
     margin-bottom: 24px;
 }
+
 .summary-title {
     display: flex;
     gap: 12px;
     align-items: flex-start;
 }
+
 .summary-title i {
     font-size: 24px;
     color: var(--color-task-green-text);
@@ -3386,12 +3382,15 @@ body.dark-mode .logo-img {
     padding: 8px;
     border-radius: 8px;
 }
+
 .summary-title h3 {
     margin: 0;
-    font-size: 24px; /* Referência bold */
+    font-size: 24px;
+    /* Referência bold */
     font-weight: 700;
     color: var(--color-text-main);
 }
+
 .summary-title p {
     margin: 4px 0 0;
     font-size: 14px;
@@ -3417,6 +3416,7 @@ body.dark-mode .logo-img {
     justify-content: center;
     background: var(--color-bg-card);
 }
+
 .summary-kpi-card h4 {
     font-size: 24px;
     font-weight: 700;
@@ -3424,6 +3424,7 @@ body.dark-mode .logo-img {
     color: var(--color-text-main);
     width: 100%;
 }
+
 .summary-kpi-card span {
     font-size: 12px;
     font-weight: 400;
@@ -3433,17 +3434,49 @@ body.dark-mode .logo-img {
 }
 
 /* Cores dos Ícones e Números de KPI */
-.summary-kpi-card.green-light .icon-wrapper { color: var(--color-task-green-text); background: var(--color-task-green-light); border-radius: 8px; padding: 4px; }
-.summary-kpi-card.green-light h4 { color: var(--color-task-green-text); }
+.summary-kpi-card.green-light .icon-wrapper {
+    color: var(--color-task-green-text);
+    background: var(--color-task-green-light);
+    border-radius: 8px;
+    padding: 4px;
+}
 
-.summary-kpi-card.blue-light .icon-wrapper { color: var(--color-task-blue); background: var(--color-task-blue-light); border-radius: 8px; padding: 4px; }
-.summary-kpi-card.blue-light h4 { color: var(--color-task-blue); }
+.summary-kpi-card.green-light h4 {
+    color: var(--color-task-green-text);
+}
 
-.summary-kpi-card.purple-light .icon-wrapper { color: var(--color-task-purple); background: var(--color-task-purple-light); border-radius: 8px; padding: 4px; }
-.summary-kpi-card.purple-light h4 { color: var(--color-task-purple); }
+.summary-kpi-card.blue-light .icon-wrapper {
+    color: var(--color-task-blue);
+    background: var(--color-task-blue-light);
+    border-radius: 8px;
+    padding: 4px;
+}
 
-.summary-kpi-card.warning-light .icon-wrapper { color: var(--color-task-yellow); background: var(--color-task-yellow-light); border-radius: 8px; padding: 4px; }
-.summary-kpi-card.warning-light h4 { color: var(--color-task-yellow); }
+.summary-kpi-card.blue-light h4 {
+    color: var(--color-task-blue);
+}
+
+.summary-kpi-card.purple-light .icon-wrapper {
+    color: var(--color-task-purple);
+    background: var(--color-task-purple-light);
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.summary-kpi-card.purple-light h4 {
+    color: var(--color-task-purple);
+}
+
+.summary-kpi-card.warning-light .icon-wrapper {
+    color: var(--color-task-yellow);
+    background: var(--color-task-yellow-light);
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.summary-kpi-card.warning-light h4 {
+    color: var(--color-task-yellow);
+}
 
 /* Listagem de atendimentos no resumo */
 .summary-list {
@@ -3452,9 +3485,11 @@ body.dark-mode .logo-img {
     padding-right: 8px;
     margin-bottom: 24px;
 }
+
 .summary-list::-webkit-scrollbar {
     width: 4px;
 }
+
 .summary-list::-webkit-scrollbar-thumb {
     background: var(--color-border);
     border-radius: 4px;
@@ -3471,10 +3506,12 @@ body.dark-mode .logo-img {
     cursor: pointer;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
+
 .day-task-item:hover {
     border-color: var(--color-task-green);
     box-shadow: 0 2px 8px rgba(34, 197, 94, 0.1);
 }
+
 .day-task-item:last-child {
     margin-bottom: 0;
 }
@@ -3500,6 +3537,7 @@ body.dark-mode .logo-img {
     flex-direction: column;
     justify-content: center;
 }
+
 .dt-content h5 {
     margin: 0;
     font-size: 14px;
@@ -3510,6 +3548,7 @@ body.dark-mode .logo-img {
     text-overflow: ellipsis;
     margin-bottom: 2px;
 }
+
 .dt-text {
     font-size: 12px;
     color: var(--color-text-mut);
@@ -3536,18 +3575,22 @@ body.dark-mode .logo-img {
     display: inline-flex;
     align-items: center;
 }
+
 .dt-badge.green {
     background: var(--color-task-green-light);
     color: var(--color-task-green-text);
 }
+
 .dt-badge.blue {
     background: var(--color-task-blue-light);
     color: var(--color-task-blue);
 }
+
 .dt-badge.purple {
     background: var(--color-task-purple-light);
     color: var(--color-task-purple);
 }
+
 .dt-badge.yellow {
     background: var(--color-task-yellow-light);
     color: var(--color-task-yellow);
@@ -3555,22 +3598,29 @@ body.dark-mode .logo-img {
 
 .summary-footer {
     padding-top: 24px;
-    border-top: none; /* Removendo borda caso haja na ref 3 */
+    border-top: none;
+    /* Removendo borda caso haja na ref 3 */
 }
+
 .summary-footer .btn {
     background: var(--color-task-green);
     color: #fff;
     border-radius: 8px;
     font-weight: 600;
-    justify-content: space-between; /* Para o texto e a setinha se houver */
+    justify-content: space-between;
+    /* Para o texto e a setinha se houver */
     padding: 12px 24px;
 }
+
 .summary-footer .btn:hover {
     background: #16a34a;
 }
 
 /* Base styles for new structures */
-.mobile-day-name { display: none; }
+.mobile-day-name {
+    display: none;
+}
+
 .cal-day-card {
     display: flex;
     flex-direction: column;
@@ -3596,7 +3646,7 @@ body.dark-mode .logo-img {
         width: 100% !important;
         box-sizing: border-box !important;
     }
-    
+
     /* 2) Coluna do calendário ocupa 100% e não cresce além */
     .tarefas-calendar-col {
         width: 100% !important;
@@ -3605,7 +3655,7 @@ body.dark-mode .logo-img {
         flex: none !important;
         display: block !important;
     }
-    
+
     /* 3) Desmonta o card branco gigante do calendário desktop */
     .calendar-full {
         background: transparent !important;
@@ -3617,7 +3667,7 @@ body.dark-mode .logo-img {
         border-radius: 0 !important;
         display: block !important;
     }
-    
+
     /* 4) Título e navegação ficam no topo, alinhados à esquerda */
     .calendar-full .card-header {
         padding: 12px 16px 10px 16px !important;
@@ -3628,12 +3678,12 @@ body.dark-mode .logo-img {
         align-items: center !important;
         justify-content: flex-start !important;
     }
-    
+
     /* Esconde o tooltip ? do desktop no mobile */
-    .calendar-full > .info-tooltip {
+    .calendar-full>.info-tooltip {
         display: none !important;
     }
-    
+
     /* 5) Grid container não cresce, não faz scroll — apenas envolve */
     .calendar-main-grid {
         overflow: visible !important;
@@ -3643,12 +3693,12 @@ body.dark-mode .logo-img {
         flex: none !important;
         display: block !important;
     }
-    
+
     /* 6) Cabeçalho fixo de dias (Dom/Seg/Ter...) escondido — cada card tem o seu */
     .cal-main-header {
         display: none !important;
     }
-    
+
     /* 7) O CARROSSEL HORIZONTAL REAL */
     .cal-main-body {
         display: flex !important;
@@ -3666,14 +3716,15 @@ body.dark-mode .logo-img {
         grid-template-columns: unset !important;
         grid-template-rows: unset !important;
     }
+
     .cal-main-body::-webkit-scrollbar {
         display: none !important;
     }
-    
+
     /* 8) CADA CARD DO DIA — wrapper externo transparente */
     .cal-day-cell {
-        flex: 0 0 calc((100vw - 32px - 30px) / 2) !important; /* 2 cards inteiros + peek do 3º */
-        max-width: calc((100vw - 32px - 30px) / 2) !important;
+        flex: 0 0 calc((100vw - 32px - 10px) / 1.6) !important; /* ~1.6 cards visíveis + peek generoso */
+        max-width: calc((100vw - 32px - 10px) / 1.6) !important;
         scroll-snap-align: start !important;
         background: transparent !important;
         border: none !important;
@@ -3685,6 +3736,7 @@ body.dark-mode .logo-img {
         flex-direction: column !important;
         cursor: pointer !important;
     }
+
     .cal-day-cell.active,
     .cal-day-cell:hover {
         background: transparent !important;
@@ -3692,7 +3744,7 @@ body.dark-mode .logo-img {
         box-shadow: none !important;
         padding: 0 !important;
     }
-    
+
     /* 9) Nome do dia (Dom, Seg, Ter...) fica ACIMA do card branco */
     .mobile-day-name {
         display: block !important;
@@ -3703,33 +3755,36 @@ body.dark-mode .logo-img {
         margin-bottom: 6px !important;
         letter-spacing: 0.2px !important;
     }
-    
+
     /* 10) CARD BRANCO com borda e sombra */
     .cal-day-card {
         background: var(--color-bg-card) !important;
         border: 1px solid var(--color-border) !important;
         border-radius: 8px !important;
         padding: 8px !important;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
         display: flex !important;
         flex-direction: column !important;
-        height: 130px !important;
+        height: 108px !important;
         overflow: hidden !important;
         flex: 1 !important;
     }
+
     .cal-day-cell.active .cal-day-card {
         border-color: var(--color-task-green) !important;
         border-width: 2px !important;
         padding: 7px !important;
     }
+
     .cal-day-cell.empty-month .mobile-day-name {
-        opacity: 0.4 !important;
+        opacity: 0.35 !important;
     }
+
     .cal-day-cell.empty-month .cal-day-card {
         background: var(--color-bg-main) !important;
-        opacity: 0.5 !important;
+        opacity: 0.4 !important;
     }
-    
+
     /* 11) Cabeçalho dentro do card: número + indicador lado a lado */
     .cal-day-header {
         display: flex !important;
@@ -3739,17 +3794,19 @@ body.dark-mode .logo-img {
         margin-bottom: 6px !important;
         flex-shrink: 0 !important;
     }
+
     .cal-day-number {
-        font-size: 14px !important;
-        font-weight: 600 !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
         color: var(--color-text-main) !important;
         margin-bottom: 0 !important;
         line-height: 1.2 !important;
     }
+
     .cal-day-cell.today .cal-day-card .cal-day-number {
         color: var(--color-task-green) !important;
     }
-    
+
     /* 12) Indicador numérico (12 / 5) no canto superior direito */
     .cal-day-indicator {
         position: static !important;
@@ -3765,10 +3822,23 @@ body.dark-mode .logo-img {
         white-space: nowrap !important;
         flex-shrink: 0 !important;
     }
-    .cal-day-indicator .ind-green { color: #22c55e !important; font-weight: 700 !important; }
-    .cal-day-indicator .ind-blue  { color: #3b82f6 !important; font-weight: 700 !important; }
-    .cal-day-indicator .ind-slash { color: #94a3b8 !important; margin: 0 1px !important; font-weight: 400 !important; }
-    
+
+    .cal-day-indicator .ind-green {
+        color: #22c55e !important;
+        font-weight: 700 !important;
+    }
+
+    .cal-day-indicator .ind-blue {
+        color: #3b82f6 !important;
+        font-weight: 700 !important;
+    }
+
+    .cal-day-indicator .ind-slash {
+        color: #94a3b8 !important;
+        margin: 0 1px !important;
+        font-weight: 400 !important;
+    }
+
     /* 13) Área de pills / barrinhas de tarefas */
     .cal-day-tasks {
         flex: 1 !important;
@@ -3777,7 +3847,7 @@ body.dark-mode .logo-img {
         gap: 3px !important;
         overflow: hidden !important;
     }
-    
+
     /* 14) Pills de tarefa — barrinhas coloridas finas */
     .cal-task-pill {
         display: flex !important;
@@ -3793,10 +3863,12 @@ body.dark-mode .logo-img {
         overflow: hidden !important;
         white-space: nowrap !important;
     }
+
     .cal-task-pill i {
         font-size: 9px !important;
         flex-shrink: 0 !important;
     }
+
     .cal-task-pill .pill-text {
         display: block !important;
         overflow: hidden !important;
@@ -3805,7 +3877,7 @@ body.dark-mode .logo-img {
         flex: 1 !important;
         min-width: 0 !important;
     }
-    
+
     /* =============================================
        COLUNA DO RESUMO DO DIA
        Sempre visível no mobile, abaixo do calendário
@@ -3823,12 +3895,13 @@ body.dark-mode .logo-img {
         padding: 0 16px 100px 16px !important;
         box-sizing: border-box !important;
     }
+
     .tarefas-container.summary-active .tarefas-summary-col {
         display: block !important;
         width: 100% !important;
         transform: none !important;
     }
-    
+
     /* Card do Resumo: sem bordas excessivas no mobile */
     .summary-panel {
         height: auto !important;
@@ -3839,26 +3912,29 @@ body.dark-mode .logo-img {
         display: flex !important;
         flex-direction: column !important;
     }
-    
+
     /* Header do Resumo — esconde o botão fechar (não faz sentido no mobile) */
     .summary-panel .summary-header {
         padding: 20px 0 4px 0 !important;
         margin-bottom: 12px !important;
     }
+
     .summary-panel .summary-header .btn-icon {
         display: none !important;
     }
+
     .summary-panel .summary-header h3 {
         font-size: 22px !important;
         font-weight: 700 !important;
     }
-    
+
     /* KPI Cards lado a lado */
     .summary-kpis {
         display: flex !important;
         gap: 10px !important;
         margin-bottom: 20px !important;
     }
+
     .summary-kpi-card {
         flex: 1 !important;
         min-width: 0 !important;
@@ -3867,14 +3943,14 @@ body.dark-mode .logo-img {
         padding: 12px !important;
         background: var(--color-bg-card) !important;
     }
-    
+
     /* Lista de atendimentos */
     .summary-list {
         overflow-y: visible !important;
         flex: none !important;
         max-height: none !important;
     }
-    
+
     /* Botão verde no fundo */
     .summary-footer {
         margin-top: 16px !important;
@@ -3882,6 +3958,7 @@ body.dark-mode .logo-img {
         border-top: none !important;
     }
 }
+
 /* Tooltip Icon */
 .info-tooltip {
     position: absolute;
@@ -3897,15 +3974,18 @@ body.dark-mode .logo-img {
     align-items: center;
     justify-content: center;
 }
+
 .info-tooltip:hover {
     color: var(--color-task-green);
     opacity: 1;
 }
+
 .kpi-card .info-tooltip,
 .summary-kpi-card .info-tooltip {
     top: 12px;
     right: 12px;
 }
+
 .info-tooltip::after {
     content: attr(data-tooltip);
     position: absolute;
@@ -3923,6 +4003,7 @@ body.dark-mode .logo-img {
     transition: opacity 0.2s;
     z-index: 100;
 }
+
 .info-tooltip::before {
     content: '';
     position: absolute;
@@ -3937,6 +4018,7 @@ body.dark-mode .logo-img {
     transition: opacity 0.2s;
     z-index: 100;
 }
+
 .info-tooltip:hover::after,
 .info-tooltip:hover::before {
     opacity: 1;
@@ -3947,10 +4029,12 @@ body.dark-mode .logo-img {
    DESKTOP CHAT LAYOUT (Conversas CRM)
    ========================================================================== */
 @media (min-width: 992px) {
+
     /* Hide iPhone Mockup */
     .mockup-overlay {
         display: none !important;
     }
+
     .iphone-mockup-wrapper {
         width: 100% !important;
         height: 100% !important;
@@ -3959,16 +4043,17 @@ body.dark-mode .logo-img {
         left: auto !important;
         position: static !important;
     }
+
     .mockup-container {
         padding: 0 !important;
         height: 100% !important;
     }
-    
-    .chat-layout > .card {
+
+    .chat-layout>.card {
         margin: 0 !important;
         height: 100% !important;
     }
-    
+
     /* Full Screen Chat */
     .mockup-screen {
         position: static !important;
@@ -3980,38 +4065,44 @@ body.dark-mode .logo-img {
     }
 
     /* Adjust Chat Header for Desktop */
-    .mockup-screen > div:first-child {
+    .mockup-screen>div:first-child {
         background: var(--color-bg-card) !important;
         color: var(--color-text-main) !important;
         padding: 16px 24px !important;
         border-bottom: 1px solid var(--color-border) !important;
         box-shadow: none !important;
     }
-    .mockup-screen > div:first-child i.ph-arrow-left {
+
+    .mockup-screen>div:first-child i.ph-arrow-left {
         display: none !important;
     }
+
     #chat-header-name {
         font-size: 16px !important;
         font-weight: 600 !important;
         color: var(--color-text-main) !important;
     }
+
     #chat-header-status {
         color: var(--color-success) !important;
     }
-    
+
     /* Botões Intervenção Desktop */
     .bot-toggle-container {
-        display: none !important; /* Esconde switch original no desktop */
+        display: none !important;
+        /* Esconde switch original no desktop */
     }
+
     .desktop-bot-actions {
         display: flex !important;
         gap: 12px;
         align-items: center;
     }
-    
+
     /* Background Pattern for Chat Area */
     #chat-messages-container {
-        background-color: #f0f2f5 !important; /* WhatsApp Web BG */
+        background-color: #f0f2f5 !important;
+        /* WhatsApp Web BG */
         background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png') !important;
         background-size: 400px !important;
         background-repeat: repeat !important;
@@ -4024,40 +4115,46 @@ body.dark-mode .logo-img {
         padding: 12px 24px !important;
         border-top: none !important;
     }
+
     #fake-chat-input {
         display: none !important;
     }
+
     #real-chat-input {
         display: block !important;
     }
+
     .fake-chat-input {
         background: #fff !important;
         border: none !important;
         border-radius: 8px !important;
         padding: 12px 16px !important;
-        box-shadow: 0 1px 1px rgba(0,0,0,0.05) !important;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05) !important;
     }
+
     #btn-send-message {
         width: 40px !important;
         height: 40px !important;
         background: var(--color-task-green) !important;
     }
+
     #btn-send-message i {
         font-size: 20px !important;
     }
-    
+
     /* Chat Contact Items (Left List) */
     .chat-contact-item {
         background: var(--color-bg-card);
         border-radius: 12px;
         margin: 8px 16px;
         border: 1px solid var(--color-border) !important;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
     }
+
     .chat-contact-item:hover {
         background: var(--color-bg-main) !important;
     }
-    
+
     /* Hide Hint Box */
     .hint-box {
         display: none !important;
@@ -4071,28 +4168,33 @@ body.dark-mode .logo-img {
     padding: 8px 12px;
     border-radius: 0 12px 12px 12px;
     max-width: 80%;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     margin-bottom: 12px;
     position: relative;
 }
+
 .msg-bubble-ia {
     align-self: flex-end;
     background: var(--color-task-green-light);
     padding: 8px 12px;
     border-radius: 12px 0 12px 12px;
     max-width: 80%;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     margin-bottom: 12px;
     position: relative;
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .desktop-bot-actions {
-    display: none; /* hidden on mobile by default */
+    display: none;
+    /* hidden on mobile by default */
 }
-.btn-intervencao, .btn-ativacao {
+
+.btn-intervencao,
+.btn-ativacao {
     transition: all 0.2s;
 }
+
 .btn-intervencao {
     background: #0f5b46;
     color: white;
@@ -4103,9 +4205,11 @@ body.dark-mode .logo-img {
     font-weight: 500;
     cursor: pointer;
 }
+
 .btn-intervencao:not(.active):hover {
     background: #0c4d3b;
 }
+
 .btn-ativacao {
     background: white;
     color: #0f5b46;
@@ -4116,11 +4220,18 @@ body.dark-mode .logo-img {
     font-weight: 500;
     cursor: pointer;
 }
+
 .btn-ativacao:not(.active):hover {
     background: #f0fdf4;
 }
 
-@media (min-width: 992px) { .dashboard-grid.chat-layout { grid-template-columns: 25% 75% !important; height: calc(100vh - 120px) !important; overflow: hidden !important; } }
+@media (min-width: 992px) {
+    .dashboard-grid.chat-layout {
+        grid-template-columns: 25% 75% !important;
+        height: calc(100vh - 120px) !important;
+        overflow: hidden !important;
+    }
+}
 
 
 /* State Classes */
@@ -4128,10 +4239,12 @@ body.dark-mode .logo-img {
     opacity: 1 !important;
     cursor: default !important;
 }
+
 .desktop-bot-actions button.inactive {
     opacity: 0.5 !important;
     cursor: pointer !important;
 }
+
 .desktop-bot-actions button.inactive:hover {
     opacity: 0.8 !important;
 }
@@ -4143,6 +4256,7 @@ body.dark-mode .logo-img {
     align-items: center;
     gap: 6px;
 }
+
 .custom-tooltip {
     position: absolute;
     top: calc(100% + 8px);
@@ -4164,9 +4278,10 @@ body.dark-mode .logo-img {
     transition: all 0.2s ease;
     z-index: 1000;
     pointer-events: none;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     border: 1px solid #eaeaea;
 }
+
 .custom-tooltip::before {
     content: '';
     position: absolute;
@@ -4177,6 +4292,7 @@ body.dark-mode .logo-img {
     border-style: solid;
     border-color: transparent transparent #ffffff transparent;
 }
+
 .custom-tooltip::after {
     content: '';
     position: absolute;
@@ -4188,17 +4304,21 @@ body.dark-mode .logo-img {
     border-color: transparent transparent #eaeaea transparent;
     z-index: -1;
 }
+
 .tooltip-title {
     font-weight: 700;
     font-size: 14px;
     margin-bottom: 4px;
     color: #111;
 }
+
 .custom-tooltip strong {
     font-weight: 700;
     font-size: 14px;
-    color: #0f5b46; /* Using the primary brand color for the bold text */
+    color: #0f5b46;
+    /* Using the primary brand color for the bold text */
 }
+
 .desktop-bot-actions button:hover .custom-tooltip {
     opacity: 1;
     visibility: visible;
@@ -4206,11 +4326,29 @@ body.dark-mode .logo-img {
 }
 
 /* Fix right edge tooltip overflow */
-.btn-ativacao .custom-tooltip { left: auto !important; right: 0 !important; transform: translateY(5px) !important; }
-.btn-ativacao:hover .custom-tooltip { transform: translateY(0) !important; }
-.btn-ativacao .custom-tooltip::before { left: auto !important; right: 20px !important; transform: none !important; }
-.btn-ativacao .custom-tooltip::after { left: auto !important; right: 19px !important; transform: none !important; }
+.btn-ativacao .custom-tooltip {
+    left: auto !important;
+    right: 0 !important;
+    transform: translateY(5px) !important;
+}
+
+.btn-ativacao:hover .custom-tooltip {
+    transform: translateY(0) !important;
+}
+
+.btn-ativacao .custom-tooltip::before {
+    left: auto !important;
+    right: 20px !important;
+    transform: none !important;
+}
+
+.btn-ativacao .custom-tooltip::after {
+    left: auto !important;
+    right: 19px !important;
+    transform: none !important;
+}
 
 
-.desktop-bot-actions button { pointer-events: auto !important; }
-
+.desktop-bot-actions button {
+    pointer-events: auto !important;
+}
