@@ -1,8 +1,10 @@
 import { supabase } from './supabase.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-
-    // 1. Autenticação e Tema
+    let adminStartDate = null;
+    let adminEndDate = null;
+    let globalTenants = [];
+    let adminChartInstance = null;    // 1. Autenticação e Tema
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
         window.location.href = 'login.html';
@@ -195,7 +197,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadTenantsList();
 
     // 5. Carregar Lista de Empresas (Tenants)
-    let globalTenants = [];
 
     async function loadTenantsList() {
         const tbody = document.getElementById('empresas-tbody');
@@ -386,8 +387,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (searchAdminInput) searchAdminInput.addEventListener('input', applyAdminFilters);
     
     // --- Lógica do Calendário Customizado do Admin ---
-    let adminStartDate = null;
-    let adminEndDate = null;
     const dateBtn = document.getElementById('date-filter-btn');
     const dateDropdown = document.getElementById('date-dropdown');
     const calendarGrid = document.getElementById('calendar-grid');
