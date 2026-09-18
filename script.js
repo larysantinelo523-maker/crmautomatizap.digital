@@ -6,6 +6,22 @@ window.getBrasiliaDate = function() {
     return new Date(str);
 };
 
+// --- Recarregamento Automático à Meia-Noite ---
+function scheduleMidnightReload() {
+    const now = window.getBrasiliaDate();
+    const tomorrow = window.getBrasiliaDate();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 2, 0); // Meia-noite e 2 segundos
+    
+    const msUntilMidnight = tomorrow.getTime() - now.getTime();
+    
+    setTimeout(() => {
+        window.location.reload();
+    }, msUntilMidnight);
+}
+scheduleMidnightReload();
+// ---------------------------------------------
+
 window.parseExactDate = function(baseDateStr) {
     if (!baseDateStr || baseDateStr === 'N/A') return null;
     const parts = baseDateStr.split('-');
