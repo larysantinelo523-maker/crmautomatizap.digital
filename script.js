@@ -418,6 +418,33 @@ if (window.location.pathname.indexOf('login.html') === -1) {
 
                     if (userData && !error) {
                         currentUserData = userData;
+
+                        // -- Avaliação Dinâmica do Status (Sincroniza com a data de vencimento) --
+                        if (userData.tipo_usuario !== 'administrador' && userData.data_vencimento && userData.data_vencimento !== 'N/A') {
+                            const vencDate = window.parseExactDate(userData.data_vencimento);
+                            if (vencDate) {
+                                const today = window.getBrasiliaDate();
+                                today.setHours(0, 0, 0, 0);
+                                const diffDays = Math.ceil((vencDate - today) / (1000 * 3600 * 24));
+                                
+                                let dynamicStatus = userData.status_assinatura;
+                                if (diffDays < 0) {
+                                    dynamicStatus = 'vencido';
+                                } else if (diffDays >= 0 && diffDays <= 3) {
+                                    dynamicStatus = 'Aviso prévio';
+                                } else if (diffDays > 3) {
+                                    dynamicStatus = 'pago';
+                                }
+
+                                if (dynamicStatus !== userData.status_assinatura) {
+                                    userData.status_assinatura = dynamicStatus;
+                                    // Sincroniza em background
+                                    supabase.from('usuarios').update({ status_assinatura: dynamicStatus }).eq('id', userId).then();
+                                }
+                            }
+                        }
+                        // ------------------------------------------------------------------------
+
                         const userName = userData.nome_completo || 'Usuário';
                         const userRole = userData.tipo_usuario || 'usuário';
 
@@ -513,7 +540,7 @@ if (window.location.pathname.indexOf('login.html') === -1) {
 
                                 if (notifText) {
                                     html += `<div style="padding: 12px; border-bottom: 1px solid var(--color-border); cursor: pointer;" onclick="window.location.href='configuracoes.html?tab=assinatura'">
-                                        <div style="font-weight: 600; font-size: 13px; color: ${isExpired ? 'var(--color-danger)' : (isRenewed ? 'var(--color-success)' : 'var(--color-warning)')}; margin-bottom: 4px;"><i class="ph ${isExpired ? 'ph-warning-circle' : (isRenewed ? 'ph-check-circle' : 'ph-warning')}"></i> ${isExpired ? 'Assinatura Vencida' : (isRenewed ? 'Você renovou sua assinatura' : 'Aviso Prévio')}</div>
+                                        <div style="font-weight: 600; font-size: 13px; color: ${isExpired ? 'var(--color-danger)' : (isRenewed ? '#10b981' : 'var(--color-warning)')}; margin-bottom: 4px;"><i class="ph ${isExpired ? 'ph-warning-circle' : (isRenewed ? 'ph-check-circle' : 'ph-warning')}"></i> ${isExpired ? 'Assinatura Vencida' : (isRenewed ? 'Você renovou sua assinatura' : 'Aviso Prévio')}</div>
                                         <div style="font-size: 12px; color: var(--color-text-mut);">${notifText}</div>
                                     </div>`;
                                     notifCount++;

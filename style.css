@@ -389,11 +389,12 @@ body.dark-mode .header {
     position: absolute;
     top: 8px;
     right: 10px;
-    width: 6px;
-    height: 6px;
-    background-color: var(--color-primary);
+    width: 8px;
+    height: 8px;
+    background-color: #10b981;
     border-radius: 50%;
     display: none;
+    box-shadow: 0 0 0 2px var(--color-bg-card);
 }
 
 /* --- Date Dropdown --- */
