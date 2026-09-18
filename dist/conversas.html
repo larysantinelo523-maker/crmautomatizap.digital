@@ -492,6 +492,8 @@
                 if(currentLeadId) {
                     await window.dbAPI.toggleBotState(currentLeadId, newState);
                     carregarMensagens({ id: currentLeadId, nome: document.getElementById('chat-header-name').innerText }); // recarrega pra mostrar o aviso
+                } else {
+                    alert('Selecione uma conversa primeiro para alterar o status do agente.');
                 }
             }
 
@@ -646,11 +648,14 @@
         }
 
         // Evento para abrir dossiê
-        document.getElementById('btn-lead-info').addEventListener('click', () => {
-            if (currentLeadId) {
-                window.location.href = `leads.html?openLead=${currentLeadId}`;
-            }
-        });
+        const btnLeadInfo = document.getElementById('btn-lead-info');
+        if (btnLeadInfo) {
+            btnLeadInfo.addEventListener('click', () => {
+                if (currentLeadId) {
+                    window.location.href = `leads.html?openLead=${currentLeadId}`;
+                }
+            });
+        }
     </script>
 </body>
 
