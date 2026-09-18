@@ -3574,15 +3574,64 @@ body.dark-mode .logo-img {
         flex-direction: column;
         height: auto;
     }
+    
+    /* CALENDAR RESPONSIVENESS */
+    .cal-main-header, 
+    .cal-main-body {
+        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    }
+    .cal-main-body {
+        gap: 4px !important;
+    }
+    .cal-day-cell {
+        padding: 4px !important;
+        min-height: 90px;
+    }
+    .cal-day-number {
+        font-size: 12px !important;
+        margin-bottom: 4px !important;
+    }
+    
+    /* INDICATOR */
+    .cal-day-indicator {
+        position: static !important;
+        justify-content: center !important;
+        width: 100% !important;
+        padding: 2px !important;
+        margin-bottom: 4px !important;
+    }
+    
+    /* PILLS */
+    .cal-task-pill {
+        padding: 0 4px !important;
+        font-size: 10px !important;
+        height: 20px !important;
+        min-height: 20px !important;
+        margin-bottom: 4px !important;
+    }
+    .cal-task-pill i {
+        font-size: 12px !important;
+        margin-right: 2px !important;
+    }
+    
+    /* SUMMARY COL */
     .tarefas-summary-col {
-        width: 100%;
-        max-width: 100%;
-        transform: translateX(0);
-        transform: translateY(40px);
+        display: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        transform: none !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        margin-top: 16px;
     }
     .tarefas-container.summary-active .tarefas-summary-col {
-        width: 100%;
-        transform: translateY(0);
+        display: block !important;
+        width: 100% !important;
+        transform: none !important;
+    }
+    .summary-panel {
+        height: auto !important;
     }
 }
 /* Tooltip Icon */
