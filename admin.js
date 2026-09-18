@@ -127,7 +127,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 4. Carregar Métricas Globais (Visão Geral)
     async function loadDashboardStats() {
         try {
-            const res = await fetch('/api/get_stats');
+            let url = '/api/get_stats';
+            const params = new URLSearchParams();
+            if (adminStartDate) {
+                const s = new Date(adminStartDate);
+                s.setHours(0, 0, 0, 0);
+                params.append('start', s.toISOString());
+            }
+            if (adminEndDate) {
+                const e = new Date(adminEndDate);
+                e.setHours(23, 59, 59, 999);
+                params.append('end', e.toISOString());
+            }
+            if (params.toString()) {
+                url += '?' + params.toString();
+            }
+            const res = await fetch(url);
             if (!res.ok) throw new Error("Erro na API (verifique chave Supabase na Vercel)");
             const stats = await res.json();
 
@@ -553,6 +568,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (selectionTxt) selectionTxt.textContent = "Nenhum período selecionado";
             updateAdminDateText();
             applyAdminFilters();
+            loadDashboardStats();
             renderAdminCalendar();
         });
     }
@@ -563,6 +579,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             e.stopPropagation();
             updateAdminDateText();
             applyAdminFilters();
+            loadDashboardStats();
             dateDropdown.classList.remove('show');
         });
     }
@@ -603,6 +620,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 updateAdminDateText();
                 dateDropdown.classList.remove('show');
                 applyAdminFilters();
+                loadDashboardStats();
             });
         }
 
@@ -611,7 +629,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             btnClearDate.addEventListener('click', (e) => {
                 e.stopPropagation();
                 adminSelectedDate = null;
+                adminStartDate = null;
+                adminEndDate = null;
                 if (selectionTxt) selectionTxt.textContent = "Nenhuma data selecionada";
+                updateAdminDateText();
+                applyAdminFilters();
+                loadDashboardStats();
                 renderAdminCalendar();
             });
         }
