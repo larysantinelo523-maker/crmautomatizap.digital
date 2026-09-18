@@ -3723,10 +3723,10 @@ body.dark-mode .logo-img {
 
     /* 8) CADA CARD DO DIA — wrapper externo transparente */
     .cal-day-cell {
-        /* 2 cards inteiros + 30% do 3º visível:
-           card_width = (viewport - padding_esq - 2xgap) / 2.3 */
-        flex: 0 0 calc((100vw - 36px) / 2.3) !important;
-        max-width: calc((100vw - 36px) / 2.3) !important;
+        /* 2 cards inteiros + 20% do 3º visível:
+           card_width = (viewport - padding_esq - 2xgap) / 2.2 */
+        flex: 0 0 calc((100vw - 36px) / 2.2) !important;
+        max-width: calc((100vw - 36px) / 2.2) !important;
         scroll-snap-align: start !important;
         background: transparent !important;
         border: none !important;
