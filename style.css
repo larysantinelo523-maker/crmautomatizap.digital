@@ -3272,7 +3272,6 @@ body.dark-mode .logo-img {
     top: 6px;
     right: 6px;
     font-size: 10px;
-    font-weight: 700;
     background: var(--color-bg-main);
     padding: 2px 6px;
     border-radius: 4px;
@@ -3281,6 +3280,10 @@ body.dark-mode .logo-img {
     display: flex;
     gap: 2px;
     align-items: center;
+}
+
+.cal-day-indicator span {
+    font-weight: 700;
 }
 
 .cal-day-cell:hover {
