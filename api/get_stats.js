@@ -24,32 +24,48 @@ export default async function handler(req, res) {
 
         if (errEmp) throw errEmp;
 
-        let totalEmpresas = empresas.length;
+        let totalEmpresas = 0;
         let clientesPagos = 0;
         let clientesInadimplentes = 0;
 
-        const hoje = new Date();
-        hoje.setHours(0, 0, 0, 0);
-
         empresas.forEach(emp => {
-            let isInadimplente = false;
+            // Garante que o administrador não seja contado (filtro duplo)
+            if (emp.tipo_usuario && emp.tipo_usuario.trim().toLowerCase() === 'administrador') return;
+            // Opcional: filtro por email caso seja necessário
+            if (emp.email && emp.email.trim().toLowerCase() === 'admin@automatizap.com') return;
+            
+            totalEmpresas++;
 
-            if (emp.status_assinatura === 'inadimplente' || emp.status_assinatura === 'cancelado') {
-                isInadimplente = true;
-            } else if (emp.data_vencimento && emp.data_vencimento !== 'N/A') {
-                const parts = emp.data_vencimento.split('-'); // ex: 2026-10-12
+            let evaluatedStatus = emp.status_assinatura || 'vencido';
+
+            if (emp.data_vencimento && emp.data_vencimento !== 'N/A') {
+                const dataVencStr = emp.data_vencimento.split('T')[0];
+                const parts = dataVencStr.split('-');
                 if (parts.length === 3) {
-                    const venc = new Date(parts[0], parts[1] - 1, parts[2]);
-                    if (venc < hoje) {
-                        isInadimplente = true;
+                    const dataVenc = new Date(parts[0], parts[1] - 1, parts[2], 0, 0, 0);
+                    const hojeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
+                    const hoje = new Date(hojeStr);
+                    
+                    dataVenc.setHours(0, 0, 0, 0);
+                    hoje.setHours(0, 0, 0, 0);
+
+                    const diffTime = dataVenc.getTime() - hoje.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays < 0) {
+                        evaluatedStatus = 'vencido';
+                    } else if (diffDays >= 0 && diffDays <= 3) {
+                        evaluatedStatus = 'Aviso prévio';
+                    } else {
+                        evaluatedStatus = 'pago';
                     }
                 }
             }
 
-            if (isInadimplente) {
-                clientesInadimplentes++;
-            } else {
+            if (evaluatedStatus === 'pago' || evaluatedStatus === 'Aviso prévio') {
                 clientesPagos++;
+            } else if (evaluatedStatus === 'vencido' || evaluatedStatus === 'inadimplente' || evaluatedStatus === 'cancelado') {
+                clientesInadimplentes++;
             }
         });
 

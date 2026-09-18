@@ -391,7 +391,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <label style="font-weight: 500; font-size: 14px; margin-bottom: 8px; text-align: left; display: block; color: var(--color-text-main);">Status da Empresa</label>
                     <div class="custom-select-container" style="display: flex; flex-direction: column; gap: 4px;">
                         <div class="custom-option selected" data-value="Todos">Todos os status</div>
-                        <div class="custom-option" data-value="Pagos">Pagos</div>
+                        <div class="custom-option" data-value="Ativos">Ativos</div>
                         <div class="custom-option admin-opt-aviso" data-value="Aviso previo">Aviso prévio</div>
                         <div class="custom-option admin-opt-inadimplente" data-value="Inadimplente">Vencido</div>
                     </div>
@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                         const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[5].textContent.trim().toLowerCase();
                                         
                                         let match = false;
-                                        if (statusVal === 'pagos' && (rowStatus === 'pago' || rowStatus === 'ativo')) {
+                                        if (statusVal === 'ativos' && (rowStatus === 'pago' || rowStatus === 'ativo' || rowStatus.includes('aviso prévio') || rowStatus.includes('aviso previo'))) {
                                             match = true;
                                         } else if (statusVal === 'aviso previo' && (rowStatus.includes('aviso prévio') || rowStatus.includes('aviso previo'))) {
                                             match = true;
