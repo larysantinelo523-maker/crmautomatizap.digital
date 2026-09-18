@@ -2107,7 +2107,7 @@ body.dark-mode .accordion-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: var(--color-surface);
+    background: var(--color-bg-card);
 }
 
 .dossier-title {
@@ -2137,7 +2137,7 @@ body.dark-mode .accordion-content {
 }
 
 .dossier-card {
-    background: var(--color-surface);
+    background: var(--color-bg-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     padding: 16px;
@@ -2167,7 +2167,7 @@ body.dark-mode .accordion-content {
 .dossier-footer {
     padding: 24px;
     border-top: 1px solid var(--color-border);
-    background: var(--color-surface);
+    background: var(--color-bg-card);
 }
 
 @media (max-width: 768px) {
@@ -3664,7 +3664,7 @@ body.dark-mode .logo-img {
 
     /* Adjust Chat Header for Desktop */
     .mockup-screen > div:first-child {
-        background: var(--color-surface) !important;
+        background: var(--color-bg-card) !important;
         color: var(--color-text-main) !important;
         padding: 16px 24px !important;
         border-bottom: 1px solid var(--color-border) !important;
@@ -3731,7 +3731,7 @@ body.dark-mode .logo-img {
     
     /* Chat Contact Items (Left List) */
     .chat-contact-item {
-        background: var(--color-surface);
+        background: var(--color-bg-card);
         border-radius: 12px;
         margin: 8px 16px;
         border: 1px solid var(--color-border) !important;
