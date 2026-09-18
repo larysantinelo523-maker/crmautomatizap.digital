@@ -210,18 +210,31 @@ fetchUserData().then(user => {
                             // Remove o bloqueio vermelho suavemente e mostra sucesso
                             const blockOverlay = document.getElementById('inadimplente-blocker');
                             if (blockOverlay) {
+                                localStorage.removeItem('was_inadimplente'); // Evita o segundo popup após o reload
                                 blockOverlay.innerHTML = `
+                                    <style>
+                                    @keyframes popCheck {
+                                        0% { transform: scale(0.5); opacity: 0; }
+                                        50% { transform: scale(1.2); opacity: 1; }
+                                        100% { transform: scale(1); opacity: 1; }
+                                    }
+                                    @keyframes pulseGlow {
+                                        0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+                                        70% { box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
+                                        100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+                                    }
+                                    </style>
                                     <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); max-width: 400px; width: 90%; text-align: center; border: 2px solid #22c55e;">
-                                        <div style="width: 60px; height: 60px; background: #dcfce7; color: #16a34a; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px; font-size: 28px;">
+                                        <div style="width: 70px; height: 70px; background: #dcfce7; color: #16a34a; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 24px; font-size: 36px; animation: popCheck 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, pulseGlow 2s infinite; position: relative;">
                                             <i class="ph ph-check-circle"></i>
                                         </div>
-                                        <h2 style="font-size: 22px; color: #1f2937; margin-bottom: 12px; font-weight: 700;">Pagamento Processado!</h2>
-                                        <p style="color: #4b5563; font-size: 15px; margin-bottom: 24px; line-height: 1.5;">Pagamento processado pelo Mercado Pago. Você já pode voltar a usar nossos serviços!</p>
+                                        <h2 style="font-size: 24px; color: #1f2937; margin-bottom: 12px; font-weight: 700;">Pagamento Aprovado!</h2>
+                                        <p style="color: #4b5563; font-size: 15px; margin-bottom: 24px; line-height: 1.5;">Processamos o seu pagamento pelo Mercado Pago com sucesso. Agradecemos pela confiança!</p>
                                         
-                                        <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 10px;">
+                                        <div style="background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 10px;">
                                             <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
-                                                <i class="ph ph-spinner ph-spin" style="font-size: 24px; color: #10b981;"></i>
-                                                <span style="font-size: 14px; color: #64748b;">Redirecionando para o seu CRM...</span>
+                                                <i class="ph ph-spinner-gap ph-spin" style="font-size: 24px; color: #10b981;"></i>
+                                                <span style="font-size: 14px; color: #64748b; font-weight: 500;">Redirecionando ao CRM...</span>
                                             </div>
                                         </div>
                                     </div>
@@ -306,17 +319,29 @@ fetchUserData().then(user => {
                     successBlocker.style.justifyContent = 'center';
                     successBlocker.style.alignItems = 'center';
                     successBlocker.innerHTML = `
+                        <style>
+                        @keyframes popCheck {
+                            0% { transform: scale(0.5); opacity: 0; }
+                            50% { transform: scale(1.2); opacity: 1; }
+                            100% { transform: scale(1); opacity: 1; }
+                        }
+                        @keyframes pulseGlow {
+                            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+                            70% { box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
+                            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+                        }
+                        </style>
                         <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); max-width: 400px; width: 90%; text-align: center; border: 2px solid #22c55e;">
-                            <div style="width: 60px; height: 60px; background: #dcfce7; color: #16a34a; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px; font-size: 28px;">
+                            <div style="width: 70px; height: 70px; background: #dcfce7; color: #16a34a; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 24px; font-size: 36px; animation: popCheck 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, pulseGlow 2s infinite; position: relative;">
                                 <i class="ph ph-check-circle"></i>
                             </div>
-                            <h2 style="font-size: 22px; color: #1f2937; margin-bottom: 12px; font-weight: 700;">Pagamento Processado!</h2>
-                            <p style="color: #4b5563; font-size: 15px; margin-bottom: 24px; line-height: 1.5;">Pagamento processado pelo Mercado Pago. Você já pode voltar a usar nossos serviços!</p>
+                            <h2 style="font-size: 24px; color: #1f2937; margin-bottom: 12px; font-weight: 700;">Pagamento Aprovado!</h2>
+                            <p style="color: #4b5563; font-size: 15px; margin-bottom: 24px; line-height: 1.5;">Processamos o seu pagamento pelo Mercado Pago com sucesso. Agradecemos pela confiança!</p>
                             
-                            <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 10px;">
+                            <div style="background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 10px;">
                                 <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
-                                    <i class="ph ph-spinner ph-spin" style="font-size: 24px; color: #10b981;"></i>
-                                    <span style="font-size: 14px; color: #64748b;">Entrando no sistema...</span>
+                                    <i class="ph ph-spinner-gap ph-spin" style="font-size: 24px; color: #10b981;"></i>
+                                    <span style="font-size: 14px; color: #64748b; font-weight: 500;">Entrando no sistema...</span>
                                 </div>
                             </div>
                         </div>
