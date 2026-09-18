@@ -713,7 +713,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ApexCharts e Highcharts logic (Similar ao do Relatórios)
-    let adminChartInstance = null;
     function renderAdminLineChart(categories, series) {
         const isDark = document.body.classList.contains('dark-mode');
         const textColor = isDark ? '#94a3b8' : '#64748b';
