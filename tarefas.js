@@ -10,9 +10,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const sumReunioes = document.getElementById('sum-reunioes');
     const sumTasksList = document.getElementById('summary-tasks-list');
 
-    // Mês atual fixo para Setembro de 2026 como base
-    const currentYear = 2026;
-    const currentMonth = 8; // Setembro (0-index)
+    // Mês atual inicialmente fixo para Setembro de 2026 como base
+    let currentYear = 2026;
+    let currentMonth = 8; // Setembro (0-index)
+    const monthNamesList = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    
+    const calMonthYear = document.getElementById('cal-main-month-year');
+    
+    function updateMonthYearText() {
+        if (calMonthYear) {
+            calMonthYear.textContent = `${monthNamesList[currentMonth]} ${currentYear}`;
+        }
+    }
 
     // Dados Mockados para os dias do mês
     // Mapeando algumas datas (ex: chaves de 1 a 30)
@@ -93,15 +102,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderCalendar() {
         calBody.innerHTML = '';
         
-        // 1 de Setembro de 2026 é Terça-feira (2)
-        const firstDayIndex = 2; 
-        const daysInMonth = 30;
+        const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
         
         // Dias do mês anterior
+        const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
         for (let i = 0; i < firstDayIndex; i++) {
             const emptyCell = document.createElement('div');
             emptyCell.className = 'cal-day-cell empty-month';
-            emptyCell.innerHTML = `<div class="cal-day-number">${31 - firstDayIndex + i + 1}</div>`;
+            emptyCell.innerHTML = `<div class="cal-day-number">${prevMonthDays - firstDayIndex + i + 1}</div>`;
             calBody.appendChild(emptyCell);
         }
 
@@ -224,8 +233,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Navegação de Meses
+    const btnPrev = document.getElementById('cal-main-prev');
+    const btnNext = document.getElementById('cal-main-next');
+    
+    if (btnPrev && btnNext) {
+        btnPrev.addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            updateMonthYearText();
+            if (calBody) renderCalendar();
+        });
+        
+        btnNext.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            updateMonthYearText();
+            if (calBody) renderCalendar();
+        });
+    }
+
     // Iniciar
     if (calBody) {
+        updateMonthYearText();
         renderCalendar();
     }
 });

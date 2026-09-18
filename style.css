@@ -3576,19 +3576,25 @@ body.dark-mode .logo-img {
     }
     
     /* CALENDAR RESPONSIVENESS */
+    .calendar-main-grid {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 8px; /* Room for scrollbar */
+    }
     .cal-main-header, 
     .cal-main-body {
-        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+        min-width: 840px !important;
+        grid-template-columns: repeat(7, 1fr) !important;
     }
     .cal-main-body {
-        gap: 4px !important;
+        gap: 8px !important;
         grid-template-rows: auto !important;
         grid-auto-rows: 1fr !important;
     }
     .cal-day-cell {
-        padding: 4px !important;
-        min-height: 55px;
-        border-radius: 4px !important;
+        padding: 8px !important;
+        min-height: 80px; /* Comfortable height */
+        border-radius: 8px !important;
     }
     .cal-day-number {
         font-size: 12px !important;
