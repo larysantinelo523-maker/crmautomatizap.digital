@@ -15,7 +15,20 @@ export default async function handler(req, res) {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { start, end } = req.query;
+    let start, end;
+    if (req.query && Object.keys(req.query).length > 0) {
+        start = req.query.start;
+        end = req.query.end;
+    } else {
+        try {
+            const host = req.headers.host || 'localhost';
+            const urlObj = new URL(req.url, `http://${host}`);
+            start = urlObj.searchParams.get('start');
+            end = urlObj.searchParams.get('end');
+        } catch (e) {
+            console.error("Erro ao fazer parse da URL:", e);
+        }
+    }
     let queryStartDate = start ? new Date(start) : null;
     let queryEndDate = end ? new Date(end) : null;
 

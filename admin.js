@@ -184,9 +184,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             animateValue('kpi-inadimplentes', 0, stats.inadimplentes || 0, 1500);
             animateValue('kpi-faturamento', 0, stats.faturamento || 0, 1500, true);
         } catch (e) {
-            console.error(e);
+            console.error("Erro no loadDashboardStats:", e);
             document.querySelectorAll('.kpi-content h2').forEach(el => {
-                el.innerHTML = '<span style="color:#ef4444; font-size: 14px;">Erro ao carregar</span>';
+                el.innerHTML = `<span style="color:#ef4444; font-size: 14px;">Erro: ${e.message}</span>`;
             });
         }
     }
