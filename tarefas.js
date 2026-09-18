@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     html += `
                         <div class="cal-day-indicator">
                             <span style="color: var(--color-success);">${kpis.atendimentos}</span> / 
-                            <span style="color: var(--color-primary-dark);">${kpis.reunioes}</span>
+                            <span style="color: #3b82f6;">${kpis.reunioes}</span>
                         </div>
                     `;
                 }
