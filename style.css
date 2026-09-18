@@ -3672,8 +3672,8 @@ body.dark-mode .logo-img {
     
     /* 8) CADA CARD DO DIA — wrapper externo transparente */
     .cal-day-cell {
-        flex: 0 0 calc((100vw - 32px - 20px) / 3) !important; /* exatos 3 cards: largura - padding - 2 gaps */
-        max-width: calc((100vw - 32px - 20px) / 3) !important;
+        flex: 0 0 calc((100vw - 32px - 30px) / 2) !important; /* 2 cards inteiros + peek do 3º */
+        max-width: calc((100vw - 32px - 30px) / 2) !important;
         scroll-snap-align: start !important;
         background: transparent !important;
         border: none !important;
@@ -3713,7 +3713,7 @@ body.dark-mode .logo-img {
         box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
         display: flex !important;
         flex-direction: column !important;
-        height: 108px !important;
+        height: 130px !important;
         overflow: hidden !important;
         flex: 1 !important;
     }
