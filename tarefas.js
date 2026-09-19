@@ -297,11 +297,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         attachEvents(document.querySelectorAll('.cal-day-cell'));
 
-        // Scroll para centralizar o dia de hoje
+        // Scroll para centralizar o dia de hoje ou o dia da URL
         setTimeout(() => {
-            const todayCell = calBody.querySelector('.cal-day-cell.today');
-            if (todayCell) {
-                const centerPos = todayCell.offsetLeft - calBody.offsetLeft - (calBody.clientWidth / 2) + (todayCell.clientWidth / 2);
+            let cellToCenter = null;
+            if (targetDayToClick) {
+                cellToCenter = calBody.querySelector(`.cal-day-cell[data-month="${currentMonth}"][data-year="${currentYear}"][data-day="${targetDayToClick}"]`);
+            }
+            if (!cellToCenter) {
+                cellToCenter = calBody.querySelector('.cal-day-cell.today');
+            }
+            if (cellToCenter) {
+                const centerPos = cellToCenter.offsetLeft - calBody.offsetLeft - (calBody.clientWidth / 2) + (cellToCenter.clientWidth / 2);
                 calBody.scrollLeft = centerPos;
             } else {
                 const firstCurrentDay = calBody.querySelector(`.cal-day-cell[data-month="${currentMonth}"]`);
@@ -556,12 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             let cellToClick = null;
             if (targetDayToClick) {
-                const cells = calBody.querySelectorAll('.cal-day-cell:not(.empty-month)');
-                cells.forEach(c => {
-                    if (parseInt(c.dataset.day) === targetDayToClick) {
-                        cellToClick = c;
-                    }
-                });
+                cellToClick = calBody.querySelector(`.cal-day-cell[data-month="${currentMonth}"][data-year="${currentYear}"][data-day="${targetDayToClick}"]`);
             }
             if (!cellToClick) {
                 cellToClick = calBody.querySelector('.cal-day-cell.today');
