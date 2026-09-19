@@ -98,50 +98,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Gerar o calendário
-    function renderCalendar() {
-        calBody.innerHTML = '';
-        
-        const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
-        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-        
-        let k = 0;
+    // Gerar HTML de um mês específico
+    function generateMonthHTML(year, month) {
+        let htmlContent = '';
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const firstDayIndex = new Date(year, month, 1).getDay();
         const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
         
-        // Dias do mês anterior
-        const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
-        for (let i = 0; i < firstDayIndex; i++) {
-            const emptyCell = document.createElement('div');
-            emptyCell.className = 'cal-day-cell empty-month';
-            emptyCell.innerHTML = `
-                <div class="mobile-day-name">${dayNames[k % 7]}</div>
-                <div class="cal-day-card">
-                    <div class="cal-day-number">${prevMonthDays - firstDayIndex + i + 1}</div>
-                </div>
-            `;
-            calBody.appendChild(emptyCell);
-            k++;
-        }
-
         const realToday = new Date();
-        const isThisMonth = realToday.getFullYear() === currentYear && realToday.getMonth() === currentMonth;
+        const isThisMonth = realToday.getFullYear() === year && realToday.getMonth() === month;
         const todayDate = realToday.getDate();
-
-        // Dias do mês atual
+        
+        let k = firstDayIndex;
         for (let i = 1; i <= daysInMonth; i++) {
-            const cell = document.createElement('div');
-            cell.className = 'cal-day-cell';
+            let classes = 'cal-day-cell';
             if (isThisMonth && i === todayDate) {
-                cell.classList.add('today');
+                classes += ' today';
             }
-            cell.dataset.day = i;
             
-            let html = `<div class="mobile-day-name">${dayNames[k % 7]}</div>`;
+            let html = `<div class="${classes}" data-day="${i}" data-month="${month}" data-year="${year}">`;
+            html += `<div class="mobile-day-name">${dayNames[k % 7]}</div>`;
             html += `<div class="cal-day-card">`;
             html += `<div class="cal-day-header">`;
             html += `<div class="cal-day-number">${i}</div>`;
             
-            // Injetar tasks mockadas se houver
             if (mockData[i]) {
                 const kpis = mockData[i].kpis;
                 if (kpis) {
@@ -151,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     `;
                 }
-                html += `</div>`; // fecha header
+                html += `</div>`; 
 
                 html += `<div class="cal-day-tasks">`;
                 const tasks = mockData[i].tasks;
@@ -168,21 +148,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `</div><div class="cal-day-tasks">`;
             }
             
-            html += `</div></div>`;
-            cell.innerHTML = html;
-            
-            // Evento de clique
-            cell.addEventListener('click', () => {
-                document.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('active'));
-                cell.classList.add('active');
-                openSummary(i);
-            });
-            
-            calBody.appendChild(cell);
+            html += `</div></div></div>`;
+            htmlContent += html;
             k++;
         }
+        return htmlContent;
+    }
+
+    // Grid do Desktop (Estático 35 slots)
+    function renderDesktopGrid() {
+        calBody.innerHTML = '';
+        const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
         
-        // Completar a grid (para dar 35 células totais - 5 semanas de 7 dias)
+        let k = 0;
+        const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
+        for (let i = 0; i < firstDayIndex; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.className = 'cal-day-cell empty-month';
+            emptyCell.innerHTML = `
+                <div class="mobile-day-name">${dayNames[k % 7]}</div>
+                <div class="cal-day-card">
+                    <div class="cal-day-number">${prevMonthDays - firstDayIndex + i + 1}</div>
+                </div>
+            `;
+            calBody.appendChild(emptyCell);
+            k++;
+        }
+
+        calBody.insertAdjacentHTML('beforeend', generateMonthHTML(currentYear, currentMonth));
+        k += daysInMonth;
+
         const totalCellsRendered = firstDayIndex + daysInMonth;
         const remainingCells = 35 - totalCellsRendered;
         for (let i = 1; i <= remainingCells; i++) {
@@ -197,16 +194,136 @@ document.addEventListener('DOMContentLoaded', () => {
             calBody.appendChild(emptyCell);
             k++;
         }
+
+        document.querySelectorAll('.cal-day-cell:not(.empty-month)').forEach(cell => {
+            cell.addEventListener('click', () => {
+                document.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('active'));
+                cell.classList.add('active');
+                openSummary(parseInt(cell.dataset.day), parseInt(cell.dataset.month), parseInt(cell.dataset.year));
+            });
+        });
     }
 
+    // Carrossel Contínuo do Mobile
+    let observer;
+    let isScrollLoading = false;
+    let minRenderedMonth, minRenderedYear, maxRenderedMonth, maxRenderedYear;
+
+    function renderInfiniteMobile() {
+        calBody.innerHTML = '';
+        
+        minRenderedMonth = currentMonth - 1;
+        minRenderedYear = currentYear;
+        if (minRenderedMonth < 0) { minRenderedMonth = 11; minRenderedYear--; }
+        
+        maxRenderedMonth = currentMonth + 1;
+        maxRenderedYear = currentYear;
+        if (maxRenderedMonth > 11) { maxRenderedMonth = 0; maxRenderedYear++; }
+
+        const html = generateMonthHTML(minRenderedYear, minRenderedMonth) + 
+                     generateMonthHTML(currentYear, currentMonth) + 
+                     generateMonthHTML(maxRenderedYear, maxRenderedMonth);
+        calBody.innerHTML = html;
+
+        if(observer) observer.disconnect();
+        observer = new IntersectionObserver((entries) => {
+            let mostVisible = null;
+            let maxRatio = 0;
+            entries.forEach(entry => {
+                if (entry.intersectionRatio > maxRatio) {
+                    maxRatio = entry.intersectionRatio;
+                    mostVisible = entry.target;
+                }
+            });
+            if (mostVisible && maxRatio > 0.4) {
+                const m = parseInt(mostVisible.dataset.month);
+                const y = parseInt(mostVisible.dataset.year);
+                if (calMonthYear) calMonthYear.textContent = `${monthNamesList[m]} ${y}`;
+            }
+        }, { root: calBody, threshold: [0.2, 0.5, 0.8] });
+
+        function attachEvents(cells) {
+            cells.forEach(cell => {
+                observer.observe(cell);
+                cell.addEventListener('click', () => {
+                    document.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('active'));
+                    cell.classList.add('active');
+                    openSummary(parseInt(cell.dataset.day), parseInt(cell.dataset.month), parseInt(cell.dataset.year));
+                });
+            });
+        }
+        attachEvents(document.querySelectorAll('.cal-day-cell'));
+
+        // Scroll para início do mês atual
+        setTimeout(() => {
+            const firstCurrentDay = calBody.querySelector(`.cal-day-cell[data-month="${currentMonth}"]`);
+            if (firstCurrentDay) {
+                calBody.scrollLeft = firstCurrentDay.offsetLeft - calBody.offsetLeft - 16;
+            }
+        }, 50);
+
+        // Lidar com o scroll infinito
+        calBody.addEventListener('scroll', () => {
+            if (window.innerWidth > 1024 || isScrollLoading) return;
+
+            // Borda direita
+            if (calBody.scrollLeft + calBody.clientWidth >= calBody.scrollWidth - 100) {
+                isScrollLoading = true;
+                maxRenderedMonth++;
+                if(maxRenderedMonth > 11) { maxRenderedMonth = 0; maxRenderedYear++; }
+                calBody.insertAdjacentHTML('beforeend', generateMonthHTML(maxRenderedYear, maxRenderedMonth));
+                
+                const daysAdded = new Date(maxRenderedYear, maxRenderedMonth + 1, 0).getDate();
+                const newCells = Array.from(calBody.children).slice(-daysAdded);
+                attachEvents(newCells);
+                setTimeout(() => { isScrollLoading = false; }, 100);
+            }
+
+            // Borda esquerda
+            if (calBody.scrollLeft <= 50) {
+                isScrollLoading = true;
+                minRenderedMonth--;
+                if(minRenderedMonth < 0) { minRenderedMonth = 11; minRenderedYear--; }
+                
+                const prevScrollWidth = calBody.scrollWidth;
+                calBody.insertAdjacentHTML('afterbegin', generateMonthHTML(minRenderedYear, minRenderedMonth));
+                const newScrollWidth = calBody.scrollWidth;
+                
+                calBody.scrollLeft += (newScrollWidth - prevScrollWidth);
+
+                const daysAdded = new Date(minRenderedYear, minRenderedMonth + 1, 0).getDate();
+                const newCells = Array.from(calBody.children).slice(0, daysAdded);
+                attachEvents(newCells);
+                setTimeout(() => { isScrollLoading = false; }, 100);
+            }
+        });
+    }
+
+    function renderCalendar() {
+        if (window.innerWidth <= 1024) {
+            renderInfiniteMobile();
+        } else {
+            renderDesktopGrid();
+        }
+    }
+
+    // Ouve resize para trocar de grid pra carrossel se a tela virar deitada
+    window.addEventListener('resize', () => {
+        // Debounce simples
+        clearTimeout(window.resizeTimer);
+        window.resizeTimer = setTimeout(() => {
+            renderCalendar();
+            updateMonthYearText();
+        }, 250);
+    });
+
     // Abrir painel
-    function openSummary(day) {
-        // Obter dia da semana de formatação
-        const dateObj = new Date(currentYear, currentMonth, day);
+    function openSummary(day, month = currentMonth, year = currentYear) {
+        const dateObj = new Date(year, month, day);
         const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
         const monthNames = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
         
-        sumDateText.textContent = `${dayNames[dateObj.getDay()]}, ${String(day).padStart(2, '0')} de ${monthNames[currentMonth]} de ${currentYear}`;
+        sumDateText.textContent = `${dayNames[dateObj.getDay()]}, ${String(day).padStart(2, '0')} de ${monthNames[month]} de ${year}`;
         
         const data = mockData[day];
         
