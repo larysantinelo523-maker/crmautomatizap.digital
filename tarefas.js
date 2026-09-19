@@ -1,4 +1,9 @@
+import { supabase } from './supabase.js';
+
 document.addEventListener('DOMContentLoaded', () => {
+    // Vencimento dinâmico do banco de dados
+    let userVencimentoDay = 9; // Default
+
     // Referências do DOM
     const wrapper = document.getElementById('tarefas-wrapper');
     const calBody = document.getElementById('cal-main-body');
@@ -122,10 +127,10 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `<div class="cal-day-card">`;
             html += `<div class="cal-day-header">`;
             let numberColorStyle = '';
-            // Lógica para vencimento (dia 9 vermelho) e aviso prévio (6, 7 e 8 amarelo)
-            if (i === 9) {
+            // Lógica dinâmica para vencimento (userVencimentoDay = vermelho) e aviso prévio (3 dias antes = amarelo)
+            if (i === userVencimentoDay) {
                 numberColorStyle = 'color: #ef4444 !important; font-weight: 800;';
-            } else if (i === 6 || i === 7 || i === 8) {
+            } else if (i === userVencimentoDay - 3 || i === userVencimentoDay - 2 || i === userVencimentoDay - 1) {
                 numberColorStyle = 'color: #eab308 !important; font-weight: 800;';
             }
 
@@ -506,8 +511,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Iniciar
-    if (calBody) {
+    // Iniciar Calendário com Dados do Supabase
+    async function initCalendar() {
+        if (!calBody) return;
+        
+        try {
+            const { data: sessionData } = await supabase.auth.getSession();
+            if (sessionData && sessionData.session) {
+                const user = sessionData.session.user;
+                const { data: userData, error } = await supabase
+                    .from('usuarios')
+                    .select('data_vencimento')
+                    .eq('id', user.id)
+                    .single();
+                    
+                if (userData && userData.data_vencimento && userData.data_vencimento !== 'N/A') {
+                    const parts = userData.data_vencimento.split('-');
+                    if(parts.length === 3) {
+                        userVencimentoDay = parseInt(parts[2], 10);
+                    }
+                }
+            }
+        } catch(err) {
+            console.error('Erro ao buscar vencimento:', err);
+        }
+        
         updateMonthYearText();
         renderCalendar();
         
@@ -519,4 +547,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 100);
     }
+    
+    initCalendar();
 });
