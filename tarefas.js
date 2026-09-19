@@ -392,23 +392,63 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (btnPrev && btnNext) {
         btnPrev.addEventListener('click', () => {
-            currentMonth--;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
+            if (window.innerWidth <= 1024) {
+                let targetMonth = currentMonth - 1;
+                let targetYear = currentYear;
+                if (targetMonth < 0) { targetMonth = 11; targetYear--; }
+                
+                let firstDay = calBody.querySelector(`.cal-day-cell[data-month="${targetMonth}"][data-year="${targetYear}"]`);
+                if (firstDay) {
+                    calBody.scrollTo({ left: firstDay.offsetLeft - calBody.offsetLeft - 16, behavior: 'smooth' });
+                } else {
+                    calBody.scrollTo({ left: 0, behavior: 'smooth' });
+                }
+            } else {
+                calBody.style.animation = 'none';
+                void calBody.offsetWidth; 
+                calBody.style.animation = 'slideOutRight 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                
+                setTimeout(() => {
+                    currentMonth--;
+                    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+                    updateMonthYearText();
+                    if (calBody) renderCalendar();
+                    
+                    calBody.style.animation = 'none';
+                    void calBody.offsetWidth;
+                    calBody.style.animation = 'slideInLeft 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                }, 200);
             }
-            updateMonthYearText();
-            if (calBody) renderCalendar();
         });
         
         btnNext.addEventListener('click', () => {
-            currentMonth++;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
+            if (window.innerWidth <= 1024) {
+                let targetMonth = currentMonth + 1;
+                let targetYear = currentYear;
+                if (targetMonth > 11) { targetMonth = 0; targetYear++; }
+                
+                let firstDay = calBody.querySelector(`.cal-day-cell[data-month="${targetMonth}"][data-year="${targetYear}"]`);
+                if (firstDay) {
+                    calBody.scrollTo({ left: firstDay.offsetLeft - calBody.offsetLeft - 16, behavior: 'smooth' });
+                } else {
+                    calBody.scrollTo({ left: calBody.scrollWidth, behavior: 'smooth' });
+                }
+            } else {
+                calBody.style.animation = 'none';
+                void calBody.offsetWidth; 
+                calBody.style.animation = 'slideOutLeft 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                
+                setTimeout(() => {
+                    currentMonth++;
+                    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+                    updateMonthYearText();
+                    if (calBody) renderCalendar();
+                    
+                    calBody.style.animation = 'none';
+                    void calBody.offsetWidth;
+                    calBody.style.animation = 'slideInRight 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                }, 200);
             }
-            updateMonthYearText();
-            if (calBody) renderCalendar();
         });
     }
 

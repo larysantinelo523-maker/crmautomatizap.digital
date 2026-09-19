@@ -2590,9 +2590,23 @@ body.dark-mode .accordion-content {
 
 /* Ocultar elementos específicos no desktop ou mobile */
 @media (min-width: 769px) {
-    .mobile-only-tooltip {
-        display: none !important;
-    }
+}
+
+@keyframes slideOutRight {
+    0% { transform: translateX(0); opacity: 1; }
+    100% { transform: translateX(30px); opacity: 0; }
+}
+@keyframes slideInLeft {
+    0% { transform: translateX(-30px); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOutLeft {
+    0% { transform: translateX(0); opacity: 1; }
+    100% { transform: translateX(-30px); opacity: 0; }
+}
+@keyframes slideInRight {
+    0% { transform: translateX(30px); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
 }
 
 @media (max-width: 768px) {
