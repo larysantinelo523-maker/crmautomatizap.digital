@@ -1367,8 +1367,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         // Lógica do botão Aplicar
                         applyBtn.addEventListener('click', () => {
-                            // O calendário já atualizou o local storage ao clicar nos dias,
-                            // Só precisamos disparar o filtro de status na tabela
+                            // Salva as datas selecionadas no local storage
+                            if (rangeStart && rangeEnd) {
+                                localStorage.setItem('calendar_filter_start', rangeStart.toISOString());
+                                localStorage.setItem('calendar_filter_end', rangeEnd.toISOString());
+                            } else if (rangeStart) {
+                                localStorage.setItem('calendar_filter_start', rangeStart.toISOString());
+                                localStorage.removeItem('calendar_filter_end');
+                            } else {
+                                localStorage.removeItem('calendar_filter_start');
+                                localStorage.removeItem('calendar_filter_end');
+                            }
                             
                             if (selectedMobileStatus === 'Todos') {
                                 btn.classList.remove('filter-active');
