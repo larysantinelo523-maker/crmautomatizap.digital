@@ -3873,6 +3873,10 @@ body.dark-mode .logo-img {
         color: var(--color-task-green) !important;
     }
 
+    .cal-day-cell.today .cal-day-card {
+        border-color: var(--color-task-green) !important;
+    }
+
     /* 12) Indicador numérico (12 / 5) no canto superior direito */
     .cal-day-indicator {
         position: static !important;
