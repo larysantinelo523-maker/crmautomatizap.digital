@@ -223,7 +223,6 @@
                                         <th>Interesse</th>
                                         <th>Status</th>
                                         <th>Último contato</th>
-                                        <th style="text-align: right;">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -264,7 +263,6 @@
                                 <span>Informações do lead</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span class="badge primary-light" id="lead-highlight-badge">--</span>
                                 <button onclick="fecharDossie()" style="background: none; border: none; cursor: pointer; color: var(--color-text-mut); display: flex; align-items: center; justify-content: center; padding: 4px;" title="Fechar"><i class="ph ph-x" style="font-size: 16px;"></i></button>
                             </div>
                         </div>
@@ -276,10 +274,6 @@
                                 <div class="contact-info">
                                     <i class="ph-fill ph-whatsapp-logo text-primary"></i>
                                     <span id="lead-highlight-phone">--</span>
-                                </div>
-                                <div class="origin-info">
-                                    <i class="ph ph-globe"></i>
-                                    <span id="lead-highlight-origin">Origem: --</span>
                                 </div>
                             </div>
                         </div>
@@ -383,6 +377,11 @@
                     const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
                     const tr = document.createElement('tr');
+                    tr.style.cursor = 'pointer';
+                    tr.onclick = (e) => {
+                        e.stopPropagation();
+                        abrirDossie(lead, badgeClass, formattedDate);
+                    };
                     tr.innerHTML = `
                         <td>
                             <div class="user-cell" style="display: flex; align-items: center; gap: 12px;">
@@ -394,20 +393,7 @@
                         <td class="mobile-interesse">${lead.interesse || 'Não informado'}</td>
                         <td class="mobile-status"><span class="badge ${badgeClass}">${lead.status}</span></td>
                         <td class="mobile-date">${formattedDate}</td>
-                        <td style="text-align: right;">
-                            <button class="btn-exibir-infos">
-                                <span class="desktop-text">Exibir Dossiê <i class="ph ph-caret-down"></i></span>
-                                <span class="mobile-text">Clique para Exibir Informações do Lead</span>
-                            </button>
-                        </td>
                     `;
-                    const btnInfo = tr.querySelector('.btn-exibir-infos');
-                    if(btnInfo) {
-                        btnInfo.onclick = (e) => {
-                            e.stopPropagation();
-                            abrirDossie(lead, badgeClass, formattedDate);
-                        };
-                    }
                     tbody.appendChild(tr);
                 });
             }
@@ -452,8 +438,6 @@
             document.getElementById('lead-highlight-avatar').textContent = initials;
             document.getElementById('lead-highlight-name').textContent = lead.nome;
             document.getElementById('lead-highlight-phone').textContent = lead.telefone;
-            document.getElementById('lead-highlight-origin').textContent = 'Origem: ' + (lead.origem || 'WhatsApp');
-            document.getElementById('lead-highlight-badge').textContent = lead.status;
             document.getElementById('lead-highlight-status').textContent = lead.status;
             
             document.getElementById('lead-highlight-interest').textContent = lead.interesse || 'Não informado';
