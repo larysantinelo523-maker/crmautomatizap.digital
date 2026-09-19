@@ -99,7 +99,15 @@
                 // Exibe erro
                 loginBtn.textContent = 'Entrar';
                 loginBtn.disabled = false;
-                errorMsg.textContent = 'Erro do Banco: ' + error.message;
+                let humanMsg = 'Ocorreu um erro ao acessar.';
+                if (error.message.includes('Invalid login credentials')) {
+                    humanMsg = 'E-mail ou senha incorretos.';
+                } else if (error.message.includes('Email not confirmed')) {
+                    humanMsg = 'E-mail não confirmado.';
+                } else {
+                    humanMsg = 'Erro: ' + error.message;
+                }
+                errorMsg.textContent = humanMsg;
                 errorMsg.style.display = 'block';
                 
                 // Efeito visual de tremor
