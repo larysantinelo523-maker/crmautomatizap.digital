@@ -208,11 +208,7 @@
                             </div>
                         </div>
 
-                        <!-- Empty State Mobile -->
-                        <div id="dossier-empty-state-mobile" class="mobile-empty-state" style="display: none; align-items: center; gap: 8px; color: var(--color-text-mut); font-size: 13px; padding: 0 16px 16px;">
-                            <i class="ph ph-info"></i>
-                            <span>Selecione um cliente na tabela para atualizar as informações do card abaixo.</span>
-                        </div>
+                        <!-- Empty State Mobile removido -->
 
                         <div class="table-responsive">
                             <table class="data-table">
@@ -223,6 +219,7 @@
                                         <th>Interesse</th>
                                         <th>Status</th>
                                         <th>Último contato</th>
+                                        <th style="text-align: right;">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -249,11 +246,7 @@
                 <!-- Coluna Secundária (Direita) -->
                 <div class="side-column">
 
-                    <!-- Empty State (Aviso pequeno) -->
-                    <div id="dossier-empty-state" class="desktop-empty-state" style="display: flex; align-items: center; gap: 8px; color: var(--color-text-mut); font-size: 13px; padding: 0 4px;">
-                        <i class="ph ph-info"></i>
-                        <span>Selecione um cliente na tabela para atualizar as informações do card.</span>
-                    </div>
+                    <!-- Empty State (Aviso pequeno) removido -->
 
                     <!-- Lead Destaque - Vazio por padrão -->
                     <section class="card lead-highlight" id="lead-highlight-card" style="display: none;">
@@ -393,6 +386,11 @@
                         <td class="mobile-interesse">${lead.interesse || 'Não informado'}</td>
                         <td class="mobile-status"><span class="badge ${badgeClass}">${lead.status}</span></td>
                         <td class="mobile-date">${formattedDate}</td>
+                        <td style="text-align: right;">
+                            <button class="btn primary full-width" style="margin-top: 8px;">
+                                Exibir Dossiê
+                            </button>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
