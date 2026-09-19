@@ -989,6 +989,8 @@ document.addEventListener('DOMContentLoaded', () => {
             rangeStart = null;
             rangeEnd = null;
         }
+        window._calendarRangeStart = rangeStart;
+        window._calendarRangeEnd = rangeEnd;
         
         function updateMainFilterText() {
             const dateText = document.getElementById('date-filter-text');
@@ -1031,6 +1033,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 rangeStart = null;
                 rangeEnd = null;
+                window._calendarRangeStart = rangeStart;
+                window._calendarRangeEnd = rangeEnd;
                 
                 if (selectionTxt) selectionTxt.textContent = `Nenhum período selecionado`;
                 
@@ -1138,6 +1142,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                         if (selectionTxt) selectionTxt.textContent = `Período selecionado: ${rangeStart.getDate().toString().padStart(2, '0')}/${(rangeStart.getMonth() + 1).toString().padStart(2, '0')} até ${rangeEnd.getDate().toString().padStart(2, '0')}/${(rangeEnd.getMonth() + 1).toString().padStart(2, '0')}`;
                     }
+                    window._calendarRangeStart = rangeStart;
+                    window._calendarRangeEnd = rangeEnd;
                     renderCalendar();
                 });
 
@@ -1368,11 +1374,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Lógica do botão Aplicar
                         applyBtn.addEventListener('click', () => {
                             // Salva as datas selecionadas no local storage
-                            if (rangeStart && rangeEnd) {
-                                localStorage.setItem('calendar_filter_start', rangeStart.toISOString());
-                                localStorage.setItem('calendar_filter_end', rangeEnd.toISOString());
-                            } else if (rangeStart) {
-                                localStorage.setItem('calendar_filter_start', rangeStart.toISOString());
+                            if (window._calendarRangeStart && window._calendarRangeEnd) {
+                                localStorage.setItem('calendar_filter_start', window._calendarRangeStart.toISOString());
+                                localStorage.setItem('calendar_filter_end', window._calendarRangeEnd.toISOString());
+                            } else if (window._calendarRangeStart) {
+                                localStorage.setItem('calendar_filter_start', window._calendarRangeStart.toISOString());
                                 localStorage.removeItem('calendar_filter_end');
                             } else {
                                 localStorage.removeItem('calendar_filter_start');
