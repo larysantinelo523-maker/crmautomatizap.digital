@@ -224,7 +224,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <h5>${t.client}</h5>
                             <div class="dt-text">${t.text}</div>
                         </div>
-                        <div class="dt-badge ${badgeColor}">${t.status}</div>
+                        <div class="dt-badge ${badgeColor}">
+                            <i class="ph-fill ph-bookmark-simple dt-badge-icon"></i>
+                            <span class="dt-badge-text">${t.status}</span>
+                        </div>
                         <i class="ph ph-caret-right dt-caret"></i>
                     </div>
                 `;

@@ -23,7 +23,10 @@ import"./supabase-DUkCiNAm.js";/* empty css              */import"./data-BfrI3Xp
                             <h5>${c.client}</h5>
                             <div class="dt-text">${c.text}</div>
                         </div>
-                        <div class="dt-badge ${f}">${c.status}</div>
+                        <div class="dt-badge ${f}">
+                            <i class="ph-fill ph-bookmark-simple dt-badge-icon"></i>
+                            <span class="dt-badge-text">${c.status}</span>
+                        </div>
                         <i class="ph ph-caret-right dt-caret"></i>
                     </div>
                 `}),C.innerHTML=m}else A.textContent="0",k.textContent="0",C.innerHTML=`

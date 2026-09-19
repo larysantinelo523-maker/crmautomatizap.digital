@@ -3584,6 +3584,10 @@ body.dark-mode .logo-img {
     align-items: center;
 }
 
+.dt-badge-icon {
+    display: none;
+}
+
 .dt-badge.green {
     background: var(--color-task-green-light);
     color: var(--color-task-green-text);
@@ -3602,6 +3606,39 @@ body.dark-mode .logo-img {
 .dt-badge.yellow {
     background: var(--color-task-yellow-light);
     color: var(--color-task-yellow);
+}
+
+@media (max-width: 1024px) {
+    .dt-badge {
+        padding: 0 !important;
+        background: transparent !important;
+        height: auto !important;
+    }
+    
+    .dt-badge-text {
+        display: none !important;
+    }
+    
+    .dt-badge-icon {
+        display: block !important;
+        font-size: 24px;
+    }
+    
+    .dt-badge.green .dt-badge-icon {
+        color: var(--color-task-green-text);
+    }
+    
+    .dt-badge.blue .dt-badge-icon {
+        color: var(--color-task-blue);
+    }
+    
+    .dt-badge.purple .dt-badge-icon {
+        color: var(--color-task-purple);
+    }
+    
+    .dt-badge.yellow .dt-badge-icon {
+        color: var(--color-task-yellow);
+    }
 }
 
 .summary-footer {
