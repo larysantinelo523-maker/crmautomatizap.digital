@@ -99,11 +99,16 @@ body {
     /* clip não quebra o position: sticky como o hidden faz */
 }
 
+html {
+    scrollbar-gutter: stable;
+}
+
 body.no-scroll {
     overflow: hidden !important;
 }
 
 body {
+    overflow-x: hidden;
     font: var(--font-body);
     color: var(--color-text-main);
     background-color: var(--color-bg-main);
@@ -3643,8 +3648,7 @@ body.dark-mode .logo-img {
         padding: 0 !important;
         gap: 0 !important;
         height: auto !important;
-        overflow-x: hidden !important;
-        overflow-y: visible !important;
+        overflow: visible !important;
         max-width: 100% !important;
         width: 100% !important;
         box-sizing: border-box !important;
@@ -3904,7 +3908,6 @@ body.dark-mode .logo-img {
         margin-top: 0 !important;
         padding: 0 16px 100px 16px !important;
         box-sizing: border-box !important;
-        overflow-x: hidden !important;
     }
 
     .tarefas-container.summary-active .tarefas-summary-col {
