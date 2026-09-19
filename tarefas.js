@@ -10,9 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const sumReunioes = document.getElementById('sum-reunioes');
     const sumTasksList = document.getElementById('summary-tasks-list');
 
-    // Mês atual inicialmente fixo para Setembro de 2026 como base
-    let currentYear = 2026;
-    let currentMonth = 8; // Setembro (0-index)
+    // Mês atual e ano baseados na data real de hoje
+    const todayDateObj = new Date();
+    let currentYear = todayDateObj.getFullYear();
+    let currentMonth = todayDateObj.getMonth();
     const monthNamesList = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     
     const calMonthYear = document.getElementById('cal-main-month-year');
