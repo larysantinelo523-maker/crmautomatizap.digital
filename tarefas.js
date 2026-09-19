@@ -271,11 +271,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         attachEvents(document.querySelectorAll('.cal-day-cell'));
 
-        // Scroll para início do mês atual
+        // Scroll para centralizar o dia de hoje
         setTimeout(() => {
-            const firstCurrentDay = calBody.querySelector(`.cal-day-cell[data-month="${currentMonth}"]`);
-            if (firstCurrentDay) {
-                calBody.scrollLeft = firstCurrentDay.offsetLeft - calBody.offsetLeft - 16;
+            const todayCell = calBody.querySelector('.cal-day-cell.today');
+            if (todayCell) {
+                const centerPos = todayCell.offsetLeft - calBody.offsetLeft - (calBody.clientWidth / 2) + (todayCell.clientWidth / 2);
+                calBody.scrollLeft = centerPos;
+            } else {
+                const firstCurrentDay = calBody.querySelector(`.cal-day-cell[data-month="${currentMonth}"]`);
+                if (firstCurrentDay) {
+                    calBody.scrollLeft = firstCurrentDay.offsetLeft - calBody.offsetLeft - 16;
+                }
             }
         }, 50);
 
