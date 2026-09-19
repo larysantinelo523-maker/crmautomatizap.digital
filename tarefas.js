@@ -121,7 +121,15 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `<div class="mobile-day-name">${dayNames[k % 7]}</div>`;
             html += `<div class="cal-day-card">`;
             html += `<div class="cal-day-header">`;
-            html += `<div class="cal-day-number">${i}</div>`;
+            let numberColorStyle = '';
+            // Lógica para vencimento (dia 9 vermelho) e aviso prévio (6, 7 e 8 amarelo)
+            if (i === 9) {
+                numberColorStyle = 'color: #ef4444 !important; font-weight: 800;';
+            } else if (i === 6 || i === 7 || i === 8) {
+                numberColorStyle = 'color: #eab308 !important; font-weight: 800;';
+            }
+
+            html += `<div class="cal-day-number" style="${numberColorStyle}">${i}</div>`;
             
             if (mockData[i]) {
                 const kpis = mockData[i].kpis;
