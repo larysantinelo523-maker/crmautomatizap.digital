@@ -465,5 +465,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (calBody) {
         updateMonthYearText();
         renderCalendar();
+        
+        // Selecionar o dia atual automaticamente ao carregar
+        setTimeout(() => {
+            const todayCell = calBody.querySelector('.cal-day-cell.today');
+            if (todayCell) {
+                todayCell.click();
+            }
+        }, 100);
     }
 });
