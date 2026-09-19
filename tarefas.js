@@ -407,10 +407,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (targetMonth < 0) { targetMonth = 11; targetYear--; }
                 
                 let firstDay = calBody.querySelector(`.cal-day-cell[data-month="${targetMonth}"][data-year="${targetYear}"]`);
+                if (!firstDay) {
+                    minRenderedMonth--;
+                    if(minRenderedMonth < 0) { minRenderedMonth = 11; minRenderedYear--; }
+                    
+                    const prevScrollWidth = calBody.scrollWidth;
+                    const prevScrollLeft = calBody.scrollLeft;
+                    calBody.insertAdjacentHTML('afterbegin', generateMonthHTML(minRenderedYear, minRenderedMonth));
+                    const newScrollWidth = calBody.scrollWidth;
+                    calBody.scrollLeft = prevScrollLeft + (newScrollWidth - prevScrollWidth);
+                    
+                    const daysAdded = new Date(minRenderedYear, minRenderedMonth + 1, 0).getDate();
+                    const newCells = Array.from(calBody.children).slice(0, daysAdded);
+                    newCells.forEach(cell => {
+                        if(observer) observer.observe(cell);
+                        cell.addEventListener('click', () => {
+                            document.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('active'));
+                            cell.classList.add('active');
+                            openSummary(parseInt(cell.dataset.day), parseInt(cell.dataset.month), parseInt(cell.dataset.year));
+                        });
+                    });
+                    firstDay = calBody.querySelector(`.cal-day-cell[data-month="${targetMonth}"][data-year="${targetYear}"]`);
+                }
+                
                 if (firstDay) {
                     calBody.scrollTo({ left: firstDay.offsetLeft - calBody.offsetLeft - 16, behavior: 'smooth' });
-                } else {
-                    calBody.scrollTo({ left: 0, behavior: 'smooth' });
                 }
             } else {
                 calBody.style.animation = 'none';
@@ -437,10 +458,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (targetMonth > 11) { targetMonth = 0; targetYear++; }
                 
                 let firstDay = calBody.querySelector(`.cal-day-cell[data-month="${targetMonth}"][data-year="${targetYear}"]`);
+                if (!firstDay) {
+                    maxRenderedMonth++;
+                    if(maxRenderedMonth > 11) { maxRenderedMonth = 0; maxRenderedYear++; }
+                    calBody.insertAdjacentHTML('beforeend', generateMonthHTML(maxRenderedYear, maxRenderedMonth));
+                    
+                    const daysAdded = new Date(maxRenderedYear, maxRenderedMonth + 1, 0).getDate();
+                    const newCells = Array.from(calBody.children).slice(-daysAdded);
+                    newCells.forEach(cell => {
+                        if(observer) observer.observe(cell);
+                        cell.addEventListener('click', () => {
+                            document.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('active'));
+                            cell.classList.add('active');
+                            openSummary(parseInt(cell.dataset.day), parseInt(cell.dataset.month), parseInt(cell.dataset.year));
+                        });
+                    });
+                    firstDay = calBody.querySelector(`.cal-day-cell[data-month="${targetMonth}"][data-year="${targetYear}"]`);
+                }
+                
                 if (firstDay) {
                     calBody.scrollTo({ left: firstDay.offsetLeft - calBody.offsetLeft - 16, behavior: 'smooth' });
-                } else {
-                    calBody.scrollTo({ left: calBody.scrollWidth, behavior: 'smooth' });
                 }
             } else {
                 calBody.style.animation = 'none';
