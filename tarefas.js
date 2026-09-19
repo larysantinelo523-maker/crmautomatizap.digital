@@ -253,6 +253,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const y = parseInt(mostVisible.dataset.year);
                 if (calMonthYear) calMonthYear.textContent = `${monthNamesList[m]} ${y}`;
                 updateMutedMonths(m, y);
+                currentMonth = m;
+                currentYear = y;
             }
         }, { root: calBody, threshold: [0.2, 0.5, 0.8] });
 
