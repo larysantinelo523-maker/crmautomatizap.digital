@@ -226,6 +226,19 @@ document.addEventListener('DOMContentLoaded', () => {
         calBody.innerHTML = html;
 
         if(observer) observer.disconnect();
+        
+        function updateMutedMonths(activeMonth, activeYear) {
+            document.querySelectorAll('.cal-day-cell').forEach(cell => {
+                const cellM = parseInt(cell.dataset.month);
+                const cellY = parseInt(cell.dataset.year);
+                if (cellM === activeMonth && cellY === activeYear) {
+                    cell.classList.remove('empty-month');
+                } else {
+                    cell.classList.add('empty-month');
+                }
+            });
+        }
+
         observer = new IntersectionObserver((entries) => {
             let mostVisible = null;
             let maxRatio = 0;
@@ -239,6 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const m = parseInt(mostVisible.dataset.month);
                 const y = parseInt(mostVisible.dataset.year);
                 if (calMonthYear) calMonthYear.textContent = `${monthNamesList[m]} ${y}`;
+                updateMutedMonths(m, y);
             }
         }, { root: calBody, threshold: [0.2, 0.5, 0.8] });
 
