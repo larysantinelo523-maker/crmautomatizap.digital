@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const dateParam = urlParams.get('date');
     let targetDayToClick = null;
+    let targetMonthToClick = null;
+    let targetYearToClick = null;
 
     // Mês atual e ano baseados na data real de hoje
     const todayDateObj = new Date();
@@ -30,6 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
             currentYear = parseInt(parts[0], 10);
             currentMonth = parseInt(parts[1], 10) - 1;
             targetDayToClick = parseInt(parts[2], 10);
+            targetMonthToClick = currentMonth;
+            targetYearToClick = currentYear;
         }
     }
     const monthNamesList = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
@@ -300,8 +304,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Scroll para centralizar o dia de hoje ou o dia da URL
         setTimeout(() => {
             let cellToCenter = null;
-            if (targetDayToClick) {
-                cellToCenter = calBody.querySelector(`.cal-day-cell[data-month="${currentMonth}"][data-year="${currentYear}"][data-day="${targetDayToClick}"]`);
+            if (targetDayToClick && targetMonthToClick !== null && targetYearToClick !== null) {
+                cellToCenter = calBody.querySelector(`.cal-day-cell[data-month="${targetMonthToClick}"][data-year="${targetYearToClick}"][data-day="${targetDayToClick}"]`);
             }
             if (!cellToCenter) {
                 cellToCenter = calBody.querySelector('.cal-day-cell.today');
@@ -561,8 +565,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Selecionar o dia atual (ou o dia passado na URL) automaticamente ao carregar
         setTimeout(() => {
             let cellToClick = null;
-            if (targetDayToClick) {
-                cellToClick = calBody.querySelector(`.cal-day-cell[data-month="${currentMonth}"][data-year="${currentYear}"][data-day="${targetDayToClick}"]`);
+            if (targetDayToClick && targetMonthToClick !== null && targetYearToClick !== null) {
+                cellToClick = calBody.querySelector(`.cal-day-cell[data-month="${targetMonthToClick}"][data-year="${targetYearToClick}"][data-day="${targetDayToClick}"]`);
             }
             if (!cellToClick) {
                 cellToClick = calBody.querySelector('.cal-day-cell.today');
