@@ -456,9 +456,12 @@
             document.getElementById('lead-highlight-last-contact').innerHTML = `<i class="ph ph-clock"></i> Último contato: ${dateStr}`;
 
             // Botões de ação
+            const leadDateObj = new Date(lead.criado_em);
+            const leadDateFormatted = `${leadDateObj.getFullYear()}-${(leadDateObj.getMonth() + 1).toString().padStart(2, '0')}-${leadDateObj.getDate().toString().padStart(2, '0')}`;
+            
             document.getElementById('lead-highlight-actions').innerHTML = `
-                <button class="btn primary full-width" onclick="window.location.href='conversas.html?lead=${lead.id}'">
-                    <i class="ph ph-chat-teardrop-text"></i> Abrir Conversa
+                <button class="btn primary full-width" onclick="window.location.href='tarefas.html?date=${leadDateFormatted}'">
+                    <i class="ph ph-calendar-check"></i> Abrir Tarefa
                 </button>
             `;
 

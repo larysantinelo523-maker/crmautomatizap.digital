@@ -15,10 +15,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const sumReunioes = document.getElementById('sum-reunioes');
     const sumTasksList = document.getElementById('summary-tasks-list');
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const dateParam = urlParams.get('date');
+    let targetDayToClick = null;
+
     // Mês atual e ano baseados na data real de hoje
     const todayDateObj = new Date();
     let currentYear = todayDateObj.getFullYear();
     let currentMonth = todayDateObj.getMonth();
+
+    if (dateParam) {
+        const parts = dateParam.split('-');
+        if (parts.length === 3) {
+            currentYear = parseInt(parts[0], 10);
+            currentMonth = parseInt(parts[1], 10) - 1;
+            targetDayToClick = parseInt(parts[2], 10);
+        }
+    }
     const monthNamesList = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     
     const calMonthYear = document.getElementById('cal-main-month-year');
@@ -539,11 +552,22 @@ document.addEventListener('DOMContentLoaded', () => {
         updateMonthYearText();
         renderCalendar();
         
-        // Selecionar o dia atual automaticamente ao carregar
+        // Selecionar o dia atual (ou o dia passado na URL) automaticamente ao carregar
         setTimeout(() => {
-            const todayCell = calBody.querySelector('.cal-day-cell.today');
-            if (todayCell) {
-                todayCell.click();
+            let cellToClick = null;
+            if (targetDayToClick) {
+                const cells = calBody.querySelectorAll('.cal-day-cell:not(.empty-month)');
+                cells.forEach(c => {
+                    if (parseInt(c.dataset.day) === targetDayToClick) {
+                        cellToClick = c;
+                    }
+                });
+            }
+            if (!cellToClick) {
+                cellToClick = calBody.querySelector('.cal-day-cell.today');
+            }
+            if (cellToClick) {
+                cellToClick.click();
             }
         }, 100);
     }
