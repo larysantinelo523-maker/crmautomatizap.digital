@@ -1728,16 +1728,157 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    const accentsMap = {
+        'A': ['A', 'Á', 'À', 'Â', 'Ã'],
+        'E': ['E', 'É', 'Ê', 'È'],
+        'I': ['I', 'Í', 'Ì'],
+        'O': ['O', 'Ó', 'Ô', 'Õ', 'Ò'],
+        'U': ['U', 'Ú', 'Ü', 'Ù'],
+        'C': ['C', 'Ç'],
+        'N': ['N', 'Ñ']
+    };
+    let activePopup = null;
+
+    // Fechar popup se clicar fora dele
+    document.addEventListener('touchstart', (e) => {
+        if (activePopup && !activePopup.contains(e.target) && !e.target.closest('.key')) {
+            activePopup.remove();
+            activePopup = null;
+        }
+    }, { passive: true });
+    
+    document.addEventListener('click', (e) => {
+        if (activePopup && !activePopup.contains(e.target) && !e.target.closest('.key')) {
+            activePopup.remove();
+            activePopup = null;
+        }
+    });
+
     keys.forEach(key => {
+        let pressTimeout;
+        let isLongPress = false;
+        
+        const startPress = (e) => {
+            if (activePopup && !activePopup.contains(e.target)) {
+                activePopup.remove();
+                activePopup = null;
+            }
+            
+            isLongPress = false;
+            let char = key.dataset.char || key.innerText.trim();
+            if (!key.dataset.char) key.dataset.char = char;
+            
+            if (accentsMap[char]) {
+                pressTimeout = setTimeout(() => {
+                    isLongPress = true;
+                    triggerHaptic();
+                    
+                    if (activePopup) activePopup.remove();
+                    
+                    const popup = document.createElement('div');
+                    popup.className = 'accent-popup';
+                    popup.style.position = 'absolute';
+                    popup.style.bottom = '115%';
+                    popup.style.left = '50%';
+                    popup.style.transform = 'translateX(-50%)';
+                    popup.style.background = 'var(--color-bg-card)';
+                    popup.style.borderRadius = '8px';
+                    popup.style.padding = '6px';
+                    popup.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+                    popup.style.display = 'flex';
+                    popup.style.gap = '6px';
+                    popup.style.zIndex = '1000';
+                    
+                    const arrow = document.createElement('div');
+                    arrow.style.position = 'absolute';
+                    arrow.style.bottom = '-6px';
+                    arrow.style.left = '50%';
+                    arrow.style.transform = 'translateX(-50%) rotate(45deg)';
+                    arrow.style.width = '12px';
+                    arrow.style.height = '12px';
+                    arrow.style.background = 'var(--color-bg-card)';
+                    arrow.style.zIndex = '-1';
+                    popup.appendChild(arrow);
+                    
+                    accentsMap[char].forEach(opt => {
+                        const btn = document.createElement('button');
+                        const displayChar = (!isShifted) ? opt.toLowerCase() : opt;
+                        btn.innerText = displayChar;
+                        btn.style.width = '36px';
+                        btn.style.height = '46px';
+                        btn.style.border = 'none';
+                        btn.style.background = 'transparent';
+                        btn.style.fontSize = '22px';
+                        btn.style.borderRadius = '6px';
+                        btn.style.color = 'var(--color-text)';
+                        btn.style.cursor = 'pointer';
+                        
+                        btn.addEventListener('touchstart', (ev) => {
+                            ev.stopPropagation();
+                            btn.style.background = 'var(--color-border)';
+                        });
+                        btn.addEventListener('touchend', (ev) => {
+                            ev.stopPropagation();
+                            ev.preventDefault();
+                            currentText += displayChar;
+                            if (displayChar.match(/[a-zA-ZÀ-ÿ]/)) isShifted = false;
+                            updateInput();
+                            checkAutocorrect();
+                            triggerHaptic();
+                            fakeInput.classList.add('active');
+                            popup.remove();
+                            activePopup = null;
+                        });
+                        btn.addEventListener('click', (ev) => {
+                            ev.stopPropagation();
+                            ev.preventDefault();
+                            currentText += displayChar;
+                            if (displayChar.match(/[a-zA-ZÀ-ÿ]/)) isShifted = false;
+                            updateInput();
+                            checkAutocorrect();
+                            triggerHaptic();
+                            fakeInput.classList.add('active');
+                            popup.remove();
+                            activePopup = null;
+                        });
+                        popup.appendChild(btn);
+                    });
+                    
+                    key.style.position = 'relative';
+                    key.appendChild(popup);
+                    activePopup = popup;
+                    
+                }, 400); // 400ms para considerar long press
+            }
+        };
+        
+        const cancelPress = () => {
+            clearTimeout(pressTimeout);
+        };
+        
+        key.addEventListener('mousedown', startPress);
+        key.addEventListener('touchstart', startPress, { passive: true });
+        
+        key.addEventListener('mouseup', cancelPress);
+        key.addEventListener('mouseleave', cancelPress);
+        key.addEventListener('touchend', cancelPress);
+        key.addEventListener('touchcancel', cancelPress);
+
         key.addEventListener('click', (e) => {
             e.stopPropagation();
-            let char = key.innerText;
+            if (isLongPress) {
+                e.preventDefault();
+                return;
+            }
+            
+            let char = key.dataset.char || key.innerText.trim();
+            if (!key.dataset.char) key.dataset.char = char;
+            
             if (key.classList.contains('space')) {
                 char = ' ';
             } else {
-                // Se for letra e não estiver shifted, converte. Se for número, não faz toLowerCase
                 if (!isShifted && char.match(/[a-zA-Z]/)) char = char.toLowerCase();
-                if (char.match(/[a-zA-Z]/)) isShifted = false; // Desliga shift após primeira letra
+                if (char.match(/[a-zA-Z]/)) isShifted = false;
             }
 
             currentText += char;
