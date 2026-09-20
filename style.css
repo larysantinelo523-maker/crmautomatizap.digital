@@ -3990,9 +3990,6 @@ body.dark-mode .logo-img {
     }
 
     /* Card do Resumo: transformado em um modal com contraste */
-    .d-none-important {
-        display: none !important;
-    }
 
     .summary-panel {
         width: auto !important;
@@ -4449,4 +4446,9 @@ body.dark-mode .logo-img {
 
 .desktop-bot-actions button {
     pointer-events: auto !important;
+}
+
+/* Helpers de visibilidade (Forçados) */
+section.summary-panel.d-none-important {
+    display: none !important;
 }
