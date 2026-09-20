@@ -1954,6 +1954,10 @@ body.dark-mode .accordion-content {
     .kpis-section {
         grid-template-columns: repeat(2, 1fr);
     }
+    
+    .mobile-welcome-block {
+        display: block !important;
+    }
 
     .charts-grid {
         flex-direction: row;

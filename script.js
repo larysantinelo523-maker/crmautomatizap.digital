@@ -476,7 +476,8 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                             return;
                         }
 
-                        document.querySelectorAll('.user-info .user-name').forEach(el => el.textContent = userName);
+                        // Preencher dados na UI
+                        document.querySelectorAll('.user-name').forEach(el => el.textContent = userName);
                         document.querySelectorAll('.user-info .user-role').forEach(el => el.textContent = userRole);
 
                         document.querySelectorAll('.user-menu .avatar').forEach(el => {
@@ -489,7 +490,7 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                     } else {
                         // Fallback: se der erro (ex: RLS bloqueando), usa o e-mail da sessão
                         const fallbackEmail = data.session.user.email;
-                        document.querySelectorAll('.user-info .user-name').forEach(el => el.textContent = fallbackEmail);
+                        document.querySelectorAll('.user-name').forEach(el => el.textContent = fallbackEmail);
                         document.querySelectorAll('.user-info .user-role').forEach(el => el.textContent = 'Erro de Permissão');
                         document.querySelectorAll('.user-menu .avatar').forEach(el => {
                             el.textContent = fallbackEmail.substring(0, 2).toUpperCase();
