@@ -3831,7 +3831,8 @@ body.dark-mode .logo-img {
         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
         display: flex !important;
         flex-direction: column !important;
-        height: 168px !important; /* altura exata medida com régua do Chrome */
+        aspect-ratio: 1 / 1 !important; /* Deixa o card perfeitamente quadrado */
+        height: auto !important;
         overflow: hidden !important;
         flex: 1 !important;
     }
