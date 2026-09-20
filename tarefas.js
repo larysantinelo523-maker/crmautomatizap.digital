@@ -599,6 +599,12 @@ window.openConversation = function(element) {
         // Esconde o resumo e mostra a conversa
         mainPanel.classList.add('d-none-important');
         convPanel.classList.remove('d-none-important');
+        
+        // Reinicia a animação
+        convPanel.classList.remove('animate-fade-slide');
+        void convPanel.offsetWidth; // Trigger reflow
+        convPanel.classList.add('animate-fade-slide');
+        
         convPanel.style.display = 'flex'; // Garante que, se perder o none, vira flex
     }
 };
@@ -610,5 +616,10 @@ window.closeConversation = function() {
     if(mainPanel && convPanel) {
         convPanel.classList.add('d-none-important');
         mainPanel.classList.remove('d-none-important');
+        
+        // Reinicia a animação
+        mainPanel.classList.remove('animate-fade-slide');
+        void mainPanel.offsetWidth; // Trigger reflow
+        mainPanel.classList.add('animate-fade-slide');
     }
 };

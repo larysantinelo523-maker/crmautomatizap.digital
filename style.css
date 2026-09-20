@@ -4452,3 +4452,19 @@ body.dark-mode .logo-img {
 section.summary-panel.d-none-important {
     display: none !important;
 }
+
+/* Animações de transição para os painéis */
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.animate-fade-slide {
+    animation: fadeSlideIn 0.25s ease-out forwards;
+}
