@@ -1781,12 +1781,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     popup.style.bottom = '115%';
                     popup.style.left = '50%';
                     popup.style.transform = 'translateX(-50%)';
-                    popup.style.background = 'var(--color-bg-card)';
-                    popup.style.borderRadius = '8px';
+                    popup.style.background = '#3a3a3c'; // Cinza escuro estilo iOS/Android nativo
+                    popup.style.borderRadius = '10px';
                     popup.style.padding = '6px';
-                    popup.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+                    popup.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
                     popup.style.display = 'flex';
-                    popup.style.gap = '6px';
+                    popup.style.gap = '2px';
                     popup.style.zIndex = '1000';
                     
                     const arrow = document.createElement('div');
@@ -1796,7 +1796,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     arrow.style.transform = 'translateX(-50%) rotate(45deg)';
                     arrow.style.width = '12px';
                     arrow.style.height = '12px';
-                    arrow.style.background = 'var(--color-bg-card)';
+                    arrow.style.background = '#3a3a3c';
                     arrow.style.zIndex = '-1';
                     popup.appendChild(arrow);
                     
@@ -1804,18 +1804,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         const btn = document.createElement('button');
                         const displayChar = (!isShifted) ? opt.toLowerCase() : opt;
                         btn.innerText = displayChar;
-                        btn.style.width = '36px';
-                        btn.style.height = '46px';
+                        btn.style.width = '38px';
+                        btn.style.height = '48px';
                         btn.style.border = 'none';
                         btn.style.background = 'transparent';
-                        btn.style.fontSize = '22px';
+                        btn.style.fontSize = '24px';
+                        btn.style.fontFamily = 'inherit';
                         btn.style.borderRadius = '6px';
-                        btn.style.color = 'var(--color-text)';
+                        btn.style.color = '#ffffff'; // Texto branco para contraste perfeito
                         btn.style.cursor = 'pointer';
                         
                         btn.addEventListener('touchstart', (ev) => {
                             ev.stopPropagation();
-                            btn.style.background = 'var(--color-border)';
+                            btn.style.background = '#5a5a5e'; // Highlight ao tocar
                         });
                         btn.addEventListener('touchend', (ev) => {
                             ev.stopPropagation();
