@@ -1778,11 +1778,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const popup = document.createElement('div');
                     popup.className = 'accent-popup';
                     popup.style.position = 'absolute';
-                    popup.style.bottom = '115%';
-                    popup.style.left = '50%';
-                    popup.style.transform = 'translateX(-50%)';
-                    popup.style.background = '#3a3a3c'; // Cinza escuro estilo iOS/Android nativo
-                    popup.style.borderRadius = '10px';
+                    popup.style.background = '#3a3a3c'; // Cinza escuro
+                    popup.style.borderRadius = '8px';
                     popup.style.padding = '6px';
                     popup.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
                     popup.style.display = 'flex';
@@ -1791,32 +1788,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     const arrow = document.createElement('div');
                     arrow.style.position = 'absolute';
-                    arrow.style.bottom = '-6px';
-                    arrow.style.left = '50%';
-                    arrow.style.transform = 'translateX(-50%) rotate(45deg)';
-                    arrow.style.width = '12px';
-                    arrow.style.height = '12px';
+                    arrow.style.bottom = '-5px';
+                    arrow.style.width = '14px';
+                    arrow.style.height = '14px';
                     arrow.style.background = '#3a3a3c';
+                    arrow.style.transform = 'rotate(45deg)';
                     arrow.style.zIndex = '-1';
+                    arrow.style.borderRadius = '2px';
                     popup.appendChild(arrow);
                     
                     accentsMap[char].forEach(opt => {
                         const btn = document.createElement('button');
                         const displayChar = (!isShifted) ? opt.toLowerCase() : opt;
                         btn.innerText = displayChar;
-                        btn.style.width = '38px';
-                        btn.style.height = '48px';
+                        btn.style.width = '36px';
+                        btn.style.height = '46px';
                         btn.style.border = 'none';
                         btn.style.background = 'transparent';
-                        btn.style.fontSize = '24px';
-                        btn.style.fontFamily = 'inherit';
+                        btn.style.fontSize = '22px';
+                        btn.style.fontFamily = "'Inter', sans-serif";
                         btn.style.borderRadius = '6px';
-                        btn.style.color = '#ffffff'; // Texto branco para contraste perfeito
+                        btn.style.color = '#ffffff'; 
                         btn.style.cursor = 'pointer';
                         
                         btn.addEventListener('touchstart', (ev) => {
                             ev.stopPropagation();
-                            btn.style.background = '#5a5a5e'; // Highlight ao tocar
+                            btn.style.background = '#5a5a5e';
                         });
                         btn.addEventListener('touchend', (ev) => {
                             ev.stopPropagation();
@@ -1845,8 +1842,32 @@ document.addEventListener('DOMContentLoaded', () => {
                         popup.appendChild(btn);
                     });
                     
-                    key.style.position = 'relative';
-                    key.appendChild(popup);
+                    // Adiciona temporariamente para calcular tamanho
+                    popup.style.visibility = 'hidden';
+                    document.body.appendChild(popup);
+                    
+                    const keyRect = key.getBoundingClientRect();
+                    const popupRect = popup.getBoundingClientRect();
+                    
+                    // Centraliza sobre a tecla
+                    let popupLeft = keyRect.left + (keyRect.width / 2) - (popupRect.width / 2);
+                    
+                    // Evita vazar pelas bordas da tela
+                    const margin = 8;
+                    if (popupLeft < margin) {
+                        popupLeft = margin;
+                    } else if (popupLeft + popupRect.width > window.innerWidth - margin) {
+                        popupLeft = window.innerWidth - popupRect.width - margin;
+                    }
+                    
+                    popup.style.left = `${popupLeft}px`;
+                    popup.style.top = `${keyRect.top - popupRect.height - 12}px`;
+                    
+                    // Ajusta a flechinha para apontar exatamente para o centro da tecla
+                    let arrowLeft = (keyRect.left + keyRect.width / 2) - popupLeft - 7;
+                    arrow.style.left = `${arrowLeft}px`;
+                    
+                    popup.style.visibility = 'visible';
                     activePopup = popup;
                     
                 }, 400); // 400ms para considerar long press
