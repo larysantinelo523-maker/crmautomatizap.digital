@@ -20,8 +20,8 @@
     <!-- CSS -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
   <script type="module" crossorigin src="/assets/supabase-DUkCiNAm.js"></script>
-  <script type="module" crossorigin src="/assets/data-BfrI3Xps.js"></script>
-  <script type="module" crossorigin src="/assets/script-vo03aQho.js"></script>
+  <script type="module" crossorigin src="/assets/data-CpRoCUfv.js"></script>
+  <script type="module" crossorigin src="/assets/script-CdktDBgC.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
   <link rel="stylesheet" crossorigin href="/assets/conversas-csRaMG8v.css">
 </head>
@@ -217,11 +217,11 @@
                         <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Como interpretar esta métrica"></i>
                             <div class="card-tooltip-container mobile-only-tooltip" onclick="this.classList.toggle('show')">
                                 <div class="tooltip-icon-btn"><i class="ph ph-question"></i></div>
-                                <div class="tooltip-box-content">Este card mostra a quantidade total de novos contatos que entraram no seu funil recentemente.</div>
+                                <div class="tooltip-box-content">Este card mostra a quantidade total de contatos que entraram no seu funil.</div>
                             </div>
                             <div class="kpi-header">
                                 <div class="icon-wrapper green-light"><i class="ph ph-users text-primary"></i></div>
-                                <h3>Novos leads</h3>
+                                <h3>Total de Leads</h3>
                             </div>
                             <div class="kpi-content">
                                 <h2 id="kpi-total">
@@ -241,14 +241,14 @@
                         <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Como interpretar esta métrica"></i>
                             <div class="card-tooltip-container mobile-only-tooltip" onclick="this.classList.toggle('show')">
                                 <div class="tooltip-icon-btn"><i class="ph ph-question"></i></div>
-                                <div class="tooltip-box-content">Descubra quantas horas de trabalho a IA poupou! Calculamos 2 minutos economizados para cada mensagem respondida automaticamente.</div>
+                                <div class="tooltip-box-content">Este card mostra quantos leads tiveram o atendimento finalizado pela IA, ou seja, a conversa já chegou a um resultado (reunião marcada, venda fechada ou lead que não quis seguir).</div>
                             </div>
                             <div class="kpi-header">
-                                <div class="icon-wrapper green-light"><i class="ph ph-clock text-primary"></i></div>
-                                <h3>Tempo Economizado</h3>
+                                <div class="icon-wrapper green-light"><i class="ph ph-check-circle text-primary"></i></div>
+                                <h3>Leads Atendidos</h3>
                             </div>
                             <div class="kpi-content">
-                                <h2 id="kpi-em-atendimento">
+                                <h2 id="kpi-atendidos">
                                     <div class="kpi-loading">
                                         <i class="ph ph-spinner-gap"></i>
                                         <span>Atualizando dados...</span>
@@ -257,7 +257,7 @@
                                 <div class="kpi-trend positive">
                                     <i class="ph ph-arrow-up"></i>
                                     <div class="trend-text">
-                                        <span>em horas</span>
+                                        <span>atendimentos finalizados</span>
                                     </div>
                                 </div>
                             </div>
@@ -265,14 +265,14 @@
                         <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Como interpretar esta métrica"></i>
                             <div class="card-tooltip-container mobile-only-tooltip" onclick="this.classList.toggle('show')">
                                 <div class="tooltip-icon-btn"><i class="ph ph-question"></i></div>
-                                <div class="tooltip-box-content">Acompanhe a quantidade absoluta de vendas, reuniões ou contratos que já foram finalizados com sucesso.</div>
+                                <div class="tooltip-box-content">Este card mostra quantas reuniões, consultas ou horários a IA conseguiu agendar com sucesso na agenda.</div>
                             </div>
                             <div class="kpi-header">
-                                <div class="icon-wrapper green-light"><i class="ph ph-star text-primary"></i></div>
-                                <h3>Fechados</h3>
+                                <div class="icon-wrapper green-light"><i class="ph ph-calendar-check text-primary"></i></div>
+                                <h3>Reuniões Marcadas</h3>
                             </div>
                             <div class="kpi-content">
-                                <h2 id="kpi-fechados">
+                                <h2 id="kpi-reunioes">
                                     <div class="kpi-loading">
                                         <i class="ph ph-spinner-gap"></i>
                                         <span>Atualizando dados...</span>
@@ -281,7 +281,7 @@
                                 <div class="kpi-trend positive">
                                     <i class="ph ph-arrow-up"></i>
                                     <div class="trend-text">
-                                        <span>negócios fechados</span>
+                                        <span>agendamentos</span>
                                     </div>
                                 </div>
                             </div>
@@ -289,14 +289,14 @@
                         <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Como interpretar esta métrica"></i>
                             <div class="card-tooltip-container mobile-only-tooltip" onclick="this.classList.toggle('show')">
                                 <div class="tooltip-icon-btn"><i class="ph ph-question"></i></div>
-                                <div class="tooltip-box-content">A porcentagem de sucesso da sua operação, calculada dividindo os negócios fechados pelo número total de leads.</div>
+                                <div class="tooltip-box-content">Este card mostra quantos leads recusaram o produto ou serviço durante o atendimento. Use essa lista para decidir a melhor forma de tentar recuperar esses contatos.</div>
                             </div>
                             <div class="kpi-header">
-                                <div class="icon-wrapper green-light"><i class="ph ph-chart-pie text-primary"></i></div>
-                                <h3>Taxa de conversão</h3>
+                                <div class="icon-wrapper green-light"><i class="ph ph-recycle text-primary"></i></div>
+                                <h3>Leads a Recuperar</h3>
                             </div>
                             <div class="kpi-content">
-                                <h2 id="kpi-taxa">
+                                <h2 id="kpi-recuperar">
                                     <div class="kpi-loading">
                                         <i class="ph ph-spinner-gap"></i>
                                         <span>Atualizando dados...</span>
@@ -305,7 +305,7 @@
                                 <div class="kpi-trend positive">
                                     <i class="ph ph-arrow-up"></i>
                                     <div class="trend-text">
-                                        <span>fechados / total</span>
+                                        <span>recusas/sem interesse</span>
                                     </div>
                                 </div>
                             </div>
@@ -432,22 +432,17 @@
             }
 
             // Atualizar contadores KPI
-            animateValueUser('kpi-total', 0, leads.length, 1500);
+            const totalLeads = leads.length;
+            animateValueUser('kpi-total', 0, totalLeads, 1500);
 
-            // Calcular tempo economizado (igual relatorios)
-            let iaCount = 0;
-            for (const lead of leads) {
-                const conversas = await window.dbAPI.fetchConversations(lead.id);
-                iaCount += conversas.filter(c => c.enviado_por === 'IA').length;
-            }
-            const tempoPoupadoHoras = Math.round(((iaCount * 2) / 60) * 10) / 10;
-            animateValueUser('kpi-em-atendimento', 0, tempoPoupadoHoras, 1500, (val) => val.toFixed(1) + 'h');
+            const leadsAtendidos = leads.filter(l => l.status && l.status.trim().toLowerCase() !== 'em andamento').length;
+            animateValueUser('kpi-atendidos', 0, leadsAtendidos, 1500);
 
-            const fechados = leads.filter(l => l.status === 'Fechado').length;
-            animateValueUser('kpi-fechados', 0, fechados, 1500);
+            const reunioesMarcadas = leads.filter(l => l.status && l.status.trim().toLowerCase() === 'reunião marcada').length;
+            animateValueUser('kpi-reunioes', 0, reunioesMarcadas, 1500);
             
-            const taxa = leads.length > 0 ? Math.round((fechados / leads.length) * 100) : 0;
-            animateValueUser('kpi-taxa', 0, taxa, 1500, (val) => Math.round(val) + '%');
+            const leadsRecuperar = leads.filter(l => l.status && (l.status.trim().toLowerCase() === 'a recuperar' || l.status.trim().toLowerCase() === 'recusou')).length;
+            animateValueUser('kpi-recuperar', 0, leadsRecuperar, 1500);
 
             // Atualizar paginação
             const paginationEl = document.getElementById('dashboard-pagination-info');

@@ -185,23 +185,23 @@ window.startPageTutorial = function() {
             },
             {
                 selector: '.kpi-card:nth-child(1)',
-                title: 'Novos Leads',
-                text: 'Este card mostra a quantidade total de novos contatos que entraram no seu funil recentemente.'
+                title: 'Total de Leads',
+                text: 'Este card mostra a quantidade total de contatos que entraram no seu funil.'
             },
             {
                 selector: '.kpi-card:nth-child(2)',
-                title: 'Tempo Economizado',
-                text: 'Descubra quantas horas de trabalho a Inteligência Artificial poupou da sua equipe! O cálculo é simples: consideramos que cada mensagem respondida automaticamente pela IA economiza, em média, 2 minutos do tempo de um humano.'
+                title: 'Leads Atendidos',
+                text: 'Este card mostra quantos leads tiveram o atendimento finalizado pela IA.'
             },
             {
                 selector: '.kpi-card:nth-child(3)',
-                title: 'Fechados',
-                text: 'Acompanhe a quantidade absoluta de vendas, reuniões ou contratos que já foram finalizados com sucesso.'
+                title: 'Reuniões Marcadas',
+                text: 'Este card mostra quantas reuniões a IA conseguiu agendar com sucesso na agenda.'
             },
             {
                 selector: '.kpi-card:nth-child(4)',
-                title: 'Taxa de Conversão',
-                text: 'A porcentagem de sucesso da sua operação, calculada dividindo os negócios fechados pelo número total de leads.'
+                title: 'Leads a Recuperar',
+                text: 'Este card mostra quantos leads recusaram o produto ou serviço durante o atendimento.'
             },
             {
                 selector: '.table-card',
@@ -231,27 +231,27 @@ window.startPageTutorial = function() {
             {
                 selector: '.kpi-card:nth-child(1)',
                 title: 'Total de Leads',
-                text: 'Este card mostra a quantidade total de novos contatos que entraram no seu funil recentemente.'
+                text: 'Este card mostra a quantidade total de contatos que entraram no seu funil.'
             },
             {
                 selector: '.kpi-card:nth-child(2)',
-                title: 'Tempo Economizado',
-                text: 'Descubra quantas horas de trabalho a Inteligência Artificial poupou da sua equipe! O cálculo é simples: consideramos que cada mensagem respondida automaticamente pela IA economiza, em média, 2 minutos do tempo de um humano.'
+                title: 'Leads Atendidos',
+                text: 'Este card mostra quantos leads tiveram o atendimento finalizado pela IA.'
             },
             {
                 selector: '.kpi-card:nth-child(3)',
-                title: 'Vendas Fechadas',
-                text: 'Acompanhe a quantidade absoluta de vendas, reuniões ou contratos que já foram finalizados com sucesso.'
+                title: 'Reuniões Marcadas',
+                text: 'Este card mostra quantas reuniões a IA conseguiu agendar com sucesso na agenda.'
             },
             {
                 selector: '.kpi-card:nth-child(4)',
-                title: 'Reuniões Agendadas',
-                text: 'Acompanhe a quantidade de agendamentos realizados. Mede a eficiência da qualificação, mostrando quantos leads concordaram em marcar uma visita.'
+                title: 'Leads a Recuperar',
+                text: 'Este card mostra quantos leads recusaram o produto ou serviço durante o atendimento.'
             },
             {
                 selector: '.relatorios-charts .card:first-child',
                 title: 'Gráfico de Desempenho',
-                text: 'Visualize a conversão do seu funil: desde a quantidade total de Leads até o Tempo Poupado em formato de linha.'
+                text: 'Visualize a conversão do seu funil: desde a quantidade total de Leads até os Leads a Recuperar em formato de linha.'
             },
             {
                 selector: '.map-container-flex',

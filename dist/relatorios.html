@@ -88,8 +88,8 @@
     </style>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
   <script type="module" crossorigin src="/assets/supabase-DUkCiNAm.js"></script>
-  <script type="module" crossorigin src="/assets/data-BfrI3Xps.js"></script>
-  <script type="module" crossorigin src="/assets/script-vo03aQho.js"></script>
+  <script type="module" crossorigin src="/assets/data-CpRoCUfv.js"></script>
+  <script type="module" crossorigin src="/assets/script-CdktDBgC.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
   <link rel="stylesheet" crossorigin href="/assets/conversas-csRaMG8v.css">
 </head>
@@ -270,7 +270,7 @@
                                 <div class="tooltip-box-content">Este card mostra a quantidade total de contatos que entraram no seu funil.</div>
                             </div>
                             <div class="kpi-header">
-                                <div class="icon-wrapper green-light"><i class="ph ph-funnel text-primary"></i></div>
+                                <div class="icon-wrapper green-light"><i class="ph ph-users text-primary"></i></div>
                                 <h3>Total de Leads</h3>
                             </div>
                             <div class="kpi-content">
@@ -281,62 +281,40 @@
                                     </div>
                                 </h2>
                                 <div class="kpi-trend positive"><i class="ph ph-arrow-up"></i>
-                                    <div class="trend-text"><span>no banco de dados</span></div>
+                                    <div class="trend-text"><span>total registrado</span></div>
                                 </div>
                             </div>
                         </div>
                         <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Como interpretar esta métrica"></i>
                             <div class="card-tooltip-container mobile-only-tooltip" onclick="this.classList.toggle('show')">
                                 <div class="tooltip-icon-btn"><i class="ph ph-question"></i></div>
-                                <div class="tooltip-box-content">Descubra quantas horas de trabalho a IA poupou! Calculamos 2 minutos economizados para cada mensagem.</div>
+                                <div class="tooltip-box-content">Este card mostra quantos leads tiveram o atendimento finalizado pela IA, ou seja, a conversa já chegou a um resultado (reunião marcada, venda fechada ou lead que não quis seguir).</div>
                             </div>
                             <div class="kpi-header">
-                                <div class="icon-wrapper green-light"><i class="ph ph-clock text-primary"></i></div>
-                                <h3>Tempo Economizado</h3>
+                                <div class="icon-wrapper green-light"><i class="ph ph-check-circle text-primary"></i></div>
+                                <h3>Leads Atendidos</h3>
                             </div>
                             <div class="kpi-content">
-                                <h2 id="rel-atendimentos">
+                                <h2 id="rel-atendidos">
                                     <div class="kpi-loading">
                                         <i class="ph ph-spinner-gap"></i>
                                         <span>Atualizando dados...</span>
                                     </div>
                                 </h2>
                                 <div class="kpi-trend positive"><i class="ph ph-arrow-up"></i>
-                                    <div class="trend-text"><span>em horas</span></div>
+                                    <div class="trend-text"><span>atendimentos finalizados</span></div>
                                 </div>
                             </div>
                         </div>
                         <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Como interpretar esta métrica"></i>
                             <div class="card-tooltip-container mobile-only-tooltip" onclick="this.classList.toggle('show')">
                                 <div class="tooltip-icon-btn"><i class="ph ph-question"></i></div>
-                                <div class="tooltip-box-content">Acompanhe a quantidade de vendas ou contratos que já foram finalizados.</div>
+                                <div class="tooltip-box-content">Este card mostra quantas reuniões, consultas ou horários a IA conseguiu agendar com sucesso na agenda.</div>
                             </div>
                             <div class="kpi-header">
-                                <div class="icon-wrapper green-light"><i class="ph ph-currency-dollar text-primary"></i>
+                                <div class="icon-wrapper green-light"><i class="ph ph-calendar-check text-primary"></i>
                                 </div>
-                                <h3>Vendas Fechadas</h3>
-                            </div>
-                            <div class="kpi-content">
-                                <h2 id="rel-fechados">
-                                    <div class="kpi-loading">
-                                        <i class="ph ph-spinner-gap"></i>
-                                        <span>Atualizando dados...</span>
-                                    </div>
-                                </h2>
-                                <div class="kpi-trend positive"><i class="ph ph-arrow-up"></i>
-                                    <div class="trend-text"><span>leads com status fechado</span></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Como interpretar esta métrica"></i>
-                            <div class="card-tooltip-container mobile-only-tooltip" onclick="this.classList.toggle('show')">
-                                <div class="tooltip-icon-btn"><i class="ph ph-question"></i></div>
-                                <div class="tooltip-box-content">Acompanhe a quantidade de agendamentos realizados mostrando o sucesso da qualificação.</div>
-                            </div>
-                            <div class="kpi-header">
-                                <div class="icon-wrapper green-light"><i class="ph ph-calendar-plus text-primary"></i>
-                                </div>
-                                <h3>Reuniões Agendadas</h3>
+                                <h3>Reuniões Marcadas</h3>
                             </div>
                             <div class="kpi-content">
                                 <h2 id="rel-reunioes">
@@ -346,7 +324,29 @@
                                     </div>
                                 </h2>
                                 <div class="kpi-trend positive"><i class="ph ph-arrow-up"></i>
-                                    <div class="trend-text"><span>leads com reunião marcada</span></div>
+                                    <div class="trend-text"><span>agendamentos</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Como interpretar esta métrica"></i>
+                            <div class="card-tooltip-container mobile-only-tooltip" onclick="this.classList.toggle('show')">
+                                <div class="tooltip-icon-btn"><i class="ph ph-question"></i></div>
+                                <div class="tooltip-box-content">Este card mostra quantos leads recusaram o produto ou serviço durante o atendimento. Use essa lista para decidir a melhor forma de tentar recuperar esses contatos.</div>
+                            </div>
+                            <div class="kpi-header">
+                                <div class="icon-wrapper green-light"><i class="ph ph-recycle text-primary"></i>
+                                </div>
+                                <h3>Leads a Recuperar</h3>
+                            </div>
+                            <div class="kpi-content">
+                                <h2 id="rel-recuperar">
+                                    <div class="kpi-loading">
+                                        <i class="ph ph-spinner-gap"></i>
+                                        <span>Atualizando dados...</span>
+                                    </div>
+                                </h2>
+                                <div class="kpi-trend positive"><i class="ph ph-arrow-up"></i>
+                                    <div class="trend-text"><span>recusas/sem interesse</span></div>
                                 </div>
                             </div>
                         </div>
@@ -433,47 +433,37 @@
                 if (window.dbAPI) {
                     clearInterval(tryInit);
                     const leads = await window.dbAPI.fetchLeads();
-                    document.getElementById('rel-total-leads').textContent = leads.length;
-                    const fechados = leads.filter(l => l.status === 'Fechado').length;
-                    document.getElementById('rel-fechados').textContent = fechados;
-
-                    // Busca mensagens da IA
-                    let iaCount = 0;
-                    for (const lead of leads) {
-                        const conversas = await window.dbAPI.fetchConversations(lead.id);
-                        iaCount += conversas.filter(c => c.enviado_por === 'IA').length;
-                    }
                     
-                    // Calcula o tempo poupado (2 minutos por mensagem IA), transformando em horas (1 casa decimal)
-                    const tempoPoupadoHoras = Math.round(((iaCount * 2) / 60) * 10) / 10;
+                    const totalLeads = leads.length;
+                    document.getElementById('rel-total-leads').textContent = totalLeads;
                     
-                    document.getElementById('rel-atendimentos').textContent = `${tempoPoupadoHoras}h`;
-
-                    // Prepara dados fixos para o gráfico conforme solicitado
-                    const countNovos = leads.filter(l => l.status === 'Novo' || !l.status).length;
-                    const countAtendimentos = leads.filter(l => l.status === 'Em Atendimento').length;
-                    const countVendas = leads.filter(l => l.status === 'Fechado').length;
-                    const countReunioes = leads.filter(l => l.status && l.status.toLowerCase().includes('reuni')).length;
-
+                    const leadsAtendidos = leads.filter(l => l.status && l.status.trim().toLowerCase() !== 'em andamento').length;
+                    document.getElementById('rel-atendidos').textContent = leadsAtendidos;
+                    
+                    const reunioesMarcadas = leads.filter(l => l.status && l.status.trim().toLowerCase() === 'reunião marcada').length;
                     const reunioesEl = document.getElementById('rel-reunioes');
-                    if (reunioesEl) reunioesEl.textContent = countReunioes;
+                    if (reunioesEl) reunioesEl.textContent = reunioesMarcadas;
+                    
+                    const leadsRecuperar = leads.filter(l => l.status && (l.status.trim().toLowerCase() === 'a recuperar' || l.status.trim().toLowerCase() === 'recusou')).length;
+                    const recuperarEl = document.getElementById('rel-recuperar');
+                    if (recuperarEl) recuperarEl.textContent = leadsRecuperar;
 
                     // Textos multilinhas (arrays) para evitar que o gráfico fique espremido horizontalmente no mobile
                     const chartLabels = [
                         ['Total', 'de Leads'],
-                        ['Vendas', '(Fechados)'],
-                        ['Reuniões', 'Agendadas'],
-                        ['Tempo Poupado', '(Horas)']
+                        ['Leads', 'Atendidos'],
+                        ['Reuniões', 'Marcadas'],
+                        ['Leads a', 'Recuperar']
                     ];
-                    // Usamos leads.length para o Total de Leads
-                    const chartData = [leads.length, countVendas, countReunioes, tempoPoupadoHoras];
+                    
+                    const chartData = [totalLeads, leadsAtendidos, reunioesMarcadas, leadsRecuperar];
 
                     // Cores mais vivas para um efeito bonito
                     const chartColors = [
                         '#00a884', // Verde (Total de Leads)
-                        '#8b5cf6', // Roxo (Vendas)
+                        '#3b82f6', // Azul (Leads Atendidos)
                         '#f59e0b', // Laranja (Reuniões)
-                        '#ec4899'  // Rosa (Tempo Poupado)
+                        '#ef4444'  // Vermelho (Leads a Recuperar)
                     ];
 
                     const ctx = document.getElementById('statusChart').getContext('2d');
