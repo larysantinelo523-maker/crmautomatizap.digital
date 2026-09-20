@@ -48,57 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Dados Mockados para os dias do mês
     // Mapeando algumas datas (ex: chaves de 1 a 30)
-    const mockData = {
-        1: {
-            kpis: { atendimentos: 12, reunioes: 5 },
-            tasks: [
-                { type: 'atendimento', client: 'Fernanda Costa', time: '08:24', text: 'A cliente Fernanda Costa ficou interessada e gostaria de saber mais sobre nossos serviços.', status: 'Atendido' },
-                { type: 'atendimento', client: 'Bruna Martins', time: '09:12', text: 'A cliente Bruna Martins pediu mais informações sobre os planos e agendou uma conversa.', status: 'Atendido' },
-                { type: 'reuniao', client: 'Clínica Vida', time: '10:37', text: 'O cliente Clínica Vida demonstrou interesse e solicitou o agendamento de uma reunião.', status: 'Reunião marcada' },
-                { type: 'atendimento', client: 'Juliana Santos', time: '14:26', text: 'A cliente Juliana Santos solicitou um orçamento personalizado.', status: 'Atendido' }
-            ]
-        },
-        7: {
-            kpis: { atendimentos: 8, reunioes: 2 },
-            tasks: [
-                { type: 'reuniao', client: 'Studio Beleza', time: '11:00', text: 'O Studio Beleza agendou uma apresentação formal.', status: 'Reunião marcada' },
-                { type: 'atendimento', client: 'Vanessa Martins', time: '16:45', text: 'A cliente Vanessa Martins tirou dúvidas sobre o plano e ficou de pensar.', status: 'Atendido' }
-            ]
-        },
-        14: {
-            kpis: { atendimentos: 20, reunioes: 4 },
-            tasks: [
-                { type: 'atendimento', client: 'Tatiana Alves', time: '09:00', text: 'A cliente Tatiana Alves gostou dos preços e quer prosseguir.', status: 'Atendido' },
-                { type: 'atendimento', client: 'Rafael Pereira', time: '10:15', text: 'O cliente Rafael Pereira pediu contato para amanhã.', status: 'Atendido' },
-                { type: 'reuniao', client: 'Agência PR', time: '14:00', text: 'Reunião confirmada com a Agência PR.', status: 'Reunião marcada' }
-            ]
-        },
-        16: {
-            kpis: { atendimentos: 15, reunioes: 3 },
-            tasks: [
-                { type: 'atendimento', client: 'João Silva', time: '08:24', text: 'O cliente João Silva ficou interessado e gostaria de saber mais sobre nossos serviços.', status: 'Atendido' },
-                { type: 'atendimento', client: 'Maria Clara', time: '09:12', text: 'A cliente Maria Clara pediu mais informações sobre os planos e agendou uma conversa.', status: 'Atendido' },
-                { type: 'reuniao', client: 'Rafael Lima', time: '10:37', text: 'O cliente Rafael Lima demonstrou interesse e solicitou o agendamento de uma reunião.', status: 'Reunião marcada' },
-                { type: 'atendimento', client: 'Ana Fernandes', time: '11:03', text: 'A cliente Ana Fernandes solicitou um orçamento personalizado.', status: 'Atendido' },
-                { type: 'atendimento', client: 'Pedro Paulo', time: '14:26', text: 'O cliente Pedro Paulo confirmou a reunião para o dia 17.', status: 'Atendido' },
-                { type: 'atendimento', client: 'Luana Souza', time: '16:18', text: 'A cliente Luana Souza tirou dúvidas sobre o plano e fez a compra.', status: 'Atendido' }
-            ]
-        },
-        21: {
-            kpis: { atendimentos: 5, reunioes: 1 },
-            tasks: [
-                { type: 'atendimento', client: 'Vanessa Souza', time: '10:00', text: 'A cliente Vanessa Souza pediu um orçamento.', status: 'Atendido' },
-                { type: 'reuniao', client: 'Loja do Pão', time: '15:30', text: 'Reunião de alinhamento marcada.', status: 'Reunião marcada' }
-            ]
-        },
-        30: {
-            kpis: { atendimentos: 10, reunioes: 2 },
-            tasks: [
-                { type: 'atendimento', client: 'Wagner Silva', time: '08:30', text: 'O cliente Wagner Silva aprovou a proposta.', status: 'Atendido' },
-                { type: 'atendimento', client: 'Juliana Mendes', time: '11:20', text: 'A cliente Juliana Mendes solicitou contrato.', status: 'Atendido' }
-            ]
-        }
-    };
+    // Objeto que será preenchido com dados reais do Supabase
+    let calendarData = {};
 
     // Helper para gerar iniciais
     function getInitials(name) {
@@ -153,8 +104,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             html += `<div class="cal-day-number" style="${numberColorStyle}">${i}</div>`;
             
-            if (mockData[i]) {
-                const kpis = mockData[i].kpis;
+            const dateKey = `${year}-${month}-${i}`;
+            if (calendarData[dateKey]) {
+                const kpis = calendarData[dateKey].kpis;
                 if (kpis) {
                     html += `
                         <div class="cal-day-indicator">
@@ -165,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `</div>`; 
 
                 html += `<div class="cal-day-tasks">`;
-                const tasks = mockData[i].tasks;
+                const tasks = calendarData[dateKey].tasks;
                 tasks.forEach(t => {
                     let pillClass = t.type === 'reuniao' ? 'blue' : 'green';
                     let icon = t.type === 'reuniao' ? 'ph-calendar-blank' : 'ph-whatsapp-logo';
@@ -384,7 +336,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         sumDateText.textContent = `${dayNames[dateObj.getDay()]}, ${String(day).padStart(2, '0')} de ${monthNames[month]} de ${year}`;
         
-        const data = mockData[day];
+        const dateKey = `${year}-${month}-${day}`;
+        const data = calendarData[dateKey];
         
         if (data) {
             sumAtend.textContent = data.kpis.atendimentos;
@@ -539,6 +492,51 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!calBody) return;
         
         try {
+            await new Promise(resolve => {
+                if (window.dbAPI) resolve();
+                else {
+                    const int = setInterval(() => {
+                        if (window.dbAPI) { clearInterval(int); resolve(); }
+                    }, 50);
+                }
+            });
+
+            const leads = await window.dbAPI.fetchLeads();
+            calendarData = {};
+
+            leads.forEach(lead => {
+                if (!lead.criado_em) return;
+                const d = new Date(lead.criado_em);
+                const year = d.getFullYear();
+                const month = d.getMonth();
+                const day = d.getDate();
+                const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                const dateKey = `${year}-${month}-${day}`;
+                if (!calendarData[dateKey]) {
+                    calendarData[dateKey] = { kpis: { atendimentos: 0, reunioes: 0 }, tasks: [] };
+                }
+                
+                const st = lead.status ? lead.status.trim().toLowerCase() : '';
+                if (st === 'em andamento') return; // Ignora os que ainda estão em andamento
+                
+                let isReuniao = (st === 'reunião marcada');
+                let type = isReuniao ? 'reuniao' : 'atendimento';
+                let actionText = isReuniao ? 'O lead agendou uma reunião.' : 'O lead teve o atendimento finalizado.';
+                if (lead.resumo) actionText = lead.resumo;
+                
+                if (isReuniao) calendarData[dateKey].kpis.reunioes++;
+                else calendarData[dateKey].kpis.atendimentos++;
+                
+                calendarData[dateKey].tasks.push({
+                    type: type,
+                    client: lead.nome || 'Desconhecido',
+                    time: timeStr,
+                    text: actionText,
+                    status: lead.status || 'Atendido'
+                });
+            });
+
             const { data: sessionData } = await supabase.auth.getSession();
             if (sessionData && sessionData.session) {
                 const user = sessionData.session.user;
