@@ -52,12 +52,12 @@
         });
       });
     </script>
-  <script type="module" crossorigin src="/assets/tarefas-CqQjuUCj.js"></script>
+  <script type="module" crossorigin src="/assets/tarefas-C69Kz9G3.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
   <link rel="modulepreload" crossorigin href="/assets/data-D8Vc-_ni.js">
   <link rel="modulepreload" crossorigin href="/assets/script-B_ap9ZG8.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas--LoPJuS_.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas--MyWZE4y.css">
 </head>
 
 <body>
@@ -255,7 +255,7 @@
 
                 <!-- Coluna do Resumo do Dia -->
                 <div class="tarefas-summary-col" id="tarefas-summary-col">
-                    <section class="card summary-panel" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Veja o resumo diário de tarefas em detalhes"></i>
+                    <section class="card summary-panel" id="main-summary-panel" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Veja o resumo diário de tarefas em detalhes"></i>
                         <div class="summary-header">
                             <div class="summary-title">
                                 <div>
@@ -293,6 +293,26 @@
                                 <span>Ver todos os atendimentos do dia</span>
                                 <i class="ph ph-caret-right" style="font-size: 16px;"></i>
                             </button>
+                        </div>
+                    </section>
+
+                    <!-- Painel de Resumo da Conversa (Oculto por Padrão) -->
+                    <section class="card summary-panel" id="conversation-panel" style="display: none; height: 100%; flex-direction: column;">
+                        <div class="conversation-header" style="margin-bottom: 20px;">
+                            <button id="back-to-summary" style="background: none; border: none; cursor: pointer; color: var(--color-text-mut); font-size: 13px; text-decoration: underline; margin-bottom: 12px; display: inline-block; padding: 0;">voltar</button>
+                            <h3 style="font-size: 20px; font-weight: 700; color: var(--color-text-main); margin-bottom: 4px;">Resumo da Conversa</h3>
+                            <p style="font-size: 13px; color: var(--color-text-sec);">Cliente: <span id="conv-client-name" style="color: var(--color-primary); font-weight: 500;">...</span></p>
+                        </div>
+                        
+                        <div class="conversation-body" style="flex: 1; overflow-y: auto;">
+                            <div class="conv-section" style="margin-bottom: 24px;">
+                                <h4 style="font-size: 14px; font-weight: 600; color: var(--color-text-main); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;"><i class="ph-fill ph-user text-primary" style="font-size: 16px;"></i> O que o cliente disse:</h4>
+                                <p id="conv-client-text" style="font-size: 14px; color: var(--color-text-sec); line-height: 1.5;">...</p>
+                            </div>
+                            <div class="conv-section" style="margin-bottom: 24px;">
+                                <h4 style="font-size: 14px; font-weight: 600; color: var(--color-text-main); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;"><i class="ph-fill ph-robot" style="color: #6366f1; font-size: 16px;"></i> O que a IA respondeu:</h4>
+                                <p id="conv-ai-text" style="font-size: 14px; color: var(--color-text-sec); line-height: 1.5;">...</p>
+                            </div>
                         </div>
                     </section>
                 </div>

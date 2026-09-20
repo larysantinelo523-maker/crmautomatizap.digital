@@ -344,10 +344,12 @@ document.addEventListener('DOMContentLoaded', () => {
             sumReunioes.textContent = data.kpis.reunioes;
             
             let listHtml = '';
-            data.tasks.forEach(t => {
+            data.tasks.forEach((t, index) => {
                 const badgeColor = getStatusBadgeClass(t.status);
+                // Mock AI response if it doesn't exist
+                const aiResponseMock = `Análise concluída. O lead está interessado no serviço. Qualificação: ${t.status}.`;
                 listHtml += `
-                    <div class="day-task-item">
+                    <div class="day-task-item" data-client="${t.client}" data-text="${t.text}" data-ai-text="${aiResponseMock}" onclick="window.openConversation(this)">
                         <div class="dt-avatar">${getInitials(t.client)}</div>
                         <div class="dt-content">
                             <h5>${t.client}</h5>
@@ -576,4 +578,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     initCalendar();
+});
+
+// --- Lógica do Resumo da Conversa (Nova Tela) ---
+window.openConversation = function(element) {
+    const mainPanel = document.getElementById('main-summary-panel');
+    const convPanel = document.getElementById('conversation-panel');
+    
+    if(mainPanel && convPanel) {
+        // Extrai os dados do elemento clicado
+        const clientName = element.getAttribute('data-client');
+        const clientText = element.getAttribute('data-text');
+        const aiText = element.getAttribute('data-ai-text');
+        
+        // Preenche o painel de conversa
+        document.getElementById('conv-client-name').textContent = clientName || 'Cliente';
+        document.getElementById('conv-client-text').textContent = clientText || 'Sem mensagem recebida.';
+        document.getElementById('conv-ai-text').textContent = aiText || 'Nenhuma interação da IA registrada.';
+        
+        // Esconde o resumo e mostra a conversa
+        mainPanel.style.display = 'none';
+        convPanel.style.display = 'flex';
+    }
+};
+
+// Botão voltar do painel de conversa
+document.addEventListener('DOMContentLoaded', () => {
+    const btnBack = document.getElementById('back-to-summary');
+    if(btnBack) {
+        btnBack.addEventListener('click', (e) => {
+            e.preventDefault();
+            const mainPanel = document.getElementById('main-summary-panel');
+            const convPanel = document.getElementById('conversation-panel');
+            
+            if(mainPanel && convPanel) {
+                convPanel.style.display = 'none';
+                mainPanel.style.display = 'block';
+            }
+        });
+    }
 });
