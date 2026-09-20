@@ -2813,6 +2813,10 @@ body.dark-mode .accordion-content {
     font-size: 15px;
 }
 
+.ios-keyboard.lowercase .key:not(.special):not(.space) {
+    text-transform: lowercase;
+}
+
 .flex-1 {
     flex: 1.5;
 }

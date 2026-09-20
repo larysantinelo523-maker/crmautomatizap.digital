@@ -1626,6 +1626,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         // Auto-scroll para acompanhar a digitação
         fakeTypingText.scrollTop = fakeTypingText.scrollHeight;
+        
+        if (isShifted) {
+            iosKeyboard.classList.remove('lowercase');
+        } else {
+            iosKeyboard.classList.add('lowercase');
+        }
     }
 
     // --- Suporte a Teclado Físico (Desktop) ---
@@ -1850,21 +1856,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     const popupRect = popup.getBoundingClientRect();
                     
                     // Centraliza sobre a tecla
-                    let popupLeft = keyRect.left + (keyRect.width / 2) - (popupRect.width / 2);
+                    let popupLeft = keyRect.left + window.scrollX + (keyRect.width / 2) - (popupRect.width / 2);
                     
                     // Evita vazar pelas bordas da tela
                     const margin = 8;
-                    if (popupLeft < margin) {
-                        popupLeft = margin;
-                    } else if (popupLeft + popupRect.width > window.innerWidth - margin) {
-                        popupLeft = window.innerWidth - popupRect.width - margin;
+                    if (popupLeft < margin + window.scrollX) {
+                        popupLeft = margin + window.scrollX;
+                    } else if (popupLeft + popupRect.width > window.innerWidth + window.scrollX - margin) {
+                        popupLeft = window.innerWidth + window.scrollX - popupRect.width - margin;
                     }
                     
                     popup.style.left = `${popupLeft}px`;
-                    popup.style.top = `${keyRect.top - popupRect.height - 12}px`;
+                    // Calcula o topo levando em consideração o scroll da página
+                    popup.style.top = `${keyRect.top + window.scrollY - popupRect.height - 12}px`;
                     
                     // Ajusta a flechinha para apontar exatamente para o centro da tecla
-                    let arrowLeft = (keyRect.left + keyRect.width / 2) - popupLeft - 7;
+                    let arrowLeft = (keyRect.left + window.scrollX + keyRect.width / 2) - popupLeft - 7;
                     arrow.style.left = `${arrowLeft}px`;
                     
                     popup.style.visibility = 'visible';
