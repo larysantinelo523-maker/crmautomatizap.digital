@@ -497,29 +497,15 @@
             const objectionText = document.getElementById('lead-objection');
             const nextStepText = document.getElementById('lead-next-step');
 
-            // Mockup tático (até o backend da IA preencher as colunas exatas)
-            let dor = lead.dor_principal || `Tem interesse em ${lead.interesse || 'nossos serviços'}, busca praticidade.`;
-            let objecao = lead.objecao || 'Nenhuma objeção clara detectada ainda.';
-            let proximoPasso = lead.proximo_passo || 'Acompanhar a conversa e tentar agendamento.';
+            // Puxa os dados reais vindos do banco de dados (Supabase via n8n)
+            // Se ainda não tiverem sido gerados, mostra uma mensagem padrão
+            let dor = lead.dor_principal;
+            let objecao = lead.objecao;
+            let proximoPasso = lead.proximo_passo;
 
-            const st = (lead.status || '').toLowerCase();
-            if (st.includes('agendado') || st.includes('atendimento')) {
-                dor = 'Buscava disponibilidade com urgência.';
-                objecao = 'Nenhuma. O lead já avançou no funil.';
-                proximoPasso = 'Enviar lembrete 1 hora antes do compromisso.';
-            } else if (st.includes('negociação') || st.includes('negociacao')) {
-                dor = `Demonstrou forte interesse em ${lead.interesse || 'serviços'}, mas quer analisar.`;
-                objecao = 'Aparentemente, achou o valor um pouco acima do esperado.';
-                proximoPasso = 'Oferecer um bônus ou desconto se não responder até amanhã.';
-            } else if (st.includes('perdido')) {
-                dor = 'Estava apenas especulando preços no momento.';
-                objecao = 'Sem orçamento disponível / Achou caro.';
-                proximoPasso = 'Adicionar na lista de remarketing para promoção no próximo mês.';
-            }
-
-            painText.textContent = dor;
-            objectionText.textContent = objecao;
-            nextStepText.textContent = proximoPasso;
+            painText.textContent = dor || 'Aguardando IA extrair esta informação...';
+            objectionText.textContent = objecao || 'Nenhuma objeção registrada pela IA.';
+            nextStepText.textContent = proximoPasso || 'Aguardando definição estratégica.';
             
             summaryBox.style.display = 'block';
 
