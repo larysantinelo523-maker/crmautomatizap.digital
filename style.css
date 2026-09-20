@@ -2805,7 +2805,8 @@ body.dark-mode .accordion-content {
     font-size: 16px;
 }
 
-.key.special:active {
+.key.special:active,
+.key-shift.shift-active {
     background-color: #ffffff;
 }
 

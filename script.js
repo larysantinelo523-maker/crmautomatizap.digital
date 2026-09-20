@@ -1627,10 +1627,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Auto-scroll para acompanhar a digitação
         fakeTypingText.scrollTop = fakeTypingText.scrollHeight;
         
+        const shiftBtn = document.querySelector('.key-shift');
         if (isShifted) {
             iosKeyboard.classList.remove('lowercase');
+            if (shiftBtn) shiftBtn.classList.add('shift-active');
         } else {
             iosKeyboard.classList.add('lowercase');
+            if (shiftBtn) shiftBtn.classList.remove('shift-active');
         }
     }
 
@@ -1773,6 +1776,8 @@ document.addEventListener('DOMContentLoaded', () => {
             isLongPress = false;
             let char = key.dataset.char || key.innerText.trim();
             if (!key.dataset.char) key.dataset.char = char;
+            
+            char = char.toUpperCase();
             
             if (accentsMap[char]) {
                 pressTimeout = setTimeout(() => {
@@ -1993,6 +1998,17 @@ document.addEventListener('DOMContentLoaded', () => {
             kbLetters.style.display = 'flex';
             fakeInput.classList.add('active');
         }));
+    }
+    
+    // Shift Toggle
+    const btnShift = document.querySelector('.key-shift');
+    if (btnShift) {
+        btnShift.addEventListener('click', (e) => {
+            e.stopPropagation();
+            triggerHaptic();
+            isShifted = !isShifted;
+            updateInput();
+        });
     }
     
     // Emojis
