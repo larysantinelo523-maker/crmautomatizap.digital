@@ -328,10 +328,24 @@
 
                         <div class="highlight-summary" id="lead-highlight-summary-box" style="display:none;">
                             <div class="summary-header">
-                                <i class="ph ph-robot"></i>
-                                <span>Resumo da conversa</span>
+                                <i class="ph ph-target"></i>
+                                <span>Raio-X Estratégico</span>
                             </div>
-                            <p class="summary-text" id="lead-highlight-summary">Nenhum resumo disponível.</p>
+                            
+                            <div class="tactical-item" style="margin-bottom: 12px; font-size: 13px; line-height: 1.4;">
+                                <strong><i class="ph-fill ph-fire" style="color: #ff9800; font-size: 14px; margin-right: 4px; vertical-align: middle;"></i> Dor Principal:</strong>
+                                <span id="lead-pain" style="color: var(--color-text-sec); display: block; margin-top: 4px; padding-left: 20px;">--</span>
+                            </div>
+                            
+                            <div class="tactical-item" style="margin-bottom: 12px; font-size: 13px; line-height: 1.4;">
+                                <strong><i class="ph-fill ph-warning-circle" style="color: #f44336; font-size: 14px; margin-right: 4px; vertical-align: middle;"></i> Objeção/Gargalo:</strong>
+                                <span id="lead-objection" style="color: var(--color-text-sec); display: block; margin-top: 4px; padding-left: 20px;">--</span>
+                            </div>
+
+                            <div class="tactical-item next-step" style="font-size: 13px; line-height: 1.4; padding: 10px; background: var(--color-primary-light); border-radius: 8px; margin-top: 16px;">
+                                <strong style="color: var(--color-primary);"><i class="ph-bold ph-arrow-right" style="font-size: 14px; margin-right: 4px; vertical-align: middle;"></i> Próximo Passo:</strong>
+                                <span id="lead-next-step" style="color: var(--color-text-main); font-weight: 500; display: block; margin-top: 4px;">--</span>
+                            </div>
                         </div>
 
                         <div class="action-buttons" id="lead-highlight-actions" style="margin-top: 16px;"></div>
@@ -479,14 +493,36 @@
             document.getElementById('lead-highlight-qualification').textContent = lead.qualificacao || 'Não informada';
 
             const summaryBox = document.getElementById('lead-highlight-summary-box');
-            const summaryText = document.getElementById('lead-highlight-summary');
-            if (lead.resumo) {
-                summaryText.textContent = lead.resumo;
-                summaryBox.style.display = 'block';
-            } else {
-                summaryBox.style.display = 'none';
+            const painText = document.getElementById('lead-pain');
+            const objectionText = document.getElementById('lead-objection');
+            const nextStepText = document.getElementById('lead-next-step');
+
+            // Mockup tático (até o backend da IA preencher as colunas exatas)
+            let dor = lead.dor_principal || `Tem interesse em ${lead.interesse || 'nossos serviços'}, busca praticidade.`;
+            let objecao = lead.objecao || 'Nenhuma objeção clara detectada ainda.';
+            let proximoPasso = lead.proximo_passo || 'Acompanhar a conversa e tentar agendamento.';
+
+            const st = (lead.status || '').toLowerCase();
+            if (st.includes('agendado') || st.includes('atendimento')) {
+                dor = 'Buscava disponibilidade com urgência.';
+                objecao = 'Nenhuma. O lead já avançou no funil.';
+                proximoPasso = 'Enviar lembrete 1 hora antes do compromisso.';
+            } else if (st.includes('negociação') || st.includes('negociacao')) {
+                dor = `Demonstrou forte interesse em ${lead.interesse || 'serviços'}, mas quer analisar.`;
+                objecao = 'Aparentemente, achou o valor um pouco acima do esperado.';
+                proximoPasso = 'Oferecer um bônus ou desconto se não responder até amanhã.';
+            } else if (st.includes('perdido')) {
+                dor = 'Estava apenas especulando preços no momento.';
+                objecao = 'Sem orçamento disponível / Achou caro.';
+                proximoPasso = 'Adicionar na lista de remarketing para promoção no próximo mês.';
             }
+
+            painText.textContent = dor;
+            objectionText.textContent = objecao;
+            nextStepText.textContent = proximoPasso;
             
+            summaryBox.style.display = 'block';
+
             document.getElementById('lead-highlight-last-contact').innerHTML = `<i class="ph ph-clock"></i> Último contato: ${dateStr}`;
 
             // Botões de ação
