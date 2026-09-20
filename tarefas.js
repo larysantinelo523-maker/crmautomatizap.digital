@@ -597,8 +597,9 @@ window.openConversation = function(element) {
         document.getElementById('conv-ai-text').textContent = aiText || 'Nenhuma interação da IA registrada.';
         
         // Esconde o resumo e mostra a conversa
-        mainPanel.style.display = 'none';
-        convPanel.style.display = 'flex';
+        mainPanel.classList.add('d-none-important');
+        convPanel.classList.remove('d-none-important');
+        convPanel.style.display = 'flex'; // Garante que, se perder o none, vira flex
     }
 };
 
@@ -607,7 +608,7 @@ window.closeConversation = function() {
     const convPanel = document.getElementById('conversation-panel');
     
     if(mainPanel && convPanel) {
-        convPanel.style.display = 'none';
-        mainPanel.style.display = 'flex';
+        convPanel.classList.add('d-none-important');
+        mainPanel.classList.remove('d-none-important');
     }
 };

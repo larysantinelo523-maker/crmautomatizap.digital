@@ -3990,6 +3990,10 @@ body.dark-mode .logo-img {
     }
 
     /* Card do Resumo: transformado em um modal com contraste */
+    .d-none-important {
+        display: none !important;
+    }
+
     .summary-panel {
         width: auto !important;
         max-width: 100% !important;
