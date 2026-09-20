@@ -602,19 +602,12 @@ window.openConversation = function(element) {
     }
 };
 
-// Botão voltar do painel de conversa
-document.addEventListener('DOMContentLoaded', () => {
-    const btnBack = document.getElementById('back-to-summary');
-    if(btnBack) {
-        btnBack.addEventListener('click', (e) => {
-            e.preventDefault();
-            const mainPanel = document.getElementById('main-summary-panel');
-            const convPanel = document.getElementById('conversation-panel');
-            
-            if(mainPanel && convPanel) {
-                convPanel.style.display = 'none';
-                mainPanel.style.display = 'block';
-            }
-        });
+window.closeConversation = function() {
+    const mainPanel = document.getElementById('main-summary-panel');
+    const convPanel = document.getElementById('conversation-panel');
+    
+    if(mainPanel && convPanel) {
+        convPanel.style.display = 'none';
+        mainPanel.style.display = 'block';
     }
-});
+};
