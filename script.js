@@ -1784,6 +1784,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const popup = document.createElement('div');
                     popup.className = 'accent-popup';
                     popup.style.position = 'absolute';
+                    popup.style.bottom = '115%';
+                    popup.style.left = '50%';
+                    popup.style.transform = 'translateX(-50%)';
                     popup.style.background = '#3a3a3c'; // Cinza escuro
                     popup.style.borderRadius = '8px';
                     popup.style.padding = '6px';
@@ -1795,10 +1798,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     const arrow = document.createElement('div');
                     arrow.style.position = 'absolute';
                     arrow.style.bottom = '-5px';
+                    arrow.style.left = '50%';
+                    arrow.style.transform = 'translateX(-50%) rotate(45deg)';
                     arrow.style.width = '14px';
                     arrow.style.height = '14px';
                     arrow.style.background = '#3a3a3c';
-                    arrow.style.transform = 'rotate(45deg)';
                     arrow.style.zIndex = '-1';
                     arrow.style.borderRadius = '2px';
                     popup.appendChild(arrow);
@@ -1816,6 +1820,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         btn.style.borderRadius = '6px';
                         btn.style.color = '#ffffff'; 
                         btn.style.cursor = 'pointer';
+                        btn.style.textTransform = 'none'; // Evita herdar uppercase do botão pai
                         
                         btn.addEventListener('touchstart', (ev) => {
                             ev.stopPropagation();
@@ -1848,33 +1853,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         popup.appendChild(btn);
                     });
                     
-                    // Adiciona temporariamente para calcular tamanho
-                    popup.style.visibility = 'hidden';
-                    document.body.appendChild(popup);
+                    key.style.position = 'relative';
+                    key.appendChild(popup);
                     
-                    const keyRect = key.getBoundingClientRect();
-                    const popupRect = popup.getBoundingClientRect();
-                    
-                    // Centraliza sobre a tecla
-                    let popupLeft = keyRect.left + window.scrollX + (keyRect.width / 2) - (popupRect.width / 2);
-                    
-                    // Evita vazar pelas bordas da tela
-                    const margin = 8;
-                    if (popupLeft < margin + window.scrollX) {
-                        popupLeft = margin + window.scrollX;
-                    } else if (popupLeft + popupRect.width > window.innerWidth + window.scrollX - margin) {
-                        popupLeft = window.innerWidth + window.scrollX - popupRect.width - margin;
+                    // Ajuste caso vaze pelas bordas da tela
+                    const rect = popup.getBoundingClientRect();
+                    if (rect.left < 8) {
+                        popup.style.left = '0';
+                        popup.style.transform = 'none';
+                        arrow.style.left = '18px'; // move seta para alinhar com tecla
+                        arrow.style.transform = 'rotate(45deg)';
+                    } else if (rect.right > window.innerWidth - 8) {
+                        popup.style.left = 'auto';
+                        popup.style.right = '0';
+                        popup.style.transform = 'none';
+                        arrow.style.left = 'auto';
+                        arrow.style.right = '18px';
+                        arrow.style.transform = 'rotate(45deg)';
                     }
                     
-                    popup.style.left = `${popupLeft}px`;
-                    // Calcula o topo levando em consideração o scroll da página
-                    popup.style.top = `${keyRect.top + window.scrollY - popupRect.height - 12}px`;
-                    
-                    // Ajusta a flechinha para apontar exatamente para o centro da tecla
-                    let arrowLeft = (keyRect.left + window.scrollX + keyRect.width / 2) - popupLeft - 7;
-                    arrow.style.left = `${arrowLeft}px`;
-                    
-                    popup.style.visibility = 'visible';
                     activePopup = popup;
                     
                 }, 400); // 400ms para considerar long press
@@ -1884,6 +1881,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const cancelPress = () => {
             clearTimeout(pressTimeout);
         };
+        
+        key.addEventListener('contextmenu', (e) => e.preventDefault()); // Evita menu nativo no mobile
         
         key.addEventListener('mousedown', startPress);
         key.addEventListener('touchstart', startPress, { passive: true });

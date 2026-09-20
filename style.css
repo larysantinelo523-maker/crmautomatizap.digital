@@ -2759,6 +2759,7 @@ body.dark-mode .accordion-content {
     max-height: 250px;
     opacity: 1;
     padding: 8px 4px 15px 4px;
+    overflow: visible;
 }
 
 /* Força ocultar teclado no desktop mesmo se tentar ativar */
