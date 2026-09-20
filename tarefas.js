@@ -608,6 +608,6 @@ window.closeConversation = function() {
     
     if(mainPanel && convPanel) {
         convPanel.style.display = 'none';
-        mainPanel.style.display = 'block';
+        mainPanel.style.display = 'flex';
     }
 };
