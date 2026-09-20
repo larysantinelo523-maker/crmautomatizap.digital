@@ -185,21 +185,16 @@ window.startPageTutorial = function() {
             },
             {
                 selector: '.kpi-card:nth-child(1)',
-                title: 'Total de Leads',
-                text: 'Este card mostra a quantidade total de contatos que entraram no seu funil.'
-            },
-            {
-                selector: '.kpi-card:nth-child(2)',
                 title: 'Leads Atendidos',
                 text: 'Este card mostra quantos leads tiveram o atendimento finalizado pela IA.'
             },
             {
-                selector: '.kpi-card:nth-child(3)',
+                selector: '.kpi-card:nth-child(2)',
                 title: 'Reuniões Marcadas',
                 text: 'Este card mostra quantas reuniões a IA conseguiu agendar com sucesso na agenda.'
             },
             {
-                selector: '.kpi-card:nth-child(4)',
+                selector: '.kpi-card:nth-child(3)',
                 title: 'Leads a Recuperar',
                 text: 'Este card mostra quantos leads recusaram o produto ou serviço durante o atendimento.'
             },
@@ -230,28 +225,23 @@ window.startPageTutorial = function() {
         steps = [
             {
                 selector: '.kpi-card:nth-child(1)',
-                title: 'Total de Leads',
-                text: 'Este card mostra a quantidade total de contatos que entraram no seu funil.'
-            },
-            {
-                selector: '.kpi-card:nth-child(2)',
                 title: 'Leads Atendidos',
                 text: 'Este card mostra quantos leads tiveram o atendimento finalizado pela IA.'
             },
             {
-                selector: '.kpi-card:nth-child(3)',
+                selector: '.kpi-card:nth-child(2)',
                 title: 'Reuniões Marcadas',
                 text: 'Este card mostra quantas reuniões a IA conseguiu agendar com sucesso na agenda.'
             },
             {
-                selector: '.kpi-card:nth-child(4)',
+                selector: '.kpi-card:nth-child(3)',
                 title: 'Leads a Recuperar',
                 text: 'Este card mostra quantos leads recusaram o produto ou serviço durante o atendimento.'
             },
             {
                 selector: '.relatorios-charts .card:first-child',
                 title: 'Gráfico de Desempenho',
-                text: 'Visualize a conversão do seu funil: desde a quantidade total de Leads até os Leads a Recuperar em formato de linha.'
+                text: 'Visualize a conversão do seu funil e os resultados em formato de linha.'
             },
             {
                 selector: '.map-container-flex',

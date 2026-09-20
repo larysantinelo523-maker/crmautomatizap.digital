@@ -88,10 +88,10 @@
     </style>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
   <script type="module" crossorigin src="/assets/supabase-DUkCiNAm.js"></script>
-  <script type="module" crossorigin src="/assets/data-CpRoCUfv.js"></script>
-  <script type="module" crossorigin src="/assets/script-CdktDBgC.js"></script>
+  <script type="module" crossorigin src="/assets/data-D8Vc-_ni.js"></script>
+  <script type="module" crossorigin src="/assets/script-DtDQKViG.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-csRaMG8v.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-DrUPNsqL.css">
 </head>
 
 <body>
@@ -264,27 +264,7 @@
             <div class="dashboard-grid no-sidebar">
                 <div class="main-column" style="flex: 1;">
                     <section class="kpis-section relatorios-kpis">
-                        <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Como interpretar esta métrica"></i>
-                            <div class="card-tooltip-container mobile-only-tooltip" onclick="this.classList.toggle('show')">
-                                <div class="tooltip-icon-btn"><i class="ph ph-question"></i></div>
-                                <div class="tooltip-box-content">Este card mostra a quantidade total de contatos que entraram no seu funil.</div>
-                            </div>
-                            <div class="kpi-header">
-                                <div class="icon-wrapper green-light"><i class="ph ph-users text-primary"></i></div>
-                                <h3>Total de Leads</h3>
-                            </div>
-                            <div class="kpi-content">
-                                <h2 id="rel-total-leads">
-                                    <div class="kpi-loading">
-                                        <i class="ph ph-spinner-gap"></i>
-                                        <span>Atualizando dados...</span>
-                                    </div>
-                                </h2>
-                                <div class="kpi-trend positive"><i class="ph ph-arrow-up"></i>
-                                    <div class="trend-text"><span>total registrado</span></div>
-                                </div>
-                            </div>
-                        </div>
+
                         <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Como interpretar esta métrica"></i>
                             <div class="card-tooltip-container mobile-only-tooltip" onclick="this.classList.toggle('show')">
                                 <div class="tooltip-icon-btn"><i class="ph ph-question"></i></div>
@@ -434,8 +414,7 @@
                     clearInterval(tryInit);
                     const leads = await window.dbAPI.fetchLeads();
                     
-                    const totalLeads = leads.length;
-                    document.getElementById('rel-total-leads').textContent = totalLeads;
+
                     
                     const leadsAtendidos = leads.filter(l => l.status && l.status.trim().toLowerCase() !== 'em andamento').length;
                     document.getElementById('rel-atendidos').textContent = leadsAtendidos;
@@ -450,17 +429,15 @@
 
                     // Textos multilinhas (arrays) para evitar que o gráfico fique espremido horizontalmente no mobile
                     const chartLabels = [
-                        ['Total', 'de Leads'],
                         ['Leads', 'Atendidos'],
                         ['Reuniões', 'Marcadas'],
                         ['Leads a', 'Recuperar']
                     ];
                     
-                    const chartData = [totalLeads, leadsAtendidos, reunioesMarcadas, leadsRecuperar];
+                    const chartData = [leadsAtendidos, reunioesMarcadas, leadsRecuperar];
 
                     // Cores mais vivas para um efeito bonito
                     const chartColors = [
-                        '#00a884', // Verde (Total de Leads)
                         '#3b82f6', // Azul (Leads Atendidos)
                         '#f59e0b', // Laranja (Reuniões)
                         '#ef4444'  // Vermelho (Leads a Recuperar)
@@ -485,7 +462,7 @@
                         data: {
                             labels: chartLabels,
                             datasets: [{
-                                label: 'Total',
+                                label: 'Valor',
                                 data: chartData,
                                 backgroundColor: gradient,
                                 borderColor: '#00a884',

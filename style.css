@@ -1027,7 +1027,7 @@ body.dark-mode .dropdown-item:hover {
       ========================================================================== */
 .kpis-section {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
 }
 

@@ -211,30 +211,7 @@
                 <div class="main-column">
 
                     <section class="kpis-section">
-                        <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Como interpretar esta métrica"></i>
-                            <div class="card-tooltip-container mobile-only-tooltip" onclick="this.classList.toggle('show')">
-                                <div class="tooltip-icon-btn"><i class="ph ph-question"></i></div>
-                                <div class="tooltip-box-content">Este card mostra a quantidade total de contatos que entraram no seu funil.</div>
-                            </div>
-                            <div class="kpi-header">
-                                <div class="icon-wrapper green-light"><i class="ph ph-users text-primary"></i></div>
-                                <h3>Total de Leads</h3>
-                            </div>
-                            <div class="kpi-content">
-                                <h2 id="kpi-total">
-                                    <div class="kpi-loading">
-                                        <i class="ph ph-spinner-gap"></i>
-                                        <span>Atualizando dados...</span>
-                                    </div>
-                                </h2>
-                                <div class="kpi-trend positive">
-                                    <i class="ph ph-arrow-up"></i>
-                                    <div class="trend-text">
-                                        <span>total registrado</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                         <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Como interpretar esta métrica"></i>
                             <div class="card-tooltip-container mobile-only-tooltip" onclick="this.classList.toggle('show')">
                                 <div class="tooltip-icon-btn"><i class="ph ph-question"></i></div>
@@ -431,8 +408,6 @@
             }
 
             // Atualizar contadores KPI
-            const totalLeads = leads.length;
-            animateValueUser('kpi-total', 0, totalLeads, 1500);
 
             const leadsAtendidos = leads.filter(l => l.status && l.status.trim().toLowerCase() !== 'em andamento').length;
             animateValueUser('kpi-atendidos', 0, leadsAtendidos, 1500);
