@@ -285,7 +285,7 @@
                         </div>
                         
                         <div class="summary-footer">
-                            <button class="btn btn--primary" style="width: 100%; border: none;">
+                            <button type="button" class="btn btn--primary" onclick="window.openAllLeads()" style="width: 100%; border: none;">
                                 <span>Ver todos os atendimentos do dia</span>
                                 <i class="ph ph-caret-right" style="font-size: 16px;"></i>
                             </button>
@@ -308,6 +308,21 @@
                             <div class="conv-section" style="margin-bottom: 24px;">
                                 <h4 style="font-size: 14px; font-weight: 600; color: var(--color-text-main); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;"><i class="ph-fill ph-robot" style="color: #6366f1; font-size: 16px;"></i> O que a IA respondeu:</h4>
                                 <p id="conv-ai-text" style="font-size: 14px; color: var(--color-text-sec); line-height: 1.5;">...</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Painel de Todos os Atendimentos (Oculto por Padrão) -->
+                    <section class="card summary-panel d-none-important" id="all-leads-panel" style="height: 100%; flex-direction: column;">
+                        <div class="conversation-header" style="margin-bottom: 20px;">
+                            <button type="button" onclick="window.closeAllLeads()" style="background: none; border: none; cursor: pointer; color: var(--color-text-mut); font-size: 13px; text-decoration: underline; margin-bottom: 12px; display: inline-block; padding: 0;">voltar</button>
+                            <h3 style="font-size: 20px; font-weight: 700; color: var(--color-text-main); margin-bottom: 4px;">Todos os Atendimentos</h3>
+                            <p style="font-size: 13px; color: var(--color-text-sec);">Veja a lista completa do dia</p>
+                        </div>
+                        
+                        <div class="conversation-body" style="flex: 1; overflow-y: auto;">
+                            <div id="all-leads-list" style="display: flex; flex-direction: column; gap: 12px;">
+                                <!-- Preenchido via JS -->
                             </div>
                         </div>
                     </section>

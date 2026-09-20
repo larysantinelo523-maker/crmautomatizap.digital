@@ -344,11 +344,13 @@ document.addEventListener('DOMContentLoaded', () => {
             sumReunioes.textContent = data.kpis.reunioes;
             
             let listHtml = '';
+            let allListHtml = '';
+            
             data.tasks.forEach((t, index) => {
                 const badgeColor = getStatusBadgeClass(t.status);
                 // Mock AI response if it doesn't exist
                 const aiResponseMock = `Análise concluída. O lead está interessado no serviço. Qualificação: ${t.status}.`;
-                listHtml += `
+                const itemHtml = `
                     <div class="day-task-item" data-client="${t.client}" data-text="${t.text}" data-ai-text="${aiResponseMock}" onclick="window.openConversation(this)">
                         <div class="dt-avatar">${getInitials(t.client)}</div>
                         <div class="dt-content">
@@ -362,8 +364,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         <i class="ph ph-caret-right dt-caret"></i>
                     </div>
                 `;
+                
+                if (index < 3) {
+                    listHtml += itemHtml;
+                }
+                allListHtml += itemHtml;
             });
             sumTasksList.innerHTML = listHtml;
+            const allLeadsList = document.getElementById('all-leads-list');
+            if(allLeadsList) allLeadsList.innerHTML = allListHtml;
         } else {
             // Estado vazio
             sumAtend.textContent = '0';
@@ -581,11 +590,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // --- Lógica do Resumo da Conversa (Nova Tela) ---
+let previousPanelId = 'main-summary-panel';
+
 window.openConversation = function(element) {
     const mainPanel = document.getElementById('main-summary-panel');
+    const allLeadsPanel = document.getElementById('all-leads-panel');
     const convPanel = document.getElementById('conversation-panel');
     
-    if(mainPanel && convPanel) {
+    if(convPanel) {
         // Extrai os dados do elemento clicado
         const clientName = element.getAttribute('data-client');
         const clientText = element.getAttribute('data-text');
@@ -596,8 +608,15 @@ window.openConversation = function(element) {
         document.getElementById('conv-client-text').textContent = clientText || 'Sem mensagem recebida.';
         document.getElementById('conv-ai-text').textContent = aiText || 'Nenhuma interação da IA registrada.';
         
-        // Esconde o resumo e mostra a conversa
-        mainPanel.classList.add('d-none-important');
+        // Esconde o painel atual (main ou all-leads)
+        if (allLeadsPanel && !allLeadsPanel.classList.contains('d-none-important')) {
+            previousPanelId = 'all-leads-panel';
+            allLeadsPanel.classList.add('d-none-important');
+        } else if (mainPanel && !mainPanel.classList.contains('d-none-important')) {
+            previousPanelId = 'main-summary-panel';
+            mainPanel.classList.add('d-none-important');
+        }
+        
         convPanel.classList.remove('d-none-important');
         
         // Reinicia a animação
@@ -610,16 +629,46 @@ window.openConversation = function(element) {
 };
 
 window.closeConversation = function() {
-    const mainPanel = document.getElementById('main-summary-panel');
+    const prevPanel = document.getElementById(previousPanelId);
     const convPanel = document.getElementById('conversation-panel');
     
-    if(mainPanel && convPanel) {
+    if(prevPanel && convPanel) {
         convPanel.classList.add('d-none-important');
-        mainPanel.classList.remove('d-none-important');
+        prevPanel.classList.remove('d-none-important');
         
         // Reinicia a animação
+        prevPanel.classList.remove('animate-fade-slide');
+        void prevPanel.offsetWidth; // Trigger reflow
+        prevPanel.classList.add('animate-fade-slide');
+    }
+};
+
+window.openAllLeads = function() {
+    const mainPanel = document.getElementById('main-summary-panel');
+    const allLeadsPanel = document.getElementById('all-leads-panel');
+    
+    if(mainPanel && allLeadsPanel) {
+        mainPanel.classList.add('d-none-important');
+        allLeadsPanel.classList.remove('d-none-important');
+        
+        allLeadsPanel.classList.remove('animate-fade-slide');
+        void allLeadsPanel.offsetWidth;
+        allLeadsPanel.classList.add('animate-fade-slide');
+        
+        allLeadsPanel.style.display = 'flex';
+    }
+};
+
+window.closeAllLeads = function() {
+    const mainPanel = document.getElementById('main-summary-panel');
+    const allLeadsPanel = document.getElementById('all-leads-panel');
+    
+    if(mainPanel && allLeadsPanel) {
+        allLeadsPanel.classList.add('d-none-important');
+        mainPanel.classList.remove('d-none-important');
+        
         mainPanel.classList.remove('animate-fade-slide');
-        void mainPanel.offsetWidth; // Trigger reflow
+        void mainPanel.offsetWidth;
         mainPanel.classList.add('animate-fade-slide');
     }
 };
