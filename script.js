@@ -1964,40 +1964,78 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('touchcancel', stopBackspace);
     });
 
-    // Alternar Layouts (ABC / 123)
+    // Alternar Layouts (ABC / 123 / Emoji)
     const kbLetters = document.getElementById('keyboard-letters');
     const kbNumbers = document.getElementById('keyboard-numbers');
+    const kbEmojis = document.getElementById('keyboard-emojis');
 
-    const btnNum = document.querySelector('.key-toggle-num');
-    const btnAbc = document.querySelector('.key-toggle-abc');
+    const btnNums = document.querySelectorAll('.key-toggle-num');
+    const btnAbcs = document.querySelectorAll('.key-toggle-abc');
+    const btnEmojis = document.querySelectorAll('.key-toggle-emoji');
 
-    if (btnNum && kbLetters && kbNumbers) {
-        btnNum.addEventListener('click', (e) => {
+    if (btnNums.length) {
+        btnNums.forEach(btn => btn.addEventListener('click', (e) => {
             e.stopPropagation();
             triggerHaptic();
             kbLetters.style.display = 'none';
+            if (kbEmojis) kbEmojis.style.display = 'none';
             kbNumbers.style.display = 'flex';
             fakeInput.classList.add('active');
-        });
+        }));
     }
 
-    if (btnAbc && kbLetters && kbNumbers) {
-        btnAbc.addEventListener('click', (e) => {
+    if (btnAbcs.length) {
+        btnAbcs.forEach(btn => btn.addEventListener('click', (e) => {
             e.stopPropagation();
             triggerHaptic();
             kbNumbers.style.display = 'none';
+            if (kbEmojis) kbEmojis.style.display = 'none';
             kbLetters.style.display = 'flex';
             fakeInput.classList.add('active');
+        }));
+    }
+    
+    // Emojis
+    if (kbEmojis && btnEmojis.length) {
+        const emojiContainer = kbEmojis.querySelector('.emoji-container');
+        const emojisList = ['😀','😃','😄','😁','😆','😅','😂','🤣','🥲','☺️','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥸','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗','🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾','🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿','😾'];
+        
+        emojisList.forEach(emoji => {
+            const btn = document.createElement('button');
+            btn.className = 'key emoji-key';
+            btn.innerText = emoji;
+            btn.style.fontSize = '26px';
+            btn.style.background = 'transparent';
+            btn.style.border = 'none';
+            btn.style.padding = '4px';
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                currentText += emoji;
+                updateInput();
+                triggerHaptic();
+                fakeInput.classList.add('active');
+            });
+            emojiContainer.appendChild(btn);
         });
+
+        btnEmojis.forEach(btn => btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            triggerHaptic();
+            kbLetters.style.display = 'none';
+            kbNumbers.style.display = 'none';
+            kbEmojis.style.display = 'flex';
+            fakeInput.classList.add('active');
+        }));
     }
 
-    // Botão Enter/Retorno
-    const btnEnters = document.querySelectorAll('.btn-send-enter');
-    btnEnters.forEach(btn => {
+    // Botão Enter/Retorno (apenas quebra linha)
+    const btnReturns = document.querySelectorAll('.key-return');
+    btnReturns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             currentText += '\n';
             updateInput();
+            triggerHaptic();
             fakeInput.classList.add('active');
         });
     });

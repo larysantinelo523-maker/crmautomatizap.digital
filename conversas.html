@@ -371,10 +371,10 @@
                                         </div>
                                         <div class="keyboard-row bottom-row">
                                             <button class="key special flex-1 key-toggle-num">123</button>
-                                            <button class="key special flex-1"><i class="ph ph-smiley"
+                                            <button class="key special flex-1 key-toggle-emoji"><i class="ph ph-smiley"
                                                     style="font-size: 20px;"></i></button>
                                             <button class="key space flex-5 key-space">espaço</button>
-                                            <button class="key special flex-2 btn-send-enter">retorno</button>
+                                            <button class="key special flex-2 key-return">retorno</button>
                                         </div>
                                     </div>
 
@@ -404,10 +404,24 @@
                                         </div>
                                         <div class="keyboard-row bottom-row">
                                             <button class="key special flex-1 key-toggle-abc">ABC</button>
-                                            <button class="key special flex-1"><i class="ph ph-smiley"
+                                            <button class="key special flex-1 key-toggle-emoji"><i class="ph ph-smiley"
                                                     style="font-size: 20px;"></i></button>
                                             <button class="key space flex-5 key-space">espaço</button>
-                                            <button class="key special flex-2 btn-send-enter">retorno</button>
+                                            <button class="key special flex-2 key-return">retorno</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Layout de Emojis (Oculto por padrão) -->
+                                    <div id="keyboard-emojis" style="display: none; flex-direction: column; height: 100%;">
+                                        <div class="emoji-container" style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; padding: 4px; overflow-y: auto; flex: 1; margin-bottom: 8px;">
+                                            <!-- Preenchido via JS -->
+                                        </div>
+                                        <div class="keyboard-row bottom-row">
+                                            <button class="key special flex-1 key-toggle-abc">ABC</button>
+                                            <button class="key special backspace key-backspace"><i
+                                                    class="ph-fill ph-backspace" style="font-size: 20px;"></i></button>
+                                            <button class="key space flex-5 key-space">espaço</button>
+                                            <button class="key special flex-2 key-return">retorno</button>
                                         </div>
                                     </div>
 
