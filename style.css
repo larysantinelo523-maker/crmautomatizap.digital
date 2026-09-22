@@ -2012,6 +2012,7 @@ body.dark-mode .accordion-content {
     position: relative;
     cursor: pointer;
     margin: 0 4px;
+    flex-shrink: 0;
 }
 
 .bot-switch-input {
@@ -4176,6 +4177,10 @@ body.dark-mode .logo-img {
         font-size: 16px !important;
         font-weight: 600 !important;
         color: var(--color-text-main) !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: 100% !important;
     }
 
     #chat-header-status {
@@ -4285,8 +4290,8 @@ body.dark-mode .logo-img {
     background: #fff;
     padding: 8px 12px;
     border-radius: 0 12px 12px 12px;
-    min-width: 80px;
-    max-width: 50%;
+    min-width: 60px;
+    max-width: 75%;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     margin-bottom: 12px;
     position: relative;
@@ -4300,8 +4305,8 @@ body.dark-mode .logo-img {
     background: var(--color-task-green-light);
     padding: 8px 12px;
     border-radius: 12px 0 12px 12px;
-    min-width: 80px;
-    max-width: 50%;
+    min-width: 60px;
+    max-width: 75%;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     margin-bottom: 12px;
     position: relative;
