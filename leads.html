@@ -417,6 +417,9 @@
 
                     const date = new Date(lead.criado_em);
                     const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    const initials = lead.nome.charAt(0).toUpperCase();
+                    const avatarContent = lead.foto_perfil ? `<img src="${lead.foto_perfil}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : initials;
+                    const avatarStyle = lead.foto_perfil ? 'background: transparent;' : 'background: var(--color-primary); color: white; font-weight: 600;';
 
                     const tr = document.createElement('tr');
                     tr.style.cursor = 'pointer';
@@ -427,7 +430,7 @@
                     tr.innerHTML = `
                         <td>
                             <div class="user-cell" style="display: flex; align-items: center; gap: 12px;">
-                                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0;">${lead.nome.charAt(0).toUpperCase()}</div>
+                                <div style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; overflow: hidden; ${avatarStyle}">${avatarContent}</div>
                                 <span class="user-name" style="font-weight: 500; color: var(--color-text-main);">${lead.nome}</span>
                             </div>
                         </td>
@@ -481,8 +484,14 @@
             }, 100);
 
             // Preenche os dados
-            const initials = lead.nome.charAt(0).toUpperCase();
-            document.getElementById('lead-highlight-avatar').textContent = initials;
+            const avatarEl = document.getElementById('lead-highlight-avatar');
+            if (lead.foto_perfil) {
+                avatarEl.innerHTML = `<img src="${lead.foto_perfil}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                avatarEl.style.background = 'transparent';
+            } else {
+                avatarEl.textContent = lead.nome.charAt(0).toUpperCase();
+                avatarEl.style.background = '';
+            }
             document.getElementById('lead-highlight-name').textContent = lead.nome;
             document.getElementById('lead-highlight-phone').textContent = lead.telefone;
             document.getElementById('lead-highlight-status').textContent = lead.status;
