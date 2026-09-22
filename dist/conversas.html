@@ -575,8 +575,13 @@
             document.getElementById('chat-header-name').innerText = lead.nome;
             document.getElementById('chat-header-status').innerText = lead.status;
             const avatar = document.getElementById('chat-header-avatar');
-            avatar.innerText = lead.nome.charAt(0).toUpperCase();
-            avatar.style.background = 'var(--color-primary)';
+            if (lead.foto_perfil) {
+                avatar.innerHTML = `<img src="${lead.foto_perfil}" alt="Foto" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                avatar.style.background = 'transparent';
+            } else {
+                avatar.innerText = lead.nome.charAt(0).toUpperCase();
+                avatar.style.background = 'var(--color-primary)';
+            }
 
             const mensagens = await window.dbAPI.fetchConversations(lead.id);
             container.innerHTML = '';
@@ -618,6 +623,10 @@
 
             let html = '';
             const initials = lead.nome.substring(0, 2).toUpperCase();
+            const avatarHtml = lead.foto_perfil 
+                ? `<img src="${lead.foto_perfil}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`
+                : initials;
+
             mensagens.forEach(msg => {
                 const date = new Date(msg.criado_em);
                 const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
@@ -625,7 +634,7 @@
                 if (msg.remetente.toLowerCase() === 'cliente') {
                     html += `
                     <div style="align-self: flex-start; display: flex; gap: 8px; max-width: 90%; margin-bottom: 8px;">
-                        <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--color-task-green-light); color: var(--color-task-green-text); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0; margin-top: 4px;">${initials}</div>
+                        <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--color-task-green-light); color: var(--color-task-green-text); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0; margin-top: 4px; overflow: hidden;">${avatarHtml}</div>
                         <div class="msg-bubble-client">
                             <p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>
                             <div style="text-align: right; margin-top: 2px; margin-bottom: -2px;">
@@ -675,6 +684,10 @@
             if (emptyMsg) emptyMsg.remove();
 
             const initials = lead.nome.substring(0, 2).toUpperCase();
+            const avatarHtml = lead.foto_perfil 
+                ? `<img src="${lead.foto_perfil}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`
+                : initials;
+
             const date = new Date(msg.criado_em);
             const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             const remetente = (msg.remetente || '').toLowerCase();
@@ -683,7 +696,7 @@
             if (remetente === 'cliente') {
                 novoHtml = `
                 <div style="align-self: flex-start; display: flex; gap: 8px; max-width: 90%; margin-bottom: 8px;">
-                    <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--color-task-green-light); color: var(--color-task-green-text); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0; margin-top: 4px;">${initials}</div>
+                    <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--color-task-green-light); color: var(--color-task-green-text); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0; margin-top: 4px; overflow: hidden;">${avatarHtml}</div>
                     <div class="msg-bubble-client">
                         <p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>
                         <div style="text-align: right; margin-top: 2px; margin-bottom: -2px;">
