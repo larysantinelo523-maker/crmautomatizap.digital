@@ -16,6 +16,7 @@ export async function fetchLeads() {
 
     if (error) {
         console.error('Erro ao buscar leads:', error);
+        alert("Erro Supabase: " + (error.message || JSON.stringify(error)));
         return [];
     }
     return data;
@@ -23,9 +24,9 @@ export async function fetchLeads() {
 
 export async function fetchConversations(leadId) {
     const { data, error } = await supabase
-        .from('conversas')
+        .from('mensagens')
         .select('*')
-        .eq('id_lead', leadId)
+        .eq('lead_id', leadId)
         .order('criado_em', { ascending: true });
 
     if (error) {
@@ -70,12 +71,12 @@ export async function sendMessage(leadId, messageText) {
     if (!id_empresa) return null;
 
     const { data, error } = await supabase
-        .from('conversas')
+        .from('mensagens')
         .insert([{
-            id_empresa: id_empresa,
-            id_lead: leadId,
-            mensagem: messageText,
-            enviado_por: 'Humano',
+            lead_id: leadId,
+            conteudo: messageText,
+            remetente: 'humano',
+            tipo_mensagem: 'texto',
             bot_ativo: false // Ao mandar msg manual, assumimos que desativou o bot ou não importa pra lógica imediata
         }])
         .select();
@@ -95,33 +96,33 @@ export async function toggleBotState(leadId, isActive) {
 
     // Verifica se já existe uma mensagem de sistema para este lead
     const { data: existingMsgs, error: checkError } = await supabase
-        .from('conversas')
+        .from('mensagens')
         .select('id')
-        .eq('id_lead', leadId)
-        .eq('enviado_por', 'Sistema');
+        .eq('lead_id', leadId)
+        .eq('remetente', 'sistema');
 
     if (existingMsgs && existingMsgs.length > 0) {
         // Se já existe, apenas ATUALIZA a(s) linha(s) existente(s) em vez de criar novas
         const { error } = await supabase
-            .from('conversas')
+            .from('mensagens')
             .update({
-                mensagem: mensagemStr,
+                conteudo: mensagemStr,
                 bot_ativo: isActive,
                 criado_em: new Date().toISOString() // atualiza a data para ir pro fim da lista
             })
-            .eq('id_lead', leadId)
-            .eq('enviado_por', 'Sistema');
+            .eq('lead_id', leadId)
+            .eq('remetente', 'sistema');
             
         if (error) console.error('Erro ao atualizar msg de sistema:', error);
     } else {
         // Se não existe, cria a primeira mensagem de sistema
         const { error } = await supabase
-            .from('conversas')
+            .from('mensagens')
             .insert([{
-                id_empresa: id_empresa,
-                id_lead: leadId,
-                mensagem: mensagemStr,
-                enviado_por: 'Sistema',
+                lead_id: leadId,
+                conteudo: mensagemStr,
+                remetente: 'sistema',
+                tipo_mensagem: 'texto',
                 bot_ativo: isActive
             }]);
 
@@ -155,16 +156,16 @@ export async function seedFakeData() {
     }
 
     // Criar Conversas para a Mariana
-    await supabase.from('conversas').insert([
-        { id_empresa, id_lead: leads[0].id, enviado_por: 'Cliente', mensagem: 'Olá, gostaria de saber sobre os planos.' },
-        { id_empresa, id_lead: leads[0].id, enviado_por: 'IA', mensagem: 'Olá Mariana! Temos o Plano Básico e o Avançado. Qual atende melhor sua agência?' },
-        { id_empresa, id_lead: leads[0].id, enviado_por: 'Cliente', mensagem: 'Quero detalhes do Avançado.' }
+    await supabase.from('mensagens').insert([
+        { lead_id: leads[0].id, remetente: 'cliente', tipo_mensagem: 'texto', conteudo: 'Olá, gostaria de saber sobre os planos.' },
+        { lead_id: leads[0].id, remetente: 'ia', tipo_mensagem: 'texto', conteudo: 'Olá Mariana! Temos o Plano Básico e o Avançado. Qual atende melhor sua agência?' },
+        { lead_id: leads[0].id, remetente: 'cliente', tipo_mensagem: 'texto', conteudo: 'Quero detalhes do Avançado.' }
     ]);
 
     // Criar Conversas para o Lucas
-    await supabase.from('conversas').insert([
-        { id_empresa, id_lead: leads[1].id, enviado_por: 'Cliente', mensagem: 'Bom dia, vcs fazem integração com RD Station?' },
-        { id_empresa, id_lead: leads[1].id, enviado_por: 'IA', mensagem: 'Bom dia, Lucas! Sim, nós integramos com o RD Station perfeitamente.' }
+    await supabase.from('mensagens').insert([
+        { lead_id: leads[1].id, remetente: 'cliente', tipo_mensagem: 'texto', conteudo: 'Bom dia, vcs fazem integração com RD Station?' },
+        { lead_id: leads[1].id, remetente: 'ia', tipo_mensagem: 'texto', conteudo: 'Bom dia, Lucas! Sim, nós integramos com o RD Station perfeitamente.' }
     ]);
 
     alert("Dados de teste injetados com sucesso! Atualize a página.");

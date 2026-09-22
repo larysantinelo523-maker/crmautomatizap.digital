@@ -53,9 +53,9 @@
         });
       });
     </script>
-  <script type="module" crossorigin src="/assets/conversas-Douwwqn4.js"></script>
+  <script type="module" crossorigin src="/assets/conversas-DkkOOeq5.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
-  <link rel="modulepreload" crossorigin href="/assets/data-D8Vc-_ni.js">
+  <link rel="modulepreload" crossorigin href="/assets/data-Co2-K-GP.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
   <link rel="stylesheet" crossorigin href="/assets/conversas-DQlJixFy.css">
 </head>
@@ -621,23 +621,23 @@
                 const date = new Date(msg.criado_em);
                 const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
-                if (msg.enviado_por === 'Cliente') {
+                if (msg.remetente.toLowerCase() === 'cliente') {
                     html += `
                     <div style="align-self: flex-start; display: flex; gap: 8px; max-width: 90%; margin-bottom: 8px;">
                         <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--color-task-green-light); color: var(--color-task-green-text); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0; margin-top: 4px;">${initials}</div>
                         <div class="msg-bubble-client">
-                            <p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.mensagem}</p>
+                            <p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>
                             <div style="text-align: right; margin-top: 2px; margin-bottom: -2px;">
                                 <span style="font-size: 10px; color: #999;">${timeStr}</span>
                             </div>
                         </div>
                     </div>`;
-                } else if (msg.enviado_por === 'IA' || msg.enviado_por === 'Humano') {
+                } else if (msg.remetente.toLowerCase() === 'ia' || msg.remetente.toLowerCase() === 'humano') {
                     html += `
                     <div class="msg-bubble-ia">
-                        <p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.mensagem}</p>
+                        <p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>
                         <div style="text-align: right; margin-top: 2px; margin-bottom: -2px; display: flex; justify-content: flex-end; align-items: center; gap: 4px;">
-                            <span style="font-size: 10px; color: #667781;">${timeStr} ${msg.enviado_por === 'IA' ? '' : ''}</span>
+                            <span style="font-size: 10px; color: #667781;">${timeStr}</span>
                             <i class="ph-fill ph-checks" style="color: #53bdeb; font-size: 14px;"></i>
                         </div>
                     </div>`;
