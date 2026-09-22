@@ -171,6 +171,33 @@ export async function seedFakeData() {
     alert("Dados de teste injetados com sucesso! Atualize a página.");
 }
 
+// ==========================================
+// REALTIME: escuta mensagens novas em tempo real
+// ==========================================
+export function subscribeToMessages(leadId, onNewMessage) {
+    const channel = supabase
+        .channel(`mensagens-lead-${leadId}`)
+        .on(
+            'postgres_changes',
+            {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'mensagens',
+                filter: `lead_id=eq.${leadId}`
+            },
+            (payload) => {
+                onNewMessage(payload.new);
+            }
+        )
+        .subscribe();
+
+    return channel; // retorna para poder cancelar depois
+}
+
+export function unsubscribeFromMessages(channel) {
+    if (channel) supabase.removeChannel(channel);
+}
+
 // Expõe globalmente para uso rápido no console e scripts
 window.dbAPI = {
     fetchLeads,
@@ -179,5 +206,7 @@ window.dbAPI = {
     fetchUserData,
     sendMessage,
     toggleBotState,
-    seedFakeData
+    seedFakeData,
+    subscribeToMessages,
+    unsubscribeFromMessages
 };

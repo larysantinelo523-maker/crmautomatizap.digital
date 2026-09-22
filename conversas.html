@@ -474,6 +474,7 @@
 
     <script>
         let currentLeadId = null;
+        let realtimeChannel = null; // canal de realtime ativo
 
         window.initConversations = async function() {
             if(!window.dbAPI) return;
@@ -649,6 +650,59 @@
             container.innerHTML += html;
             // Scroll to bottom
             container.scrollTop = container.scrollHeight;
+
+            // --- REALTIME: cancela assinatura anterior e inicia nova ---
+            if (window.dbAPI.unsubscribeFromMessages && realtimeChannel) {
+                window.dbAPI.unsubscribeFromMessages(realtimeChannel);
+                realtimeChannel = null;
+            }
+            if (window.dbAPI.subscribeToMessages) {
+                realtimeChannel = window.dbAPI.subscribeToMessages(lead.id, (novaMensagem) => {
+                    adicionarMensagemNaTela(novaMensagem, lead);
+                });
+            }
+        }
+
+        function adicionarMensagemNaTela(msg, lead) {
+            const container = document.getElementById('chat-messages-container');
+            if (!container) return;
+
+            // Remove aviso de "nenhuma mensagem" se existir
+            const emptyMsg = container.querySelector('[data-empty]');
+            if (emptyMsg) emptyMsg.remove();
+
+            const initials = lead.nome.substring(0, 2).toUpperCase();
+            const date = new Date(msg.criado_em);
+            const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const remetente = (msg.remetente || '').toLowerCase();
+
+            let novoHtml = '';
+            if (remetente === 'cliente') {
+                novoHtml = `
+                <div style="align-self: flex-start; display: flex; gap: 8px; max-width: 90%; margin-bottom: 8px;">
+                    <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--color-task-green-light); color: var(--color-task-green-text); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0; margin-top: 4px;">${initials}</div>
+                    <div class="msg-bubble-client">
+                        <p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>
+                        <div style="text-align: right; margin-top: 2px; margin-bottom: -2px;">
+                            <span style="font-size: 10px; color: #999;">${timeStr}</span>
+                        </div>
+                    </div>
+                </div>`;
+            } else if (remetente === 'ia' || remetente === 'humano') {
+                novoHtml = `
+                <div class="msg-bubble-ia">
+                    <p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>
+                    <div style="text-align: right; margin-top: 2px; margin-bottom: -2px; display: flex; justify-content: flex-end; align-items: center; gap: 4px;">
+                        <span style="font-size: 10px; color: #667781;">${timeStr}</span>
+                        <i class="ph-fill ph-checks" style="color: #53bdeb; font-size: 14px;"></i>
+                    </div>
+                </div>`;
+            }
+
+            if (novoHtml) {
+                container.insertAdjacentHTML('beforeend', novoHtml);
+                container.scrollTop = container.scrollHeight;
+            }
         }
 
         async function enviarMensagemDigitada() {
