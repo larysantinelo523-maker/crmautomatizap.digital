@@ -1,0 +1,35 @@
+"Chefe, chegou a hora de construir a Máquina de Follow-up (O Segurança Cobrador). 
+Vamos criar aqueles Cron Jobs no N8N que varrem o Supabase de madrugada, marcam quem sumiu, 
+e disparam mensagens de recuperação às 9h da manhã para tentar reativar o cliente, 
+repetindo nos dias seguintes."
+
+    ⚠️ Dica de Ouro de Arquitetura: Nós vamos precisar colocar um limite nisso, ex: 
+    tentar no máximo por 3 dias. Se ficar mandando mensagem para sempre, os clientes 
+    vão denunciar o WhatsApp
+
+🛠️ O Passo a Passo de Como Faremos Isso (Quando chegar a hora)
+Quando formos construir essa máquina, dividiremos o trabalho em 4 passos:
+
+    Passo 1: Preparar o Banco (A Gaveta de Cobrança) Vamos criar uma coluninha nova no 
+    Supabase chamada tentativas_followup (um número que começa em zero) para sabermos 
+    há quantos dias estamos cobrando o Joãozinho.
+
+    Passo 2: O Robô da Madrugada (A Ronda das 3h) Vamos criar um fluxo NOVO no N8N. 
+    Ele vai ter um "Schedule Trigger" (Despertador) configurado para rodar todo dia 
+    às 3h00. O que ele faz? Vai no Supabase, procura os atendimentos abertos há mais 
+    de 24h, muda o status deles para recuperacao_pendente e soma 1 
+    na coluna de tentativas.
+
+    Passo 3: O Robô Vendedor da Manhã (O Disparo das 9h) Vamos criar outro fluxo com 
+    Despertador para às 9h00. O que ele faz? Vai no Supabase, puxa todo mundo que 
+    está como recuperacao_pendente, manda os dados pra Inteligência Artificial (OpenAI)
+    escrever uma mensagem persuasiva ("Oi João, notei que você sumiu ontem..."), 
+    dispara a mensagem pelo WhatsApp e volta a comanda pro status "aberto".
+
+    Passo 4: A Trava Anti-Banimento No robô da madrugada, colocaremos uma regrinha: Se a 
+    coluna tentativas_followup bater o número 3 (ou seja, já cobramos 3 vezes e o cara 
+    ignorou as 3), o robô muda o status para fechado_definitivo e desiste do cara. Assim 
+    protegemos o chip do Geremias.
+
+    Gostou do plano de voo? Salva esse textinho lá em cima e, quando a gente 
+    terminar a espinha dorsal de mensagens, a gente constrói essa obra de arte!
