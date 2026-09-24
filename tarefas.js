@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (kpis) {
                     html += `
                         <div class="cal-day-indicator">
-                            <span class="ind-green">${kpis.atendimentos}</span><span class="ind-slash"> / </span><span class="ind-blue">${kpis.reunioes}</span>
+                            <span class="ind-blue">${kpis.reunioes}</span>
                         </div>
                     `;
                 }
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     let icon = t.type === 'reuniao' ? 'ph-calendar-blank' : 'ph-whatsapp-logo';
                     html += `
                         <div class="cal-task-pill ${pillClass}">
-                            <i class="ph ${icon}"></i> <span class="pill-text">${t.client.split(' ')[0]}</span>
+                            <i class="ph ${icon}"></i> <span class="pill-text">${t.time} - ${t.client.split(' ')[0]}</span>
                         </div>
                     `;
                 });
@@ -340,8 +340,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = calendarData[dateKey];
         
         if (data) {
-            sumAtend.textContent = data.kpis.atendimentos;
-            sumReunioes.textContent = data.kpis.reunioes;
+            if (sumAtend) sumAtend.textContent = data.kpis.atendimentos;
+            if (sumReunioes) sumReunioes.textContent = data.kpis.reunioes;
             
             let listHtml = '';
             let allListHtml = '';
@@ -354,7 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="day-task-item" data-client="${t.client}" data-text="${t.text}" data-ai-text="${aiResponseMock}" onclick="window.openConversation(this)">
                         <div class="dt-avatar">${getInitials(t.client)}</div>
                         <div class="dt-content">
-                            <h5>${t.client}</h5>
+                            <h5>${t.client} — ${t.time}</h5>
                             <div class="dt-text">${t.text}</div>
                         </div>
                         <div class="dt-badge ${badgeColor}">
@@ -375,8 +375,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if(allLeadsList) allLeadsList.innerHTML = allListHtml;
         } else {
             // Estado vazio
-            sumAtend.textContent = '0';
-            sumReunioes.textContent = '0';
+            if (sumAtend) sumAtend.textContent = '0';
+            if (sumReunioes) sumReunioes.textContent = '0';
                                     sumTasksList.innerHTML = `
                 <div style="text-align: center; padding: 24px 0; color: var(--color-text-mut);">
                     Nenhuma atividade registrada neste dia.
@@ -521,15 +521,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const year = d.getFullYear();
                 const month = d.getMonth();
                 const day = d.getDate();
-                const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const timeStr = ag.hora_agendada ? ag.hora_agendada.substring(0, 5) : '00:00';
                 
                 const dateKey = `${year}-${month}-${day}`;
                 if (!calendarData[dateKey]) {
                     calendarData[dateKey] = { kpis: { atendimentos: 0, reunioes: 0 }, tasks: [] };
                 }
                 
-                const st = ag.status ? ag.status.trim().toLowerCase() : 'agendado';
-                if (st === 'cancelado') return;
+                const st = ag.status ? ag.status.trim().toLowerCase() : '';
+                if (st !== 'qualificado') return; // Só mostra os qualificados (agendados de verdade)
                 
                 let type = 'reuniao';
                 let actionText = `Consulta agendada para as ${timeStr}`;
