@@ -49,6 +49,19 @@ export async function fetchTasks() {
     return data;
 }
 
+export async function fetchAgendamentos() {
+    const { data, error } = await supabase
+        .from('agendamentos')
+        .select('*')
+        .order('data_agendamento', { ascending: true });
+
+    if (error) {
+        console.error('Erro ao buscar agendamentos:', error);
+        return [];
+    }
+    return data;
+}
+
 export async function fetchUserData() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return null;
@@ -203,6 +216,7 @@ window.dbAPI = {
     fetchLeads,
     fetchConversations,
     fetchTasks,
+    fetchAgendamentos,
     fetchUserData,
     sendMessage,
     toggleBotState,

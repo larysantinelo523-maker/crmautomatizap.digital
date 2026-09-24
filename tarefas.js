@@ -512,12 +512,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            const leads = await window.dbAPI.fetchLeads();
+            const agendamentos = await window.dbAPI.fetchAgendamentos();
             calendarData = {};
 
-            leads.forEach(lead => {
-                if (!lead.criado_em) return;
-                const d = new Date(lead.criado_em);
+            agendamentos.forEach(ag => {
+                if (!ag.data_agendamento) return;
+                const d = new Date(ag.data_agendamento);
                 const year = d.getFullYear();
                 const month = d.getMonth();
                 const day = d.getDate();
@@ -528,23 +528,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     calendarData[dateKey] = { kpis: { atendimentos: 0, reunioes: 0 }, tasks: [] };
                 }
                 
-                const st = lead.status ? lead.status.trim().toLowerCase() : '';
-                if (st === 'em andamento') return; // Ignora os que ainda estão em andamento
+                const st = ag.status ? ag.status.trim().toLowerCase() : 'agendado';
+                if (st === 'cancelado') return;
                 
-                let isReuniao = (st === 'reunião marcada');
-                let type = isReuniao ? 'reuniao' : 'atendimento';
-                let actionText = isReuniao ? 'O lead agendou uma reunião.' : 'O lead teve o atendimento finalizado.';
-                if (lead.resumo) actionText = lead.resumo;
+                let type = 'reuniao';
+                let actionText = `Consulta agendada para as ${timeStr}`;
                 
-                if (isReuniao) calendarData[dateKey].kpis.reunioes++;
-                else calendarData[dateKey].kpis.atendimentos++;
+                calendarData[dateKey].kpis.reunioes++;
                 
                 calendarData[dateKey].tasks.push({
                     type: type,
-                    client: lead.nome || 'Desconhecido',
+                    client: ag.nome_lead || 'Cliente',
                     time: timeStr,
                     text: actionText,
-                    status: lead.status || 'Atendido'
+                    status: ag.status || 'Agendado'
                 });
             });
 
