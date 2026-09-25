@@ -356,15 +356,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         
                         <!-- Meio: Info -->
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; overflow: hidden;">
-                            <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--color-text);">
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; overflow: hidden; justify-content: center;">
+                            <!-- VIEW DESKTOP -->
+                            <div class="dt-info-desktop" style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--color-text);">
                                 <i class="ph-fill ph-calendar-blank" style="color: #3b82f6; font-size: 14px;"></i>
                                 <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${t.client}</span>
                                 <i class="ph ph-clock" style="color: var(--color-text-mut); margin-left: 4px; font-size: 14px;"></i>
                                 <span style="color: var(--color-text-mut); font-weight: 400;">${t.time}</span>
                             </div>
+                            
+                            <!-- VIEW MOBILE -->
+                            <div class="dt-info-mobile" style="font-size: 14px; font-weight: 700; color: var(--color-text); margin-bottom: 2px;">
+                                ${t.client}
+                            </div>
+
                             <div style="font-size: 11px; color: var(--color-text-mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                Interesse em ${t.interesse.toLowerCase()}
+                                interesse ${t.interesse ? t.interesse.toLowerCase() : 'não identificado'}
                             </div>
                         </div>
                         
