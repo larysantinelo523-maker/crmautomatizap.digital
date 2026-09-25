@@ -3308,12 +3308,12 @@ body.dark-mode .logo-img {
 }
 
 .cal-day-cell:hover {
-    border-color: var(--color-primary);
+    border-color: var(--color-task-blue);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
 }
 
 .cal-day-cell.active {
-    border-color: var(--color-primary);
+    border-color: var(--color-task-blue);
     border-width: 2px;
     padding: 7px;
     /* Compensa borda mais grossa */
@@ -3322,11 +3322,11 @@ body.dark-mode .logo-img {
 }
 
 .cal-day-cell.today {
-    border-color: var(--color-primary);
+    border-color: var(--color-task-blue);
 }
 
 .cal-day-cell.today .cal-day-number {
-    color: var(--color-primary);
+    color: var(--color-task-blue);
     font-weight: 700;
 }
 
@@ -3855,7 +3855,7 @@ body.dark-mode .logo-img {
     }
 
     .cal-day-cell.active .cal-day-card {
-        border-color: var(--color-primary) !important;
+        border-color: var(--color-task-blue) !important;
         border-width: 2px !important;
         padding: 7px !important;
     }
@@ -3888,11 +3888,11 @@ body.dark-mode .logo-img {
     }
 
     .cal-day-cell.today .cal-day-card .cal-day-number {
-        color: var(--color-primary) !important;
+        color: var(--color-task-blue) !important;
     }
 
     .cal-day-cell.today .cal-day-card {
-        border-color: var(--color-primary) !important;
+        border-color: var(--color-task-blue) !important;
     }
 
     /* 12) Indicador numérico (12 / 5) no canto superior direito */
