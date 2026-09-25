@@ -448,17 +448,16 @@
                 if (window.dbAPI) {
                     clearInterval(tryInit);
                     const leads = await window.dbAPI.fetchLeads();
-                    
+                    const agendamentos = await window.dbAPI.fetchAgendamentos();
 
-                    
-                    const leadsAtendidos = leads.filter(l => l.status && l.status.trim().toLowerCase() !== 'em andamento').length;
+                    const leadsAtendidos = leads.length;
                     document.getElementById('rel-atendidos').textContent = leadsAtendidos;
                     
-                    const reunioesMarcadas = leads.filter(l => l.status && l.status.trim().toLowerCase() === 'reunião marcada').length;
+                    const reunioesMarcadas = agendamentos.filter(a => a.status && a.status.trim().toLowerCase() === 'qualificado').length;
                     const reunioesEl = document.getElementById('rel-reunioes');
                     if (reunioesEl) reunioesEl.textContent = reunioesMarcadas;
                     
-                    const leadsRecuperar = leads.filter(l => l.status && (l.status.trim().toLowerCase() === 'a recuperar' || l.status.trim().toLowerCase() === 'recusou')).length;
+                    const leadsRecuperar = 0;
                     const recuperarEl = document.getElementById('rel-recuperar');
                     if (recuperarEl) recuperarEl.textContent = leadsRecuperar;
 

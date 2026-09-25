@@ -411,9 +411,9 @@
             } else {
                 leads.forEach(lead => {
                     let badgeClass = 'primary-light';
-                    if(lead.status === 'Fechado') badgeClass = 'success';
-                    else if(lead.status === 'Em Atendimento') badgeClass = 'warning';
-                    else if(lead.status === 'Perdido') badgeClass = 'danger';
+                    let st = lead.status ? lead.status.trim().toLowerCase() : '';
+                    if(st === 'em atendimento') badgeClass = 'success';
+                    else if(st === 'qualificado') badgeClass = 'primary-light';
 
                     const date = new Date(lead.criado_em);
                     const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
@@ -455,9 +455,9 @@
                 const leadToOpen = leads.find(l => l.id.toString() === leadIdToOpen);
                 if (leadToOpen) {
                     let badgeClass = 'primary-light';
-                    if(leadToOpen.status === 'Fechado') badgeClass = 'success';
-                    else if(leadToOpen.status === 'Em Atendimento') badgeClass = 'warning';
-                    else if(leadToOpen.status === 'Perdido') badgeClass = 'danger';
+                    let st2 = leadToOpen.status ? leadToOpen.status.trim().toLowerCase() : '';
+                    if(st2 === 'em atendimento') badgeClass = 'success';
+                    else if(st2 === 'qualificado') badgeClass = 'primary-light';
                     const date = new Date(leadToOpen.criado_em);
                     const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                     

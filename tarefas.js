@@ -61,13 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return name.substring(0, 2).toUpperCase();
     }
 
-    // Helper para cor do badge com base no status
     function getStatusBadgeClass(status) {
-        switch(status) {
-            case 'Atendido': return 'green';
-            case 'Reunião marcada': return 'blue';
-            case 'Lead qualificado': return 'purple';
-            case 'Venda': return 'yellow';
+        let st = status ? status.trim().toLowerCase() : '';
+        switch(st) {
+            case 'em atendimento': return 'green';
+            case 'qualificado': return 'blue';
             default: return 'green';
         }
     }

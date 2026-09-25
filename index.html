@@ -458,13 +458,26 @@
 
             // Atualizar contadores KPI
 
-            const leadsAtendidos = leads.filter(l => l.status && l.status.trim().toLowerCase() !== 'em andamento').length;
+            const leadsAtendidos = leads.length; // Agora todo lead no banco é lead atendido
             animateValueUser('kpi-atendidos', 0, leadsAtendidos, 1500);
 
-            const reunioesMarcadas = leads.filter(l => l.status && l.status.trim().toLowerCase() === 'reunião marcada').length;
+            let agendamentos = await window.dbAPI.fetchAgendamentos();
+            if (startDt) {
+                agendamentos = agendamentos.filter(a => {
+                    const aDate = new Date(a.created_at || a.criado_em || a.data_agendamento);
+                    return aDate >= startDt;
+                });
+            }
+            if (endDt) {
+                agendamentos = agendamentos.filter(a => {
+                    const aDate = new Date(a.created_at || a.criado_em || a.data_agendamento);
+                    return aDate <= endDt;
+                });
+            }
+            const reunioesMarcadas = agendamentos.filter(a => a.status && a.status.trim().toLowerCase() === 'qualificado').length;
             animateValueUser('kpi-reunioes', 0, reunioesMarcadas, 1500);
             
-            const leadsRecuperar = leads.filter(l => l.status && (l.status.trim().toLowerCase() === 'a recuperar' || l.status.trim().toLowerCase() === 'recusou')).length;
+            const leadsRecuperar = 0; // A definir nova regra de negócio futuramente
             animateValueUser('kpi-recuperar', 0, leadsRecuperar, 1500);
 
             // Atualizar paginação
@@ -482,9 +495,9 @@
                 console.log('[DEBUG foto_perfil] Leads retornados:', leads.slice(0, 5).map(l => ({nome: l.nome, foto_perfil: l.foto_perfil})));
                 leads.slice(0, 5).forEach(lead => {
                     let badgeClass = 'primary-light';
-                    if (lead.status === 'Fechado') badgeClass = 'success';
-                    else if (lead.status === 'Em Atendimento') badgeClass = 'warning';
-                    else if (lead.status === 'Perdido') badgeClass = 'danger';
+                    let st = lead.status ? lead.status.trim().toLowerCase() : '';
+                    if (st === 'em atendimento') badgeClass = 'success';
+                    else if (st === 'qualificado') badgeClass = 'primary-light';
 
                     const date = new Date(lead.criado_em);
                     const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
