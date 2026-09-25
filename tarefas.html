@@ -88,8 +88,8 @@
             
             /* 3. Botão "Ver todos os agendamentos do dia" */
             .btn-ver-todos {
-                background: #eef2ff !important;
-                color: #3b82f6 !important;
+                background: #e8faf1 !important;
+                color: #22c55e !important;
                 font-weight: 600 !important;
             }
             
@@ -102,6 +102,27 @@
         }
         @media (min-width: 769px) {
             .dt-info-mobile { display: none !important; }
+        }
+    </style>
+    <style>
+        /* ==================================================
+           FORÇAR COR VERDE PARA TARJAS DE AGENDAMENTO E INDICADORES
+           (Sobrescreve qualquer cache do navegador)
+           ================================================== */
+        .cal-task-pill.blue, .cal-task-pill.green {
+            background: #E8FAF1 !important;
+            color: #16A34A !important;
+        }
+        .cal-task-pill.blue i, .cal-task-pill.green i {
+            color: #16A34A !important;
+        }
+        .cal-day-indicator .ind-blue {
+            color: #16A34A !important;
+            font-weight: 700 !important;
+        }
+        .cal-day-cell.active {
+            border-color: #22c55e !important;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15) !important;
         }
     </style>
 </head>

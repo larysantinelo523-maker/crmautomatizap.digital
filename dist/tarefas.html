@@ -52,12 +52,83 @@
         });
       });
     </script>
-  <script type="module" crossorigin src="/assets/tarefas-BuF9TciE.js"></script>
+    <style>
+        /* CSS EXCLUSIVO PARA O MOBILE (REF: DESIGN CANVA) */
+        @media (max-width: 768px) {
+            /* 1. Mini Card de Total: Remove o texto, deixa o ícone e número grandes */
+            .mini-kpi-badge span { 
+                display: none !important; 
+            }
+            .mini-kpi-badge {
+                padding: 10px !important;
+                border-radius: 8px !important;
+                gap: 8px !important;
+                margin-top: 4px; /* descolar um pouco do topo */
+            }
+            .mini-kpi-badge i {
+                font-size: 18px !important;
+            }
+            .mini-kpi-badge strong {
+                font-size: 18px !important;
+                margin-left: 0px !important;
+            }
+            
+            /* Ajuste do Título para não bater no badge */
+            .summary-title h3 {
+                max-width: 70%;
+                line-height: 1.3;
+            }
+
+            /* 2. Item da Lista (Card do Lead) */
+            .dt-info-desktop { display: none !important; }
+            .dt-info-mobile { display: block !important; }
+            .day-task-item { padding: 16px 12px !important; }
+            
+            /* 3. Botão "Ver todos os agendamentos do dia" */
+            .btn-ver-todos {
+                background: #e8faf1 !important;
+                color: #22c55e !important;
+                font-weight: 600 !important;
+            }
+            
+            /* 4. Scroll apenas na lista de agendamentos */
+            .summary-list {
+                max-height: 50vh !important;
+                overflow-y: auto !important;
+                padding-right: 4px;
+            }
+        }
+        @media (min-width: 769px) {
+            .dt-info-mobile { display: none !important; }
+        }
+    </style>
+    <style>
+        /* ==================================================
+           FORÇAR COR VERDE PARA TARJAS DE AGENDAMENTO E INDICADORES
+           (Sobrescreve qualquer cache do navegador)
+           ================================================== */
+        .cal-task-pill.blue, .cal-task-pill.green {
+            background: #E8FAF1 !important;
+            color: #16A34A !important;
+        }
+        .cal-task-pill.blue i, .cal-task-pill.green i {
+            color: #16A34A !important;
+        }
+        .cal-day-indicator .ind-blue {
+            color: #16A34A !important;
+            font-weight: 700 !important;
+        }
+        .cal-day-cell.active {
+            border-color: #22c55e !important;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15) !important;
+        }
+    </style>
+  <script type="module" crossorigin src="/assets/tarefas-CnpTx5Qv.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
   <link rel="modulepreload" crossorigin href="/assets/data-CXmzkeF3.js">
   <link rel="modulepreload" crossorigin href="/assets/script-BSLXmEa-.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-aKEJDf-l.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-nvKmLBmQ.css">
 </head>
 
 <body>
@@ -256,23 +327,19 @@
                 <!-- Coluna do Resumo do Dia -->
                 <div class="tarefas-summary-col" id="tarefas-summary-col">
                     <section class="card summary-panel" id="main-summary-panel" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Veja o resumo diário de tarefas em detalhes"></i>
-                        <div class="summary-header">
-                            <div class="summary-title">
+                        <div class="summary-header" style="align-items: flex-start; padding-right: 32px;">
+                            <div class="summary-title" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
                                 <div>
-                                    <h3>Agendamentos Realizados</h3>
+                                    <h3 style="font-size: 16px;">Agendamentos Realizados</h3>
                                     <p id="summary-date-text">Ter, 01 de setembro de 2026</p>
                                 </div>
+                                <div class="mini-kpi-badge" style="background: rgba(34, 197, 94, 0.1); color: #16a34a; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 500; border: 1px solid rgba(34, 197, 94, 0.2);">
+                                    <i class="ph ph-calendar-check"></i>
+                                    <span>Total de agendamentos</span>
+                                    <strong id="sum-reunioes" style="font-size: 13px; margin-left: 2px;">0</strong>
+                                </div>
                             </div>
-                            <button class="btn-icon" id="summary-close-btn"><i class="ph ph-x"></i></button>
-                        </div>
-
-                        <!-- KPIs do Dia -->
-                        <div class="summary-kpis">
-                            <div class="summary-kpi-card blue-light" style="position: relative; width: 100%;"><i class="ph ph-question info-tooltip" data-tooltip="Total de reuniões marcadas"></i>
-                                <div class="icon-wrapper blue-light" style="width: 32px; height: 32px; font-size: 16px;"><i class="ph ph-calendar-blank" style="color: #3b82f6;"></i></div>
-                                <h4 id="sum-reunioes">5</h4>
-                                <span>Reuniões marcadas</span>
-                            </div>
+                            <button class="btn-icon" id="summary-close-btn" style="position: absolute; top: 16px; right: 16px;"><i class="ph ph-x"></i></button>
                         </div>
 
                         <!-- Lista de Atendimentos do Dia -->
@@ -283,7 +350,7 @@
                         </div>
                         
                         <div class="summary-footer">
-                            <button type="button" class="btn btn--primary" onclick="window.openAllLeads()" style="width: 100%; border: none;">
+                            <button type="button" class="btn btn-ver-todos" onclick="window.openAllLeads()" style="width: 100%; border: none; background: var(--color-success); color: white; border-radius: 8px; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease;">
                                 <span>Ver todos os agendamentos do dia</span>
                                 <i class="ph ph-caret-right" style="font-size: 16px;"></i>
                             </button>

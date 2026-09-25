@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let st = status ? status.trim().toLowerCase() : '';
         switch(st) {
             case 'em atendimento': return 'green';
-            case 'qualificado': return 'blue';
+            case 'qualificado': return 'green';
             default: return 'green';
         }
     }
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (kpis) {
                     html += `
                         <div class="cal-day-indicator">
-                            <span class="ind-blue">${kpis.reunioes}</span>
+                            <span class="ind-green">${kpis.reunioes}</span>
                         </div>
                     `;
                 }
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `<div class="cal-day-tasks">`;
                 const tasks = calendarData[dateKey].tasks;
                 tasks.forEach(t => {
-                    let pillClass = t.type === 'reuniao' ? 'blue' : 'green';
+                    let pillClass = t.type === 'reuniao' ? 'green' : 'green';
                     let icon = t.type === 'reuniao' ? 'ph-calendar-blank' : 'ph-whatsapp-logo';
                     html += `
                         <div class="cal-task-pill ${pillClass}">
@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; overflow: hidden; justify-content: center;">
                             <!-- VIEW DESKTOP -->
                             <div class="dt-info-desktop" style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--color-text);">
-                                <i class="ph-fill ph-calendar-blank" style="color: #3b82f6; font-size: 14px;"></i>
+                                <i class="ph-fill ph-calendar-blank" style="color: #22c55e; font-size: 14px;"></i>
                                 <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${t.client}</span>
                                 <i class="ph ph-clock" style="color: var(--color-text-mut); margin-left: 4px; font-size: 14px;"></i>
                                 <span style="color: var(--color-text-mut); font-weight: 400;">${t.time}</span>

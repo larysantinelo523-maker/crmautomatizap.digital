@@ -3194,8 +3194,8 @@ body.dark-mode .logo-img {
     --color-task-green: #22C55E;
     --color-task-green-light: #E8FAF1;
     --color-task-green-text: #16A34A;
-    --color-task-blue: #3B82F6;
-    --color-task-blue-light: #EFF6FF;
+    --color-task-blue: #22C55E;
+    --color-task-blue-light: #E8FAF1;
     --color-task-purple: #A855F7;
     --color-task-purple-light: #FAF5FF;
     --color-task-yellow: #EAB308;
@@ -3917,7 +3917,7 @@ body.dark-mode .logo-img {
     }
 
     .cal-day-indicator .ind-blue {
-        color: #3b82f6 !important;
+        color: #22c55e !important;
         font-weight: 700 !important;
     }
 
