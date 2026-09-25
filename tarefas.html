@@ -252,23 +252,19 @@
                 <!-- Coluna do Resumo do Dia -->
                 <div class="tarefas-summary-col" id="tarefas-summary-col">
                     <section class="card summary-panel" id="main-summary-panel" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Veja o resumo diário de tarefas em detalhes"></i>
-                        <div class="summary-header">
-                            <div class="summary-title">
+                        <div class="summary-header" style="align-items: flex-start; padding-right: 32px;">
+                            <div class="summary-title" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
                                 <div>
-                                    <h3>Agendamentos Realizados</h3>
+                                    <h3 style="font-size: 16px;">Agendamentos Realizados</h3>
                                     <p id="summary-date-text">Ter, 01 de setembro de 2026</p>
                                 </div>
+                                <div class="mini-kpi-badge" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 500; border: 1px solid rgba(59, 130, 246, 0.2);">
+                                    <i class="ph-fill ph-calendar"></i>
+                                    <span>Total de agendamentos</span>
+                                    <strong id="sum-reunioes" style="font-size: 13px; margin-left: 2px;">0</strong>
+                                </div>
                             </div>
-                            <button class="btn-icon" id="summary-close-btn"><i class="ph ph-x"></i></button>
-                        </div>
-
-                        <!-- KPIs do Dia -->
-                        <div class="summary-kpis">
-                            <div class="summary-kpi-card blue-light" style="position: relative; width: 100%;"><i class="ph ph-question info-tooltip" data-tooltip="Total de reuniões marcadas"></i>
-                                <div class="icon-wrapper blue-light" style="width: 32px; height: 32px; font-size: 16px;"><i class="ph ph-calendar-blank" style="color: #3b82f6;"></i></div>
-                                <h4 id="sum-reunioes">5</h4>
-                                <span>Reuniões marcadas</span>
-                            </div>
+                            <button class="btn-icon" id="summary-close-btn" style="position: absolute; top: 16px; right: 16px;"><i class="ph ph-x"></i></button>
                         </div>
 
                         <!-- Lista de Atendimentos do Dia -->

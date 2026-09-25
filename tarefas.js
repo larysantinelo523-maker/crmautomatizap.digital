@@ -345,27 +345,40 @@ document.addEventListener('DOMContentLoaded', () => {
             let allListHtml = '';
             
             data.tasks.forEach((t, index) => {
-                const badgeColor = getStatusBadgeClass(t.status);
-                // Mock AI response if it doesn't exist
-                const aiResponseMock = `Análise concluída. O lead está interessado no serviço. Qualificação: ${t.status}.`;
+                const fotoHtml = t.foto ? `<img src="${t.foto}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` : getInitials(t.client);
+                
                 const itemHtml = `
-                    <div class="day-task-item" data-client="${t.client}" data-text="${t.text}" data-ai-text="${aiResponseMock}" onclick="window.openConversation(this)">
-                        <div class="dt-avatar">${getInitials(t.client)}</div>
-                        <div class="dt-content">
-                            <h5>${t.client} — ${t.time}</h5>
-                            <div class="dt-text">${t.text}</div>
+                    <div class="day-task-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border: 1px solid var(--color-border); border-radius: 8px; margin-bottom: 0px; cursor: pointer; background: #fff;" onclick="window.openConversation(this)" data-client="${t.client}" data-text="${t.text}">
+                        
+                        <!-- Lado Esquerdo: Avatar -->
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: ${t.foto ? 'transparent' : 'var(--color-primary)'}; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; flex-shrink: 0; overflow: hidden; margin-right: 12px;">
+                            ${fotoHtml}
                         </div>
-                        <div class="dt-badge ${badgeColor}">
-                            <i class="ph-fill ph-bookmark-simple dt-badge-icon"></i>
-                            <span class="dt-badge-text">${t.status}</span>
+                        
+                        <!-- Meio: Info -->
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; overflow: hidden;">
+                            <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--color-text);">
+                                <i class="ph-fill ph-calendar-blank" style="color: #3b82f6; font-size: 14px;"></i>
+                                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${t.client}</span>
+                                <i class="ph ph-clock" style="color: var(--color-text-mut); margin-left: 4px; font-size: 14px;"></i>
+                                <span style="color: var(--color-text-mut); font-weight: 400;">${t.time}</span>
+                            </div>
+                            <div style="font-size: 11px; color: var(--color-text-mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                Interesse em ${t.interesse.toLowerCase()}
+                            </div>
                         </div>
-                        <i class="ph ph-caret-right dt-caret"></i>
+                        
+                        <!-- Lado Direito: Badge e Seta -->
+                        <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0; margin-left: 8px;">
+                            <div class="badge primary-light" style="font-size: 11px; padding: 4px 8px;">
+                                Qualificado
+                            </div>
+                            <i class="ph ph-caret-right" style="color: var(--color-text-mut);"></i>
+                        </div>
                     </div>
                 `;
                 
-                if (index < 3) {
-                    listHtml += itemHtml;
-                }
+                listHtml += itemHtml;
                 allListHtml += itemHtml;
             });
             sumTasksList.innerHTML = listHtml;
@@ -510,7 +523,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            const agendamentos = await window.dbAPI.fetchAgendamentos();
+            const [agendamentos, leads] = await Promise.all([
+                window.dbAPI.fetchAgendamentos(),
+                window.dbAPI.fetchLeads()
+            ]);
             calendarData = {};
 
             agendamentos.forEach(ag => {
@@ -532,6 +548,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 let type = 'reuniao';
                 let actionText = `Consulta agendada para as ${timeStr}`;
                 
+                // Buscar dados reais do lead
+                const lead = leads.find(l => l.id === ag.lead_id);
+                const foto = lead ? lead.foto_perfil : null;
+                const interesse = lead && lead.interesse ? lead.interesse : 'Não informado';
+                
                 calendarData[dateKey].kpis.reunioes++;
                 
                 calendarData[dateKey].tasks.push({
@@ -539,7 +560,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     client: ag.nome_lead || 'Cliente',
                     time: timeStr,
                     text: actionText,
-                    status: ag.status || 'Agendado'
+                    status: ag.status || 'Agendado',
+                    foto: foto,
+                    interesse: interesse
                 });
             });
 
