@@ -809,27 +809,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
         }
 
-        const btnSuspender = document.getElementById('btn-suspender-empresa');
-        const iconSuspender = document.getElementById('icon-suspender');
-        const txtSuspender = document.getElementById('text-suspender');
 
-        if (usuario.status_assinatura === 'suspenso') {
-            btnSuspender.style.backgroundColor = '#dcfce7';
-            btnSuspender.style.color = '#16a34a';
-            iconSuspender.className = 'ph-fill ph-play-circle';
-            txtSuspender.textContent = 'Reativar Empresa';
-            btnSuspender.onclick = () => toggleStatus(id, 'ativo');
-        } else {
-            btnSuspender.style.backgroundColor = '#fee2e2';
-            btnSuspender.style.color = '#dc2626';
-            iconSuspender.className = 'ph-fill ph-pause-circle';
-            txtSuspender.textContent = 'Suspender Empresa';
-            btnSuspender.onclick = () => {
-                if (confirm('Tem certeza que deseja suspender esta empresa? O acesso ao CRM será bloqueado.')) {
-                    toggleStatus(id, 'suspenso');
-                }
-            };
-        }
 
         document.getElementById('edit-nome').value = usuario.nome_completo || '';
         document.getElementById('edit-email').value = usuario.email || '';
@@ -1025,7 +1005,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const modalSenha = document.getElementById('modal-alterar-senha');
     const modalConfig = document.getElementById('modal-configurar-horario');
 
-    document.getElementById('btn-editar-empresa').addEventListener('click', () => modalEdit.classList.add('active'));
+
     document.getElementById('btn-modal-senha').addEventListener('click', () => modalSenha.classList.add('active'));
     document.getElementById('btn-configurar-horario').addEventListener('click', () => modalConfig.classList.add('active'));
 

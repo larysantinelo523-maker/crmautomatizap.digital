@@ -74,7 +74,7 @@
         });
       });
     </script>
-  <script type="module" crossorigin src="/assets/admin-BsgYWylv.js"></script>
+  <script type="module" crossorigin src="/assets/admin-5cABNAP9.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
   <link rel="stylesheet" crossorigin href="/assets/conversas-DwEKgn8S.css">
 </head>
@@ -415,9 +415,15 @@
                 <!-- Secao Detalhes da Empresa (Mini Dashboard) -->
                 <!-- Secao Detalhes da Empresa (Mini Dashboard) -->
                 <section id="sec-detalhes-empresa" class="admin-section">
-                    <button class="btn btn-outline" id="btn-voltar-empresas" style="margin-bottom: 24px;">
-                        <i class="ph ph-arrow-left"></i> Voltar para Lista
-                    </button>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <button class="btn btn-outline" id="btn-voltar-empresas">
+                            <i class="ph ph-arrow-left"></i> Voltar para Lista
+                        </button>
+                        
+                        <button class="btn" id="btn-modal-senha" style="background-color: #dcfce7; border: 1px solid #16a34a; color: #16a34a; padding: 8px 16px; font-weight: 600; font-size: 13px; border-radius: 8px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s;">
+                            <i class="ph-fill ph-lock-key" style="font-size: 18px;"></i> SENHA
+                        </button>
+                    </div>
                     
                     <div class="company-summary-card card" style="margin-bottom: 24px; padding: 0; overflow: hidden;">
                         <div style="display: flex; flex-wrap: wrap;">
@@ -485,25 +491,6 @@
                                         <span style="color: var(--color-text-mut); font-size: 14px;">Criada em</span>
                                         <span id="info-criada-em" style="font-weight: 500; font-size: 14px;">...</span>
                                     </div>
-                                </div>
-                            </div>
-                                
-                            <!-- Ações Rápidas (Movidas para o Card da Esquerda) -->
-                            <div style="margin-top: 32px; border-top: 1px dashed var(--color-border); padding-top: 24px;">
-                                <div class="card-title" style="margin-bottom: 16px;">
-                                    <i class="ph-fill ph-lightning text-primary"></i>
-                                    <h3>Ações Rápidas</h3>
-                                </div>
-                                <div style="display: flex; gap: 12px;">
-                                    <button class="btn" id="btn-editar-empresa" style="flex: 1; background-color: var(--color-bg); border: 1px solid var(--color-primary); color: var(--color-primary); padding: 10px; font-weight: 600; font-size: 12px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
-                                        <i class="ph-fill ph-pencil-simple" style="font-size: 18px;"></i> Editar
-                                    </button>
-                                    <button class="btn" id="btn-modal-senha" style="flex: 1; background-color: #dcfce7; color: #16a34a; border: none; padding: 10px; font-weight: 600; font-size: 12px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
-                                        <i class="ph-fill ph-lock-key" style="font-size: 18px;"></i> Senha
-                                    </button>
-                                    <button class="btn" id="btn-suspender-empresa" style="flex: 1; background-color: #fee2e2; color: #dc2626; border: none; padding: 10px; font-weight: 600; font-size: 12px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
-                                        <i class="ph-fill ph-pause-circle" id="icon-suspender" style="font-size: 18px;"></i> <span id="text-suspender">Suspender</span>
-                                    </button>
                                 </div>
                             </div>
 
