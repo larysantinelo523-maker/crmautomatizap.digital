@@ -692,136 +692,142 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('page-title').textContent = "Configurações da empresa";
         document.getElementById('page-subtitle').textContent = "Gerencie as informações, o horário de atendimento e as ações desta empresa.";
 
-        // Popula os dados básicos imediatamente
-        document.getElementById('detalhe-nome-empresa').textContent = nome || 'Carregando...';
-        document.getElementById('detalhe-email-empresa').innerHTML = `<i class="ph-fill ph-envelope-simple"></i> <span>${email || '...'}</span>`;
-        document.getElementById('info-nome').textContent = nome || 'Carregando...';
-        document.getElementById('info-email').textContent = email || 'Carregando...';
-
-        // Resets loading state for other fields
-        document.getElementById('detalhe-status-badge').textContent = "";
-        document.getElementById('detalhe-status-badge').style.backgroundColor = "transparent";
-        document.getElementById('detalhe-total-leads').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">00</span>`;
-        document.getElementById('detalhe-total-reunioes').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">00</span>`;
-        document.getElementById('info-criada-em').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">Carregando...</span>`;
-        document.getElementById('horarios-list').innerHTML = `<div style="text-align: center; color: var(--color-text-mut); padding: 16px;"><span style="background: #e2e8f0; color: transparent; border-radius: 4px;">Carregando horários...</span></div>`;
+        // 1. Busca os dados básicos na lista que já foi baixada pela API /api/list_tenants
+        const tenantData = globalTenants.find(t => t.id_empresa === id) || {};
         
+        const displayNome = tenantData.nome || nome || 'Sem Nome';
+        const displayEmail = tenantData.email || email || 'Sem Email';
+        
+        document.getElementById('detalhe-nome-empresa').textContent = displayNome;
+        document.getElementById('detalhe-email-empresa').innerHTML = `<i class="ph-fill ph-envelope-simple"></i> <span>${displayEmail}</span>`;
+        document.getElementById('info-nome').textContent = displayNome;
+        document.getElementById('info-email').textContent = displayEmail;
+
+        const badge = document.getElementById('detalhe-status-badge');
+        const sBoxIcon = document.getElementById('status-box-icon');
+        const sBoxBadge = document.getElementById('status-box-badge');
+        const sBoxText = document.getElementById('status-box-text');
+
+        let statusStr = "Ativa";
+        let statusColor = "#22c55e";
+        let statusExp = "Pagamento em dia. Empresa funcionando normalmente.";
+        
+        if (tenantData.status === 'vencido') {
+            statusStr = "Vencida";
+            statusColor = "#ef4444";
+            statusExp = "Pagamento está em atraso.";
+        } else if (tenantData.status === 'Aviso prévio') {
+            statusStr = "Aviso Prévio";
+            statusColor = "#f59e0b";
+            statusExp = `Pagamento próximo do vencimento.`;
+        } else if (tenantData.status === 'suspenso') {
+            statusStr = "Suspensa";
+            statusColor = "#9ca3af";
+            statusExp = "Empresa suspensa. O acesso ao CRM está bloqueado.";
+        } else {
+            statusStr = "Pago";
+            statusColor = "#22c55e";
+        }
+
+        badge.textContent = statusStr;
+        badge.style.backgroundColor = statusColor;
+        sBoxBadge.textContent = statusStr;
+        sBoxBadge.style.backgroundColor = statusColor;
+        sBoxText.textContent = statusExp;
+        document.getElementById('status-box').style.backgroundColor = statusColor + '20';
+        sBoxIcon.style.color = statusColor;
+
+        document.getElementById('detalhe-total-leads').textContent = tenantData.total_leads || 0;
+
+        // 2. Tenta buscar os dados adicionais diretamente do Supabase usando a sessão do Administrador
         try {
-            const res = await fetch(`/api/get_tenant_info?id=${id}`);
-            if (!res.ok) throw new Error('Erro ao carregar os dados');
-            const data = await res.json();
+            // Busca o usuário completo para pegar descricao, localizacao, etc (Pode falhar por RLS, se falhar usamos só o que temos)
+            const { data: usuario } = await supabase.from('usuarios').select('*').eq('id', id).single();
             
-            const usuario = data.usuario;
-            const horarios = data.horarios;
-            const totalLeads = data.total_leads;
-            const totalReunioes = data.reunioes_marcadas;
+            if (usuario) {
+                const localEl = document.getElementById('detalhe-local-empresa');
+                if (usuario.localizacao) {
+                    localEl.innerHTML = `<i class="ph-fill ph-map-pin"></i> <span>${usuario.localizacao}</span>`;
+                    localEl.style.display = 'flex';
+                } else {
+                    localEl.style.display = 'none';
+                }
 
-            document.getElementById('detalhe-nome-empresa').textContent = usuario.nome_completo || nome;
-            document.getElementById('detalhe-email-empresa').innerHTML = `<i class="ph-fill ph-envelope-simple"></i> <span>${usuario.email || email}</span>`;
-            
-            const badge = document.getElementById('detalhe-status-badge');
-            const sBoxIcon = document.getElementById('status-box-icon');
-            const sBoxBadge = document.getElementById('status-box-badge');
-            const sBoxText = document.getElementById('status-box-text');
+                const descEl = document.getElementById('detalhe-desc-empresa');
+                if (usuario.descricao) {
+                    descEl.textContent = usuario.descricao;
+                    descEl.style.display = 'block';
+                } else {
+                    descEl.style.display = 'none';
+                }
 
-            let statusStr = "Ativa";
-            let statusColor = "#22c55e";
-            let statusExp = "Pagamento em dia. Empresa funcionando normalmente.";
-            
-            if (data.status === 'vencido') {
-                statusStr = "Vencida";
-                statusColor = "#ef4444";
-                statusExp = "Pagamento está em atraso.";
-            } else if (data.status === 'Aviso prévio') {
-                statusStr = "Aviso Prévio";
-                statusColor = "#f59e0b";
-                statusExp = `Pagamento vence em ${data.diasRestantes} dias.`;
-                if (data.diasRestantes === 0) statusExp = "Pagamento vence hoje.";
-            } else if (data.status === 'suspenso') {
-                statusStr = "Suspensa";
-                statusColor = "#9ca3af";
-                statusExp = "Empresa suspensa. O acesso ao CRM está bloqueado.";
+                const rowWpp = document.getElementById('row-whatsapp');
+                if (usuario.whatsapp) {
+                    document.getElementById('info-whatsapp').textContent = usuario.whatsapp;
+                    rowWpp.style.display = 'flex';
+                } else rowWpp.style.display = 'none';
+
+                const rowCnpj = document.getElementById('row-cnpj');
+                if (usuario.cnpj_cpf) {
+                    document.getElementById('info-cnpj').textContent = usuario.cnpj_cpf;
+                    rowCnpj.style.display = 'flex';
+                } else rowCnpj.style.display = 'none';
+
+                const rowSeg = document.getElementById('row-segmento');
+                if (usuario.segmento) {
+                    document.getElementById('info-segmento').textContent = usuario.segmento;
+                    rowSeg.style.display = 'flex';
+                } else rowSeg.style.display = 'none';
+
+                const rowDesc = document.getElementById('row-descricao');
+                if (usuario.descricao) {
+                    document.getElementById('info-descricao').textContent = usuario.descricao;
+                    rowDesc.style.display = 'flex';
+                } else rowDesc.style.display = 'none';
+
+                let dataCriada = "";
+                if (usuario.criado_em) {
+                    const dc = new Date(usuario.criado_em);
+                    dataCriada = `${dc.toLocaleDateString('pt-BR', {timeZone:'America/Sao_Paulo'})} - ${dc.toLocaleTimeString('pt-BR', {timeZone:'America/Sao_Paulo', hour:'2-digit', minute:'2-digit'})}`;
+                }
+                document.getElementById('info-criada-em').textContent = dataCriada;
+                
+                window.tempUsuario = usuario;
             } else {
-                statusStr = "Pago";
-                statusColor = "#22c55e";
+                // Oculta tudo que não temos acesso
+                document.getElementById('detalhe-local-empresa').style.display = 'none';
+                document.getElementById('detalhe-desc-empresa').style.display = 'none';
+                document.getElementById('row-whatsapp').style.display = 'none';
+                document.getElementById('row-cnpj').style.display = 'none';
+                document.getElementById('row-segmento').style.display = 'none';
+                document.getElementById('row-descricao').style.display = 'none';
+                document.getElementById('info-criada-em').textContent = 'N/A';
+                window.tempUsuario = { id: id };
             }
 
-            badge.textContent = statusStr;
-            badge.style.backgroundColor = statusColor;
-            sBoxBadge.textContent = statusStr;
-            sBoxBadge.style.backgroundColor = statusColor;
-            sBoxText.textContent = statusExp;
-            document.getElementById('status-box').style.backgroundColor = statusColor + '20';
-            sBoxIcon.style.color = statusColor;
-
-            const localEl = document.getElementById('detalhe-local-empresa');
-            if (usuario.localizacao) {
-                localEl.innerHTML = `<i class="ph-fill ph-map-pin"></i> <span>${usuario.localizacao}</span>`;
-                localEl.style.display = 'flex';
-            } else {
-                localEl.style.display = 'none';
-            }
-
-            const descEl = document.getElementById('detalhe-desc-empresa');
-            if (usuario.descricao) {
-                descEl.textContent = usuario.descricao;
-                descEl.style.display = 'block';
-            } else {
-                descEl.style.display = 'none';
-            }
-
-            document.getElementById('info-nome').textContent = usuario.nome_completo || nome;
-            document.getElementById('info-email').textContent = usuario.email || email;
+            // Busca os Horários
+            const { data: horarios } = await supabase.from('horarios_empresa').select('*').eq('id_empresa', id);
+            window.tempHorarios = horarios || [];
             
-            const rowWpp = document.getElementById('row-whatsapp');
-            if (usuario.whatsapp) {
-                document.getElementById('info-whatsapp').textContent = usuario.whatsapp;
-                rowWpp.style.display = 'flex';
-            } else rowWpp.style.display = 'none';
-
-            const rowCnpj = document.getElementById('row-cnpj');
-            if (usuario.cnpj_cpf) {
-                document.getElementById('info-cnpj').textContent = usuario.cnpj_cpf;
-                rowCnpj.style.display = 'flex';
-            } else rowCnpj.style.display = 'none';
-
-            const rowSeg = document.getElementById('row-segmento');
-            if (usuario.segmento) {
-                document.getElementById('info-segmento').textContent = usuario.segmento;
-                rowSeg.style.display = 'flex';
-            } else rowSeg.style.display = 'none';
-
-            const rowDesc = document.getElementById('row-descricao');
-            if (usuario.descricao) {
-                document.getElementById('info-descricao').textContent = usuario.descricao;
-                rowDesc.style.display = 'flex';
-            } else rowDesc.style.display = 'none';
-
-            let dataCriada = "";
-            if (usuario.criado_em) {
-                const dc = new Date(usuario.criado_em);
-                dataCriada = `${dc.toLocaleDateString('pt-BR', {timeZone:'America/Sao_Paulo'})} - ${dc.toLocaleTimeString('pt-BR', {timeZone:'America/Sao_Paulo', hour:'2-digit', minute:'2-digit'})}`;
-            }
-            document.getElementById('info-criada-em').textContent = dataCriada;
-
-            document.getElementById('detalhe-total-leads').textContent = totalLeads;
-            document.getElementById('detalhe-total-reunioes').textContent = totalReunioes;
-
-            // Mantendo os dados no escopo para usar no config dias
-            window.tempHorarios = horarios;
-            window.tempUsuario = usuario;
+            // Busca as Reuniões Marcadas (leads com qualificacao=qualificado)
+            const data30diasStr = new Date(new Date().getTime() - (30 * 24 * 60 * 60 * 1000)).toISOString();
+            const { count: reunioesCount } = await supabase
+                .from('leads')
+                .select('*', { count: 'exact', head: true })
+                .eq('id_empresa', id)
+                .or('status.eq.qualificado,qualificacao.eq.qualificado')
+                .gte('criado_em', data30diasStr);
+                
+            document.getElementById('detalhe-total-reunioes').textContent = reunioesCount || 0;
 
         } catch (error) {
             console.error(error);
-            document.getElementById('detalhe-nome-empresa').textContent = "Não foi possível carregar";
-            document.getElementById('detalhe-total-leads').textContent = "0";
             document.getElementById('detalhe-total-reunioes').textContent = "0";
-            document.getElementById('info-nome').textContent = "Não foi possível carregar";
-            return;
+            window.tempHorarios = [];
         }
 
-        const usuario = window.tempUsuario;
-        const horarios = window.tempHorarios;
+        const usuario = window.tempUsuario || { id: id };
+        const horarios = window.tempHorarios || [];
 
         const hList = document.getElementById('horarios-list');
         hList.innerHTML = '';
