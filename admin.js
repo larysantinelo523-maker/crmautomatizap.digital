@@ -678,7 +678,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentTenantEmail = '';
 
     document.getElementById('btn-voltar-empresas').addEventListener('click', () => {
-        showSection('empresas');
+        showSection('dashboard');
         currentTenantId = null;
     });
 
