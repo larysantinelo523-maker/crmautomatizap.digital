@@ -1007,7 +1007,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
     document.getElementById('btn-modal-senha').addEventListener('click', () => modalSenha.classList.add('active'));
-    document.getElementById('btn-configurar-horario').addEventListener('click', () => modalConfig.classList.add('active'));
+    if(document.getElementById('btn-configurar-horario')) {
+        document.getElementById('btn-configurar-horario').addEventListener('click', () => modalConfig.classList.add('active'));
+    }
 
     document.querySelectorAll('.close-modal').forEach(btn => {
         btn.addEventListener('click', (e) => {

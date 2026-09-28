@@ -16,14 +16,14 @@
 
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
+
     <!-- Highcharts -->
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     <!-- Mapas Highcharts -->
     <script src="https://code.highcharts.com/maps/modules/map.js"></script>
     <script src="https://code.highcharts.com/mapdata/countries/br/br-all.js"></script>
-    
+
     <!-- ApexCharts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
@@ -34,13 +34,14 @@
         .admin-section {
             display: none;
         }
+
         .admin-section.active {
             display: block;
         }
     </style>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-    
+
     <!-- PWA Setup -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -48,32 +49,32 @@
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="manifest" href="manifest.json">
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js').catch(err => console.log('SW fail: ', err));
-        });
-      }
-      let deferredPrompt;
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        const installBtns = document.querySelectorAll('.install-pwa-btn');
-        installBtns.forEach(btn => {
-          btn.style.display = 'flex';
-          btn.addEventListener('click', (e) => {
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW fail: ', err));
+            });
+        }
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
-            if(deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                  if (choiceResult.outcome === 'accepted') {
-                    installBtns.forEach(b => b.style.display = 'none');
-                  }
-                  deferredPrompt = null;
+            deferredPrompt = e;
+            const installBtns = document.querySelectorAll('.install-pwa-btn');
+            installBtns.forEach(btn => {
+                btn.style.display = 'flex';
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then((choiceResult) => {
+                            if (choiceResult.outcome === 'accepted') {
+                                installBtns.forEach(b => b.style.display = 'none');
+                            }
+                            deferredPrompt = null;
+                        });
+                    }
                 });
-            }
-          });
+            });
         });
-      });
     </script>
 </head>
 
@@ -100,11 +101,15 @@
             </nav>
 
             <div class="sidebar-footer">
-                <div class="sidebar-clock" id="sidebar-clock" style="margin-bottom: 12px; padding: 12px; background: var(--color-bg-main); border-radius: 8px; border: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px;">
+                <div class="sidebar-clock" id="sidebar-clock"
+                    style="margin-bottom: 12px; padding: 12px; background: var(--color-bg-main); border-radius: 8px; border: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px;">
                     <i class="ph ph-clock" style="font-size: 20px; color: var(--color-primary);"></i>
                     <div>
-                        <div id="clock-time" style="font-size: 15px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">00:00</div>
-                        <div id="clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">Carregando...</div>
+                        <div id="clock-time"
+                            style="font-size: 15px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">
+                            00:00</div>
+                        <div id="clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">
+                            Carregando...</div>
                     </div>
                 </div>
             </div>
@@ -131,12 +136,14 @@
                             <span id="date-filter-text">01/09/2026 - 30/09/2026</span>
                             <i class="ph ph-caret-down"></i>
                         </button>
-                        
+
                         <!-- Date Dropdown -->
                         <div class="date-dropdown" id="date-dropdown">
-                            <div class="date-dropdown-header" style="display: flex; justify-content: space-between; align-items: center;">
+                            <div class="date-dropdown-header"
+                                style="display: flex; justify-content: space-between; align-items: center;">
                                 <h4>Filtrar por Data</h4>
-                                <button id="btn-clear-date-filter" style="background: none; border: none; font-size: 11px; color: var(--color-text-mut); cursor: pointer; text-decoration: underline;">Limpar</button>
+                                <button id="btn-clear-date-filter"
+                                    style="background: none; border: none; font-size: 11px; color: var(--color-text-mut); cursor: pointer; text-decoration: underline;">Limpar</button>
                             </div>
                             <div class="date-dropdown-body">
                                 <div class="calendar-header">
@@ -154,12 +161,14 @@
                                     <span class="cal-day-name">S</span>
                                     <!-- Dias injetados via JS -->
                                 </div>
-                                <div style="display: flex; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--color-text-sec);">
+                                <div
+                                    style="display: flex; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--color-text-sec);">
                                     <span id="cal-selection-text">Selecione uma data</span>
                                 </div>
                             </div>
                             <div class="date-dropdown-footer">
-                                <button class="btn btn--primary" id="btn-apply-date" style="width: 100%;">Aplicar Filtro</button>
+                                <button class="btn btn--primary" id="btn-apply-date" style="width: 100%;">Aplicar
+                                    Filtro</button>
                             </div>
                         </div>
                     </div>
@@ -171,14 +180,19 @@
                             <span class="user-role">SaaS Admin</span>
                         </div>
                         <i class="ph ph-caret-down"></i>
-                        
+
                         <!-- Dropdown do Usuário -->
                         <div class="user-dropdown" id="user-dropdown">
-                            <div class="mobile-clock-widget" style="padding: 12px 16px; border-bottom: 1px solid var(--color-border); display: none; align-items: center; gap: 12px; margin-bottom: 4px;">
+                            <div class="mobile-clock-widget"
+                                style="padding: 12px 16px; border-bottom: 1px solid var(--color-border); display: none; align-items: center; gap: 12px; margin-bottom: 4px;">
                                 <i class="ph ph-clock" style="font-size: 20px; color: var(--color-primary);"></i>
                                 <div>
-                                    <div id="mobile-clock-time" style="font-size: 14px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">00:00</div>
-                                    <div id="mobile-clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">Carregando...</div>
+                                    <div id="mobile-clock-time"
+                                        style="font-size: 14px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">
+                                        00:00</div>
+                                    <div id="mobile-clock-date"
+                                        style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">
+                                        Carregando...</div>
                                 </div>
                             </div>
                             <div class="dropdown-item theme-item" onclick="event.stopPropagation()">
@@ -206,7 +220,8 @@
                 <!-- Secao Dashboard -->
                 <section id="sec-dashboard" class="admin-section active">
                     <div class="kpis-section">
-                        <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Como interpretar esta métrica"></i>
+                        <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip"
+                                data-tooltip="Como interpretar esta métrica"></i>
                             <div class="kpi-header">
                                 <div class="icon-wrapper green-light"><i class="ph ph-buildings text-primary"></i></div>
                                 <h3>Empresas Cadastradas</h3>
@@ -220,9 +235,11 @@
                                 </h2>
                             </div>
                         </div>
-                        <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Como interpretar esta métrica"></i>
+                        <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip"
+                                data-tooltip="Como interpretar esta métrica"></i>
                             <div class="kpi-header">
-                                <div class="icon-wrapper" style="background: #dcfce7; color: #16a34a;"><i class="ph ph-money"></i></div>
+                                <div class="icon-wrapper" style="background: #dcfce7; color: #16a34a;"><i
+                                        class="ph ph-money"></i></div>
                                 <h3>Clientes Ativos</h3>
                             </div>
                             <div class="kpi-content">
@@ -234,9 +251,11 @@
                                 </h2>
                             </div>
                         </div>
-                        <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Como interpretar esta métrica"></i>
+                        <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip"
+                                data-tooltip="Como interpretar esta métrica"></i>
                             <div class="kpi-header">
-                                <div class="icon-wrapper" style="background: #fee2e2; color: #dc2626;"><i class="ph ph-warning-circle"></i></div>
+                                <div class="icon-wrapper" style="background: #fee2e2; color: #dc2626;"><i
+                                        class="ph ph-warning-circle"></i></div>
                                 <h3>Clientes Inadimplentes</h3>
                             </div>
                             <div class="kpi-content">
@@ -248,7 +267,8 @@
                                 </h2>
                             </div>
                         </div>
-                        <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip" data-tooltip="Como interpretar esta métrica"></i>
+                        <div class="kpi-card" style="position: relative;"><i class="ph ph-question info-tooltip"
+                                data-tooltip="Como interpretar esta métrica"></i>
                             <div class="kpi-header">
                                 <div class="icon-wrapper green-light"><i class="ph ph-wallet text-primary"></i></div>
                                 <h3>Faturamento do Mês</h3>
@@ -273,16 +293,24 @@
                                     <p>Clique em uma empresa para visualizar o painel detalhado dela.</p>
                                 </div>
                             </div>
-                            
-                            <div class="table-controls-wrapper" style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
-                                <div class="table-controls" style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                                    <div class="search-input" style="position: relative; display: flex; align-items: center; flex: 1;">
-                                        <i class="ph ph-magnifying-glass" style="position: absolute; left: 12px; color: var(--color-text-mut);"></i>
-                                        <input type="text" id="search-empresas" placeholder="Buscar por nome ou email..." style="padding: 8px 12px 8px 36px; border: none; border-radius: 8px; background: transparent; color: var(--color-text-main); font-size: 13px; outline: none; width: 100%;">
+
+                            <div class="table-controls-wrapper"
+                                style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+                                <div class="table-controls"
+                                    style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                                    <div class="search-input"
+                                        style="position: relative; display: flex; align-items: center; flex: 1;">
+                                        <i class="ph ph-magnifying-glass"
+                                            style="position: absolute; left: 12px; color: var(--color-text-mut);"></i>
+                                        <input type="text" id="search-empresas"
+                                            placeholder="Buscar por nome ou email..."
+                                            style="padding: 8px 12px 8px 36px; border: none; border-radius: 8px; background: transparent; color: var(--color-text-main); font-size: 13px; outline: none; width: 100%;">
                                     </div>
-                                    <button class="btn-icon outline" id="btn-clear-admin-filters" title="Limpar Filtros"><i class="ph ph-funnel"></i></button>
+                                    <button class="btn-icon outline" id="btn-clear-admin-filters"
+                                        title="Limpar Filtros"><i class="ph ph-funnel"></i></button>
                                 </div>
-                                <button class="btn btn-cadastrar-desktop" id="btn-open-cadastrar-modal" style="border: none; flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <button class="btn btn-cadastrar-desktop" id="btn-open-cadastrar-modal"
+                                    style="border: none; flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 8px;">
                                     <span class="admin-btn-text" style="font-weight: 500;">Cadastrar Empresa</span>
                                     <i class="ph ph-plus" style="font-weight: bold;"></i>
                                 </button>
@@ -297,21 +325,26 @@
                                         color: var(--color-primary) !important;
                                         padding: 8px !important;
                                     }
+
                                     .btn-cadastrar-desktop .ph-plus {
                                         color: var(--color-primary) !important;
                                         font-size: 20px;
                                     }
+
                                     .admin-btn-text {
                                         display: none;
                                     }
+
                                     #btn-open-cadastrar-modal {
                                         padding: 8px 12px !important;
                                     }
                                 }
+
                                 .admin-table {
                                     width: 100%;
                                     border-collapse: collapse;
                                 }
+
                                 @media (min-width: 769px) {
                                     .btn-cadastrar-desktop {
                                         background-color: var(--color-primary) !important;
@@ -319,18 +352,23 @@
                                         border-radius: 6px !important;
                                         padding: 8px 16px !important;
                                     }
+
                                     .btn-cadastrar-desktop .admin-btn-text {
                                         color: white !important;
                                     }
+
                                     .btn-cadastrar-desktop .ph-plus {
                                         color: white !important;
                                         font-size: 15px;
                                     }
-                                    
-                                    .admin-table, .admin-table thead, .admin-table tbody {
+
+                                    .admin-table,
+                                    .admin-table thead,
+                                    .admin-table tbody {
                                         display: block;
                                         width: 100%;
                                     }
+
                                     .admin-table tr {
                                         display: grid;
                                         grid-template-columns: minmax(140px, 1.5fr) minmax(160px, 1.5fr) minmax(100px, 1fr) minmax(100px, 1fr) minmax(90px, 0.8fr) minmax(90px, 0.8fr) minmax(140px, 1.2fr);
@@ -338,30 +376,49 @@
                                         align-items: center;
                                         border-bottom: 1px solid var(--color-border);
                                     }
-                                    .admin-table th, .admin-table td {
+
+                                    .admin-table th,
+                                    .admin-table td {
                                         padding: 16px 12px;
                                         text-align: left;
                                         display: flex;
                                         align-items: center;
                                         border-bottom: none !important;
                                     }
+
                                     .admin-table th {
                                         color: var(--color-text-light);
                                         font-weight: 600;
                                         font-size: 14px;
                                     }
                                 }
+
                                 @media (max-width: 768px) {
-                                    .admin-table td:nth-child(2)::before { content: "Email Responsável"; }
-                                    .admin-table td:nth-child(3)::before { content: "Data de Vencimento"; }
-                                    .admin-table td:nth-child(4)::before { content: "Dias Restantes"; }
-                                    .admin-table td:nth-child(5)::before { content: "Total de Leads"; }
-                                    .admin-table td:nth-child(6)::before { 
-                                        content: "Status" !important; 
+                                    .admin-table td:nth-child(2)::before {
+                                        content: "Email Responsável";
+                                    }
+
+                                    .admin-table td:nth-child(3)::before {
+                                        content: "Data de Vencimento";
+                                    }
+
+                                    .admin-table td:nth-child(4)::before {
+                                        content: "Dias Restantes";
+                                    }
+
+                                    .admin-table td:nth-child(5)::before {
+                                        content: "Total de Leads";
+                                    }
+
+                                    .admin-table td:nth-child(6)::before {
+                                        content: "Status" !important;
                                         display: block !important;
                                     }
-                                    .admin-table td:nth-child(7)::before { content: "Chave de API"; }
-                                    
+
+                                    .admin-table td:nth-child(7)::before {
+                                        content: "Chave de API";
+                                    }
+
                                     .admin-table td:nth-child(6) {
                                         position: static !important;
                                         width: 100% !important;
@@ -373,7 +430,7 @@
                                         align-items: center !important;
                                         overflow: visible !important;
                                     }
-                                    
+
                                     .admin-table td:nth-child(7) {
                                         display: flex;
                                         justify-content: space-between;
@@ -382,6 +439,7 @@
                                         padding-top: 12px;
                                         margin-top: 6px;
                                     }
+
                                     .admin-table td:nth-child(7) .btn-copy-id {
                                         position: relative !important;
                                         right: auto !important;
@@ -402,58 +460,95 @@
                                 </thead>
                                 <tbody id="empresas-tbody">
                                     <tr>
-                                        <td colspan="6" style="text-align: center; padding: 24px;">Carregando empresas...</td>
+                                        <td colspan="6" style="text-align: center; padding: 24px;">Carregando
+                                            empresas...</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </section>
-                
+
                 <!-- Secao Detalhes da Empresa (Mini Dashboard) -->
                 <!-- Secao Detalhes da Empresa (Mini Dashboard) -->
                 <section id="sec-detalhes-empresa" class="admin-section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <button class="btn btn-outline" id="btn-voltar-empresas">
                             <i class="ph ph-arrow-left"></i> Voltar para Lista
                         </button>
-                        
-                        <button class="btn" id="btn-modal-senha" style="background-color: #dcfce7; border: 1px solid #16a34a; color: #16a34a; padding: 8px 16px; font-weight: 600; font-size: 13px; border-radius: 8px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s;">
+
+                        <button class="btn" id="btn-modal-senha"
+                            style="background-color: #dcfce7; border: 1px solid #16a34a; color: #16a34a; padding: 8px 16px; font-weight: 600; font-size: 13px; border-radius: 8px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s;">
                             <i class="ph-fill ph-lock-key" style="font-size: 18px;"></i> SENHA
                         </button>
                     </div>
-                    
+
                     <div class="company-summary-card card" style="margin-bottom: 24px; padding: 0; overflow: hidden;">
                         <div style="display: flex; flex-wrap: wrap;">
                             <!-- Col 1 -->
-                            <div style="flex: 1.5; min-width: 300px; padding: 24px; border-right: 1px solid var(--color-border); display: flex; align-items: flex-start; gap: 16px; position: relative;">
-                                <div class="icon-wrapper" style="background: #dcfce7; color: #16a34a; width: 64px; height: 64px; font-size: 32px; border-radius: 16px;"><i class="ph ph-buildings"></i></div>
+                            <div
+                                style="flex: 1.5; min-width: 300px; padding: 24px; border-right: 1px solid var(--color-border); display: flex; align-items: flex-start; gap: 16px; position: relative;">
+                                <div class="icon-wrapper"
+                                    style="background: #dcfce7; color: #16a34a; width: 64px; height: 64px; font-size: 32px; border-radius: 16px;">
+                                    <i class="ph ph-buildings"></i>
+                                </div>
                                 <div style="flex: 1;">
                                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                                        <h2 id="detalhe-nome-empresa" style="margin: 0; font-size: 20px;">Carregando...</h2>
-                                        <span id="detalhe-status-badge" style="background-color: #22c55e; color: white; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600;">...</span>
+                                        <h2 id="detalhe-nome-empresa" style="margin: 0; font-size: 20px;">Carregando...
+                                        </h2>
+                                        <span id="detalhe-status-badge"
+                                            style="background-color: #22c55e; color: white; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600;">...</span>
                                     </div>
-                                    <p id="detalhe-email-empresa" style="color: var(--color-text-mut); margin-bottom: 4px; display: flex; align-items: center; gap: 4px;"><i class="ph ph-envelope-simple"></i> <span>...</span></p>
-                                    <p id="detalhe-local-empresa" style="color: var(--color-text-mut); margin-bottom: 8px; display: flex; align-items: center; gap: 4px; display: none;"><i class="ph ph-map-pin"></i> <span>...</span></p>
-                                    <p id="detalhe-desc-empresa" style="color: var(--color-text-mut); font-size: 13px; line-height: 1.4; display: none;">...</p>
+                                    <p id="detalhe-email-empresa"
+                                        style="color: var(--color-text-mut); margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">
+                                        <i class="ph ph-envelope-simple"></i> <span>...</span>
+                                    </p>
+                                    <p id="detalhe-local-empresa"
+                                        style="color: var(--color-text-mut); margin-bottom: 8px; display: flex; align-items: center; gap: 4px; display: none;">
+                                        <i class="ph ph-map-pin"></i> <span>...</span>
+                                    </p>
+                                    <p id="detalhe-desc-empresa"
+                                        style="color: var(--color-text-mut); font-size: 13px; line-height: 1.4; display: none;">
+                                        ...</p>
                                 </div>
                             </div>
                             <!-- Col 2 -->
-                            <div style="flex: 1; min-width: 200px; padding: 24px; border-right: 1px solid var(--color-border); display: flex; align-items: flex-start; gap: 16px;">
-                                <div class="icon-wrapper" style="background: #dcfce7; color: #16a34a; width: 48px; height: 48px; border-radius: 50%;"><i class="ph-fill ph-chat-circle"></i></div>
+                            <div
+                                style="flex: 1; min-width: 200px; padding: 24px; border-right: 1px solid var(--color-border); display: flex; align-items: flex-start; gap: 16px;">
+                                <div class="icon-wrapper"
+                                    style="background: #dcfce7; color: #16a34a; width: 48px; height: 48px; border-radius: 50%;">
+                                    <i class="ph-fill ph-chat-circle"></i>
+                                </div>
                                 <div>
-                                    <p style="color: var(--color-text-main); font-weight: 600; margin-bottom: 4px; font-size: 14px;">Total de Leads</p>
+                                    <p
+                                        style="color: var(--color-text-main); font-weight: 600; margin-bottom: 4px; font-size: 14px;">
+                                        Total de Leads</p>
                                     <h2 id="detalhe-total-leads" style="font-size: 28px; margin-bottom: 4px;">0</h2>
-                                    <p id="detalhe-var-leads" style="font-size: 12px; color: var(--color-text-mut); display: flex; align-items: center; gap: 4px; font-weight: 500;"><span style="color: var(--color-text-mut); font-weight: 400;">(Últimos 30 dias)</span></p>
+                                    <p id="detalhe-var-leads"
+                                        style="font-size: 12px; color: var(--color-text-mut); display: flex; align-items: center; gap: 4px; font-weight: 500;">
+                                        <span style="color: var(--color-text-mut); font-weight: 400;">(Últimos 30
+                                            dias)</span>
+                                    </p>
                                 </div>
                             </div>
                             <!-- Col 3 -->
-                            <div style="flex: 1; min-width: 200px; padding: 24px; display: flex; align-items: flex-start; gap: 16px;">
-                                <div class="icon-wrapper" style="background: #dcfce7; color: #16a34a; width: 48px; height: 48px; border-radius: 50%;"><i class="ph-fill ph-calendar-check"></i></div>
+                            <div
+                                style="flex: 1; min-width: 200px; padding: 24px; display: flex; align-items: flex-start; gap: 16px;">
+                                <div class="icon-wrapper"
+                                    style="background: #dcfce7; color: #16a34a; width: 48px; height: 48px; border-radius: 50%;">
+                                    <i class="ph-fill ph-calendar-check"></i>
+                                </div>
                                 <div>
-                                    <p style="color: var(--color-text-main); font-weight: 600; margin-bottom: 4px; font-size: 14px;">Reuniões Agendadas</p>
+                                    <p
+                                        style="color: var(--color-text-main); font-weight: 600; margin-bottom: 4px; font-size: 14px;">
+                                        Reuniões Agendadas</p>
                                     <h2 id="detalhe-total-reunioes" style="font-size: 28px; margin-bottom: 4px;">0</h2>
-                                    <p id="detalhe-var-reunioes" style="font-size: 12px; color: var(--color-text-mut); display: flex; align-items: center; gap: 4px; font-weight: 500;"><span style="color: var(--color-text-mut); font-weight: 400;">(Últimos 30 dias)</span></p>
+                                    <p id="detalhe-var-reunioes"
+                                        style="font-size: 12px; color: var(--color-text-mut); display: flex; align-items: center; gap: 4px; font-weight: 500;">
+                                        <span style="color: var(--color-text-mut); font-weight: 400;">(Últimos 30
+                                            dias)</span>
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -467,25 +562,33 @@
                                     <i class="ph-fill ph-buildings text-primary"></i>
                                     <h3>Informações da Empresa</h3>
                                 </div>
-                                
+
                                 <div id="info-linhas" style="display: flex; flex-direction: column;">
-                                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
-                                        <span style="color: var(--color-text-mut); font-size: 14px;">Nome da empresa</span>
+                                    <div class="info-row"
+                                        style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
+                                        <span style="color: var(--color-text-mut); font-size: 14px;">Nome da
+                                            empresa</span>
                                         <span id="info-nome" style="font-weight: 500; font-size: 14px;">...</span>
                                     </div>
-                                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
-                                        <span style="color: var(--color-text-mut); font-size: 14px;">Email de contato</span>
+                                    <div class="info-row"
+                                        style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
+                                        <span style="color: var(--color-text-mut); font-size: 14px;">Email de
+                                            contato</span>
                                         <span id="info-email" style="font-weight: 500; font-size: 14px;">...</span>
                                     </div>
-                                    <div id="row-segmento" class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
+                                    <div id="row-segmento" class="info-row"
+                                        style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
                                         <span style="color: var(--color-text-mut); font-size: 14px;">Segmento</span>
                                         <span id="info-segmento" style="font-weight: 500; font-size: 14px;">...</span>
                                     </div>
-                                    <div id="row-descricao" class="info-row" style="display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
+                                    <div id="row-descricao" class="info-row"
+                                        style="display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
                                         <span style="color: var(--color-text-mut); font-size: 14px;">Descrição</span>
-                                        <span id="info-descricao" style="font-weight: 500; font-size: 13px; line-height: 1.4;">...</span>
+                                        <span id="info-descricao"
+                                            style="font-weight: 500; font-size: 13px; line-height: 1.4;">...</span>
                                     </div>
-                                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0;">
+                                    <div class="info-row"
+                                        style="display: flex; justify-content: space-between; padding: 12px 0;">
                                         <span style="color: var(--color-text-mut); font-size: 14px;">Criada em</span>
                                         <span id="info-criada-em" style="font-weight: 500; font-size: 14px;">...</span>
                                     </div>
@@ -496,17 +599,18 @@
 
                         <!-- Right -->
                         <div style="display: flex; flex-direction: column; gap: 24px;">
-                            
+
                             <!-- Horário Comercial -->
                             <div class="card">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                                     <div class="card-title" style="margin: 0;">
                                         <i class="ph-fill ph-clock text-primary"></i>
                                         <h3 style="margin: 0;">Horário Comercial</h3>
                                     </div>
 
                                 </div>
-                                
+
                                 <div id="horarios-list" style="display: flex; flex-direction: column; gap: 12px;">
                                     <!-- JS vai inserir aqui -->
                                 </div>
@@ -527,7 +631,8 @@
                                     <input type="password" id="admin-new-password" class="form-control" required>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary" id="btn-change-password" style="width: 100%;">Atualizar Senha Master</button>
+                            <button type="submit" class="btn btn-primary" id="btn-change-password"
+                                style="width: 100%;">Atualizar Senha Master</button>
                         </form>
                     </div>
                 </section>
@@ -549,28 +654,32 @@
                         <label style="color: var(--color-text-mut);">Nome da Empresa</label>
                         <div class="input-wrapper">
                             <i class="ph ph-building"></i>
-                            <input type="text" id="tenant-nome" class="form-control" placeholder="Ex: Barbearia do João" required>
+                            <input type="text" id="tenant-nome" class="form-control" placeholder="Ex: Barbearia do João"
+                                required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label style="color: var(--color-text-mut);">E-mail de Login (Administrador da Empresa)</label>
                         <div class="input-wrapper">
                             <i class="ph ph-envelope-simple"></i>
-                            <input type="email" id="tenant-email" class="form-control" placeholder="contato@empresa.com" required>
+                            <input type="email" id="tenant-email" class="form-control" placeholder="contato@empresa.com"
+                                required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label style="color: var(--color-text-mut);">Senha Inicial</label>
                         <div class="input-wrapper">
                             <i class="ph ph-lock-key"></i>
-                            <input type="password" id="tenant-senha" class="form-control" placeholder="Senha provisória" required>
+                            <input type="password" id="tenant-senha" class="form-control" placeholder="Senha provisória"
+                                required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label style="color: var(--color-text-mut);">Definir Valor da Cobrança</label>
                         <div class="input-wrapper">
                             <i class="ph ph-currency-dollar"></i>
-                            <input type="text" id="tenant-mensalidade" class="form-control" placeholder="Digite um valor" required>
+                            <input type="text" id="tenant-mensalidade" class="form-control"
+                                placeholder="Digite um valor" required>
                         </div>
                     </div>
                     <div class="form-group">
@@ -579,11 +688,13 @@
                             <i class="ph ph-calendar"></i>
                             <input type="date" id="tenant-vencimento" class="form-control" required>
                         </div>
-                        <small style="color: var(--color-text-sec); display: block; margin-top: 8px;">Esta data definirá quando os avisos de fatura vão aparecer no CRM do cliente.</small>
+                        <small style="color: var(--color-text-sec); display: block; margin-top: 8px;">Esta data definirá
+                            quando os avisos de fatura vão aparecer no CRM do cliente.</small>
                     </div>
-                    
+
                     <div class="form-actions" style="margin-top: 32px; display: flex; justify-content: flex-end;">
-                        <button type="submit" class="login-btn" id="btn-submit-tenant" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <button type="submit" class="login-btn" id="btn-submit-tenant"
+                            style="display: flex; align-items: center; justify-content: center; gap: 8px;">
                             <i class="ph ph-check" style="font-size: 20px;"></i>
                             Criar Empresa no Sistema
                         </button>
@@ -631,25 +742,29 @@
                             <input type="date" id="edit-vencimento" class="form-control">
                         </div>
                     </div>
-                    
-                    <h4 style="margin-top: 24px; margin-bottom: 16px; color: var(--color-text-main);">Informações Opcionais</h4>
-                    
+
+                    <h4 style="margin-top: 24px; margin-bottom: 16px; color: var(--color-text-main);">Informações
+                        Opcionais</h4>
+
                     <div class="form-group">
                         <label style="color: var(--color-text-mut);">Segmento</label>
                         <div class="input-wrapper">
                             <i class="ph ph-tag"></i>
-                            <input type="text" id="edit-segmento" class="form-control" placeholder="Ex: Saúde / Serviços">
+                            <input type="text" id="edit-segmento" class="form-control"
+                                placeholder="Ex: Saúde / Serviços">
                         </div>
                     </div>
                     <div class="form-group">
                         <label style="color: var(--color-text-mut);">Descrição</label>
                         <div class="input-wrapper">
                             <i class="ph ph-text-align-left"></i>
-                            <textarea id="edit-descricao" class="form-control" placeholder="Breve descrição da empresa" style="height: 80px; padding-top: 12px; resize: none;"></textarea>
+                            <textarea id="edit-descricao" class="form-control" placeholder="Breve descrição da empresa"
+                                style="height: 80px; padding-top: 12px; resize: none;"></textarea>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" id="btn-save-edit" style="width: 100%; margin-top: 16px;">
+                    <button type="submit" class="btn btn-primary" id="btn-save-edit"
+                        style="width: 100%; margin-top: 16px;">
                         Salvar Alterações
                     </button>
                 </form>
@@ -680,7 +795,8 @@
                             <input type="password" id="nova-senha-cliente-confirm" class="form-control" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary" id="btn-save-senha" style="width: 100%; margin-top: 16px;">
+                    <button type="submit" class="btn btn-primary" id="btn-save-senha"
+                        style="width: 100%; margin-top: 16px;">
                         Salvar Nova Senha
                     </button>
                 </form>
@@ -697,13 +813,14 @@
             </div>
             <div class="modal-body">
                 <form id="form-config-horario" class="login-form">
-                    
+
                     <div style="display: flex; gap: 16px; margin-bottom: 24px;">
                         <div class="form-group" style="flex: 1;">
                             <label style="color: var(--color-text-mut); font-size: 13px;">Fuso Horário</label>
                             <div class="input-wrapper">
                                 <i class="ph ph-globe"></i>
-                                <select id="config-fuso" class="form-control" style="appearance: auto; padding-left: 40px;">
+                                <select id="config-fuso" class="form-control"
+                                    style="appearance: auto; padding-left: 40px;">
                                     <option value="America/Recife">America/Recife</option>
                                     <option value="America/Sao_Paulo">America/Sao_Paulo</option>
                                     <option value="America/Manaus">America/Manaus</option>
@@ -711,16 +828,19 @@
                             </div>
                         </div>
                         <div class="form-group" style="flex: 1;">
-                            <label style="color: var(--color-text-mut); font-size: 13px;">Lead parado após (horas)</label>
+                            <label style="color: var(--color-text-mut); font-size: 13px;">Lead parado após
+                                (horas)</label>
                             <div class="input-wrapper">
                                 <i class="ph ph-hourglass"></i>
-                                <input type="number" id="config-horas-parado" class="form-control" min="1" value="24" required>
+                                <input type="number" id="config-horas-parado" class="form-control" min="1" value="24"
+                                    required>
                             </div>
                         </div>
                     </div>
 
                     <h4 style="margin-bottom: 16px; color: var(--color-text-main);">Dias da Semana</h4>
-                    <div id="config-dias-container" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                    <div id="config-dias-container"
+                        style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
                         <!-- Renderizado via JS -->
                     </div>
 
