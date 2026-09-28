@@ -56,10 +56,10 @@
       });
     </script>
   <script type="module" crossorigin src="/assets/supabase-DUkCiNAm.js"></script>
-  <script type="module" crossorigin src="/assets/data-CXmzkeF3.js"></script>
-  <script type="module" crossorigin src="/assets/script-BiD5GKT0.js"></script>
+  <script type="module" crossorigin src="/assets/data-CEV4NcjX.js"></script>
+  <script type="module" crossorigin src="/assets/script-DYINcIcl.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-BkxFzjgD.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-DwEKgn8S.css">
 </head>
 
 <body>
@@ -360,7 +360,6 @@
                                 <thead>
                                     <tr>
                                         <th>Nome</th>
-                                        <th>Origem</th>
                                         <th>Interesse</th>
                                         <th>Status</th>
                                         <th>Lead criado em:</th>
@@ -582,7 +581,7 @@
                     tr.style.cursor = 'pointer';
                     tr.onclick = (e) => {
                         e.stopPropagation();
-                        abrirDossie(lead, badgeClass, formattedDate);
+                        abrirDossie(lead, badgeClass, formattedDate, tr);
                     };
 
                     tr.innerHTML = `
@@ -592,7 +591,6 @@
                                     <span class="user-name" style="font-weight: 500;">${lead.nome}</span>
                                 </div>
                             </td>
-                            <td class="mobile-origem">${lead.origem || 'WhatsApp'}</td>
                             <td class="mobile-interesse">${lead.interesse || 'Não informado'}</td>
                             <td class="mobile-status"><span class="badge ${badgeClass}">${lead.status}</span></td>
                             <td class="mobile-date">${formattedDate}</td>
@@ -602,14 +600,38 @@
             }
         };
 
-        function abrirDossie(lead, badgeClass, dateStr) {
+        window.currentOpenLeadId = null;
+        window.fecharDossie = function() {
+            document.querySelector('.dashboard-grid').classList.remove('has-dossier');
             const card = document.getElementById('lead-highlight-card');
-            card.style.display = 'block';
+            if (window.innerWidth <= 1024) card.style.display = 'none';
+            document.querySelectorAll('.data-table tbody tr.active-row').forEach(el => el.classList.remove('active-row'));
+            window.currentOpenLeadId = null;
+        };
 
-            // Scroll suave para o dossiê (âncora)
-            setTimeout(() => {
-                card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
+        function abrirDossie(lead, badgeClass, dateStr, trElement) {
+            const grid = document.querySelector('.dashboard-grid');
+            const card = document.getElementById('lead-highlight-card');
+            
+            if (window.currentOpenLeadId === lead.id && grid.classList.contains('has-dossier')) {
+                window.fecharDossie();
+                return;
+            }
+
+            document.querySelectorAll('.data-table tbody tr.active-row').forEach(el => el.classList.remove('active-row'));
+            if (trElement) trElement.classList.add('active-row');
+            
+            window.currentOpenLeadId = lead.id;
+            grid.classList.add('has-dossier');
+
+            if (window.innerWidth <= 1024) {
+                card.style.display = 'block';
+                setTimeout(() => {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            } else {
+                card.style.display = '';
+            }
 
             // Preenche os dados
             const avatarEl = document.getElementById('lead-highlight-avatar');
@@ -654,15 +676,9 @@
                 </button>
             `;
 
-            setTimeout(() => {
-                const dossierArea = document.querySelector('.highlight-section') || card;
-                dossierArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 50);
         }
         
-        function fecharDossie() {
-            document.getElementById('lead-highlight-card').style.display = 'none';
-        }
+        // fecharDossie já está definido acima
     </script>
 </body>
 
