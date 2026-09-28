@@ -53,7 +53,7 @@ module.exports = async (req, res) => {
             .from('leads')
             .select('*', { count: 'exact', head: true })
             .eq('id_empresa', id)
-            .eq('status', 'qualificado')
+            .or('status.eq.qualificado,qualificacao.eq.qualificado')
             .gte('criado_em', data30diasStr);
 
         // Define status
