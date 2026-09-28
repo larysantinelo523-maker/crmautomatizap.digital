@@ -14,8 +14,74 @@ export default async function handler(req, res) {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // ─── MODO DETALHE: /api/list_tenants?id=UUID ────────────────────────────────
+    if (req.query && req.query.id) {
+        const id = req.query.id;
+        try {
+            const { data: usuario, error: errorUser } = await supabase
+                .from('usuarios')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (errorUser) throw errorUser;
+
+            const { data: horarios } = await supabase
+                .from('horarios_empresa')
+                .select('*')
+                .eq('id_empresa', id);
+
+            const data30diasStr = new Date(new Date().getTime() - (30 * 24 * 60 * 60 * 1000)).toISOString();
+
+            const { count: leadsCount } = await supabase
+                .from('leads')
+                .select('*', { count: 'exact', head: true })
+                .eq('id_empresa', id)
+                .gte('criado_em', data30diasStr);
+
+            const { count: reunioesCount } = await supabase
+                .from('leads')
+                .select('*', { count: 'exact', head: true })
+                .eq('id_empresa', id)
+                .or('status.eq.qualificado,qualificacao.eq.qualificado')
+                .gte('criado_em', data30diasStr);
+
+            // Calcular status de pagamento
+            let evaluatedStatus = usuario.status_assinatura || 'vencido';
+            let diffDays = 0;
+
+            if (usuario.data_vencimento) {
+                const dataVencStr = usuario.data_vencimento.split('T')[0];
+                const [yr, mo, dy] = dataVencStr.split('-');
+                const dataVenc = new Date(parseInt(yr), parseInt(mo) - 1, parseInt(dy), 0, 0, 0);
+                const hojeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
+                const hoje = new Date(hojeStr);
+                dataVenc.setHours(0, 0, 0, 0);
+                hoje.setHours(0, 0, 0, 0);
+                const diffTime = dataVenc.getTime() - hoje.getTime();
+                diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays < 0) evaluatedStatus = 'vencido';
+                else if (diffDays <= 3) evaluatedStatus = 'Aviso prévio';
+                else evaluatedStatus = 'pago';
+            }
+
+            return res.status(200).json({
+                usuario,
+                horarios: horarios || [],
+                status: evaluatedStatus,
+                diasRestantes: diffDays,
+                total_leads: leadsCount || 0,
+                reunioes_marcadas: reunioesCount || 0
+            });
+
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Internal server error', details: err.message });
+        }
+    }
+
+    // ─── MODO LISTA: /api/list_tenants ──────────────────────────────────────────
     try {
-        // Obter todos os usuários (que são as empresas agora)
         const { data: usuarios, error: errUser } = await supabase
             .from('usuarios')
             .select('*')
@@ -29,17 +95,14 @@ export default async function handler(req, res) {
             let currentStatus = user.status_assinatura || 'vencido';
             let evaluatedStatus = currentStatus;
             
-            // Avaliar o status com base na data de vencimento
             if (user.data_vencimento) {
-                // Considerando UTC/Brasil para pegar o 'hoje' correto
-                const dataVencStr = user.data_vencimento.split('T')[0]; // Pega só a data se houver tempo
+                const dataVencStr = user.data_vencimento.split('T')[0];
                 const [yr, mo, dy] = dataVencStr.split('-');
                 const dataVenc = new Date(yr, mo - 1, dy, 0, 0, 0);
                 
                 const hojeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
                 const hoje = new Date(hojeStr);
                 
-                // Zera as horas para comparar apenas os dias
                 dataVenc.setHours(0, 0, 0, 0);
                 hoje.setHours(0, 0, 0, 0);
 
@@ -54,10 +117,8 @@ export default async function handler(req, res) {
                     evaluatedStatus = 'pago';
                 }
 
-                // Se o status real for diferente do que está no banco, atualiza o banco
                 if (evaluatedStatus !== currentStatus) {
                     currentStatus = evaluatedStatus;
-                    // Atualiza em background no banco
                     await supabase
                         .from('usuarios')
                         .update({ status_assinatura: currentStatus })
@@ -65,8 +126,7 @@ export default async function handler(req, res) {
                 }
             }
 
-            // Pegar contagem de leads. A tabela leads ainda usa a coluna id_empresa para armazenar o ID do usuário/empresa
-            let leadsCount = user.quantidade_leads; // Usa a nova coluna se existir
+            let leadsCount = user.quantidade_leads;
             
             if (leadsCount === undefined || leadsCount === null) {
                 const { count, error: errLeads } = await supabase
@@ -77,7 +137,7 @@ export default async function handler(req, res) {
             }
 
             result.push({
-                id_empresa: user.id, // Mantemos a chave id_empresa para não quebrar o frontend imediatamente
+                id_empresa: user.id,
                 nome: user.nome_completo || 'Sem Nome',
                 email: user.email || 'N/A',
                 vencimento: user.data_vencimento || 'N/A',

@@ -723,15 +723,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         // --- PASSO 2: Busca dados completos da API segura (Service Role Key) ---
         let apiData = null;
         try {
-            const res = await fetch(`/api/get_tenant_info?id=${encodeURIComponent(id)}`);
+            const res = await fetch(`/api/list_tenants?id=${encodeURIComponent(id)}`);
             if (res.ok) {
                 apiData = await res.json();
             } else {
                 const errText = await res.text();
-                console.warn('get_tenant_info retornou erro:', res.status, errText);
+                console.warn('list_tenants?id= retornou erro:', res.status, errText);
             }
         } catch (err) {
-            console.error('Erro ao chamar get_tenant_info:', err);
+            console.error('Erro ao chamar list_tenants?id=:', err);
         }
 
         // --- PASSO 3: Se a API respondeu, preenche todos os campos com dados reais ---
