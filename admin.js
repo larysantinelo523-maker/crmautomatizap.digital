@@ -753,15 +753,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             else document.getElementById('info-descricao').style.color = 'var(--color-text-main)';
         }
 
-        // Status box (painel verde/vermelho)
-        const sBoxBadge = document.getElementById('status-box-badge');
-        const sBoxText  = document.getElementById('status-box-text');
-        const sBoxIcon  = document.getElementById('status-box-icon');
-        const sBox      = document.getElementById('status-box');
-        if (sBoxBadge) { sBoxBadge.textContent = sInfo.label; sBoxBadge.style.backgroundColor = sInfo.color; }
-        if (sBoxText)  { sBoxText.textContent = t.status === 'vencido' ? 'Pagamento está em atraso.' : t.status === 'Aviso prévio' ? 'Pagamento próximo do vencimento.' : 'Pagamento em dia.'; }
-        if (sBoxIcon)  { sBoxIcon.style.color = sInfo.color; }
-        if (sBox)      { sBox.style.backgroundColor = sInfo.color + '20'; }
 
         // Salva para uso nos modais
         window.tempUsuario = { id: id, nome_completo: displayNome, email: displayEmail, ...t };
