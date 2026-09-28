@@ -136,13 +136,28 @@ export default async function handler(req, res) {
                 leadsCount = count;
             }
 
+            // Reuniões agendadas (últimos 30 dias)
+            const data30dias = new Date(new Date().getTime() - (30 * 24 * 60 * 60 * 1000)).toISOString();
+            const { count: reunioesCount } = await supabase
+                .from('leads').select('*', { count: 'exact', head: true })
+                .eq('id_empresa', user.id)
+                .or('status.eq.qualificado,qualificacao.eq.qualificado')
+                .gte('criado_em', data30dias);
+
             result.push({
                 id_empresa: user.id,
                 nome: user.nome_completo || 'Sem Nome',
                 email: user.email || 'N/A',
                 vencimento: user.data_vencimento || 'N/A',
                 status: evaluatedStatus,
-                total_leads: leadsCount || 0
+                total_leads: leadsCount || 0,
+                reunioes_marcadas: reunioesCount || 0,
+                criado_em: user.criado_em || null,
+                whatsapp: user.whatsapp || null,
+                segmento: user.segmento || null,
+                localizacao: user.localizacao || null,
+                descricao: user.descricao || null,
+                cnpj_cpf: user.cnpj_cpf || null
             });
         }
 

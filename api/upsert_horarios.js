@@ -1,15 +1,29 @@
 const { createClient } = require('@supabase/supabase-js');
 
 export default async function handler(req, res) {
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-    const { userId, fuso_horario, horas_lead_parado, horarios } = req.body;
-    if (!userId) return res.status(400).json({ error: 'Missing userId' });
-
     const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://qosgrqdfeqzxnzhmwomv.supabase.co';
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!supabaseKey) return res.status(500).json({ error: 'Missing SERVICE_ROLE_KEY' });
-
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // ─── GET: buscar horários de uma empresa ─────────────────────────────────────
+    if (req.method === 'GET') {
+        const id = req.query && req.query.id;
+        if (!id) return res.status(400).json({ error: 'Missing id' });
+        try {
+            const { data: horarios, error } = await supabase
+                .from('horarios_empresa').select('*').eq('id_empresa', id);
+            if (error) throw error;
+            return res.status(200).json(horarios || []);
+        } catch (err) {
+            return res.status(500).json({ error: err.message });
+        }
+    }
+
+    // ─── POST: salvar horários de uma empresa ────────────────────────────────────
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    const { userId, fuso_horario, horas_lead_parado, horarios } = req.body;
+    if (!userId) return res.status(400).json({ error: 'Missing userId' });
 
     try {
         const userUpdate = {};

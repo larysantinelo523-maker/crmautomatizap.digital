@@ -688,152 +688,105 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentTenantEmail = email;
 
         showSection('detalhes-empresa');
-        
         document.getElementById('page-title').textContent = "Configurações da empresa";
         document.getElementById('page-subtitle').textContent = "Gerencie as informações, o horário de atendimento e as ações desta empresa.";
 
-        // --- PASSO 1: Exibe dados instantâneos do cache globalTenants enquanto a API carrega ---
-        const tenantCache = globalTenants.find(t => t.id_empresa === id) || {};
-        const displayNome = tenantCache.nome || nome || 'Carregando...';
-        const displayEmail = tenantCache.email || email || '...';
+        // ─── Lê todos os dados do cache globalTenants (já carregado pelo list_tenants) ───
+        const t = globalTenants.find(x => x.id_empresa === id) || {};
 
+        const displayNome  = t.nome  || nome  || '—';
+        const displayEmail = t.email || email || '—';
+
+        // Cabeçalho
         document.getElementById('detalhe-nome-empresa').textContent = displayNome;
-        document.getElementById('detalhe-email-empresa').innerHTML = `<i class="ph-fill ph-envelope-simple"></i> <span>${displayEmail}</span>`;
-        document.getElementById('info-nome').textContent = displayNome;
-        document.getElementById('info-email').textContent = displayEmail;
-        document.getElementById('info-criada-em').textContent = '...';
-        document.getElementById('detalhe-total-leads').textContent = tenantCache.total_leads ?? '...';
-        document.getElementById('detalhe-total-reunioes').textContent = '...';
-        document.getElementById('horarios-list').innerHTML = `<div style="text-align:center;color:var(--color-text-mut);padding:16px;">Carregando horários...</div>`;
+        document.getElementById('detalhe-email-empresa').innerHTML  = `<i class="ph-fill ph-envelope-simple"></i> <span>${displayEmail}</span>`;
+
+        // Localização
+        const localEl = document.getElementById('detalhe-local-empresa');
+        if (t.localizacao) {
+            localEl.innerHTML = `<i class="ph-fill ph-map-pin"></i> <span>${t.localizacao}</span>`;
+            localEl.style.display = 'flex';
+        } else { localEl.style.display = 'none'; }
+
+        // Descrição no cabeçalho
+        const descEl = document.getElementById('detalhe-desc-empresa');
+        if (t.descricao) { descEl.textContent = t.descricao; descEl.style.display = 'block'; }
+        else { descEl.style.display = 'none'; }
 
         // Status badge
-        const badge = document.getElementById('detalhe-status-badge');
         const statusMap = {
-            'vencido': { label: 'Vencida', color: '#ef4444' },
-            'Aviso prévio': { label: 'Aviso Prévio', color: '#f59e0b' },
-            'suspenso': { label: 'Suspensa', color: '#9ca3af' },
-            'pago': { label: 'Pago', color: '#22c55e' },
+            'vencido':      { label: 'Vencida',      color: '#ef4444' },
+            'Aviso prévio': { label: 'Aviso Prévio',  color: '#f59e0b' },
+            'suspenso':     { label: 'Suspensa',      color: '#9ca3af' },
+            'pago':         { label: 'Pago',          color: '#22c55e' },
         };
-        const statusInfo = statusMap[tenantCache.status] || { label: 'Pago', color: '#22c55e' };
-        if (badge) {
-            badge.textContent = statusInfo.label;
-            badge.style.backgroundColor = statusInfo.color;
-        }
+        const sInfo = statusMap[t.status] || { label: 'Pago', color: '#22c55e' };
+        const badge = document.getElementById('detalhe-status-badge');
+        if (badge) { badge.textContent = sInfo.label; badge.style.backgroundColor = sInfo.color; }
 
-        // --- PASSO 2: Busca dados completos da API segura (Service Role Key) ---
-        let apiData = null;
-        try {
-            const res = await fetch(`/api/get_stats?id=${encodeURIComponent(id)}`);
-            if (res.ok) {
-                apiData = await res.json();
-            } else {
-                const errText = await res.text();
-                console.warn('list_tenants?id= retornou erro:', res.status, errText);
-            }
-        } catch (err) {
-            console.error('Erro ao chamar list_tenants?id=:', err);
-        }
+        // KPIs
+        document.getElementById('detalhe-total-leads').textContent    = t.total_leads       ?? 0;
+        document.getElementById('detalhe-total-reunioes').textContent = t.reunioes_marcadas ?? 0;
 
-        // --- PASSO 3: Se a API respondeu, preenche todos os campos com dados reais ---
-        let usuario = null;
-        let horarios = [];
-        
-        if (apiData) {
-            usuario = apiData.usuario;
-            horarios = apiData.horarios || [];
+        // Painel "Informações da Empresa"
+        document.getElementById('info-nome').textContent  = displayNome;
+        document.getElementById('info-email').textContent = displayEmail;
 
-            // Nome e email da empresa
-            const nomeReal = usuario.nome_completo || displayNome;
-            const emailReal = usuario.email || displayEmail;
-            document.getElementById('detalhe-nome-empresa').textContent = nomeReal;
-            document.getElementById('detalhe-email-empresa').innerHTML = `<i class="ph-fill ph-envelope-simple"></i> <span>${emailReal}</span>`;
-            document.getElementById('info-nome').textContent = nomeReal;
-            document.getElementById('info-email').textContent = emailReal;
-
-            // Status atualizado pela API
-            const statusApi = statusMap[apiData.status] || { label: 'Pago', color: '#22c55e' };
-            if (badge) {
-                badge.textContent = statusApi.label;
-                badge.style.backgroundColor = statusApi.color;
-            }
-
-            // Leads e Reuniões
-            document.getElementById('detalhe-total-leads').textContent = apiData.total_leads ?? 0;
-            document.getElementById('detalhe-total-reunioes').textContent = apiData.reunioes_marcadas ?? 0;
-
-            // Localização
-            const localEl = document.getElementById('detalhe-local-empresa');
-            if (usuario.localizacao) {
-                localEl.innerHTML = `<i class="ph-fill ph-map-pin"></i> <span>${usuario.localizacao}</span>`;
-                localEl.style.display = 'flex';
-            } else {
-                localEl.style.display = 'none';
-            }
-
-            // Descrição (no topo do card)
-            const descEl = document.getElementById('detalhe-desc-empresa');
-            if (usuario.descricao) {
-                descEl.textContent = usuario.descricao;
-                descEl.style.display = 'block';
-            } else {
-                descEl.style.display = 'none';
-            }
-
-            // Informações extras do painel
-            const rowWpp = document.getElementById('row-whatsapp');
-            if (rowWpp) {
-                if (usuario.whatsapp) {
-                    document.getElementById('info-whatsapp').textContent = usuario.whatsapp;
-                    rowWpp.style.display = 'flex';
-                } else rowWpp.style.display = 'none';
-            }
-
-            const rowCnpj = document.getElementById('row-cnpj');
-            if (rowCnpj) {
-                if (usuario.cnpj_cpf) {
-                    document.getElementById('info-cnpj').textContent = usuario.cnpj_cpf;
-                    rowCnpj.style.display = 'flex';
-                } else rowCnpj.style.display = 'none';
-            }
-
-            const rowSeg = document.getElementById('row-segmento');
-            if (rowSeg) {
-                if (usuario.segmento) {
-                    document.getElementById('info-segmento').textContent = usuario.segmento;
-                    rowSeg.style.display = 'flex';
-                } else rowSeg.style.display = 'none';
-            }
-
-            const rowDesc = document.getElementById('row-descricao');
-            if (rowDesc) {
-                if (usuario.descricao) {
-                    document.getElementById('info-descricao').textContent = usuario.descricao;
-                    rowDesc.style.display = 'flex';
-                } else rowDesc.style.display = 'none';
-            }
-
-            // Data de criação
-            if (usuario.criado_em) {
-                const dc = new Date(usuario.criado_em);
-                const dataCriada = `${dc.toLocaleDateString('pt-BR', {timeZone:'America/Sao_Paulo'})}`;
-                document.getElementById('info-criada-em').textContent = dataCriada;
-            } else {
-                document.getElementById('info-criada-em').textContent = 'N/A';
-            }
-
+        if (t.criado_em) {
+            const dc = new Date(t.criado_em);
+            document.getElementById('info-criada-em').textContent = dc.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
         } else {
-            // API falhou — escondes o que não temos
-            document.getElementById('detalhe-local-empresa').style.display = 'none';
-            document.getElementById('detalhe-desc-empresa').style.display = 'none';
-            document.getElementById('detalhe-total-reunioes').textContent = '0';
             document.getElementById('info-criada-em').textContent = 'N/A';
         }
 
-        // Salva para uso nos modais (editar, configurar horários, etc.)
-        window.tempUsuario = usuario || { id: id, nome_completo: displayNome, email: displayEmail };
+        const rowWpp = document.getElementById('row-whatsapp');
+        if (rowWpp) {
+            if (t.whatsapp) { document.getElementById('info-whatsapp').textContent = t.whatsapp; rowWpp.style.display = 'flex'; }
+            else rowWpp.style.display = 'none';
+        }
+        const rowCnpj = document.getElementById('row-cnpj');
+        if (rowCnpj) {
+            if (t.cnpj_cpf) { document.getElementById('info-cnpj').textContent = t.cnpj_cpf; rowCnpj.style.display = 'flex'; }
+            else rowCnpj.style.display = 'none';
+        }
+        const rowSeg = document.getElementById('row-segmento');
+        if (rowSeg) {
+            if (t.segmento) { document.getElementById('info-segmento').textContent = t.segmento; rowSeg.style.display = 'flex'; }
+            else rowSeg.style.display = 'none';
+        }
+        const rowDesc = document.getElementById('row-descricao');
+        if (rowDesc) {
+            if (t.descricao) { document.getElementById('info-descricao').textContent = t.descricao; rowDesc.style.display = 'flex'; }
+            else rowDesc.style.display = 'none';
+        }
+
+        // Status box (painel verde/vermelho)
+        const sBoxBadge = document.getElementById('status-box-badge');
+        const sBoxText  = document.getElementById('status-box-text');
+        const sBoxIcon  = document.getElementById('status-box-icon');
+        const sBox      = document.getElementById('status-box');
+        if (sBoxBadge) { sBoxBadge.textContent = sInfo.label; sBoxBadge.style.backgroundColor = sInfo.color; }
+        if (sBoxText)  { sBoxText.textContent = t.status === 'vencido' ? 'Pagamento está em atraso.' : t.status === 'Aviso prévio' ? 'Pagamento próximo do vencimento.' : 'Pagamento em dia.'; }
+        if (sBoxIcon)  { sBoxIcon.style.color = sInfo.color; }
+        if (sBox)      { sBox.style.backgroundColor = sInfo.color + '20'; }
+
+        // Salva para uso nos modais
+        window.tempUsuario = { id: id, nome_completo: displayNome, email: displayEmail, ...t };
+
+        // ─── Busca horários via upsert_horarios?id= (endpoint existente na Vercel) ──
+        let horarios = [];
+        document.getElementById('horarios-list').innerHTML = `<div style="text-align:center;color:var(--color-text-mut);padding:16px;">Carregando horários...</div>`;
+        try {
+            const hRes = await fetch(`/api/upsert_horarios?id=${encodeURIComponent(id)}`);
+            if (hRes.ok) {
+                horarios = await hRes.json();
+            } else {
+                console.warn('upsert_horarios GET retornou:', hRes.status);
+            }
+        } catch (err) {
+            console.warn('Erro ao buscar horários:', err);
+        }
         window.tempHorarios = horarios;
-
-
 
         const hList = document.getElementById('horarios-list');
         hList.innerHTML = '';
