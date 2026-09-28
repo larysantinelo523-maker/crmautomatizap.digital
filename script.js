@@ -575,7 +575,7 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                         });
 
                         newLeads.forEach(l => {
-                            html += `<div style="padding: 12px; border-bottom: 1px solid var(--color-border); cursor: pointer;" onclick="window.location.href='leads.html'">
+                            html += `<div style="padding: 12px; border-bottom: 1px solid var(--color-border); cursor: pointer;" onclick="window.location.href='index.html'">
                                 <div style="font-weight: 600; font-size: 13px; color: var(--color-text); margin-bottom: 4px;"><i class="ph ph-user-plus text-primary"></i> Novo Lead</div>
                                 <div style="font-size: 12px; color: var(--color-text-mut);">Você recebeu um novo lead: ${l.nome}</div>
                             </div>`;
