@@ -687,109 +687,222 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentTenantName = nome;
         currentTenantEmail = email;
 
-        document.getElementById('detalhe-nome-empresa').textContent = nome;
-        document.getElementById('detalhe-email-empresa').textContent = email;
-
-        // Limpar gráficos
-        document.getElementById('admin-chart-line').innerHTML = '<i class="ph ph-spinner-gap"></i> Carregando gráfico...';
-        document.getElementById('admin-map-container').innerHTML = '<i class="ph ph-spinner-gap"></i> Carregando mapa...';
-
         showSection('detalhes-empresa');
+        
+        document.getElementById('page-title').textContent = "Configurações da empresa";
+        document.getElementById('page-subtitle').textContent = "Gerencie as informações, o horário de atendimento e as ações desta empresa.";
 
-        try {
-            const res = await fetch(`/api/get_tenant_stats?id_empresa=${id}`);
-            if (!res.ok) throw new Error("Erro na API");
-
-            const data = await res.json();
-
-            renderAdminLineChart(data.lineChartData.categories, data.lineChartData.series);
-            renderAdminMap(data.mapData);
-
-        } catch (e) {
-            console.error(e);
-            document.getElementById('admin-chart-line').innerHTML = 'Erro ao carregar';
-            document.getElementById('admin-map-container').innerHTML = 'Erro ao carregar';
+        const { data: usuario, error: errorUser } = await supabase.from('usuarios').select('*').eq('id', id).single();
+        if (errorUser) {
+            console.error(errorUser);
+            return;
         }
-    }
 
-    // ApexCharts e Highcharts logic (Similar ao do Relatórios)
-    function renderAdminLineChart(categories, series) {
-        const isDark = document.body.classList.contains('dark-mode');
-        const textColor = isDark ? '#94a3b8' : '#64748b';
+        const { data: horarios, error: errorHorarios } = await supabase.from('horarios_empresa').select('*').eq('id_empresa', id);
 
-        const options = {
-            series: [{ name: "Leads", data: series }],
-            chart: {
-                height: 350,
-                type: 'area',
-                toolbar: { show: false },
-                fontFamily: 'Poppins, sans-serif',
-                background: 'transparent'
-            },
-            colors: ['#00A884'],
-            fill: {
-                type: 'gradient',
-                gradient: {
-                    shadeIntensity: 1,
-                    opacityFrom: 0.4,
-                    opacityTo: 0.05,
-                    stops: [0, 90, 100]
+        document.getElementById('detalhe-nome-empresa').textContent = usuario.nome_completo || nome;
+        document.getElementById('detalhe-email-empresa').innerHTML = `<i class="ph-fill ph-envelope-simple"></i> <span>${usuario.email || email}</span>`;
+        
+        const badge = document.getElementById('detalhe-status-badge');
+        const sBoxIcon = document.getElementById('status-box-icon');
+        const sBoxBadge = document.getElementById('status-box-badge');
+        const sBoxText = document.getElementById('status-box-text');
+
+        let statusStr = "Ativa";
+        let statusColor = "#22c55e";
+        let statusExp = "Pagamento em dia. Empresa funcionando normalmente.";
+        
+        if (usuario.status_assinatura === 'suspenso') {
+            statusStr = "Suspensa";
+            statusColor = "#9ca3af";
+            statusExp = "Empresa suspensa. O acesso ao CRM está bloqueado.";
+        } else {
+            if (usuario.data_vencimento && usuario.data_vencimento !== 'N/A') {
+                const pts = usuario.data_vencimento.split('-');
+                const nextDate = new Date(parseInt(pts[0], 10), parseInt(pts[1], 10) - 1, parseInt(pts[2], 10));
+                const hojeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
+                const hoje = new Date(hojeStr);
+                hoje.setHours(0, 0, 0, 0);
+                const diffDays = Math.ceil((nextDate.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+                
+                if (diffDays < 0) {
+                    statusStr = "Vencida";
+                    statusColor = "#ef4444";
+                    statusExp = "Pagamento está em atraso.";
+                } else if (diffDays <= 3) {
+                    statusStr = "Aviso Prévio";
+                    statusColor = "#f59e0b";
+                    statusExp = `Pagamento vence em ${diffDays} dias.`;
+                    if (diffDays === 0) statusExp = "Pagamento vence hoje.";
                 }
-            },
-            dataLabels: { enabled: false },
-            stroke: { curve: 'smooth', width: 2 },
-            xaxis: {
-                categories: categories,
-                labels: { style: { colors: textColor } },
-                axisBorder: { show: false },
-                axisTicks: { show: false }
-            },
-            yaxis: {
-                labels: { style: { colors: textColor } }
-            },
-            theme: { mode: isDark ? 'dark' : 'light' }
+            }
+        }
+
+        badge.textContent = statusStr;
+        badge.style.backgroundColor = statusColor;
+        sBoxBadge.textContent = statusStr;
+        sBoxBadge.style.backgroundColor = statusColor;
+        sBoxText.textContent = statusExp;
+        document.getElementById('status-box').style.backgroundColor = statusColor + '20';
+        sBoxIcon.style.color = statusColor;
+
+        const localEl = document.getElementById('detalhe-local-empresa');
+        if (usuario.localizacao) {
+            localEl.innerHTML = `<i class="ph-fill ph-map-pin"></i> <span>${usuario.localizacao}</span>`;
+            localEl.style.display = 'flex';
+        } else {
+            localEl.style.display = 'none';
+        }
+
+        const descEl = document.getElementById('detalhe-desc-empresa');
+        if (usuario.descricao) {
+            descEl.textContent = usuario.descricao;
+            descEl.style.display = 'block';
+        } else {
+            descEl.style.display = 'none';
+        }
+
+        document.getElementById('info-nome').textContent = usuario.nome_completo || nome;
+        document.getElementById('info-email').textContent = usuario.email || email;
+        
+        const rowWpp = document.getElementById('row-whatsapp');
+        if (usuario.whatsapp) {
+            document.getElementById('info-whatsapp').textContent = usuario.whatsapp;
+            rowWpp.style.display = 'flex';
+        } else rowWpp.style.display = 'none';
+
+        const rowCnpj = document.getElementById('row-cnpj');
+        if (usuario.cnpj_cpf) {
+            document.getElementById('info-cnpj').textContent = usuario.cnpj_cpf;
+            rowCnpj.style.display = 'flex';
+        } else rowCnpj.style.display = 'none';
+
+        const rowSeg = document.getElementById('row-segmento');
+        if (usuario.segmento) {
+            document.getElementById('info-segmento').textContent = usuario.segmento;
+            rowSeg.style.display = 'flex';
+        } else rowSeg.style.display = 'none';
+
+        const rowDesc = document.getElementById('row-descricao');
+        if (usuario.descricao) {
+            document.getElementById('info-descricao').textContent = usuario.descricao;
+            rowDesc.style.display = 'flex';
+        } else rowDesc.style.display = 'none';
+
+        let dataCriada = "...";
+        if (usuario.criado_em) {
+            const dc = new Date(usuario.criado_em);
+            dataCriada = `${dc.toLocaleDateString('pt-BR')} - ${dc.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}`;
+        }
+        document.getElementById('info-criada-em').textContent = dataCriada;
+
+        const { data: leadsInfo } = await supabase.from('leads').select('id, data_criacao, qualificacao').eq('id_empresa', id);
+        
+        let total30 = 0, total60 = 0, reunioes30 = 0, reunioes60 = 0;
+        if (leadsInfo) {
+            const now = new Date();
+            const date30 = new Date(now.getTime() - 30*24*60*60*1000);
+            const date60 = new Date(now.getTime() - 60*24*60*60*1000);
+
+            leadsInfo.forEach(l => {
+                const dc = new Date(l.data_criacao);
+                if (dc >= date30) {
+                    total30++;
+                    if (l.qualificacao === 'qualificado') reunioes30++;
+                } else if (dc >= date60) {
+                    total60++;
+                    if (l.qualificacao === 'qualificado') reunioes60++;
+                }
+            });
+        }
+        
+        document.getElementById('detalhe-total-leads').textContent = total30;
+        document.getElementById('detalhe-total-reunioes').textContent = reunioes30;
+
+        const updateVar = (idVar, cur, prev) => {
+            const el = document.getElementById(idVar);
+            if (prev === 0) {
+                el.innerHTML = `<span style="color: var(--color-text-mut); font-weight: 400;">(Últimos 30 dias)</span>`;
+            } else {
+                const pct = ((cur - prev) / prev) * 100;
+                const isPos = pct >= 0;
+                const color = isPos ? '#16a34a' : '#dc2626';
+                const icon = isPos ? 'ph-trend-up' : 'ph-trend-down';
+                el.innerHTML = `<i class="ph-fill ${icon}" style="color: ${color}"></i> <span style="color: ${color}">${isPos?'+':''}${pct.toFixed(0)}%</span> <span style="color: var(--color-text-mut); font-weight: 400; margin-left:4px;">(Últimos 30 dias)</span>`;
+            }
         };
 
-        const container = document.getElementById("admin-chart-line");
-        container.innerHTML = '';
+        updateVar('detalhe-var-leads', total30, total60);
+        updateVar('detalhe-var-reunioes', reunioes30, reunioes60);
 
-        if (adminChartInstance) adminChartInstance.destroy();
-        adminChartInstance = new ApexCharts(container, options);
-        adminChartInstance.render();
-    }
+        const hList = document.getElementById('horarios-list');
+        hList.innerHTML = '';
+        if (!horarios || horarios.length === 0) {
+            hList.innerHTML = `
+                <div style="background-color: var(--color-bg); padding: 16px; border-radius: 8px; border: 1px dashed var(--color-border); text-align: center;">
+                    <p style="font-weight: 600; color: var(--color-text-main); margin-bottom: 4px;">Horário não configurado</p>
+                    <p style="font-size: 13px; color: var(--color-text-mut);">Sem horário, a métrica 'Atendidos fora do horário' fica desligada pra esta empresa.</p>
+                </div>
+            `;
+        } else {
+            const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+            for (let i = 1; i <= 7; i++) {
+                const idx = i === 7 ? 0 : i;
+                const ds = dias[idx];
+                const cfg = horarios.find(h => h.dia_semana === idx);
+                const isOpen = cfg && cfg.aberto;
+                const timeText = isOpen ? `${cfg.hora_abertura.substring(0,5)} - ${cfg.hora_fechamento.substring(0,5)}` : 'Fechado';
+                const toggleColor = isOpen ? '#22c55e' : '#e2e8f0';
+                const toggleKnob = isOpen ? 'right: 2px;' : 'left: 2px;';
+                
+                hList.innerHTML += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background-color: var(--color-bg); border-radius: 8px;">
+                        <span style="font-weight: 600; color: var(--color-text-main); width: 80px;">${ds}</span>
+                        <span style="color: ${isOpen ? 'var(--color-text-main)' : 'var(--color-text-mut)'}; font-size: 14px;">${timeText}</span>
+                        <div style="position: relative; width: 40px; height: 24px; background-color: ${toggleColor}; border-radius: 12px; transition: 0.2s;">
+                            <div style="position: absolute; top: 2px; ${toggleKnob} width: 20px; height: 20px; background-color: white; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"></div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
 
-    async function renderAdminMap(data) {
-        const isDark = document.body.classList.contains('dark-mode');
-        const mapConfig = {
-            chart: {
-                map: 'countries/br/br-all',
-                backgroundColor: 'transparent',
-                style: { fontFamily: 'Poppins, sans-serif' }
-            },
-            title: { text: null },
-            mapNavigation: {
-                enabled: true,
-                buttonOptions: { verticalAlign: 'bottom' }
-            },
-            colorAxis: {
-                min: 0,
-                minColor: isDark ? '#1a1d2d' : '#f1f5f9',
-                maxColor: '#00A884'
-            },
-            series: [{
-                data: data,
-                name: 'Leads',
-                states: { hover: { color: '#25D366' } },
-                dataLabels: {
-                    enabled: true,
-                    format: '{point.name}',
-                    style: { color: isDark ? '#fff' : '#333' }
+        const btnSuspender = document.getElementById('btn-suspender-empresa');
+        const iconSuspender = document.getElementById('icon-suspender');
+        const txtSuspender = document.getElementById('text-suspender');
+
+        if (usuario.status_assinatura === 'suspenso') {
+            btnSuspender.style.backgroundColor = '#dcfce7';
+            btnSuspender.style.color = '#16a34a';
+            iconSuspender.className = 'ph-fill ph-play-circle';
+            txtSuspender.textContent = 'Reativar Empresa';
+            btnSuspender.onclick = () => toggleStatus(id, 'ativo');
+        } else {
+            btnSuspender.style.backgroundColor = '#fee2e2';
+            btnSuspender.style.color = '#dc2626';
+            iconSuspender.className = 'ph-fill ph-pause-circle';
+            txtSuspender.textContent = 'Suspender Empresa';
+            btnSuspender.onclick = () => {
+                if (confirm('Tem certeza que deseja suspender esta empresa? O acesso ao CRM será bloqueado.')) {
+                    toggleStatus(id, 'suspenso');
                 }
-            }],
-            credits: { enabled: false }
-        };
+            };
+        }
 
-        Highcharts.mapChart('admin-map-container', mapConfig);
+        document.getElementById('edit-nome').value = usuario.nome_completo || '';
+        document.getElementById('edit-email').value = usuario.email || '';
+        document.getElementById('edit-mensalidade').value = usuario.mensalidade || '';
+        document.getElementById('edit-vencimento').value = (usuario.data_vencimento && usuario.data_vencimento !== 'N/A') ? usuario.data_vencimento : '';
+        document.getElementById('edit-whatsapp').value = usuario.whatsapp || '';
+        document.getElementById('edit-cnpj').value = usuario.cnpj_cpf || '';
+        document.getElementById('edit-segmento').value = usuario.segmento || '';
+        document.getElementById('edit-localizacao').value = usuario.localizacao || '';
+        document.getElementById('edit-descricao').value = usuario.descricao || '';
+        
+        document.getElementById('config-fuso').value = usuario.fuso_horario || 'America/Recife';
+        document.getElementById('config-horas-parado').value = usuario.horas_lead_parado || 24;
+
+        renderConfigDias(horarios || []);
     }
 
     // Lógica do Modal de Cadastrar Empresa
@@ -908,5 +1021,183 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         btn.disabled = false;
         btn.textContent = 'Atualizar Senha Master';
+    });
+
+    // --- Lógica Modais de Empresa ---
+    async function toggleStatus(id, newStatus) {
+        try {
+            if (newStatus === 'suspenso') {
+                const res = await fetch('/api/suspend_tenant', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id_empresa: id})
+                });
+                if (!res.ok) throw new Error('Erro ao suspender na API Serverless');
+            }
+            
+            const { error } = await supabase.from('usuarios').update({status_assinatura: newStatus}).eq('id', id);
+            if (error) throw error;
+            
+            alert(`Empresa ${newStatus === 'suspenso' ? 'suspensa' : 'reativada'} com sucesso!`);
+            loadTenantDetails(id, currentTenantName, currentTenantEmail);
+            loadTenantsList();
+        } catch(e) {
+            alert(e.message);
+        }
+    }
+
+    function renderConfigDias(horarios) {
+        const container = document.getElementById('config-dias-container');
+        container.innerHTML = '';
+        const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        
+        for (let i = 1; i <= 7; i++) {
+            const idx = i === 7 ? 0 : i;
+            const ds = dias[idx];
+            const cfg = horarios.find(h => h.dia_semana === idx) || { aberto: false, hora_abertura: '09:00', hora_fechamento: '18:00' };
+            
+            container.innerHTML += `
+                <div class="config-dia-row" data-dia="${idx}" style="display: flex; align-items: center; gap: 16px; background: var(--color-bg); padding: 12px 16px; border-radius: 8px; border: 1px solid var(--color-border);">
+                    <label style="width: 100px; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" class="cb-aberto" ${cfg.aberto ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: var(--color-primary);">
+                        <span style="font-weight: 500; font-size: 14px;">${ds}</span>
+                    </label>
+                    <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                        <input type="time" class="form-control time-abertura" value="${cfg.hora_abertura.substring(0,5)}" ${cfg.aberto ? '' : 'disabled'} style="width: 100%;">
+                        <span style="color: var(--color-text-mut);">às</span>
+                        <input type="time" class="form-control time-fechamento" value="${cfg.hora_fechamento.substring(0,5)}" ${cfg.aberto ? '' : 'disabled'} style="width: 100%;">
+                    </div>
+                </div>
+            `;
+        }
+
+        container.querySelectorAll('.cb-aberto').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                const row = e.target.closest('.config-dia-row');
+                const tA = row.querySelector('.time-abertura');
+                const tF = row.querySelector('.time-fechamento');
+                tA.disabled = !e.target.checked;
+                tF.disabled = !e.target.checked;
+            });
+        });
+    }
+
+    const modalEdit = document.getElementById('modal-editar-empresa');
+    const modalSenha = document.getElementById('modal-alterar-senha');
+    const modalConfig = document.getElementById('modal-configurar-horario');
+
+    document.getElementById('btn-editar-empresa').addEventListener('click', () => modalEdit.classList.add('active'));
+    document.getElementById('btn-modal-senha').addEventListener('click', () => modalSenha.classList.add('active'));
+    document.getElementById('btn-configurar-horario').addEventListener('click', () => modalConfig.classList.add('active'));
+
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.target.closest('.modal').classList.remove('active');
+        });
+    });
+
+    document.querySelectorAll('.modal').forEach(m => {
+        m.addEventListener('click', (e) => {
+            if (e.target === m) m.classList.remove('active');
+        });
+    });
+
+    document.getElementById('form-edit-tenant').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-save-edit');
+        btn.disabled = true;
+        btn.textContent = 'Salvando...';
+
+        const payload = {
+            nome_completo: document.getElementById('edit-nome').value,
+            email: document.getElementById('edit-email').value,
+            mensalidade: document.getElementById('edit-mensalidade').value,
+            data_vencimento: document.getElementById('edit-vencimento').value || 'N/A',
+            whatsapp: document.getElementById('edit-whatsapp').value,
+            cnpj_cpf: document.getElementById('edit-cnpj').value,
+            segmento: document.getElementById('edit-segmento').value,
+            localizacao: document.getElementById('edit-localizacao').value,
+            descricao: document.getElementById('edit-descricao').value,
+        };
+
+        const { error } = await supabase.from('usuarios').update(payload).eq('id', currentTenantId);
+        
+        btn.disabled = false;
+        btn.textContent = 'Salvar Alterações';
+
+        if (error) alert('Erro: ' + error.message);
+        else {
+            modalEdit.classList.remove('active');
+            loadTenantDetails(currentTenantId, payload.nome_completo, payload.email);
+            loadTenantsList();
+        }
+    });
+
+    document.getElementById('form-alterar-senha').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const s1 = document.getElementById('nova-senha-cliente').value;
+        const s2 = document.getElementById('nova-senha-cliente-confirm').value;
+
+        if (s1 !== s2) {
+            alert('As senhas não coincidem!');
+            return;
+        }
+
+        const btn = document.getElementById('btn-save-senha');
+        btn.disabled = true;
+        btn.textContent = 'Atualizando...';
+
+        try {
+            const res = await fetch('/api/change_tenant_password', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id_empresa: currentTenantId, new_password: s1 })
+            });
+            if (!res.ok) throw new Error('Erro ao alterar senha');
+            
+            modalSenha.classList.remove('active');
+            alert('Senha alterada com sucesso!');
+            document.getElementById('form-alterar-senha').reset();
+        } catch(err) {
+            alert(err.message);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Salvar Nova Senha';
+        }
+    });
+
+    document.getElementById('form-config-horario').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-save-horario');
+        btn.disabled = true;
+        btn.textContent = 'Salvando...';
+
+        const fuso = document.getElementById('config-fuso').value;
+        const horasParado = document.getElementById('config-horas-parado').value;
+
+        await supabase.from('usuarios').update({ fuso_horario: fuso, horas_lead_parado: horasParado }).eq('id', currentTenantId);
+
+        const rows = document.querySelectorAll('.config-dia-row');
+        const novosHorarios = [];
+        rows.forEach(r => {
+            novosHorarios.push({
+                id_empresa: currentTenantId,
+                dia_semana: parseInt(r.getAttribute('data-dia')),
+                aberto: r.querySelector('.cb-aberto').checked,
+                hora_abertura: r.querySelector('.time-abertura').value,
+                hora_fechamento: r.querySelector('.time-fechamento').value
+            });
+        });
+
+        const { error } = await supabase.from('horarios_empresa').upsert(novosHorarios, { onConflict: 'id_empresa, dia_semana' });
+        
+        btn.disabled = false;
+        btn.textContent = 'Salvar Horários';
+
+        if (error) alert('Erro: ' + error.message);
+        else {
+            modalConfig.classList.remove('active');
+            loadTenantDetails(currentTenantId, currentTenantName, currentTenantEmail);
+        }
     });
 });

@@ -411,46 +411,140 @@
                 </section>
                 
                 <!-- Secao Detalhes da Empresa (Mini Dashboard) -->
+                <!-- Secao Detalhes da Empresa (Mini Dashboard) -->
                 <section id="sec-detalhes-empresa" class="admin-section">
                     <button class="btn btn-outline" id="btn-voltar-empresas" style="margin-bottom: 24px;">
                         <i class="ph ph-arrow-left"></i> Voltar para Lista
                     </button>
                     
-                    <div class="card" style="margin-bottom: 24px;">
-                        <h2 id="detalhe-nome-empresa" style="margin-bottom: 8px;">Empresa</h2>
-                        <p id="detalhe-email-empresa" style="color: var(--color-text-mut);">email@empresa.com</p>
-                    </div>
-
-                    <!-- Gráficos Idênticos aos Relatórios -->
-                    <div class="charts-row">
-                        <div class="card chart-card">
-                            <div class="card-header">
-                                <div class="card-title">
-                                    <i class="ph ph-trend-up text-primary"></i>
-                                    <div>
-                                        <h3>Leads ao longo do tempo</h3>
-                                        <p>Volume de leads recebidos da empresa.</p>
+                    <div class="company-summary-card card" style="margin-bottom: 24px; padding: 0; overflow: hidden;">
+                        <div style="display: flex; flex-wrap: wrap;">
+                            <!-- Col 1 -->
+                            <div style="flex: 1.5; min-width: 300px; padding: 24px; border-right: 1px solid var(--color-border); display: flex; align-items: flex-start; gap: 16px; position: relative;">
+                                <div class="icon-wrapper" style="background: #dcfce7; color: #16a34a; width: 64px; height: 64px; font-size: 32px; border-radius: 16px;"><i class="ph ph-buildings"></i></div>
+                                <div style="flex: 1;">
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                        <h2 id="detalhe-nome-empresa" style="margin: 0; font-size: 20px;">Carregando...</h2>
+                                        <span id="detalhe-status-badge" style="background-color: #22c55e; color: white; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600;">...</span>
                                     </div>
+                                    <p id="detalhe-email-empresa" style="color: var(--color-text-mut); margin-bottom: 4px; display: flex; align-items: center; gap: 4px;"><i class="ph ph-envelope-simple"></i> <span>...</span></p>
+                                    <p id="detalhe-local-empresa" style="color: var(--color-text-mut); margin-bottom: 8px; display: flex; align-items: center; gap: 4px; display: none;"><i class="ph ph-map-pin"></i> <span>...</span></p>
+                                    <p id="detalhe-desc-empresa" style="color: var(--color-text-mut); font-size: 13px; line-height: 1.4; display: none;">...</p>
+                                </div>
+                                <button class="btn btn-outline" id="btn-editar-empresa" style="position: absolute; top: 24px; right: 24px; padding: 6px 12px; font-size: 13px; color: var(--color-primary); border-color: var(--color-primary);">
+                                    <i class="ph ph-pencil-simple"></i> Editar Empresa
+                                </button>
+                            </div>
+                            <!-- Col 2 -->
+                            <div style="flex: 1; min-width: 200px; padding: 24px; border-right: 1px solid var(--color-border); display: flex; align-items: flex-start; gap: 16px;">
+                                <div class="icon-wrapper" style="background: #dcfce7; color: #16a34a; width: 48px; height: 48px; border-radius: 50%;"><i class="ph-fill ph-chat-circle"></i></div>
+                                <div>
+                                    <p style="color: var(--color-text-main); font-weight: 600; margin-bottom: 4px; font-size: 14px;">Total de Leads</p>
+                                    <h2 id="detalhe-total-leads" style="font-size: 28px; margin-bottom: 4px;">0</h2>
+                                    <p id="detalhe-var-leads" style="font-size: 12px; color: var(--color-text-mut); display: flex; align-items: center; gap: 4px; font-weight: 500;"><span style="color: var(--color-text-mut); font-weight: 400;">(Últimos 30 dias)</span></p>
                                 </div>
                             </div>
-                            <div class="chart-container" id="admin-chart-line" style="min-height: 300px; display: flex; align-items: center; justify-content: center; color: var(--color-text-mut);">
-                                Carregando gráfico...
+                            <!-- Col 3 -->
+                            <div style="flex: 1; min-width: 200px; padding: 24px; display: flex; align-items: flex-start; gap: 16px;">
+                                <div class="icon-wrapper" style="background: #dcfce7; color: #16a34a; width: 48px; height: 48px; border-radius: 50%;"><i class="ph-fill ph-calendar-check"></i></div>
+                                <div>
+                                    <p style="color: var(--color-text-main); font-weight: 600; margin-bottom: 4px; font-size: 14px;">Reuniões Agendadas</p>
+                                    <h2 id="detalhe-total-reunioes" style="font-size: 28px; margin-bottom: 4px;">0</h2>
+                                    <p id="detalhe-var-reunioes" style="font-size: 12px; color: var(--color-text-mut); display: flex; align-items: center; gap: 4px; font-weight: 500;"><span style="color: var(--color-text-mut); font-weight: 400;">(Últimos 30 dias)</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+                        <!-- Left -->
+                        <div class="card" style="display: flex; flex-direction: column; gap: 16px;">
+                            <div class="card-title" style="margin-bottom: 8px;">
+                                <i class="ph-fill ph-buildings text-primary"></i>
+                                <h3>Informações da Empresa</h3>
+                            </div>
+                            
+                            <div id="info-linhas" style="display: flex; flex-direction: column;">
+                                <div class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
+                                    <span style="color: var(--color-text-mut); font-size: 14px;">Nome da empresa</span>
+                                    <span id="info-nome" style="font-weight: 500; font-size: 14px;">...</span>
+                                </div>
+                                <div class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
+                                    <span style="color: var(--color-text-mut); font-size: 14px;">Email de contato</span>
+                                    <span id="info-email" style="font-weight: 500; font-size: 14px;">...</span>
+                                </div>
+                                <div id="row-whatsapp" class="info-row" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--color-border); display: none;">
+                                    <span style="color: var(--color-text-mut); font-size: 14px;">WhatsApp</span>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <i class="ph-fill ph-whatsapp-logo" style="color: #25D366; font-size: 18px;"></i>
+                                        <span id="info-whatsapp" style="font-weight: 500; font-size: 14px;">...</span>
+                                        <button class="btn btn-outline" style="padding: 2px 8px; font-size: 11px; border-color: var(--color-primary); color: var(--color-primary);" onclick="navigator.clipboard.writeText(document.getElementById('info-whatsapp').innerText)">Copiar</button>
+                                    </div>
+                                </div>
+                                <div id="row-cnpj" class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border); display: none;">
+                                    <span style="color: var(--color-text-mut); font-size: 14px;">CNPJ / CPF</span>
+                                    <span id="info-cnpj" style="font-weight: 500; font-size: 14px;">...</span>
+                                </div>
+                                <div id="row-segmento" class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border); display: none;">
+                                    <span style="color: var(--color-text-mut); font-size: 14px;">Segmento</span>
+                                    <span id="info-segmento" style="font-weight: 500; font-size: 14px;">...</span>
+                                </div>
+                                <div id="row-descricao" class="info-row" style="display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-bottom: 1px solid var(--color-border); display: none;">
+                                    <span style="color: var(--color-text-mut); font-size: 14px;">Descrição</span>
+                                    <span id="info-descricao" style="font-weight: 500; font-size: 13px; line-height: 1.4;">...</span>
+                                </div>
+                                <div class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
+                                    <span style="color: var(--color-text-mut); font-size: 14px;">Criada em</span>
+                                    <span id="info-criada-em" style="font-weight: 500; font-size: 14px;">...</span>
+                                </div>
+                            </div>
+                            
+                            <div id="status-box" style="background-color: #dcfce7; border-radius: 8px; padding: 16px; margin-top: 8px;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <i class="ph-fill ph-credit-card text-primary" id="status-box-icon" style="font-size: 20px;"></i>
+                                    <h4 style="margin: 0; color: var(--color-text-main); font-size: 14px;">Status da empresa</h4>
+                                    <span id="status-box-badge" style="background-color: #22c55e; color: white; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600;">...</span>
+                                </div>
+                                <p id="status-box-text" style="color: var(--color-text-mut); font-size: 13px; margin: 0; margin-top: 8px;">...</p>
                             </div>
                         </div>
 
-                        <div class="card chart-card">
-                            <div class="card-header">
-                                <div class="card-title">
-                                    <i class="ph ph-map-pin text-primary"></i>
-                                    <div>
-                                        <h3>Leads por Estado</h3>
-                                        <p>Distribuição geográfica.</p>
+                        <!-- Right -->
+                        <div style="display: flex; flex-direction: column; gap: 24px;">
+                            
+                            <!-- Horário Comercial -->
+                            <div class="card">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                    <div class="card-title" style="margin: 0;">
+                                        <i class="ph-fill ph-clock text-primary"></i>
+                                        <h3 style="margin: 0;">Horário Comercial</h3>
                                     </div>
+                                    <button class="btn btn-outline" id="btn-configurar-horario" style="padding: 6px 12px; font-size: 13px; color: var(--color-primary); border-color: var(--color-primary);">
+                                        <i class="ph ph-pencil-simple"></i> Configurar
+                                    </button>
+                                </div>
+                                
+                                <div id="horarios-list" style="display: flex; flex-direction: column; gap: 12px;">
+                                    <!-- JS vai inserir aqui -->
                                 </div>
                             </div>
-                            <div class="chart-container" id="admin-map-container" style="min-height: 300px; display: flex; align-items: center; justify-content: center; color: var(--color-text-mut);">
-                                Carregando mapa...
+
+                            <!-- Ações Rápidas -->
+                            <div class="card">
+                                <div class="card-title" style="margin-bottom: 16px;">
+                                    <i class="ph-fill ph-lightning text-primary"></i>
+                                    <h3>Ações Rápidas</h3>
+                                </div>
+                                <div style="display: flex; gap: 16px;">
+                                    <button class="btn" id="btn-modal-senha" style="flex: 1; background-color: #dcfce7; color: #16a34a; border: none; padding: 12px; font-weight: 600; font-size: 13px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                                        <i class="ph-fill ph-lock-key" style="font-size: 20px;"></i> Alterar Senha
+                                    </button>
+                                    <button class="btn" id="btn-suspender-empresa" style="flex: 1; background-color: #fee2e2; color: #dc2626; border: none; padding: 12px; font-weight: 600; font-size: 13px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                                        <i class="ph-fill ph-pause-circle" id="icon-suspender" style="font-size: 20px;"></i> <span id="text-suspender">Suspender</span>
+                                    </button>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </section>
@@ -529,6 +623,165 @@
                         </button>
                     </div>
                     <div id="tenant-msg" style="margin-top: 16px; font-weight: 600; text-align: center;"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Empresa -->
+    <div id="modal-editar-empresa" class="modal">
+        <div class="modal-content" style="max-width: 500px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2>Editar Empresa</h2>
+                <button class="close-modal"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-edit-tenant" class="login-form">
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Nome da Empresa</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-building"></i>
+                            <input type="text" id="edit-nome" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">E-mail</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-envelope-simple"></i>
+                            <input type="email" id="edit-email" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Valor da Cobrança</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-currency-dollar"></i>
+                            <input type="text" id="edit-mensalidade" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Vencimento</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-calendar"></i>
+                            <input type="date" id="edit-vencimento" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-top: 24px; margin-bottom: 16px; color: var(--color-text-main);">Informações Opcionais</h4>
+                    
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">WhatsApp</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-whatsapp-logo"></i>
+                            <input type="text" id="edit-whatsapp" class="form-control" placeholder="(00) 00000-0000">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">CNPJ / CPF</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-identification-card"></i>
+                            <input type="text" id="edit-cnpj" class="form-control" placeholder="00.000.000/0000-00">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Segmento</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-tag"></i>
+                            <input type="text" id="edit-segmento" class="form-control" placeholder="Ex: Saúde / Serviços">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Localização</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-map-pin"></i>
+                            <input type="text" id="edit-localizacao" class="form-control" placeholder="Ex: São Paulo, SP">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Descrição</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-text-align-left"></i>
+                            <textarea id="edit-descricao" class="form-control" placeholder="Breve descrição da empresa" style="height: 80px; padding-top: 12px; resize: none;"></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="btn-save-edit" style="width: 100%; margin-top: 16px;">
+                        Salvar Alterações
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Alterar Senha -->
+    <div id="modal-alterar-senha" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Alterar Senha do Cliente</h2>
+                <button class="close-modal"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-alterar-senha" class="login-form">
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Nova Senha</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-lock-key"></i>
+                            <input type="password" id="nova-senha-cliente" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Confirmar Nova Senha</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-lock-key"></i>
+                            <input type="password" id="nova-senha-cliente-confirm" class="form-control" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="btn-save-senha" style="width: 100%; margin-top: 16px;">
+                        Salvar Nova Senha
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Configurar Horário -->
+    <div id="modal-configurar-horario" class="modal">
+        <div class="modal-content" style="max-width: 500px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2>Configurar Horário Comercial</h2>
+                <button class="close-modal"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-config-horario" class="login-form">
+                    
+                    <div style="display: flex; gap: 16px; margin-bottom: 24px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label style="color: var(--color-text-mut); font-size: 13px;">Fuso Horário</label>
+                            <div class="input-wrapper">
+                                <i class="ph ph-globe"></i>
+                                <select id="config-fuso" class="form-control" style="appearance: auto; padding-left: 40px;">
+                                    <option value="America/Recife">America/Recife</option>
+                                    <option value="America/Sao_Paulo">America/Sao_Paulo</option>
+                                    <option value="America/Manaus">America/Manaus</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label style="color: var(--color-text-mut); font-size: 13px;">Lead parado após (horas)</label>
+                            <div class="input-wrapper">
+                                <i class="ph ph-hourglass"></i>
+                                <input type="number" id="config-horas-parado" class="form-control" min="1" value="24" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-bottom: 16px; color: var(--color-text-main);">Dias da Semana</h4>
+                    <div id="config-dias-container" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                        <!-- Renderizado via JS -->
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="btn-save-horario" style="width: 100%;">
+                        Salvar Horários
+                    </button>
                 </form>
             </div>
         </div>
