@@ -992,11 +992,24 @@ body.dark-mode .dropdown-item:hover {
     overflow: hidden;
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
+    position: sticky;
+    top: 104px;
+    height: fit-content;
+    max-height: calc(100vh - 128px);
 }
 
 .dashboard-grid.has-dossier .side-column {
     opacity: 1;
-    overflow: visible;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.side-column::-webkit-scrollbar {
+    width: 4px;
+}
+.side-column::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: 4px;
 }
 
 /* ==========================================================================
