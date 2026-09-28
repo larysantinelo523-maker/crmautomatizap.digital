@@ -1,6 +1,6 @@
 const { createClient } = require('@supabase/supabase-js');
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
     const { id_empresa, status } = req.body; // status opcional
 
