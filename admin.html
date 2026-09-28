@@ -453,46 +453,36 @@
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch;">
                         <!-- Left -->
-                        <div class="card" style="display: flex; flex-direction: column; gap: 16px;">
-                            <div class="card-title" style="margin-bottom: 8px;">
-                                <i class="ph-fill ph-buildings text-primary"></i>
-                                <h3>Informações da Empresa</h3>
-                            </div>
-                            
-                            <div id="info-linhas" style="display: flex; flex-direction: column;">
-                                <div class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
-                                    <span style="color: var(--color-text-mut); font-size: 14px;">Nome da empresa</span>
-                                    <span id="info-nome" style="font-weight: 500; font-size: 14px;">...</span>
+                        <div class="card" style="display: flex; flex-direction: column; gap: 16px; height: 100%;">
+                            <div style="flex: 1;">
+                                <div class="card-title" style="margin-bottom: 8px;">
+                                    <i class="ph-fill ph-buildings text-primary"></i>
+                                    <h3>Informações da Empresa</h3>
                                 </div>
-                                <div class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
-                                    <span style="color: var(--color-text-mut); font-size: 14px;">Email de contato</span>
-                                    <span id="info-email" style="font-weight: 500; font-size: 14px;">...</span>
-                                </div>
-                                <div id="row-whatsapp" class="info-row" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--color-border); display: none;">
-                                    <span style="color: var(--color-text-mut); font-size: 14px;">WhatsApp</span>
-                                    <div style="display: flex; align-items: center; gap: 8px;">
-                                        <i class="ph-fill ph-whatsapp-logo" style="color: #25D366; font-size: 18px;"></i>
-                                        <span id="info-whatsapp" style="font-weight: 500; font-size: 14px;">...</span>
-                                        <button class="btn btn-outline" style="padding: 2px 8px; font-size: 11px; border-color: var(--color-primary); color: var(--color-primary);" onclick="navigator.clipboard.writeText(document.getElementById('info-whatsapp').innerText)">Copiar</button>
+                                
+                                <div id="info-linhas" style="display: flex; flex-direction: column;">
+                                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
+                                        <span style="color: var(--color-text-mut); font-size: 14px;">Nome da empresa</span>
+                                        <span id="info-nome" style="font-weight: 500; font-size: 14px;">...</span>
                                     </div>
-                                </div>
-                                <div id="row-cnpj" class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border); display: none;">
-                                    <span style="color: var(--color-text-mut); font-size: 14px;">CNPJ / CPF</span>
-                                    <span id="info-cnpj" style="font-weight: 500; font-size: 14px;">...</span>
-                                </div>
-                                <div id="row-segmento" class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border); display: none;">
-                                    <span style="color: var(--color-text-mut); font-size: 14px;">Segmento</span>
-                                    <span id="info-segmento" style="font-weight: 500; font-size: 14px;">...</span>
-                                </div>
-                                <div id="row-descricao" class="info-row" style="display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-bottom: 1px solid var(--color-border); display: none;">
-                                    <span style="color: var(--color-text-mut); font-size: 14px;">Descrição</span>
-                                    <span id="info-descricao" style="font-weight: 500; font-size: 13px; line-height: 1.4;">...</span>
-                                </div>
-                                <div class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
-                                    <span style="color: var(--color-text-mut); font-size: 14px;">Criada em</span>
-                                    <span id="info-criada-em" style="font-weight: 500; font-size: 14px;">...</span>
+                                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
+                                        <span style="color: var(--color-text-mut); font-size: 14px;">Email de contato</span>
+                                        <span id="info-email" style="font-weight: 500; font-size: 14px;">...</span>
+                                    </div>
+                                    <div id="row-segmento" class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
+                                        <span style="color: var(--color-text-mut); font-size: 14px;">Segmento</span>
+                                        <span id="info-segmento" style="font-weight: 500; font-size: 14px;">...</span>
+                                    </div>
+                                    <div id="row-descricao" class="info-row" style="display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
+                                        <span style="color: var(--color-text-mut); font-size: 14px;">Descrição</span>
+                                        <span id="info-descricao" style="font-weight: 500; font-size: 13px; line-height: 1.4;">...</span>
+                                    </div>
+                                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 12px 0;">
+                                        <span style="color: var(--color-text-mut); font-size: 14px;">Criada em</span>
+                                        <span id="info-criada-em" style="font-weight: 500; font-size: 14px;">...</span>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -525,14 +515,17 @@
                             </div>
 
                             <!-- Ações Rápidas -->
-                            <div class="card">
+                            <div class="card" style="display: flex; flex-direction: column;">
                                 <div class="card-title" style="margin-bottom: 16px;">
                                     <i class="ph-fill ph-lightning text-primary"></i>
                                     <h3>Ações Rápidas</h3>
                                 </div>
                                 <div style="display: flex; gap: 16px;">
+                                    <button class="btn" id="btn-editar-empresa" style="flex: 1; background-color: var(--color-bg); border: 1px solid var(--color-primary); color: var(--color-primary); padding: 12px; font-weight: 600; font-size: 13px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                                        <i class="ph-fill ph-pencil-simple" style="font-size: 20px;"></i> Editar
+                                    </button>
                                     <button class="btn" id="btn-modal-senha" style="flex: 1; background-color: #dcfce7; color: #16a34a; border: none; padding: 12px; font-weight: 600; font-size: 13px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
-                                        <i class="ph-fill ph-lock-key" style="font-size: 20px;"></i> Alterar Senha
+                                        <i class="ph-fill ph-lock-key" style="font-size: 20px;"></i> Senha
                                     </button>
                                     <button class="btn" id="btn-suspender-empresa" style="flex: 1; background-color: #fee2e2; color: #dc2626; border: none; padding: 12px; font-weight: 600; font-size: 13px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
                                         <i class="ph-fill ph-pause-circle" id="icon-suspender" style="font-size: 20px;"></i> <span id="text-suspender">Suspender</span>
@@ -664,31 +657,10 @@
                     <h4 style="margin-top: 24px; margin-bottom: 16px; color: var(--color-text-main);">Informações Opcionais</h4>
                     
                     <div class="form-group">
-                        <label style="color: var(--color-text-mut);">WhatsApp</label>
-                        <div class="input-wrapper">
-                            <i class="ph ph-whatsapp-logo"></i>
-                            <input type="text" id="edit-whatsapp" class="form-control" placeholder="(00) 00000-0000">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label style="color: var(--color-text-mut);">CNPJ / CPF</label>
-                        <div class="input-wrapper">
-                            <i class="ph ph-identification-card"></i>
-                            <input type="text" id="edit-cnpj" class="form-control" placeholder="00.000.000/0000-00">
-                        </div>
-                    </div>
-                    <div class="form-group">
                         <label style="color: var(--color-text-mut);">Segmento</label>
                         <div class="input-wrapper">
                             <i class="ph ph-tag"></i>
                             <input type="text" id="edit-segmento" class="form-control" placeholder="Ex: Saúde / Serviços">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label style="color: var(--color-text-mut);">Localização</label>
-                        <div class="input-wrapper">
-                            <i class="ph ph-map-pin"></i>
-                            <input type="text" id="edit-localizacao" class="form-control" placeholder="Ex: São Paulo, SP">
                         </div>
                     </div>
                     <div class="form-group">

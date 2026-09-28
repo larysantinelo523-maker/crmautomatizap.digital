@@ -739,25 +739,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('info-criada-em').textContent = 'N/A';
         }
 
-        const rowWpp = document.getElementById('row-whatsapp');
-        if (rowWpp) {
-            if (t.whatsapp) { document.getElementById('info-whatsapp').textContent = t.whatsapp; rowWpp.style.display = 'flex'; }
-            else rowWpp.style.display = 'none';
-        }
-        const rowCnpj = document.getElementById('row-cnpj');
-        if (rowCnpj) {
-            if (t.cnpj_cpf) { document.getElementById('info-cnpj').textContent = t.cnpj_cpf; rowCnpj.style.display = 'flex'; }
-            else rowCnpj.style.display = 'none';
-        }
+
         const rowSeg = document.getElementById('row-segmento');
         if (rowSeg) {
-            if (t.segmento) { document.getElementById('info-segmento').textContent = t.segmento; rowSeg.style.display = 'flex'; }
-            else rowSeg.style.display = 'none';
+            document.getElementById('info-segmento').textContent = t.segmento ? t.segmento : 'Não informado';
+            if (!t.segmento) document.getElementById('info-segmento').style.color = 'var(--color-text-mut)';
+            else document.getElementById('info-segmento').style.color = 'var(--color-text-main)';
         }
         const rowDesc = document.getElementById('row-descricao');
         if (rowDesc) {
-            if (t.descricao) { document.getElementById('info-descricao').textContent = t.descricao; rowDesc.style.display = 'flex'; }
-            else rowDesc.style.display = 'none';
+            document.getElementById('info-descricao').textContent = t.descricao ? t.descricao : 'Não informado';
+            if (!t.descricao) document.getElementById('info-descricao').style.color = 'var(--color-text-mut)';
+            else document.getElementById('info-descricao').style.color = 'var(--color-text-main)';
         }
 
         // Status box (painel verde/vermelho)
@@ -851,10 +844,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('edit-email').value = usuario.email || '';
         document.getElementById('edit-mensalidade').value = usuario.mensalidade || '';
         document.getElementById('edit-vencimento').value = (usuario.data_vencimento && usuario.data_vencimento !== 'N/A') ? usuario.data_vencimento : '';
-        document.getElementById('edit-whatsapp').value = usuario.whatsapp || '';
-        document.getElementById('edit-cnpj').value = usuario.cnpj_cpf || '';
         document.getElementById('edit-segmento').value = usuario.segmento || '';
-        document.getElementById('edit-localizacao').value = usuario.localizacao || '';
         document.getElementById('edit-descricao').value = usuario.descricao || '';
         
         document.getElementById('config-fuso').value = usuario.fuso_horario || 'America/Recife';
@@ -1071,10 +1061,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             email: document.getElementById('edit-email').value,
             mensalidade: document.getElementById('edit-mensalidade').value,
             data_vencimento: document.getElementById('edit-vencimento').value || 'N/A',
-            whatsapp: document.getElementById('edit-whatsapp').value,
-            cnpj_cpf: document.getElementById('edit-cnpj').value,
             segmento: document.getElementById('edit-segmento').value,
-            localizacao: document.getElementById('edit-localizacao').value,
             descricao: document.getElementById('edit-descricao').value,
         };
 
