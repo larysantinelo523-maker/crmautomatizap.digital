@@ -357,7 +357,6 @@
                                 <thead>
                                     <tr>
                                         <th>Nome</th>
-                                        <th class="mobile-origem">Origem</th>
                                         <th>Interesse</th>
                                         <th>Status</th>
                                         <th>Lead criado em:</th>
@@ -591,7 +590,6 @@
                                     <span class="user-name" style="font-weight: 500;">${lead.nome}</span>
                                 </div>
                             </td>
-                            <td class="mobile-origem">${lead.origem || 'WhatsApp'}</td>
                             <td class="mobile-interesse">${lead.interesse || 'Não informado'}</td>
                             <td class="mobile-status"><span class="badge ${badgeClass}">${lead.status}</span></td>
                             <td class="mobile-date">${formattedDate}</td>

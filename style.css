@@ -965,9 +965,7 @@ body.dark-mode .dropdown-item:hover {
     gap: 24px;
 }
 
-.dashboard-grid.has-dossier .mobile-origem {
-    display: none !important;
-}
+
 
 .data-table tbody tr.active-row {
     background-color: var(--color-primary-light) !important;

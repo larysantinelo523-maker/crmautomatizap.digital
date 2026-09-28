@@ -157,9 +157,9 @@ export async function seedFakeData() {
     const { data: leads, error: leadsError } = await supabase
         .from('leads')
         .insert([
-            { id_empresa, nome: 'Mariana Silva', telefone: '(11) 98765-4321', status: 'Aguardando vendedor', origem: 'WhatsApp', interesse: 'Automação', orcamento: 'R$ 2.000 - R$ 5.000', qualificacao: 'Alta', resumo: 'A cliente demonstrou interesse em automatizar o atendimento da empresa. Informou que atualmente perde muitos leads por falta de resposta rápida. Tem interesse no plano completo e mencionou um orçamento entre R$ 2.000 e R$ 5.000.' },
-            { id_empresa, nome: 'Lucas Pereira', telefone: '(21) 99999-8888', status: 'Em Atendimento', origem: 'WhatsApp', interesse: 'Criação de sites', orcamento: 'R$ 1.000 - R$ 3.000', qualificacao: 'Média', resumo: 'Deseja criar um site institucional para a imobiliária dele. Gostaria de integração com WhatsApp.' },
-            { id_empresa, nome: 'Roberto Costa', telefone: '(31) 91234-5678', status: 'Fechado', origem: 'Site', interesse: 'Gestão de redes sociais', orcamento: 'R$ 5.000+', qualificacao: 'Alta', resumo: 'Fechamos pacote trimestral de gestão de redes sociais. O cliente já enviou as referências visuais.' }
+            { id_empresa, nome: 'Mariana Silva', telefone: '(11) 98765-4321', status: 'Aguardando vendedor', interesse: 'Automação', orcamento: 'R$ 2.000 - R$ 5.000', qualificacao: 'Alta', resumo: 'A cliente demonstrou interesse em automatizar o atendimento da empresa. Informou que atualmente perde muitos leads por falta de resposta rápida. Tem interesse no plano completo e mencionou um orçamento entre R$ 2.000 e R$ 5.000.' },
+            { id_empresa, nome: 'Lucas Pereira', telefone: '(21) 99999-8888', status: 'Em Atendimento', interesse: 'Criação de sites', orcamento: 'R$ 1.000 - R$ 3.000', qualificacao: 'Média', resumo: 'Deseja criar um site institucional para a imobiliária dele. Gostaria de integração com WhatsApp.' },
+            { id_empresa, nome: 'Roberto Costa', telefone: '(31) 91234-5678', status: 'Fechado', interesse: 'Gestão de redes sociais', orcamento: 'R$ 5.000+', qualificacao: 'Alta', resumo: 'Fechamos pacote trimestral de gestão de redes sociais. O cliente já enviou as referências visuais.' }
         ])
         .select();
 
