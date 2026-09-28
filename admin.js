@@ -723,7 +723,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // --- PASSO 2: Busca dados completos da API segura (Service Role Key) ---
         let apiData = null;
         try {
-            const res = await fetch(`/api/list_tenants?id=${encodeURIComponent(id)}`);
+            const res = await fetch(`/api/tenant_detail?id=${encodeURIComponent(id)}`);
             if (res.ok) {
                 apiData = await res.json();
             } else {
