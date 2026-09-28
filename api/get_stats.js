@@ -15,6 +15,55 @@ export default async function handler(req, res) {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // ─── MODO DETALHE: /api/get_stats?id=UUID ────────────────────────────────────
+    const detailId = req.query && req.query.id;
+    if (detailId) {
+        try {
+            const { data: usuario, error: errorUser } = await supabase
+                .from('usuarios').select('*').eq('id', detailId).single();
+            if (errorUser) throw errorUser;
+
+            const { data: horarios } = await supabase
+                .from('horarios_empresa').select('*').eq('id_empresa', detailId);
+
+            const data30dias = new Date(new Date().getTime() - (30 * 24 * 60 * 60 * 1000)).toISOString();
+
+            const { count: leadsCount } = await supabase
+                .from('leads').select('*', { count: 'exact', head: true })
+                .eq('id_empresa', detailId).gte('criado_em', data30dias);
+
+            const { count: reunioesCount } = await supabase
+                .from('leads').select('*', { count: 'exact', head: true })
+                .eq('id_empresa', detailId)
+                .or('status.eq.qualificado,qualificacao.eq.qualificado')
+                .gte('criado_em', data30dias);
+
+            let evaluatedStatus = usuario.status_assinatura || 'vencido';
+            let diffDays = 0;
+            if (usuario.data_vencimento) {
+                const dataVencStr = usuario.data_vencimento.split('T')[0];
+                const [yr, mo, dy] = dataVencStr.split('-');
+                const dataVenc = new Date(parseInt(yr), parseInt(mo) - 1, parseInt(dy));
+                const hoje = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+                dataVenc.setHours(0,0,0,0); hoje.setHours(0,0,0,0);
+                diffDays = Math.ceil((dataVenc.getTime() - hoje.getTime()) / (1000*60*60*24));
+                if (diffDays < 0) evaluatedStatus = 'vencido';
+                else if (diffDays <= 3) evaluatedStatus = 'Aviso prévio';
+                else evaluatedStatus = 'pago';
+            }
+
+            return res.status(200).json({
+                usuario, horarios: horarios || [],
+                status: evaluatedStatus, diasRestantes: diffDays,
+                total_leads: leadsCount || 0, reunioes_marcadas: reunioesCount || 0
+            });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Internal server error', details: err.message });
+        }
+    }
+    // ─────────────────────────────────────────────────────────────────────────────
+
     let start, end;
     if (req.query && Object.keys(req.query).length > 0) {
         start = req.query.start;
