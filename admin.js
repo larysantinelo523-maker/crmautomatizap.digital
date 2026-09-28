@@ -704,9 +704,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('info-email').textContent = displayEmail;
 
         const badge = document.getElementById('detalhe-status-badge');
-        const sBoxIcon = document.getElementById('status-box-icon');
-        const sBoxBadge = document.getElementById('status-box-badge');
-        const sBoxText = document.getElementById('status-box-text');
 
         let statusStr = "Ativa";
         let statusColor = "#22c55e";
@@ -729,13 +726,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             statusColor = "#22c55e";
         }
 
-        badge.textContent = statusStr;
-        badge.style.backgroundColor = statusColor;
-        sBoxBadge.textContent = statusStr;
-        sBoxBadge.style.backgroundColor = statusColor;
-        sBoxText.textContent = statusExp;
-        document.getElementById('status-box').style.backgroundColor = statusColor + '20';
-        sBoxIcon.style.color = statusColor;
+        if (badge) {
+            badge.textContent = statusStr;
+            badge.style.backgroundColor = statusColor;
+        }
 
         document.getElementById('detalhe-total-leads').textContent = tenantData.total_leads || 0;
 
