@@ -692,136 +692,148 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('page-title').textContent = "Configurações da empresa";
         document.getElementById('page-subtitle').textContent = "Gerencie as informações, o horário de atendimento e as ações desta empresa.";
 
-        // 1. Busca os dados básicos na lista que já foi baixada pela API /api/list_tenants
-        const tenantData = globalTenants.find(t => t.id_empresa === id) || {};
-        
-        const displayNome = tenantData.nome || nome || 'Sem Nome';
-        const displayEmail = tenantData.email || email || 'Sem Email';
-        
+        // --- PASSO 1: Exibe dados instantâneos do cache globalTenants enquanto a API carrega ---
+        const tenantCache = globalTenants.find(t => t.id_empresa === id) || {};
+        const displayNome = tenantCache.nome || nome || 'Carregando...';
+        const displayEmail = tenantCache.email || email || '...';
+
         document.getElementById('detalhe-nome-empresa').textContent = displayNome;
         document.getElementById('detalhe-email-empresa').innerHTML = `<i class="ph-fill ph-envelope-simple"></i> <span>${displayEmail}</span>`;
         document.getElementById('info-nome').textContent = displayNome;
         document.getElementById('info-email').textContent = displayEmail;
+        document.getElementById('info-criada-em').textContent = '...';
+        document.getElementById('detalhe-total-leads').textContent = tenantCache.total_leads ?? '...';
+        document.getElementById('detalhe-total-reunioes').textContent = '...';
+        document.getElementById('horarios-list').innerHTML = `<div style="text-align:center;color:var(--color-text-mut);padding:16px;">Carregando horários...</div>`;
 
+        // Status badge
         const badge = document.getElementById('detalhe-status-badge');
-
-        let statusStr = "Ativa";
-        let statusColor = "#22c55e";
-        let statusExp = "Pagamento em dia. Empresa funcionando normalmente.";
-        
-        if (tenantData.status === 'vencido') {
-            statusStr = "Vencida";
-            statusColor = "#ef4444";
-            statusExp = "Pagamento está em atraso.";
-        } else if (tenantData.status === 'Aviso prévio') {
-            statusStr = "Aviso Prévio";
-            statusColor = "#f59e0b";
-            statusExp = `Pagamento próximo do vencimento.`;
-        } else if (tenantData.status === 'suspenso') {
-            statusStr = "Suspensa";
-            statusColor = "#9ca3af";
-            statusExp = "Empresa suspensa. O acesso ao CRM está bloqueado.";
-        } else {
-            statusStr = "Pago";
-            statusColor = "#22c55e";
-        }
-
+        const statusMap = {
+            'vencido': { label: 'Vencida', color: '#ef4444' },
+            'Aviso prévio': { label: 'Aviso Prévio', color: '#f59e0b' },
+            'suspenso': { label: 'Suspensa', color: '#9ca3af' },
+            'pago': { label: 'Pago', color: '#22c55e' },
+        };
+        const statusInfo = statusMap[tenantCache.status] || { label: 'Pago', color: '#22c55e' };
         if (badge) {
-            badge.textContent = statusStr;
-            badge.style.backgroundColor = statusColor;
+            badge.textContent = statusInfo.label;
+            badge.style.backgroundColor = statusInfo.color;
         }
 
-        document.getElementById('detalhe-total-leads').textContent = tenantData.total_leads || 0;
-
-        // 2. Tenta buscar os dados adicionais diretamente do Supabase usando a sessão do Administrador
+        // --- PASSO 2: Busca dados completos da API segura (Service Role Key) ---
+        let apiData = null;
         try {
-            // Busca o usuário completo para pegar descricao, localizacao, etc (Pode falhar por RLS, se falhar usamos só o que temos)
-            const { data: usuario } = await supabase.from('usuarios').select('*').eq('id', id).single();
-            
-            if (usuario) {
-                const localEl = document.getElementById('detalhe-local-empresa');
-                if (usuario.localizacao) {
-                    localEl.innerHTML = `<i class="ph-fill ph-map-pin"></i> <span>${usuario.localizacao}</span>`;
-                    localEl.style.display = 'flex';
-                } else {
-                    localEl.style.display = 'none';
-                }
+            const res = await fetch(`/api/get_tenant_info?id=${encodeURIComponent(id)}`);
+            if (res.ok) {
+                apiData = await res.json();
+            } else {
+                const errText = await res.text();
+                console.warn('get_tenant_info retornou erro:', res.status, errText);
+            }
+        } catch (err) {
+            console.error('Erro ao chamar get_tenant_info:', err);
+        }
 
-                const descEl = document.getElementById('detalhe-desc-empresa');
-                if (usuario.descricao) {
-                    descEl.textContent = usuario.descricao;
-                    descEl.style.display = 'block';
-                } else {
-                    descEl.style.display = 'none';
-                }
+        // --- PASSO 3: Se a API respondeu, preenche todos os campos com dados reais ---
+        let usuario = null;
+        let horarios = [];
+        
+        if (apiData) {
+            usuario = apiData.usuario;
+            horarios = apiData.horarios || [];
 
-                const rowWpp = document.getElementById('row-whatsapp');
+            // Nome e email da empresa
+            const nomeReal = usuario.nome_completo || displayNome;
+            const emailReal = usuario.email || displayEmail;
+            document.getElementById('detalhe-nome-empresa').textContent = nomeReal;
+            document.getElementById('detalhe-email-empresa').innerHTML = `<i class="ph-fill ph-envelope-simple"></i> <span>${emailReal}</span>`;
+            document.getElementById('info-nome').textContent = nomeReal;
+            document.getElementById('info-email').textContent = emailReal;
+
+            // Status atualizado pela API
+            const statusApi = statusMap[apiData.status] || { label: 'Pago', color: '#22c55e' };
+            if (badge) {
+                badge.textContent = statusApi.label;
+                badge.style.backgroundColor = statusApi.color;
+            }
+
+            // Leads e Reuniões
+            document.getElementById('detalhe-total-leads').textContent = apiData.total_leads ?? 0;
+            document.getElementById('detalhe-total-reunioes').textContent = apiData.reunioes_marcadas ?? 0;
+
+            // Localização
+            const localEl = document.getElementById('detalhe-local-empresa');
+            if (usuario.localizacao) {
+                localEl.innerHTML = `<i class="ph-fill ph-map-pin"></i> <span>${usuario.localizacao}</span>`;
+                localEl.style.display = 'flex';
+            } else {
+                localEl.style.display = 'none';
+            }
+
+            // Descrição (no topo do card)
+            const descEl = document.getElementById('detalhe-desc-empresa');
+            if (usuario.descricao) {
+                descEl.textContent = usuario.descricao;
+                descEl.style.display = 'block';
+            } else {
+                descEl.style.display = 'none';
+            }
+
+            // Informações extras do painel
+            const rowWpp = document.getElementById('row-whatsapp');
+            if (rowWpp) {
                 if (usuario.whatsapp) {
                     document.getElementById('info-whatsapp').textContent = usuario.whatsapp;
                     rowWpp.style.display = 'flex';
                 } else rowWpp.style.display = 'none';
+            }
 
-                const rowCnpj = document.getElementById('row-cnpj');
+            const rowCnpj = document.getElementById('row-cnpj');
+            if (rowCnpj) {
                 if (usuario.cnpj_cpf) {
                     document.getElementById('info-cnpj').textContent = usuario.cnpj_cpf;
                     rowCnpj.style.display = 'flex';
                 } else rowCnpj.style.display = 'none';
+            }
 
-                const rowSeg = document.getElementById('row-segmento');
+            const rowSeg = document.getElementById('row-segmento');
+            if (rowSeg) {
                 if (usuario.segmento) {
                     document.getElementById('info-segmento').textContent = usuario.segmento;
                     rowSeg.style.display = 'flex';
                 } else rowSeg.style.display = 'none';
+            }
 
-                const rowDesc = document.getElementById('row-descricao');
+            const rowDesc = document.getElementById('row-descricao');
+            if (rowDesc) {
                 if (usuario.descricao) {
                     document.getElementById('info-descricao').textContent = usuario.descricao;
                     rowDesc.style.display = 'flex';
                 } else rowDesc.style.display = 'none';
-
-                let dataCriada = "";
-                if (usuario.criado_em) {
-                    const dc = new Date(usuario.criado_em);
-                    dataCriada = `${dc.toLocaleDateString('pt-BR', {timeZone:'America/Sao_Paulo'})} - ${dc.toLocaleTimeString('pt-BR', {timeZone:'America/Sao_Paulo', hour:'2-digit', minute:'2-digit'})}`;
-                }
-                document.getElementById('info-criada-em').textContent = dataCriada;
-                
-                window.tempUsuario = usuario;
-            } else {
-                // Oculta tudo que não temos acesso
-                document.getElementById('detalhe-local-empresa').style.display = 'none';
-                document.getElementById('detalhe-desc-empresa').style.display = 'none';
-                document.getElementById('row-whatsapp').style.display = 'none';
-                document.getElementById('row-cnpj').style.display = 'none';
-                document.getElementById('row-segmento').style.display = 'none';
-                document.getElementById('row-descricao').style.display = 'none';
-                document.getElementById('info-criada-em').textContent = 'N/A';
-                window.tempUsuario = { id: id };
             }
 
-            // Busca os Horários
-            const { data: horarios } = await supabase.from('horarios_empresa').select('*').eq('id_empresa', id);
-            window.tempHorarios = horarios || [];
-            
-            // Busca as Reuniões Marcadas (leads com qualificacao=qualificado)
-            const data30diasStr = new Date(new Date().getTime() - (30 * 24 * 60 * 60 * 1000)).toISOString();
-            const { count: reunioesCount } = await supabase
-                .from('leads')
-                .select('*', { count: 'exact', head: true })
-                .eq('id_empresa', id)
-                .or('status.eq.qualificado,qualificacao.eq.qualificado')
-                .gte('criado_em', data30diasStr);
-                
-            document.getElementById('detalhe-total-reunioes').textContent = reunioesCount || 0;
+            // Data de criação
+            if (usuario.criado_em) {
+                const dc = new Date(usuario.criado_em);
+                const dataCriada = `${dc.toLocaleDateString('pt-BR', {timeZone:'America/Sao_Paulo'})}`;
+                document.getElementById('info-criada-em').textContent = dataCriada;
+            } else {
+                document.getElementById('info-criada-em').textContent = 'N/A';
+            }
 
-        } catch (error) {
-            console.error(error);
-            document.getElementById('detalhe-total-reunioes').textContent = "0";
-            window.tempHorarios = [];
+        } else {
+            // API falhou — escondes o que não temos
+            document.getElementById('detalhe-local-empresa').style.display = 'none';
+            document.getElementById('detalhe-desc-empresa').style.display = 'none';
+            document.getElementById('detalhe-total-reunioes').textContent = '0';
+            document.getElementById('info-criada-em').textContent = 'N/A';
         }
 
-        const usuario = window.tempUsuario || { id: id };
-        const horarios = window.tempHorarios || [];
+        // Salva para uso nos modais (editar, configurar horários, etc.)
+        window.tempUsuario = usuario || { id: id, nome_completo: displayNome, email: displayEmail };
+        window.tempHorarios = horarios;
+
+
 
         const hList = document.getElementById('horarios-list');
         hList.innerHTML = '';

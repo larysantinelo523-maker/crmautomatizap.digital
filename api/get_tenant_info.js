@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     try {
-        // 1. Fetch User
+        // 1. Busca o usuario/empresa
         const { data: usuario, error: errorUser } = await supabase
             .from('usuarios')
             .select('*')
@@ -30,44 +30,40 @@ export default async function handler(req, res) {
 
         if (errorUser) throw errorUser;
 
-        // 2. Fetch Horarios
+        // 2. Busca os horários
         const { data: horarios, error: errorHorarios } = await supabase
             .from('horarios_empresa')
             .select('*')
             .eq('id_empresa', id);
 
-        if (errorHorarios) throw errorHorarios;
-
-        // 3. Fetch Leads and Reunioes in the last 30 days
+        // 3. Contagem de leads (últimos 30 dias)
         const data30diasStr = new Date(new Date().getTime() - (30 * 24 * 60 * 60 * 1000)).toISOString();
 
-        // 3a. Leads (contagem)
-        const { count: leadsCount, error: errorLeads } = await supabase
+        const { count: leadsCount } = await supabase
             .from('leads')
             .select('*', { count: 'exact', head: true })
             .eq('id_empresa', id)
             .gte('criado_em', data30diasStr);
 
-        // 3b. Reuniões agendadas (leads com status = 'qualificado')
-        const { count: reunioesCount, error: errorReunioes } = await supabase
+        // 4. Reuniões agendadas (últimos 30 dias)
+        const { count: reunioesCount } = await supabase
             .from('leads')
             .select('*', { count: 'exact', head: true })
             .eq('id_empresa', id)
             .or('status.eq.qualificado,qualificacao.eq.qualificado')
             .gte('criado_em', data30diasStr);
 
-        // Define status
+        // 5. Calcular status de pagamento
         let evaluatedStatus = usuario.status_assinatura || 'vencido';
         let diffDays = 0;
-        
+
         if (usuario.data_vencimento) {
             const dataVencStr = usuario.data_vencimento.split('T')[0];
             const [yr, mo, dy] = dataVencStr.split('-');
-            const dataVenc = new Date(yr, mo - 1, dy, 0, 0, 0);
-            
+            const dataVenc = new Date(parseInt(yr), parseInt(mo) - 1, parseInt(dy), 0, 0, 0);
+
             const hojeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
             const hoje = new Date(hojeStr);
-            
             dataVenc.setHours(0, 0, 0, 0);
             hoje.setHours(0, 0, 0, 0);
 
@@ -96,4 +92,4 @@ export default async function handler(req, res) {
         console.error(err);
         return res.status(500).json({ error: 'Internal server error', details: err.message });
     }
-};
+}
