@@ -484,6 +484,26 @@
                                         <span id="info-criada-em" style="font-weight: 500; font-size: 14px;">...</span>
                                     </div>
                                 </div>
+                                
+                                <!-- Ações Rápidas (Movidas para o Card da Esquerda) -->
+                                <div style="margin-top: 32px; border-top: 1px dashed var(--color-border); padding-top: 24px;">
+                                    <div class="card-title" style="margin-bottom: 16px;">
+                                        <i class="ph-fill ph-lightning text-primary"></i>
+                                        <h3>Ações Rápidas</h3>
+                                    </div>
+                                    <div style="display: flex; gap: 12px;">
+                                        <button class="btn" id="btn-editar-empresa" style="flex: 1; background-color: var(--color-bg); border: 1px solid var(--color-primary); color: var(--color-primary); padding: 10px; font-weight: 600; font-size: 12px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                                            <i class="ph-fill ph-pencil-simple" style="font-size: 18px;"></i> Editar
+                                        </button>
+                                        <button class="btn" id="btn-modal-senha" style="flex: 1; background-color: #dcfce7; color: #16a34a; border: none; padding: 10px; font-weight: 600; font-size: 12px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                                            <i class="ph-fill ph-lock-key" style="font-size: 18px;"></i> Senha
+                                        </button>
+                                        <button class="btn" id="btn-suspender-empresa" style="flex: 1; background-color: #fee2e2; color: #dc2626; border: none; padding: 10px; font-weight: 600; font-size: 12px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                                            <i class="ph-fill ph-pause-circle" id="icon-suspender" style="font-size: 18px;"></i> <span id="text-suspender">Suspender</span>
+                                        </button>
+                                    </div>
+                                </div>
+
                             </div>
                             
                             <div id="status-box" style="background-color: #dcfce7; border-radius: 8px; padding: 16px; margin-top: 8px;">
@@ -513,26 +533,6 @@
                                     <!-- JS vai inserir aqui -->
                                 </div>
                             </div>
-
-                            <!-- Ações Rápidas -->
-                            <div class="card" style="display: flex; flex-direction: column;">
-                                <div class="card-title" style="margin-bottom: 16px;">
-                                    <i class="ph-fill ph-lightning text-primary"></i>
-                                    <h3>Ações Rápidas</h3>
-                                </div>
-                                <div style="display: flex; gap: 16px;">
-                                    <button class="btn" id="btn-editar-empresa" style="flex: 1; background-color: var(--color-bg); border: 1px solid var(--color-primary); color: var(--color-primary); padding: 12px; font-weight: 600; font-size: 13px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
-                                        <i class="ph-fill ph-pencil-simple" style="font-size: 20px;"></i> Editar
-                                    </button>
-                                    <button class="btn" id="btn-modal-senha" style="flex: 1; background-color: #dcfce7; color: #16a34a; border: none; padding: 12px; font-weight: 600; font-size: 13px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
-                                        <i class="ph-fill ph-lock-key" style="font-size: 20px;"></i> Senha
-                                    </button>
-                                    <button class="btn" id="btn-suspender-empresa" style="flex: 1; background-color: #fee2e2; color: #dc2626; border: none; padding: 12px; font-weight: 600; font-size: 13px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
-                                        <i class="ph-fill ph-pause-circle" id="icon-suspender" style="font-size: 20px;"></i> <span id="text-suspender">Suspender</span>
-                                    </button>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
                 </section>
