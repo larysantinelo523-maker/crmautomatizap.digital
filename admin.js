@@ -692,20 +692,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('page-title').textContent = "Configurações da empresa";
         document.getElementById('page-subtitle').textContent = "Gerencie as informações, o horário de atendimento e as ações desta empresa.";
 
-        // Resets loading state
-        document.getElementById('detalhe-nome-empresa').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">Carregando...</span>`;
-        document.getElementById('detalhe-email-empresa').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">Carregando e-mail...</span>`;
+        // Popula os dados básicos imediatamente
+        document.getElementById('detalhe-nome-empresa').textContent = nome || 'Carregando...';
+        document.getElementById('detalhe-email-empresa').innerHTML = `<i class="ph-fill ph-envelope-simple"></i> <span>${email || '...'}</span>`;
+        document.getElementById('info-nome').textContent = nome || 'Carregando...';
+        document.getElementById('info-email').textContent = email || 'Carregando...';
+
+        // Resets loading state for other fields
         document.getElementById('detalhe-status-badge').textContent = "";
         document.getElementById('detalhe-status-badge').style.backgroundColor = "transparent";
         document.getElementById('detalhe-total-leads').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">00</span>`;
         document.getElementById('detalhe-total-reunioes').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">00</span>`;
-        document.getElementById('info-nome').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">Carregando...</span>`;
-        document.getElementById('info-email').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">Carregando...</span>`;
         document.getElementById('info-criada-em').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">Carregando...</span>`;
         document.getElementById('horarios-list').innerHTML = `<div style="text-align: center; color: var(--color-text-mut); padding: 16px;"><span style="background: #e2e8f0; color: transparent; border-radius: 4px;">Carregando horários...</span></div>`;
         
         try {
-            const res = await fetch(`/api/get_tenant_details?id=${id}`);
+            const res = await fetch(`/api/get_tenant_info?id=${id}`);
             if (!res.ok) throw new Error('Erro ao carregar os dados');
             const data = await res.json();
             
