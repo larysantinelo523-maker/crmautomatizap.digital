@@ -581,7 +581,7 @@
                     tr.style.cursor = 'pointer';
                     tr.onclick = (e) => {
                         e.stopPropagation();
-                        abrirDossie(lead, badgeClass, formattedDate);
+                        abrirDossie(lead, badgeClass, formattedDate, tr);
                     };
 
                     tr.innerHTML = `
@@ -601,14 +601,38 @@
             }
         };
 
-        function abrirDossie(lead, badgeClass, dateStr) {
+        window.currentOpenLeadId = null;
+        window.fecharDossie = function() {
+            document.querySelector('.dashboard-grid').classList.remove('has-dossier');
             const card = document.getElementById('lead-highlight-card');
-            card.style.display = 'block';
+            if (window.innerWidth <= 1024) card.style.display = 'none';
+            document.querySelectorAll('.data-table tbody tr.active-row').forEach(el => el.classList.remove('active-row'));
+            window.currentOpenLeadId = null;
+        };
 
-            // Scroll suave para o dossiê (âncora)
-            setTimeout(() => {
-                card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
+        function abrirDossie(lead, badgeClass, dateStr, trElement) {
+            const grid = document.querySelector('.dashboard-grid');
+            const card = document.getElementById('lead-highlight-card');
+            
+            if (window.currentOpenLeadId === lead.id && grid.classList.contains('has-dossier')) {
+                window.fecharDossie();
+                return;
+            }
+
+            document.querySelectorAll('.data-table tbody tr.active-row').forEach(el => el.classList.remove('active-row'));
+            if (trElement) trElement.classList.add('active-row');
+            
+            window.currentOpenLeadId = lead.id;
+            grid.classList.add('has-dossier');
+
+            if (window.innerWidth <= 1024) {
+                card.style.display = 'block';
+                setTimeout(() => {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            } else {
+                card.style.display = '';
+            }
 
             // Preenche os dados
             const avatarEl = document.getElementById('lead-highlight-avatar');
@@ -659,9 +683,7 @@
             }, 50);
         }
         
-        function fecharDossie() {
-            document.getElementById('lead-highlight-card').style.display = 'none';
-        }
+        // fecharDossie já está definido acima
     </script>
 </body>
 

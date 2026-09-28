@@ -954,9 +954,24 @@ body.dark-mode .dropdown-item:hover {
 .dashboard-grid {
     padding: 24px 32px;
     display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 24px;
+    grid-template-columns: 1fr 0px;
+    gap: 0px;
     align-items: start;
+    transition: grid-template-columns 0.3s ease-in-out, gap 0.3s ease-in-out;
+}
+
+.dashboard-grid.has-dossier {
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+}
+
+.dashboard-grid.has-dossier .mobile-origem {
+    display: none !important;
+}
+
+.data-table tbody tr.active-row {
+    background-color: var(--color-primary-light) !important;
+    border-left: 3px solid var(--color-primary);
 }
 
 .dashboard-grid.no-sidebar {
@@ -967,12 +982,21 @@ body.dark-mode .dropdown-item:hover {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    min-width: 0;
 }
 
 .side-column {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.dashboard-grid.has-dossier .side-column {
+    opacity: 1;
+    overflow: visible;
 }
 
 /* ==========================================================================
