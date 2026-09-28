@@ -692,148 +692,134 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('page-title').textContent = "Configurações da empresa";
         document.getElementById('page-subtitle').textContent = "Gerencie as informações, o horário de atendimento e as ações desta empresa.";
 
-        const { data: usuario, error: errorUser } = await supabase.from('usuarios').select('*').eq('id', id).single();
-        if (errorUser) {
-            console.error(errorUser);
+        // Resets loading state
+        document.getElementById('detalhe-nome-empresa').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">Carregando...</span>`;
+        document.getElementById('detalhe-email-empresa').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">Carregando e-mail...</span>`;
+        document.getElementById('detalhe-status-badge').textContent = "";
+        document.getElementById('detalhe-status-badge').style.backgroundColor = "transparent";
+        document.getElementById('detalhe-total-leads').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">00</span>`;
+        document.getElementById('detalhe-total-reunioes').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">00</span>`;
+        document.getElementById('info-nome').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">Carregando...</span>`;
+        document.getElementById('info-email').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">Carregando...</span>`;
+        document.getElementById('info-criada-em').innerHTML = `<span style="background: #e2e8f0; color: transparent; border-radius: 4px;">Carregando...</span>`;
+        document.getElementById('horarios-list').innerHTML = `<div style="text-align: center; color: var(--color-text-mut); padding: 16px;"><span style="background: #e2e8f0; color: transparent; border-radius: 4px;">Carregando horários...</span></div>`;
+        
+        try {
+            const res = await fetch(`/api/get_tenant_details?id=${id}`);
+            if (!res.ok) throw new Error('Erro ao carregar os dados');
+            const data = await res.json();
+            
+            const usuario = data.usuario;
+            const horarios = data.horarios;
+            const totalLeads = data.total_leads;
+            const totalReunioes = data.reunioes_marcadas;
+
+            document.getElementById('detalhe-nome-empresa').textContent = usuario.nome_completo || nome;
+            document.getElementById('detalhe-email-empresa').innerHTML = `<i class="ph-fill ph-envelope-simple"></i> <span>${usuario.email || email}</span>`;
+            
+            const badge = document.getElementById('detalhe-status-badge');
+            const sBoxIcon = document.getElementById('status-box-icon');
+            const sBoxBadge = document.getElementById('status-box-badge');
+            const sBoxText = document.getElementById('status-box-text');
+
+            let statusStr = "Ativa";
+            let statusColor = "#22c55e";
+            let statusExp = "Pagamento em dia. Empresa funcionando normalmente.";
+            
+            if (data.status === 'vencido') {
+                statusStr = "Vencida";
+                statusColor = "#ef4444";
+                statusExp = "Pagamento está em atraso.";
+            } else if (data.status === 'Aviso prévio') {
+                statusStr = "Aviso Prévio";
+                statusColor = "#f59e0b";
+                statusExp = `Pagamento vence em ${data.diasRestantes} dias.`;
+                if (data.diasRestantes === 0) statusExp = "Pagamento vence hoje.";
+            } else if (data.status === 'suspenso') {
+                statusStr = "Suspensa";
+                statusColor = "#9ca3af";
+                statusExp = "Empresa suspensa. O acesso ao CRM está bloqueado.";
+            } else {
+                statusStr = "Pago";
+                statusColor = "#22c55e";
+            }
+
+            badge.textContent = statusStr;
+            badge.style.backgroundColor = statusColor;
+            sBoxBadge.textContent = statusStr;
+            sBoxBadge.style.backgroundColor = statusColor;
+            sBoxText.textContent = statusExp;
+            document.getElementById('status-box').style.backgroundColor = statusColor + '20';
+            sBoxIcon.style.color = statusColor;
+
+            const localEl = document.getElementById('detalhe-local-empresa');
+            if (usuario.localizacao) {
+                localEl.innerHTML = `<i class="ph-fill ph-map-pin"></i> <span>${usuario.localizacao}</span>`;
+                localEl.style.display = 'flex';
+            } else {
+                localEl.style.display = 'none';
+            }
+
+            const descEl = document.getElementById('detalhe-desc-empresa');
+            if (usuario.descricao) {
+                descEl.textContent = usuario.descricao;
+                descEl.style.display = 'block';
+            } else {
+                descEl.style.display = 'none';
+            }
+
+            document.getElementById('info-nome').textContent = usuario.nome_completo || nome;
+            document.getElementById('info-email').textContent = usuario.email || email;
+            
+            const rowWpp = document.getElementById('row-whatsapp');
+            if (usuario.whatsapp) {
+                document.getElementById('info-whatsapp').textContent = usuario.whatsapp;
+                rowWpp.style.display = 'flex';
+            } else rowWpp.style.display = 'none';
+
+            const rowCnpj = document.getElementById('row-cnpj');
+            if (usuario.cnpj_cpf) {
+                document.getElementById('info-cnpj').textContent = usuario.cnpj_cpf;
+                rowCnpj.style.display = 'flex';
+            } else rowCnpj.style.display = 'none';
+
+            const rowSeg = document.getElementById('row-segmento');
+            if (usuario.segmento) {
+                document.getElementById('info-segmento').textContent = usuario.segmento;
+                rowSeg.style.display = 'flex';
+            } else rowSeg.style.display = 'none';
+
+            const rowDesc = document.getElementById('row-descricao');
+            if (usuario.descricao) {
+                document.getElementById('info-descricao').textContent = usuario.descricao;
+                rowDesc.style.display = 'flex';
+            } else rowDesc.style.display = 'none';
+
+            let dataCriada = "";
+            if (usuario.criado_em) {
+                const dc = new Date(usuario.criado_em);
+                dataCriada = `${dc.toLocaleDateString('pt-BR', {timeZone:'America/Sao_Paulo'})} - ${dc.toLocaleTimeString('pt-BR', {timeZone:'America/Sao_Paulo', hour:'2-digit', minute:'2-digit'})}`;
+            }
+            document.getElementById('info-criada-em').textContent = dataCriada;
+
+            document.getElementById('detalhe-total-leads').textContent = totalLeads;
+            document.getElementById('detalhe-total-reunioes').textContent = totalReunioes;
+
+            // Mantendo os dados no escopo para usar no config dias
+            window.tempHorarios = horarios;
+            window.tempUsuario = usuario;
+
+        } catch (error) {
+            console.error(error);
+            document.getElementById('detalhe-nome-empresa').textContent = "Não foi possível carregar";
+            document.getElementById('detalhe-total-leads').textContent = "0";
+            document.getElementById('detalhe-total-reunioes').textContent = "0";
+            document.getElementById('info-nome').textContent = "Não foi possível carregar";
             return;
         }
 
-        const { data: horarios, error: errorHorarios } = await supabase.from('horarios_empresa').select('*').eq('id_empresa', id);
-
-        document.getElementById('detalhe-nome-empresa').textContent = usuario.nome_completo || nome;
-        document.getElementById('detalhe-email-empresa').innerHTML = `<i class="ph-fill ph-envelope-simple"></i> <span>${usuario.email || email}</span>`;
-        
-        const badge = document.getElementById('detalhe-status-badge');
-        const sBoxIcon = document.getElementById('status-box-icon');
-        const sBoxBadge = document.getElementById('status-box-badge');
-        const sBoxText = document.getElementById('status-box-text');
-
-        let statusStr = "Ativa";
-        let statusColor = "#22c55e";
-        let statusExp = "Pagamento em dia. Empresa funcionando normalmente.";
-        
-        if (usuario.status_assinatura === 'suspenso') {
-            statusStr = "Suspensa";
-            statusColor = "#9ca3af";
-            statusExp = "Empresa suspensa. O acesso ao CRM está bloqueado.";
-        } else {
-            if (usuario.data_vencimento && usuario.data_vencimento !== 'N/A') {
-                const pts = usuario.data_vencimento.split('-');
-                const nextDate = new Date(parseInt(pts[0], 10), parseInt(pts[1], 10) - 1, parseInt(pts[2], 10));
-                const hojeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
-                const hoje = new Date(hojeStr);
-                hoje.setHours(0, 0, 0, 0);
-                const diffDays = Math.ceil((nextDate.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
-                
-                if (diffDays < 0) {
-                    statusStr = "Vencida";
-                    statusColor = "#ef4444";
-                    statusExp = "Pagamento está em atraso.";
-                } else if (diffDays <= 3) {
-                    statusStr = "Aviso Prévio";
-                    statusColor = "#f59e0b";
-                    statusExp = `Pagamento vence em ${diffDays} dias.`;
-                    if (diffDays === 0) statusExp = "Pagamento vence hoje.";
-                }
-            }
-        }
-
-        badge.textContent = statusStr;
-        badge.style.backgroundColor = statusColor;
-        sBoxBadge.textContent = statusStr;
-        sBoxBadge.style.backgroundColor = statusColor;
-        sBoxText.textContent = statusExp;
-        document.getElementById('status-box').style.backgroundColor = statusColor + '20';
-        sBoxIcon.style.color = statusColor;
-
-        const localEl = document.getElementById('detalhe-local-empresa');
-        if (usuario.localizacao) {
-            localEl.innerHTML = `<i class="ph-fill ph-map-pin"></i> <span>${usuario.localizacao}</span>`;
-            localEl.style.display = 'flex';
-        } else {
-            localEl.style.display = 'none';
-        }
-
-        const descEl = document.getElementById('detalhe-desc-empresa');
-        if (usuario.descricao) {
-            descEl.textContent = usuario.descricao;
-            descEl.style.display = 'block';
-        } else {
-            descEl.style.display = 'none';
-        }
-
-        document.getElementById('info-nome').textContent = usuario.nome_completo || nome;
-        document.getElementById('info-email').textContent = usuario.email || email;
-        
-        const rowWpp = document.getElementById('row-whatsapp');
-        if (usuario.whatsapp) {
-            document.getElementById('info-whatsapp').textContent = usuario.whatsapp;
-            rowWpp.style.display = 'flex';
-        } else rowWpp.style.display = 'none';
-
-        const rowCnpj = document.getElementById('row-cnpj');
-        if (usuario.cnpj_cpf) {
-            document.getElementById('info-cnpj').textContent = usuario.cnpj_cpf;
-            rowCnpj.style.display = 'flex';
-        } else rowCnpj.style.display = 'none';
-
-        const rowSeg = document.getElementById('row-segmento');
-        if (usuario.segmento) {
-            document.getElementById('info-segmento').textContent = usuario.segmento;
-            rowSeg.style.display = 'flex';
-        } else rowSeg.style.display = 'none';
-
-        const rowDesc = document.getElementById('row-descricao');
-        if (usuario.descricao) {
-            document.getElementById('info-descricao').textContent = usuario.descricao;
-            rowDesc.style.display = 'flex';
-        } else rowDesc.style.display = 'none';
-
-        let dataCriada = "...";
-        if (usuario.criado_em) {
-            const dc = new Date(usuario.criado_em);
-            dataCriada = `${dc.toLocaleDateString('pt-BR')} - ${dc.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}`;
-        }
-        document.getElementById('info-criada-em').textContent = dataCriada;
-
-        const { data: leadsInfo } = await supabase.from('leads').select('id, data_criacao, qualificacao').eq('id_empresa', id);
-        
-        let total30 = 0, total60 = 0, reunioes30 = 0, reunioes60 = 0;
-        if (leadsInfo) {
-            const now = new Date();
-            const date30 = new Date(now.getTime() - 30*24*60*60*1000);
-            const date60 = new Date(now.getTime() - 60*24*60*60*1000);
-
-            leadsInfo.forEach(l => {
-                const dc = new Date(l.data_criacao);
-                if (dc >= date30) {
-                    total30++;
-                    if (l.qualificacao === 'qualificado') reunioes30++;
-                } else if (dc >= date60) {
-                    total60++;
-                    if (l.qualificacao === 'qualificado') reunioes60++;
-                }
-            });
-        }
-        
-        document.getElementById('detalhe-total-leads').textContent = total30;
-        document.getElementById('detalhe-total-reunioes').textContent = reunioes30;
-
-        const updateVar = (idVar, cur, prev) => {
-            const el = document.getElementById(idVar);
-            if (prev === 0) {
-                el.innerHTML = `<span style="color: var(--color-text-mut); font-weight: 400;">(Últimos 30 dias)</span>`;
-            } else {
-                const pct = ((cur - prev) / prev) * 100;
-                const isPos = pct >= 0;
-                const color = isPos ? '#16a34a' : '#dc2626';
-                const icon = isPos ? 'ph-trend-up' : 'ph-trend-down';
-                el.innerHTML = `<i class="ph-fill ${icon}" style="color: ${color}"></i> <span style="color: ${color}">${isPos?'+':''}${pct.toFixed(0)}%</span> <span style="color: var(--color-text-mut); font-weight: 400; margin-left:4px;">(Últimos 30 dias)</span>`;
-            }
-        };
-
-        updateVar('detalhe-var-leads', total30, total60);
-        updateVar('detalhe-var-reunioes', reunioes30, reunioes60);
+        const usuario = window.tempUsuario;
+        const horarios = window.tempHorarios;
 
         const hList = document.getElementById('horarios-list');
         hList.innerHTML = '';
