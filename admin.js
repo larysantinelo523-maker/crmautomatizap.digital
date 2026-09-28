@@ -773,51 +773,56 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Salva para uso nos modais
         window.tempUsuario = { id: id, nome_completo: displayNome, email: displayEmail, ...t };
 
-        // ─── Busca horários via upsert_horarios?id= (endpoint existente na Vercel) ──
-        let horarios = [];
-        document.getElementById('horarios-list').innerHTML = `<div style="text-align:center;color:var(--color-text-mut);padding:16px;">Carregando horários...</div>`;
-        try {
-            const hRes = await fetch(`/api/upsert_horarios?id=${encodeURIComponent(id)}`);
-            if (hRes.ok) {
-                horarios = await hRes.json();
-            } else {
-                console.warn('upsert_horarios GET retornou:', hRes.status);
-            }
-        } catch (err) {
-            console.warn('Erro ao buscar horários:', err);
-        }
+        // ─── Busca horários do cache do usuário ──
+        let horarios = t.horarios || [];
         window.tempHorarios = horarios;
 
         const hList = document.getElementById('horarios-list');
         hList.innerHTML = '';
-        if (!horarios || horarios.length === 0) {
-            hList.innerHTML = `
-                <div style="background-color: var(--color-bg); padding: 16px; border-radius: 8px; border: 1px dashed var(--color-border); text-align: center;">
-                    <p style="font-weight: 600; color: var(--color-text-main); margin-bottom: 4px;">Horário não configurado</p>
-                    <p style="font-size: 13px; color: var(--color-text-mut);">Sem horário, a métrica 'Atendidos fora do horário' fica desligada pra esta empresa.</p>
-                </div>
-            `;
-        } else {
-            const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-            for (let i = 1; i <= 7; i++) {
-                const idx = i === 7 ? 0 : i;
-                const ds = dias[idx];
-                const cfg = horarios.find(h => h.dia_semana === idx);
-                const isOpen = cfg && cfg.aberto;
-                const timeText = isOpen ? `${cfg.hora_abertura.substring(0,5)} - ${cfg.hora_fechamento.substring(0,5)}` : 'Fechado';
-                const toggleColor = isOpen ? '#22c55e' : '#e2e8f0';
-                const toggleKnob = isOpen ? 'right: 2px;' : 'left: 2px;';
-                
-                hList.innerHTML += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background-color: var(--color-bg); border-radius: 8px;">
-                        <span style="font-weight: 600; color: var(--color-text-main); width: 80px;">${ds}</span>
-                        <span style="color: ${isOpen ? 'var(--color-text-main)' : 'var(--color-text-mut)'}; font-size: 14px;">${timeText}</span>
-                        <div style="position: relative; width: 40px; height: 24px; background-color: ${toggleColor}; border-radius: 12px; transition: 0.2s;">
-                            <div style="position: absolute; top: 2px; ${toggleKnob} width: 20px; height: 20px; background-color: white; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"></div>
+        
+        const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        for (let i = 1; i <= 7; i++) {
+            const idx = i === 7 ? 0 : i;
+            const ds = dias[idx];
+            const cfg = horarios.find(h => h.dia_semana === idx);
+            const isOpen = cfg && cfg.aberto;
+            const timeText = isOpen ? `${cfg.hora_abertura.substring(0,5)} - ${cfg.hora_fechamento.substring(0,5)}` : 'Fechado';
+            const toggleColor = isOpen ? '#22c55e' : '#e2e8f0';
+            const toggleKnob = isOpen ? 'right: 2px;' : 'left: 2px;';
+            
+            hList.innerHTML += `
+                <div style="display: flex; flex-direction: column; background-color: var(--color-bg); border-radius: 8px; border: 1px solid var(--color-border); margin-bottom: 8px; overflow: hidden;">
+                    <!-- Cabecalho do dia -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
+                        <div style="display: flex; align-items: center; gap: 16px; flex: 1;">
+                            <span style="font-weight: 600; color: var(--color-text-main); width: 80px;">${ds}</span>
+                            <span style="color: ${isOpen ? 'var(--color-text-main)' : 'var(--color-text-mut)'}; font-size: 14px;">${timeText}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="position: relative; width: 36px; height: 20px; background-color: ${toggleColor}; border-radius: 10px; transition: 0.2s;">
+                                <div style="position: absolute; top: 2px; ${toggleKnob} width: 16px; height: 16px; background-color: white; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"></div>
+                            </div>
+                            <button class="btn btn-outline" onclick="toggleEditHorario(${idx})" style="padding: 4px 8px; font-size: 11px; border-color: var(--color-border);">Configurar</button>
                         </div>
                     </div>
-                `;
-            }
+                    <!-- Formulario de edicao (escondido) -->
+                    <div id="edit-horario-${idx}" style="display: none; padding: 12px 16px; background-color: #f8fafc; border-top: 1px solid var(--color-border); flex-wrap: wrap; gap: 12px; align-items: center;">
+                        <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" id="check-aberto-${idx}" ${isOpen ? 'checked' : ''} onchange="toggleInputsHorario(${idx})">
+                            Aberto
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 13px; color: var(--color-text-mut);">Das</span>
+                            <input type="time" id="time-abertura-${idx}" class="form-control" style="padding: 4px 8px; width: auto;" value="${isOpen ? cfg.hora_abertura.substring(0,5) : '08:00'}" ${!isOpen ? 'disabled' : ''}>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 13px; color: var(--color-text-mut);">Até</span>
+                            <input type="time" id="time-fechamento-${idx}" class="form-control" style="padding: 4px 8px; width: auto;" value="${isOpen ? cfg.hora_fechamento.substring(0,5) : '18:00'}" ${!isOpen ? 'disabled' : ''}>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveHorario(${idx}, '${id}')" style="padding: 6px 12px; font-size: 12px; margin-left: auto;">Salvar</button>
+                    </div>
+                </div>
+            `;
         }
 
         const btnSuspender = document.getElementById('btn-suspender-empresa');
@@ -1119,38 +1124,76 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    document.getElementById('form-config-horario').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('btn-save-horario');
+});
+
+// ─── Funções Globais para Horários ───
+window.toggleEditHorario = function(idx) {
+    const el = document.getElementById('edit-horario-' + idx);
+    if (el) {
+        el.style.display = el.style.display === 'none' ? 'flex' : 'none';
+    }
+};
+
+window.toggleInputsHorario = function(idx) {
+    const isChecked = document.getElementById('check-aberto-' + idx).checked;
+    document.getElementById('time-abertura-' + idx).disabled = !isChecked;
+    document.getElementById('time-fechamento-' + idx).disabled = !isChecked;
+};
+
+window.saveHorario = async function(idx, idEmpresa) {
+    try {
+        const btn = event.target;
         btn.disabled = true;
         btn.textContent = 'Salvando...';
 
-        const fuso = document.getElementById('config-fuso').value;
-        const horasParado = document.getElementById('config-horas-parado').value;
+        const isAberto = document.getElementById('check-aberto-' + idx).checked;
+        const horaAbertura = document.getElementById('time-abertura-' + idx).value;
+        const horaFechamento = document.getElementById('time-fechamento-' + idx).value;
 
-        await supabase.from('usuarios').update({ fuso_horario: fuso, horas_lead_parado: horasParado }).eq('id', currentTenantId);
+        // Atualiza a lista atual na memoria
+        let horarios = window.tempHorarios || [];
+        const existingIdx = horarios.findIndex(h => h.dia_semana === idx);
+        
+        const newObj = {
+            dia_semana: idx,
+            aberto: isAberto,
+            hora_abertura: isAberto ? horaAbertura + ':00' : null,
+            hora_fechamento: isAberto ? horaFechamento + ':00' : null
+        };
 
-        const rows = document.querySelectorAll('.config-dia-row');
-        const novosHorarios = [];
-        rows.forEach(r => {
-            novosHorarios.push({
-                id_empresa: currentTenantId,
-                dia_semana: parseInt(r.getAttribute('data-dia')),
-                aberto: r.querySelector('.cb-aberto').checked,
-                hora_abertura: r.querySelector('.time-abertura').value,
-                hora_fechamento: r.querySelector('.time-fechamento').value
-            });
+        if (existingIdx > -1) {
+            horarios[existingIdx] = newObj;
+        } else {
+            horarios.push(newObj);
+        }
+
+        // Chama a API para salvar
+        const res = await fetch('/api/upsert_horarios', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                userId: idEmpresa,
+                horarios: horarios
+            })
         });
 
-        const { error } = await supabase.from('horarios_empresa').upsert(novosHorarios, { onConflict: 'id_empresa, dia_semana' });
+        if (!res.ok) throw new Error('Erro ao salvar horário');
         
-        btn.disabled = false;
-        btn.textContent = 'Salvar Horários';
-
-        if (error) alert('Erro: ' + error.message);
-        else {
-            modalConfig.classList.remove('active');
-            loadTenantDetails(currentTenantId, currentTenantName, currentTenantEmail);
+        // Atualiza no cache e recarrega a tela
+        const tenant = window.globalTenants.find(t => t.id === idEmpresa);
+        if (tenant) {
+            tenant.horarios = horarios;
         }
-    });
-});
+        
+        alert('Horário salvo com sucesso!');
+        loadTenantDetails(idEmpresa, tenant.nome_completo || tenant.nome, tenant.email);
+        
+    } catch(err) {
+        alert(err.message);
+    } finally {
+        if(event && event.target) {
+            event.target.disabled = false;
+            event.target.textContent = 'Salvar';
+        }
+    }
+};

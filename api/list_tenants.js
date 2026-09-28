@@ -157,7 +157,8 @@ export default async function handler(req, res) {
                 segmento: user.segmento || null,
                 localizacao: user.localizacao || null,
                 descricao: user.descricao || null,
-                cnpj_cpf: user.cnpj_cpf || null
+                cnpj_cpf: user.cnpj_cpf || null,
+                horarios: user.horarios || null
             });
         }
 

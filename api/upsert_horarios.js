@@ -11,10 +11,10 @@ export default async function handler(req, res) {
         const id = req.query && req.query.id;
         if (!id) return res.status(400).json({ error: 'Missing id' });
         try {
-            const { data: horarios, error } = await supabase
-                .from('horarios_empresa').select('*').eq('id_empresa', id);
-            if (error) throw error;
-            return res.status(200).json(horarios || []);
+            const { data: user, error } = await supabase
+                .from('usuarios').select('horarios').eq('id', id).single();
+            if (error && error.code !== 'PGRST116') throw error;
+            return res.status(200).json(user?.horarios || []);
         } catch (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -29,22 +29,11 @@ export default async function handler(req, res) {
         const userUpdate = {};
         if (fuso_horario !== undefined) userUpdate.fuso_horario = fuso_horario;
         if (horas_lead_parado !== undefined) userUpdate.horas_lead_parado = horas_lead_parado;
+        if (horarios && Array.isArray(horarios)) userUpdate.horarios = horarios;
         
         if (Object.keys(userUpdate).length > 0) {
             const { error: errUser } = await supabase.from('usuarios').update(userUpdate).eq('id', userId);
             if (errUser) throw errUser;
-        }
-
-        if (horarios && Array.isArray(horarios)) {
-            const upsertData = horarios.map(h => ({
-                id_empresa: userId,
-                dia_semana: h.dia_semana,
-                aberto: h.aberto,
-                hora_abertura: h.hora_abertura || null,
-                hora_fechamento: h.hora_fechamento || null
-            }));
-            const { error: errHorarios } = await supabase.from('horarios_empresa').upsert(upsertData, { onConflict: 'id_empresa, dia_semana' });
-            if (errHorarios) throw errHorarios;
         }
 
         return res.status(200).json({ success: true });
