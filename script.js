@@ -2134,12 +2134,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================================================
 document.addEventListener('DOMContentLoaded', () => {
     if (window.innerWidth <= 1024) {
-        // Fade in suave no carregamento (Parte do Liquid Glass Flow)
-        const mainContent = document.querySelector('.main-content');
-        if (mainContent) {
-            mainContent.style.opacity = '0';
-            mainContent.style.animation = 'fadeIn 0.4s ease forwards';
-        }
+        
         
         // 1. Injetar o Filtro SVG de Refração Real
         const svgHTML = `
@@ -2202,34 +2197,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     item.setAttribute('aria-current', 'page');
                 }
 
-                // Animação ao clicar (Feedback visual e fade out antes de redirecionar)
+                // Animação ao clicar (Feedback visual)
                 item.addEventListener('click', (e) => {
-                    const href = item.getAttribute('href');
-                    const isSamePage = href && (href === '#' || href === window.location.pathname.split('/').pop());
-                    
-                    if (href && !isSamePage) {
-                        e.preventDefault(); // Segura o redirecionamento
-                        
-                        sidebarNav.querySelectorAll('.nav-item').forEach(nav => {
-                            nav.classList.remove('active');
-                            nav.removeAttribute('aria-current');
-                        });
-                        item.classList.add('active');
-                        item.setAttribute('aria-current', 'page');
-                        moveBubbleTo(item);
-
-                        // Fade out do conteúdo principal
-                        const mainContent = document.querySelector('.main-content');
-                        if (mainContent) {
-                            mainContent.style.transition = 'opacity 0.35s ease';
-                            mainContent.style.opacity = '0';
-                        }
-                        
-                        // Aguarda a transição antes de navegar
-                        setTimeout(() => {
-                            window.location.href = href;
-                        }, 350);
-                    }
+                    sidebarNav.querySelectorAll('.nav-item').forEach(nav => {
+                        nav.classList.remove('active');
+                        nav.removeAttribute('aria-current');
+                    });
+                    item.classList.add('active');
+                    item.setAttribute('aria-current', 'page');
+                    moveBubbleTo(item);
                 });
             });
 

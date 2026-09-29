@@ -4645,8 +4645,8 @@ section.summary-panel.d-none-important {
    LIQUID GLASS MOBILE BOTTOM NAV (APP iOS 26 STYLE)
    ========================================================================== */
 :root {
-    --menu-green: #25D366;
-    --menu-green-rgb: 37, 211, 102;
+    --menu-green: #22c55e;
+    --menu-green-rgb: 34, 197, 94;
 }
 
 @media (max-width: 1024px) {
@@ -4669,15 +4669,15 @@ section.summary-panel.d-none-important {
         border: 1px solid rgba(255,255,255,0.45) !important;
         
         /* Efeito Liquid Glass Verde */
-        background: rgba(37, 211, 102, 0.82) !important;
-        backdrop-filter: blur(24px) saturate(180%) brightness(1.05) !important;
-        -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.05) !important;
+        background: #22c55e !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
         box-shadow:
             0 10px 30px rgba(0,0,0,0.14),
             0 2px 6px rgba(0,0,0,0.08),
             inset 0 1px 1px rgba(255,255,255,0.7),
             inset 0 -2px 4px rgba(0,0,0,0.10),
-            0 8px 28px rgba(37, 211, 102, 0.40) !important;
+            0 8px 28px rgba(34, 197, 94, 0.40) !important;
             
         transition: transform 0.3s ease, opacity 0.3s ease !important;
     }
@@ -4688,15 +4688,7 @@ section.summary-panel.d-none-important {
     }
 
     /* Brilho curvo superior (reflexo especular) */
-    .sidebar::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        border-radius: 999px;
-        background: linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 40%, rgba(255,255,255,0.12) 100%);
-        pointer-events: none;
-        z-index: 0;
-    }
+    .sidebar::before { display: none !important; }
 
     .sidebar-header,
     .sidebar-footer {
