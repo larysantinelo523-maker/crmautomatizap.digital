@@ -208,6 +208,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             globalTenants = await res.json();
             renderTenants(globalTenants);
+            
+            const lastTenantId = localStorage.getItem('adminLastTenantId');
+            if (lastTenantId) {
+                const t = globalTenants.find(x => x.id_empresa === lastTenantId);
+                if (t) {
+                    loadTenantDetails(t.id_empresa, t.nome, t.email);
+                }
+            }
         } catch (e) {
             console.error(e);
             tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: red;">Erro ao carregar lista. Verifique a chave na Vercel.</td></tr>';
@@ -680,12 +688,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('btn-voltar-empresas').addEventListener('click', () => {
         showSection('dashboard');
         currentTenantId = null;
+        localStorage.removeItem('adminLastTenantId');
     });
 
     async function loadTenantDetails(id, nome, email) {
         currentTenantId = id;
         currentTenantName = nome;
         currentTenantEmail = email;
+        localStorage.setItem('adminLastTenantId', id);
 
         showSection('detalhes-empresa');
         document.getElementById('page-title').textContent = "Configurações da empresa";
@@ -1084,74 +1094,74 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // ─── Funções Globais para Horários ───
+    window.toggleEditHorario = function(idx) {
+        const el = document.getElementById('edit-horario-' + idx);
+        if (el) {
+            el.style.display = el.style.display === 'none' ? 'flex' : 'none';
+        }
+    };
+
+    window.toggleInputsHorario = function(idx) {
+        const isChecked = document.getElementById('check-aberto-' + idx).checked;
+        document.getElementById('time-abertura-' + idx).disabled = !isChecked;
+        document.getElementById('time-fechamento-' + idx).disabled = !isChecked;
+    };
+
+    window.saveHorario = async function(idx, idEmpresa) {
+        try {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'Salvando...';
+
+            const isAberto = document.getElementById('check-aberto-' + idx).checked;
+            const horaAbertura = document.getElementById('time-abertura-' + idx).value;
+            const horaFechamento = document.getElementById('time-fechamento-' + idx).value;
+
+            // Atualiza a lista atual na memoria
+            let horarios = window.tempHorarios || [];
+            const existingIdx = horarios.findIndex(h => h.dia_semana === idx);
+            
+            const newObj = {
+                dia_semana: idx,
+                aberto: isAberto,
+                hora_abertura: isAberto ? horaAbertura + ':00' : null,
+                hora_fechamento: isAberto ? horaFechamento + ':00' : null
+            };
+
+            if (existingIdx > -1) {
+                horarios[existingIdx] = newObj;
+            } else {
+                horarios.push(newObj);
+            }
+
+            // Chama a API para salvar
+            const res = await fetch('/api/upsert_horarios', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    userId: idEmpresa,
+                    horarios: horarios
+                })
+            });
+
+            if (!res.ok) throw new Error('Erro ao salvar horário');
+            
+            // Atualiza no cache e recarrega a tela
+            const tenant = globalTenants.find(t => t.id_empresa === idEmpresa) || {};
+            tenant.horarios = horarios;
+            
+            alert('Horário salvo com sucesso!');
+            loadTenantDetails(idEmpresa, tenant.nome || 'Sem Nome', tenant.email || '');
+            
+        } catch(err) {
+            alert(err.message);
+        } finally {
+            if(event && event.target) {
+                event.target.disabled = false;
+                event.target.textContent = 'Salvar';
+            }
+        }
+    };
+
 });
-
-// ─── Funções Globais para Horários ───
-window.toggleEditHorario = function(idx) {
-    const el = document.getElementById('edit-horario-' + idx);
-    if (el) {
-        el.style.display = el.style.display === 'none' ? 'flex' : 'none';
-    }
-};
-
-window.toggleInputsHorario = function(idx) {
-    const isChecked = document.getElementById('check-aberto-' + idx).checked;
-    document.getElementById('time-abertura-' + idx).disabled = !isChecked;
-    document.getElementById('time-fechamento-' + idx).disabled = !isChecked;
-};
-
-window.saveHorario = async function(idx, idEmpresa) {
-    try {
-        const btn = event.target;
-        btn.disabled = true;
-        btn.textContent = 'Salvando...';
-
-        const isAberto = document.getElementById('check-aberto-' + idx).checked;
-        const horaAbertura = document.getElementById('time-abertura-' + idx).value;
-        const horaFechamento = document.getElementById('time-fechamento-' + idx).value;
-
-        // Atualiza a lista atual na memoria
-        let horarios = window.tempHorarios || [];
-        const existingIdx = horarios.findIndex(h => h.dia_semana === idx);
-        
-        const newObj = {
-            dia_semana: idx,
-            aberto: isAberto,
-            hora_abertura: isAberto ? horaAbertura + ':00' : null,
-            hora_fechamento: isAberto ? horaFechamento + ':00' : null
-        };
-
-        if (existingIdx > -1) {
-            horarios[existingIdx] = newObj;
-        } else {
-            horarios.push(newObj);
-        }
-
-        // Chama a API para salvar
-        const res = await fetch('/api/upsert_horarios', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                userId: idEmpresa,
-                horarios: horarios
-            })
-        });
-
-        if (!res.ok) throw new Error('Erro ao salvar horário');
-        
-        // Atualiza no cache e recarrega a tela
-        const tenant = globalTenants.find(t => t.id_empresa === idEmpresa) || {};
-        tenant.horarios = horarios;
-        
-        alert('Horário salvo com sucesso!');
-        loadTenantDetails(idEmpresa, tenant.nome || 'Sem Nome', tenant.email || '');
-        
-    } catch(err) {
-        alert(err.message);
-    } finally {
-        if(event && event.target) {
-            event.target.disabled = false;
-            event.target.textContent = 'Salvar';
-        }
-    }
-};
