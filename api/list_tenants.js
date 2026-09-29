@@ -170,7 +170,8 @@ export default async function handler(req, res) {
                 localizacao: user.localizacao || null,
                 descricao: user.descricao || null,
                 cnpj_cpf: user.cnpj_cpf || null,
-                horarios: user.horarios || null
+                horarios: user.horarios || null,
+                mensalidade: user.mensalidade || null
             });
         }
 

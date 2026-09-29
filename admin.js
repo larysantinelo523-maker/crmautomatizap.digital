@@ -738,6 +738,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             document.getElementById('info-criada-em').textContent = 'N/A';
         }
+        
+        if (t.vencimento && t.vencimento !== 'N/A') {
+            const dv = new Date(t.vencimento);
+            dv.setMinutes(dv.getMinutes() + dv.getTimezoneOffset());
+            document.getElementById('info-vencimento').textContent = dv.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+        } else {
+            document.getElementById('info-vencimento').textContent = 'N/A';
+        }
 
 
         const rowSeg = document.getElementById('row-segmento');
