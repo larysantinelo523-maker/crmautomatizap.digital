@@ -753,6 +753,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rowSeg = document.getElementById('row-segmento');
         if (rowSeg) {
             document.getElementById('info-segmento').textContent = t.segmento ? t.segmento : 'Não informado';
+            document.getElementById('info-localizacao').textContent = t.localizacao ? t.localizacao : 'Não informada';
             if (!t.segmento) document.getElementById('info-segmento').style.color = 'var(--color-text-mut)';
             else document.getElementById('info-segmento').style.color = 'var(--color-text-main)';
         }
