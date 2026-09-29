@@ -23,8 +23,7 @@ export default async function handler(req, res) {
                 .from('usuarios').select('*').eq('id', detailId).single();
             if (errorUser) throw errorUser;
 
-            const { data: horarios } = await supabase
-                .from('horarios_empresa').select('*').eq('id_empresa', detailId);
+            const horarios = usuario.horarios || [];
 
             const data30dias = new Date(new Date().getTime() - (30 * 24 * 60 * 60 * 1000)).toISOString();
 
