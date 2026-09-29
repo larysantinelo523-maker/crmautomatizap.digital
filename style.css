@@ -2286,13 +2286,13 @@ body.dark-mode .accordion-content {
 
     .table-controls {
         flex-direction: row;
-        width: auto;
-        justify-content: flex-end;
+        width: 100%;
+        justify-content: space-between;
         gap: 12px;
     }
     .table-controls-wrapper {
         width: 100%;
-        justify-content: flex-end !important;
+        justify-content: space-between !important;
     }
 
     .table-controls input {
