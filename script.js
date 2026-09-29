@@ -1340,10 +1340,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                     o.style.fontWeight = '';
                                 });
                                 opt.classList.add('selected');
-                                opt.style.backgroundColor = '#22c55e33';
-                                opt.style.color = '#15803d';
+                                const val = opt.getAttribute('data-value');
+                                if (val === 'Em atendimento') {
+                                    opt.style.backgroundColor = 'var(--color-warning-light)';
+                                    opt.style.color = '#B45309';
+                                } else {
+                                    opt.style.backgroundColor = '#22c55e33';
+                                    opt.style.color = '#15803d';
+                                }
                                 opt.style.fontWeight = '600';
-                                selectedMobileStatus = opt.getAttribute('data-value');
+                                selectedMobileStatus = val;
                             });
                         });
 
@@ -1464,7 +1470,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <label style="font-weight: 500; font-size: 14px; margin-bottom: 8px; text-align: left; display: block; color: var(--color-text-main);">Status do Lead</label>
                             <div class="custom-select-container" style="display: flex; flex-direction: column; gap: 4px;">
                                 <div class="custom-option selected" data-value="Todos">Todos os status</div>
-                                <div class="custom-option" data-value="Em atendimento">Em atendimento</div>
+                                <div class="custom-option opt-atendimento" data-value="Em atendimento">Em atendimento</div>
                                 <div class="custom-option" data-value="Qualificado">Qualificado</div>
                             </div>
                         `;
