@@ -39,12 +39,19 @@ export default async function handler(req, res) {
                 .eq('id_empresa', id)
                 .gte('criado_em', data30diasStr);
 
-            const { count: reunioesCount } = await supabase
-                .from('agendamentos')
-                .select('*', { count: 'exact', head: true })
-                .eq('id_empresa', id)
-                .ilike('status', '%qualificado%')
-                .gte('created_at', data30diasStr);
+            let reunioesCount = 0;
+            try {
+                const { data: ags } = await supabase
+                    .from('agendamentos').select('*')
+                    .eq('id_empresa', id);
+                if (ags) {
+                    reunioesCount = ags.filter(a => {
+                        if (!a.status || a.status.trim().toLowerCase() !== 'qualificado') return false;
+                        const aDate = new Date(a.created_at || a.criado_em || a.data_agendamento);
+                        return aDate >= new Date(data30diasStr);
+                    }).length;
+                }
+            } catch (e) { console.error('Erro agendamentos admin detalhe:', e); }
 
             // Calcular status de pagamento
             let evaluatedStatus = usuario.status_assinatura || 'vencido';
@@ -138,11 +145,19 @@ export default async function handler(req, res) {
 
             // Reuniões agendadas (últimos 30 dias)
             const data30dias = new Date(new Date().getTime() - (30 * 24 * 60 * 60 * 1000)).toISOString();
-            const { count: reunioesCount } = await supabase
-                .from('agendamentos').select('*', { count: 'exact', head: true })
-                .eq('id_empresa', user.id)
-                .ilike('status', '%qualificado%')
-                .gte('created_at', data30dias);
+            let reunioesCount = 0;
+            try {
+                const { data: ags } = await supabase
+                    .from('agendamentos').select('*')
+                    .eq('id_empresa', user.id);
+                if (ags) {
+                    reunioesCount = ags.filter(a => {
+                        if (!a.status || a.status.trim().toLowerCase() !== 'qualificado') return false;
+                        const aDate = new Date(a.created_at || a.criado_em || a.data_agendamento);
+                        return aDate >= new Date(data30dias);
+                    }).length;
+                }
+            } catch (e) { console.error('Erro agendamentos admin lista:', e); }
 
             result.push({
                 id_empresa: user.id,

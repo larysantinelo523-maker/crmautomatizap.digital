@@ -32,11 +32,19 @@ export default async function handler(req, res) {
                 .from('leads').select('*', { count: 'exact', head: true })
                 .eq('id_empresa', detailId).gte('criado_em', data30dias);
 
-            const { count: reunioesCount } = await supabase
-                .from('agendamentos').select('*', { count: 'exact', head: true })
-                .eq('id_empresa', detailId)
-                .ilike('status', '%qualificado%')
-                .gte('created_at', data30dias);
+            let reunioesCount = 0;
+            try {
+                const { data: ags } = await supabase
+                    .from('agendamentos').select('*')
+                    .eq('id_empresa', detailId);
+                if (ags) {
+                    reunioesCount = ags.filter(a => {
+                        if (!a.status || a.status.trim().toLowerCase() !== 'qualificado') return false;
+                        const aDate = new Date(a.created_at || a.criado_em || a.data_agendamento);
+                        return aDate >= new Date(data30dias);
+                    }).length;
+                }
+            } catch (e) { console.error('Erro agendamentos admin master stats:', e); }
 
             let evaluatedStatus = usuario.status_assinatura || 'vencido';
             let diffDays = 0;
