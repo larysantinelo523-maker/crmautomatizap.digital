@@ -754,6 +754,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (rowSeg) {
             document.getElementById('info-segmento').textContent = t.segmento ? t.segmento : 'Não informado';
             document.getElementById('info-localizacao').textContent = t.localizacao ? t.localizacao : 'Não informada';
+            document.getElementById('info-mensalidade').textContent = t.mensalidade ? 'R$ ' + parseFloat(t.mensalidade).toLocaleString('pt-BR', {minimumFractionDigits: 2}) : 'Não informado';
             if (!t.segmento) document.getElementById('info-segmento').style.color = 'var(--color-text-mut)';
             else document.getElementById('info-segmento').style.color = 'var(--color-text-main)';
         }
