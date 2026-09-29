@@ -701,12 +701,28 @@
                                         <span style="color: var(--color-text-mut); font-size: 14px;">Dia do Vencimento</span>
                                         <span id="info-vencimento" style="font-weight: 500; font-size: 14px;">...</span>
                                     </div>
+                                </div></div>
+                            <!-- Correções Solicitadas -->
+                            <div style="margin-top: 24px; border-top: 1px solid var(--color-border); padding-top: 24px;">
+                                <div class="card-title" style="margin-bottom: 16px;">
+                                    <i class="ph-fill ph-warning-circle text-primary"></i>
+                                    <h3 style="font-size: 15px;">Correções Solicitadas pelo Usuário</h3>
                                 </div>
-                            </div>
-
-                        </div>
-
-                        <!-- Right -->
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Data/Hora</th>
+                                                <th>Motivo Principal</th>
+                                                <th>Descrição do Problema</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="table-correcoes-body">
+                                            <tr><td colspan="3" style="text-align: center; color: var(--color-text-mut);">Carregando correções...</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div></div><!-- Right -->
                         <div style="display: flex; flex-direction: column; gap: 24px;">
 
                             <!-- Horário Comercial -->
