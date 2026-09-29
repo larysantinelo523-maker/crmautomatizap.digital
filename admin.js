@@ -711,17 +711,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('detalhe-nome-empresa').textContent = displayNome;
         document.getElementById('detalhe-email-empresa').innerHTML  = `<i class="ph-fill ph-envelope-simple"></i> <span>${displayEmail}</span>`;
 
-        // Localização
-        const localEl = document.getElementById('detalhe-local-empresa');
-        if (t.localizacao) {
-            localEl.innerHTML = `<i class="ph-fill ph-map-pin"></i> <span>${t.localizacao}</span>`;
-            localEl.style.display = 'flex';
-        } else { localEl.style.display = 'none'; }
-
-        // Descrição no cabeçalho
-        const descEl = document.getElementById('detalhe-desc-empresa');
-        if (t.descricao) { descEl.textContent = t.descricao; descEl.style.display = 'block'; }
-        else { descEl.style.display = 'none'; }
+        
 
         // Status badge
         const statusMap = {
