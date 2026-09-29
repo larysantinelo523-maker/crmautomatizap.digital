@@ -3079,7 +3079,8 @@ body.dark-mode .logo-img {
     font-size: 20px;
 }
 
-.login-form .input-wrapper input {
+.login-form .input-wrapper input,
+.login-form .input-wrapper textarea {
     width: 100%;
     padding: 14px 48px 14px 48px;
     border: 1px solid var(--color-border);
@@ -3091,7 +3092,8 @@ body.dark-mode .logo-img {
     transition: all 0.2s;
 }
 
-.login-form .input-wrapper input:focus {
+.login-form .input-wrapper input:focus,
+.login-form .input-wrapper textarea:focus {
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px var(--color-primary-light);
     outline: none;
