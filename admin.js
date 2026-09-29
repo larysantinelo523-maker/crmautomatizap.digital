@@ -1085,7 +1085,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ id_empresa: currentTenantId, new_password: s1 })
             });
-            if (!res.ok) throw new Error('Erro ao alterar senha');
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || 'Erro ao alterar senha');
+            }
             
             modalSenha.classList.remove('active');
             alert('Senha alterada com sucesso!');
