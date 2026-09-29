@@ -1213,3 +1213,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
 
+
+
+  // Toggle password visibility
+  document.querySelectorAll('.toggle-senha').forEach(icon => {
+      icon.addEventListener('click', function() {
+          const targetId = this.getAttribute('data-target');
+          const input = document.getElementById(targetId);
+          if (input) {
+              const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+              input.setAttribute('type', type);
+              if (type === 'password') {
+                  this.classList.remove('ph-eye-slash');
+                  this.classList.add('ph-eye');
+              } else {
+                  this.classList.remove('ph-eye');
+                  this.classList.add('ph-eye-slash');
+              }
+          }
+      });
+  });
