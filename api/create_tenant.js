@@ -1,11 +1,11 @@
-const { createClient } = require('@supabase/supabase-js');
+﻿const { createClient } = require('@supabase/supabase-js');
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { email, password, nome_empresa, data_vencimento, mensalidade } = req.body;
+    const { email, password, nome_empresa, data_vencimento, mensalidade, segmento, descricao, localizacao } = req.body;
     
     if (!email || !password || !nome_empresa) {
         return res.status(400).json({ error: 'Missing required fields' });
@@ -55,6 +55,10 @@ export default async function handler(req, res) {
             profileData.mensalidade = mensalidade;
         }
 
+        if (segmento !== undefined) profileData.segmento = segmento;
+        if (descricao !== undefined) profileData.descricao = descricao;
+        if (localizacao !== undefined) profileData.localizacao = localizacao;
+
         const { error: profError } = await supabase
             .from('usuarios')
             .upsert([profileData]);
@@ -74,3 +78,4 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
+

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -576,6 +576,11 @@
                                             contato</span>
                                         <span id="info-email" style="font-weight: 500; font-size: 14px;">...</span>
                                     </div>
+                                    <div id="row-localizacao" class="info-row"
+                                        style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
+                                        <span style="color: var(--color-text-mut); font-size: 14px;">Localização</span>
+                                        <span id="info-localizacao" style="font-weight: 500; font-size: 14px;">...</span>
+                                    </div>
                                     <div id="row-segmento" class="info-row"
                                         style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--color-border);">
                                         <span style="color: var(--color-text-mut); font-size: 14px;">Segmento</span>
@@ -692,6 +697,35 @@
                             quando os avisos de fatura vão aparecer no CRM do cliente.</small>
                     </div>
 
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Segmento de Negócio</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-briefcase"></i>
+                            <input type="text" id="tenant-segmento" class="form-control" placeholder="Ex: Barbearia, Clínica...">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Localização (Endereço)</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-map-pin"></i>
+                            <input type="text" id="tenant-localizacao" class="form-control" placeholder="Endereço completo da empresa">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Localização</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-map-pin"></i>
+                            <input type="text" id="edit-localizacao" class="form-control" placeholder="Ex: Endereço da empresa">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Descrição da Empresa</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-text-align-left"></i>
+                            <textarea id="tenant-descricao" class="form-control" placeholder="Breve descrição da empresa" style="height: 80px; padding-top: 12px; resize: none;"></textarea>
+                        </div>
+                    </div>
+
                     <div class="form-actions" style="margin-top: 32px; display: flex; justify-content: flex-end;">
                         <button type="submit" class="login-btn" id="btn-submit-tenant"
                             style="display: flex; align-items: center; justify-content: center; gap: 8px;">
@@ -752,6 +786,13 @@
                             <i class="ph ph-tag"></i>
                             <input type="text" id="edit-segmento" class="form-control"
                                 placeholder="Ex: Saúde / Serviços">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Localização</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-map-pin"></i>
+                            <input type="text" id="edit-localizacao" class="form-control" placeholder="Ex: Endereço da empresa">
                         </div>
                     </div>
                     <div class="form-group">
@@ -857,3 +898,5 @@
 </body>
 
 </html>
+
+

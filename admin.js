@@ -890,7 +890,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             email: document.getElementById('tenant-email').value,
             password: document.getElementById('tenant-senha').value,
             data_vencimento: document.getElementById('tenant-vencimento').value,
-            mensalidade: mensalidadeNum
+            mensalidade: mensalidadeNum,
+            segmento: document.getElementById('tenant-segmento').value,
+            descricao: document.getElementById('tenant-descricao').value,
+            localizacao: document.getElementById('tenant-localizacao').value
         };
 
         try {
@@ -1197,6 +1200,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
 });
+
+
 
 
 
