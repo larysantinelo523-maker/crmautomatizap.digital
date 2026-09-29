@@ -2487,8 +2487,7 @@ body.dark-mode .accordion-content {
     }
 
     .nav-item span {
-        font-size: 10px;
-        line-height: 1;
+        display: none;
     }
 
     .nav-item:hover,
