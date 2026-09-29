@@ -793,7 +793,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <span style="color: ${isOpen ? 'var(--color-text-main)' : 'var(--color-text-mut)'}; font-size: 14px;">${timeText}</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="position: relative; width: 36px; height: 20px; background-color: ${toggleColor}; border-radius: 10px; transition: 0.2s;">
+                            <div onclick="toggleDirectHorario(${idx}, '${id}')" style="cursor: pointer; position: relative; width: 36px; height: 20px; background-color: ${toggleColor}; border-radius: 10px; transition: 0.2s;">
                                 <div style="position: absolute; top: 2px; ${toggleKnob} width: 16px; height: 16px; background-color: white; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"></div>
                             </div>
                             <button class="btn btn-outline" onclick="toggleEditHorario(${idx})" style="padding: 4px 8px; font-size: 11px; border-color: var(--color-border);">Configurar</button>
@@ -1108,11 +1108,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('time-fechamento-' + idx).disabled = !isChecked;
     };
 
-    window.saveHorario = async function(idx, idEmpresa) {
+    window.toggleDirectHorario = async function(idx, idEmpresa) { const chk = document.getElementById('check-aberto-' + idx); chk.checked = !chk.checked; window.toggleInputsHorario(idx); await window.saveHorario(idx, idEmpresa, true); };
+
+    window.saveHorario = async function(idx, idEmpresa, isDirectToggle = false) {
         try {
-            const btn = event.target;
-            btn.disabled = true;
-            btn.textContent = 'Salvando...';
+            const btn = isDirectToggle ? null : (event ? event.target : null);
+            if (btn && btn.tagName === 'BUTTON') {
+                btn.disabled = true;
+                btn.textContent = 'Salvando...';
+            }
 
             const isAberto = document.getElementById('check-aberto-' + idx).checked;
             const horaAbertura = document.getElementById('time-abertura-' + idx).value;
@@ -1157,11 +1161,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch(err) {
             alert(err.message);
         } finally {
-            if(event && event.target) {
-                event.target.disabled = false;
-                event.target.textContent = 'Salvar';
+            const btn = isDirectToggle ? null : (event ? event.target : null);
+            if(btn && btn.tagName === 'BUTTON') {
+                btn.disabled = false;
+                btn.textContent = 'Salvar';
             }
         }
     };
 
 });
+
+
+
+
+
