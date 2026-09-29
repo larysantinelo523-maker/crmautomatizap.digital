@@ -4547,3 +4547,75 @@ section.summary-panel.d-none-important {
 .admin-kpis { grid-template-columns: repeat(4, 1fr); }
 @media (max-width: 1400px) { .admin-kpis { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 768px) { .admin-kpis { grid-template-columns: 1fr; } }
+
+
+/* Responsive admin details layout */
+.company-summary-flex {
+    display: flex;
+    flex-wrap: wrap;
+}
+.col-company-info {
+    flex: 100%;
+    padding: 20px;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    position: relative;
+}
+.col-company-leads {
+    flex: 1;
+    min-width: 50%;
+    padding: 20px;
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+.col-company-meetings {
+    flex: 1;
+    min-width: 50%;
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+.company-details-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    align-items: stretch;
+}
+
+@media (min-width: 768px) {
+    .col-company-info {
+        flex: 1.5;
+        padding: 24px;
+        border-right: 1px solid var(--color-border);
+        border-bottom: none;
+    }
+    .col-company-leads {
+        flex: 1;
+        min-width: 200px;
+        padding: 24px;
+        gap: 16px;
+    }
+    .col-company-meetings {
+        flex: 1;
+        min-width: 200px;
+        padding: 24px;
+        gap: 16px;
+    }
+    .company-details-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+}
+@media (max-width: 480px) {
+    .col-company-leads, .col-company-meetings {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+}
