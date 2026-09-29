@@ -40,11 +40,11 @@ export default async function handler(req, res) {
                 .gte('criado_em', data30diasStr);
 
             const { count: reunioesCount } = await supabase
-                .from('leads')
+                .from('agendamentos')
                 .select('*', { count: 'exact', head: true })
                 .eq('id_empresa', id)
-                .or('status.eq.qualificado,qualificacao.eq.qualificado')
-                .gte('criado_em', data30diasStr);
+                .ilike('status', '%qualificado%')
+                .gte('created_at', data30diasStr);
 
             // Calcular status de pagamento
             let evaluatedStatus = usuario.status_assinatura || 'vencido';
@@ -139,10 +139,10 @@ export default async function handler(req, res) {
             // Reuniões agendadas (últimos 30 dias)
             const data30dias = new Date(new Date().getTime() - (30 * 24 * 60 * 60 * 1000)).toISOString();
             const { count: reunioesCount } = await supabase
-                .from('leads').select('*', { count: 'exact', head: true })
+                .from('agendamentos').select('*', { count: 'exact', head: true })
                 .eq('id_empresa', user.id)
-                .or('status.eq.qualificado,qualificacao.eq.qualificado')
-                .gte('criado_em', data30dias);
+                .ilike('status', '%qualificado%')
+                .gte('created_at', data30dias);
 
             result.push({
                 id_empresa: user.id,

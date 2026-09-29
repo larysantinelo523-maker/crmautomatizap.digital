@@ -33,10 +33,10 @@ export default async function handler(req, res) {
                 .eq('id_empresa', detailId).gte('criado_em', data30dias);
 
             const { count: reunioesCount } = await supabase
-                .from('leads').select('*', { count: 'exact', head: true })
+                .from('agendamentos').select('*', { count: 'exact', head: true })
                 .eq('id_empresa', detailId)
-                .or('status.eq.qualificado,qualificacao.eq.qualificado')
-                .gte('criado_em', data30dias);
+                .ilike('status', '%qualificado%')
+                .gte('created_at', data30dias);
 
             let evaluatedStatus = usuario.status_assinatura || 'vencido';
             let diffDays = 0;
