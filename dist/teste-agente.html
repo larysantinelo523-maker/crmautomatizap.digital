@@ -246,7 +246,43 @@
 
             <!-- Dashboard Grid -->
 
+            <style>
+                .mobile-page-header {
+                    display: none;
+                    margin-bottom: 24px;
+                }
+                .mobile-page-header h1 {
+                    font-size: 22px;
+                    color: var(--color-text-main);
+                    margin: 0 0 8px 0;
+                }
+                .mobile-page-header p {
+                    font-size: 14px;
+                    color: var(--color-text-mut);
+                    margin: 0;
+                    line-height: 1.4;
+                }
+                @media (max-width: 768px) {
+                    .mobile-page-header {
+                        display: block;
+                    }
+                    .chat-card {
+                        height: 55vh !important;
+                        min-height: auto !important;
+                    }
+                    .report-card {
+                        height: auto !important;
+                        min-height: auto !important;
+                    }
+                }
+            </style>
             <div class="content-wrapper" style="padding: 24px;">
+                <!-- Titulo Mobile -->
+                <div class="mobile-page-header">
+                    <h1>Teste seu Agente</h1>
+                    <p>Converse com a inteligência artificial da sua empresa e veja como ela atende seus clientes.</p>
+                </div>
+                
                 <!-- Barra de aviso -->
                 <div
                     style="background-color: #FEF9C3; color: #854D0E; padding: 12px 16px; border-radius: 8px; display: flex; align-items: center; gap: 8px; margin-bottom: 24px; font-size: 14px;">
