@@ -4628,6 +4628,10 @@ section.summary-panel.d-none-important {
 @media (max-width: 768px) { .teste-agente-layout { flex-direction: column !important; } .teste-agente-layout > .card { flex: 1 1 100% !important; min-width: 100% !important; } }
 
 .mobile-page-header { display: none; margin-bottom: 24px; }
+.chat-layout .mobile-page-header,
+.tarefas-container .mobile-page-header {
+    padding: 24px 24px 0 24px;
+}
 .mobile-page-header h1 { font-size: 22px; color: var(--color-text-main); margin: 0 0 8px 0; }
 .mobile-page-header p { font-size: 14px; color: var(--color-text-mut); margin: 0; line-height: 1.4; }
 @media (max-width: 768px) { .mobile-page-header { display: block; } }
