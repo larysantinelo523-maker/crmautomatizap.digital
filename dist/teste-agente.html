@@ -855,7 +855,7 @@
                 if (e.target === modal) closeModal();
             });
             
-            btnSubmit.addEventListener('click', () => {
+            btnSubmit.addEventListener('click', async () => {
                 const text = textarea.value.trim();
                 if(!text) {
                     textarea.style.borderColor = 'red';
