@@ -572,7 +572,7 @@
                 leads.slice(0, 5).forEach(lead => {
                     let badgeClass = 'primary-light';
                     let st = lead.status ? lead.status.trim().toLowerCase() : '';
-                    if (st === 'em atendimento') badgeClass = 'success';
+                    if (st === 'em atendimento') badgeClass = 'warning-light';
                     else if (st === 'qualificado') badgeClass = 'primary-light';
 
                     const date = new Date(lead.criado_em);
