@@ -1,4 +1,4 @@
-import { supabase } from './supabase.js';
+ï»¿import { supabase } from './supabase.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     let adminStartDate = null;
@@ -1112,7 +1112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     window.resetarHorarios = async function(event) {
         event.preventDefault();
-        if (!confirm('Deseja realmente resetar todos os horários?')) return;
+        if (!confirm('Deseja realmente resetar todos os horï¿½rios?')) return;
         if (!currentTenantId) return;
         event.target.textContent = 'resetando...';
         try {
@@ -1124,7 +1124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     horarios: []
                 })
             });
-            if (!res.ok) throw new Error('Erro ao resetar horários');
+            if (!res.ok) throw new Error('Erro ao resetar horï¿½rios');
             const tenant = globalTenants.find(t => t.id_empresa === currentTenantId) || {};
             tenant.horarios = [];
             loadTenantDetails(currentTenantId, tenant.nome || 'Sem Nome', tenant.email || '');
@@ -1151,8 +1151,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             let horarios = window.tempHorarios || [];
             const existingIdx = horarios.findIndex(h => h.dia_semana === idx);
             
+            const diasNome = ['Domingo', 'Segunda', 'TerÃ§a', 'Quarta', 'Quinta', 'Sexta', 'SÃ¡bado'];
             const newObj = {
                 dia_semana: idx,
+                nome_semana: diasNome[idx],
                 aberto: isAberto,
                 hora_abertura: isAberto ? horaAbertura + ':00' : null,
                 hora_fechamento: isAberto ? horaFechamento + ':00' : null
@@ -1195,6 +1197,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
 });
+
 
 
 
