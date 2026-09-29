@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>AutomatiZAP - CRM Dashboard</title>
+    <title>Teste seu Agente - AutomatiZAP</title>
 
     <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,8 +18,6 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="tutorial.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 
     
@@ -57,6 +55,11 @@
         });
       });
     </script>
+  <script type="module" crossorigin src="/assets/supabase-DUkCiNAm.js"></script>
+  <script type="module" crossorigin src="/assets/data-CEV4NcjX.js"></script>
+  <script type="module" crossorigin src="/assets/script-DYINcIcl.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-B0bJzOGf.css">
 </head>
 
 <body>
@@ -65,12 +68,12 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <a href="#" class="logo">
-                    <img src="logo.png" alt="AutomatiZAP CRM" class="logo-img">
+                    <img src="/assets/logo-BxJ03jLZ.png" alt="AutomatiZAP CRM" class="logo-img">
                 </a>
             </div>
 
             <nav class="sidebar-nav">
-                <a href="index.html" class="nav-item active">
+                <a href="index.html" class="nav-item">
                     <i class="ph ph-squares-four"></i>
                     <span>Visão geral</span>
                 </a>
@@ -87,7 +90,7 @@
                     <i class="ph ph-chart-bar"></i>
                     <span>Relatórios</span>
                 </a>
-                <a href="teste-agente.html" class="nav-item">
+                <a href="teste-agente.html" class="nav-item active">
                     <i class="ph ph-robot"></i>
                     <span>Teste seu Agente</span>
                 </a>
@@ -120,10 +123,10 @@
                 <div class="header-titles">
                     <button class="mobile-menu-btn"><i class="ph ph-list"></i></button>
                     <a href="index.html" class="mobile-logo-header">
-                        <img src="logo.png" alt="AutomatiZAP CRM" class="logo-img">
+                        <img src="/assets/logo-BxJ03jLZ.png" alt="AutomatiZAP CRM" class="logo-img">
                     </a>
                     <div class="desktop-header-title">
-                        <h1>Visão geral</h1>
+                        <h1>Teste seu Agente</h1><p style="color: var(--color-text-mut); margin-top: 4px;">Converse com a inteligência artificial da sua empresa e veja como ela atende seus clientes.</p>
                         <p>Acompanhe seus leads, o desempenho do atendimento e o andamento das negociações.</p>
                     </div>
                 </div>
@@ -467,8 +470,6 @@
         </main>
     </div>
 
-    <script type="module" src="tutorial.js"></script>
-    <script type="module" src="script.js"></script>
     <script>
         window.initDashboard = async function () {
             if (!window.dbAPI) return;
