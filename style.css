@@ -4541,3 +4541,7 @@ section.summary-panel.d-none-important {
 .animate-fade-slide {
     animation: fadeSlideIn 0.25s ease-out forwards;
 }
+/* Admin Panel KPI Section 4 columns */
+.admin-kpis { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 1400px) { .admin-kpis { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .admin-kpis { grid-template-columns: 1fr; } }
