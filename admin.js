@@ -1110,6 +1110,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     window.toggleDirectHorario = async function(idx, idEmpresa) { const chk = document.getElementById('check-aberto-' + idx); chk.checked = !chk.checked; window.toggleInputsHorario(idx); await window.saveHorario(idx, idEmpresa, true); };
 
+    window.resetarHorarios = async function(event) {
+        event.preventDefault();
+        if (!confirm('Deseja realmente resetar todos os horários?')) return;
+        if (!currentTenantId) return;
+        event.target.textContent = 'resetando...';
+        try {
+            const res = await fetch('/api/upsert_horarios', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    userId: currentTenantId,
+                    horarios: []
+                })
+            });
+            if (!res.ok) throw new Error('Erro ao resetar horários');
+            const tenant = globalTenants.find(t => t.id_empresa === currentTenantId) || {};
+            tenant.horarios = [];
+            loadTenantDetails(currentTenantId, tenant.nome || 'Sem Nome', tenant.email || '');
+        } catch(err) {
+            alert(err.message);
+        } finally {
+            event.target.textContent = 'resetar';
+        }
+    };
+
     window.saveHorario = async function(idx, idEmpresa, isDirectToggle = false) {
         try {
             const btn = isDirectToggle ? null : (event ? event.target : null);
@@ -1170,6 +1195,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
 });
+
 
 
 
