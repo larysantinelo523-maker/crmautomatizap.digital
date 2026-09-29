@@ -1140,13 +1140,11 @@ window.saveHorario = async function(idx, idEmpresa) {
         if (!res.ok) throw new Error('Erro ao salvar horário');
         
         // Atualiza no cache e recarrega a tela
-        const tenant = window.globalTenants.find(t => t.id === idEmpresa);
-        if (tenant) {
-            tenant.horarios = horarios;
-        }
+        const tenant = globalTenants.find(t => t.id_empresa === idEmpresa) || {};
+        tenant.horarios = horarios;
         
         alert('Horário salvo com sucesso!');
-        loadTenantDetails(idEmpresa, tenant.nome_completo || tenant.nome, tenant.email);
+        loadTenantDetails(idEmpresa, tenant.nome || 'Sem Nome', tenant.email || '');
         
     } catch(err) {
         alert(err.message);
