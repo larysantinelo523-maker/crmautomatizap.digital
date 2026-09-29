@@ -2127,3 +2127,109 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+
+// ==========================================================================
+// LIQUID GLASS MOBILE BOTTOM NAV (APP iOS 26 STYLE)
+// ==========================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.innerWidth <= 1024) {
+        // 1. Injetar o Filtro SVG de Refração Real
+        const svgHTML = `
+            <svg style="display: none; width: 0; height: 0;">
+                <defs>
+                    <filter id="liquid-glass-filter" x="-20%" y="-20%" width="140%" height="140%">
+                        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+                        <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="G" />
+                        <feGaussianBlur stdDeviation="8" result="blur" />
+                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                </defs>
+            </svg>
+        `;
+        document.body.insertAdjacentHTML('beforeend', svgHTML);
+
+        // 2. Injetar a Bolha Deslizante e Configurar Aria-Labels
+        const sidebarNav = document.querySelector('.sidebar-nav');
+        if (sidebarNav) {
+            const bubble = document.createElement('div');
+            bubble.className = 'glass-bubble';
+            sidebarNav.insertBefore(bubble, sidebarNav.firstChild);
+
+            const navItems = sidebarNav.querySelectorAll('.nav-item');
+            
+            // Função para mover a bolha
+            const moveBubbleTo = (item, isInitial = false) => {
+                if (!item) return;
+                const navRect = sidebarNav.getBoundingClientRect();
+                const itemRect = item.getBoundingClientRect();
+                
+                // O centro do botão em relação à barra de navegação
+                const centerLeft = (itemRect.left - navRect.left) + (itemRect.width / 2);
+                const bubbleWidth = 72; // Definido no CSS
+                const targetLeft = centerLeft - (bubbleWidth / 2);
+                
+                if (isInitial) {
+                    bubble.style.transition = 'none';
+                    bubble.style.left = `${targetLeft}px`;
+                    setTimeout(() => {
+                        bubble.style.transition = '';
+                    }, 50);
+                } else {
+                    bubble.style.left = `${targetLeft}px`;
+                }
+            };
+
+            // Setup inicial
+            let activeItem = sidebarNav.querySelector('.nav-item.active');
+            if (!activeItem && navItems.length > 0) activeItem = navItems[0];
+            
+            navItems.forEach(item => {
+                // Acessibilidade e tamanhos mínimos de toque
+                const textSpan = item.querySelector('span');
+                if (textSpan) {
+                    item.setAttribute('aria-label', textSpan.textContent);
+                }
+                
+                if (item.classList.contains('active')) {
+                    item.setAttribute('aria-current', 'page');
+                }
+
+                // Animação ao clicar (Feedback visual antes de redirecionar)
+                item.addEventListener('click', (e) => {
+                    sidebarNav.querySelectorAll('.nav-item').forEach(nav => {
+                        nav.classList.remove('active');
+                        nav.removeAttribute('aria-current');
+                    });
+                    item.classList.add('active');
+                    item.setAttribute('aria-current', 'page');
+                    moveBubbleTo(item);
+                });
+            });
+
+            // Posiciona bolha inicialmente aguardando renderização do grid
+            setTimeout(() => {
+                moveBubbleTo(activeItem, true);
+            }, 150);
+            
+            // Atualiza ao redimensionar
+            window.addEventListener('resize', () => {
+                const current = sidebarNav.querySelector('.nav-item.active') || navItems[0];
+                moveBubbleTo(current, true);
+            });
+
+            // 3. Efeito de minimizar ao rolar (Scroll para baixo vs cima)
+            let lastScrollY = window.scrollY;
+            const sidebar = document.querySelector('.sidebar');
+            window.addEventListener('scroll', () => {
+                if (!sidebar) return;
+                if (window.scrollY > lastScrollY && window.scrollY > 50) {
+                    sidebar.classList.add('sidebar-scrolled');
+                } else {
+                    sidebar.classList.remove('sidebar-scrolled');
+                }
+                lastScrollY = window.scrollY;
+            }, { passive: true });
+        }
+    }
+});
