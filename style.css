@@ -2513,6 +2513,7 @@ body.dark-mode .accordion-content {
         grid-template-columns: 1fr;
         height: auto;
         overflow: visible;
+        gap: 0;
     }
 
     .modal-content {
