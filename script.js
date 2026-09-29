@@ -1304,8 +1304,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         statusBody.innerHTML = `
                             <div class="custom-option selected mobile-opt" data-value="Todos" style="padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px;">Todos os status</div>
                             <div class="custom-option mobile-opt" data-value="Em atendimento" style="padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px;">Em atendimento</div>
-                            <div class="custom-option mobile-opt" data-value="Aguardando vendedor" style="padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px;">Aguardando vendedor</div>
-                            <div class="custom-option mobile-opt" data-value="Em negociação" style="padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px;">Em negociação</div>
                             <div class="custom-option mobile-opt" data-value="Qualificado" style="padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px;">Qualificado</div>
                         `;
 
@@ -1400,9 +1398,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                     row.style.display = '';
                                 } else {
                                     const cells = row.querySelectorAll('td');
-                                    if (cells.length > 3) {
-                                        const badge = cells[3].querySelector('.badge');
-                                        const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[3].textContent.trim().toLowerCase();
+                                    if (cells.length > 2) {
+                                        const badge = cells[2].querySelector('.badge');
+                                        const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[2].textContent.trim().toLowerCase();
                                         if (rowStatus === selectedMobileStatus.toLowerCase()) {
                                             row.style.display = '';
                                         } else {
@@ -1467,8 +1465,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="custom-select-container" style="display: flex; flex-direction: column; gap: 4px;">
                                 <div class="custom-option selected" data-value="Todos">Todos os status</div>
                                 <div class="custom-option" data-value="Em atendimento">Em atendimento</div>
-                                <div class="custom-option" data-value="Aguardando vendedor">Aguardando vendedor</div>
-                                <div class="custom-option" data-value="Em negociação">Em negociação</div>
                                 <div class="custom-option" data-value="Qualificado">Qualificado</div>
                             </div>
                         `;
@@ -1498,9 +1494,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                         row.style.display = '';
                                     } else {
                                         const cells = row.querySelectorAll('td');
-                                        if (cells.length > 3) {
-                                            const badge = cells[3].querySelector('.badge');
-                                            const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[3].textContent.trim().toLowerCase();
+                                        if (cells.length > 2) {
+                                            const badge = cells[2].querySelector('.badge');
+                                            const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[2].textContent.trim().toLowerCase();
                                             if (rowStatus === statusVal.toLowerCase()) {
                                                 row.style.display = '';
                                             } else {
