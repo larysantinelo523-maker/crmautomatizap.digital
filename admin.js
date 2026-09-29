@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function loadTenantsList() {
         const tbody = document.getElementById('empresas-tbody');
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 32px;"><div class="kpi-loading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;"><i class="ph ph-spinner-gap"></i><span style="font-size: 14px;">Carregando empresas...</span></div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 32px; justify-content: center; width: 100%;"><div class="kpi-loading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;"><i class="ph ph-spinner-gap"></i><span style="font-size: 14px;">Carregando empresas...</span></div></td></tr>';
 
         try {
             const res = await fetch('/api/list_tenants');
