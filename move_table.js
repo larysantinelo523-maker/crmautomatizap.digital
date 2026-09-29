@@ -1,0 +1,74 @@
+const fs = require('fs');
+let html = fs.readFileSync('admin.html', 'utf8');
+
+const tableHtml = `
+                            <!-- Correções Solicitadas -->
+                            <div style="margin-top: 24px; border-top: 1px solid var(--color-border); padding-top: 24px;">
+                                <div class="card-title" style="margin-bottom: 16px;">
+                                    <i class="ph-fill ph-warning-circle text-primary"></i>
+                                    <h3>Correções Solicitadas pelo Usuário</h3>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Data/Hora</th>
+                                                <th>Motivo Principal</th>
+                                                <th>Descrição do Problema</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="table-correcoes-body">
+                                            <tr><td colspan="3" style="text-align: center; color: var(--color-text-mut);">Carregando correções...</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>`;
+
+const targetRemoval = `                            
+                            <!-- Correções Solicitadas -->
+                            <div class="card" style="margin-top: 24px;">
+                                <div class="card-title" style="margin-bottom: 16px;">
+                                    <i class="ph-fill ph-warning-circle text-primary"></i>
+                                    <h3>Correções Solicitadas pelo Usuário</h3>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Data/Hora</th>
+                                                <th>Motivo Principal</th>
+                                                <th>Descrição do Problema</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="table-correcoes-body">
+                                            <tr><td colspan="3" style="text-align: center; color: var(--color-text-mut);">Carregando correções...</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>`;
+
+if (html.includes(targetRemoval)) {
+    html = html.replace(targetRemoval, '');
+    
+    const insertionPoint = `                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Right -->`;
+
+    const replacement = `                                    </div>
+                                </div>
+                            </div>${tableHtml}
+
+                        </div>
+
+                        <!-- Right -->`;
+                        
+    html = html.replace(insertionPoint, replacement);
+    fs.writeFileSync('admin.html', html);
+    console.log('Moved table to the left column');
+} else {
+    console.log('targetRemoval not found in file!');
+}
