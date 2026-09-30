@@ -845,7 +845,7 @@
             reportButtons.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     // Get the text from the previous span element
-                    const container = btn.closest('div[style*="display: flex; align-items: center; justify-content: space-between"]');
+                    const container = btn.closest('.report-item');
                     const span = container.querySelector('span');
                     const iconBox = container.querySelector('div[style*="border-radius: 50%"]');
                     let iconEl = null, bgColor = '', color = '';
