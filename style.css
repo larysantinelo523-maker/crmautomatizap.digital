@@ -4924,6 +4924,9 @@ body.dark-mode .chat-body-container {
 .desktop-only {
     display: flex !important;
 }
+.report-item-body {
+    display: none;
+}
 
 @media (max-width: 1024px) {
     .desktop-only {
