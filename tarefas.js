@@ -348,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const fotoHtml = t.foto ? `<img src="${t.foto}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` : getInitials(t.client);
                 
                 const itemHtml = `
-                    <div class="day-task-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border: 1px solid var(--color-border); border-radius: 8px; margin-bottom: 0px; cursor: pointer; background: #fff;" onclick="window.openConversation(this)" data-client="${t.client}" data-text="${t.text}">
+                    <div class="day-task-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border: 1px solid var(--color-border); border-radius: 8px; margin-bottom: 0px; cursor: pointer; background: var(--color-bg-card);" onclick="window.openConversation(this)" data-client="${t.client}" data-text="${t.text}">
                         
                         <!-- Lado Esquerdo: Avatar -->
                         <div style="width: 40px; height: 40px; border-radius: 50%; background: ${t.foto ? 'transparent' : 'var(--color-primary)'}; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; flex-shrink: 0; overflow: hidden; margin-right: 12px;">
