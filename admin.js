@@ -1308,6 +1308,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadAdminNotifications() {
     const listEl = document.getElementById('notif-list');
     const badgeEl = document.getElementById('notif-badge');
+    const notifDot = document.querySelector('.notification-dot');
     if (!listEl) return;
 
     let notifications = [];
@@ -1360,12 +1361,16 @@ async function loadAdminNotifications() {
     if (notifications.length === 0) {
         listEl.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--color-text-mut); font-size: 13px;">Nenhuma notificação.</div>';
         if (badgeEl) badgeEl.style.display = 'none';
+        if (notifDot) notifDot.style.display = 'none';
         return;
     }
 
     if (badgeEl) {
         badgeEl.textContent = notifications.length;
         badgeEl.style.display = 'inline-flex';
+    }
+    if (notifDot) {
+        notifDot.style.display = 'block';
     }
 
     listEl.innerHTML = '';
