@@ -649,11 +649,11 @@
             document.getElementById('lead-highlight-phone').textContent = lead.telefone;
             const statusEl = document.getElementById('lead-highlight-status');
             statusEl.textContent = lead.status;
-            let badgeClass = 'primary-light';
+            let currentBadgeClass = 'primary-light';
             let st = lead.status ? lead.status.trim().toLowerCase() : '';
-            if (st === 'em atendimento') badgeClass = 'warning-light';
-            else if (st === 'qualificado') badgeClass = 'primary-light';
-            statusEl.className = `badge ${badgeClass}`;
+            if (st === 'em atendimento') currentBadgeClass = 'warning-light';
+            else if (st === 'qualificado') currentBadgeClass = 'primary-light';
+            statusEl.className = `badge ${currentBadgeClass}`;
             
             document.getElementById('lead-highlight-interest').textContent = lead.interesse || 'Não informado';
             document.getElementById('lead-highlight-budget').textContent = lead.orcamento || 'Não informado';
