@@ -403,7 +403,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </td>
                 <td>${tenant.email || "N/A"}</td>
                 <td>${dataVenc}</td>
-                <td><span style="font-weight: 500;">${tenant.mensalidade ? (isNaN(parseFloat(tenant.mensalidade)) ? tenant.mensalidade : 'R$ ' + parseFloat(tenant.mensalidade).toLocaleString('pt-BR', {minimumFractionDigits: 2})) : 'R$ 0,00'}</span></td>
+                <td>${diasRestantesText}</td>
+                <td><span><strong>${tenant.total_leads || 0}</strong> leads</span></td>
                 <td>${statusBadge}</td>
                 <td>
                     <div style="display: inline-flex; align-items: center; gap: 8px; font-family: monospace; font-size: 12px; background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px;">
@@ -870,25 +871,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Painel "Informações da Empresa"
     document.getElementById("info-nome").textContent = displayNome;
     document.getElementById("info-email").textContent = displayEmail;
-    
-    let diasStr = "N/A";
-    if (t.vencimento && t.vencimento !== "N/A") {
-        const pts = t.vencimento.split("-");
-        if (pts.length === 3) {
-            const yr = parseInt(pts[0], 10), mo = parseInt(pts[1], 10) - 1, dy = parseInt(pts[2], 10);
-            const nextDate = new Date(yr, mo, dy, 0, 0, 0, 0);
-            const hojeStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
-            const hoje = new Date(hojeStr);
-            hoje.setHours(0, 0, 0, 0);
-            const diffDays = Math.ceil((nextDate.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
-            if (diffDays > 3) diasStr = diffDays + " dias";
-            else if (diffDays > 0) diasStr = diffDays + (diffDays === 1 ? " dia" : " dias");
-            else if (diffDays === 0) diasStr = "Vence hoje";
-            else diasStr = "Atrasado";
-        }
-    }
-    const elDias = document.getElementById("info-dias-restantes");
-    if (elDias) elDias.textContent = diasStr;
 
     if (t.criado_em) {
       const dc = new Date(t.criado_em);
