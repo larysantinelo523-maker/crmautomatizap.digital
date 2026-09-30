@@ -4885,13 +4885,16 @@ body.dark-mode .chat-body-container {
 
 /* Report Items (Teste seu Agente) */
 .report-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     padding: 16px 0;
 }
 .report-item.border-b {
     border-bottom: 1px solid var(--color-border);
+}
+.report-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: default;
 }
 .report-item-inner {
     display: flex;
@@ -4915,20 +4918,66 @@ body.dark-mode .chat-body-container {
     background-color: var(--color-primary);
     color: white;
 }
+.mobile-only {
+    display: none !important;
+}
+.desktop-only {
+    display: flex !important;
+}
 
 @media (max-width: 1024px) {
-    .report-item {
-        flex-direction: column;
+    .desktop-only {
+        display: none !important;
+    }
+    .mobile-only {
+        display: flex !important;
+    }
+    .report-item-header {
+        cursor: pointer;
+    }
+    .report-item.expanded .report-item-body {
+        display: flex;
+    }
+    .report-item.expanded .report-caret {
+        transform: rotate(180deg);
+    }
+    .report-caret {
+        transition: transform 0.2s;
+        font-size: 16px;
+        color: var(--color-text-mut);
+    }
+    .report-item-body {
+        margin-top: 12px;
+        padding: 12px;
+        background-color: var(--color-bg-main);
+        border-radius: 8px;
+        display: none; /* toggled by .expanded */
+        align-items: center;
+        justify-content: space-between;
         gap: 12px;
-        align-items: stretch;
     }
-    .report-item-inner {
-        width: 100%;
-        padding-right: 0;
+    body.dark-mode .report-item-body {
+        background-color: #111827; /* Same as main dark bg */
     }
-    .report-item-btn {
-        width: 100%;
-        justify-content: center;
-        padding: 10px 16px;
+    .report-item-desc {
+        font-size: 12px;
+        color: var(--color-text-sec);
+        line-height: 1.4;
+        flex: 1;
+        margin: 0;
+    }
+    .report-item-btn-mobile {
+        padding: 8px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        flex-shrink: 0;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background-color: var(--color-primary);
+        color: white;
     }
 }
