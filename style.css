@@ -4870,3 +4870,7 @@ section.summary-panel.d-none-important {
         z-index: 1 !important;
     }
 }
+
+body.dark-mode .data-table tbody tr.active-row {
+    background-color: rgba(0, 200, 83, 0.15) !important;
+}
