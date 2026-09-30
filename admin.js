@@ -127,6 +127,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Dropdown de Notificações
+    const notifBtn = document.getElementById('notification-btn');
+    const notifDropdown = document.getElementById('notification-dropdown');
+
+    if (notifBtn && notifDropdown) {
+        notifBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notifDropdown.classList.toggle('show');
+            
+            if (notifDropdown.classList.contains('show')) {
+                const btnReadAll = document.getElementById('btn-read-all');
+                if (btnReadAll && btnReadAll.style.display !== 'none') {
+                    btnReadAll.click();
+                }
+            }
+            if (typeof userDropdown !== 'undefined' && userDropdown) userDropdown.classList.remove('show');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
+                notifDropdown.classList.remove('show');
+            }
+        });
+    }
+
     // Função para animar números
     function animateValue(id, start, end, duration, isCurrency = false) {
         const obj = document.getElementById(id);
