@@ -4939,25 +4939,32 @@ body.dark-mode .chat-body-container {
         cursor: pointer;
     }
     .report-item.expanded .report-item-body {
-        display: flex;
+        max-height: 200px;
+        opacity: 1;
+        margin-top: 12px;
+        padding: 12px;
     }
     .report-item.expanded .report-caret {
         transform: rotate(180deg);
     }
     .report-caret {
-        transition: transform 0.2s;
+        transition: transform 0.3s ease;
         font-size: 16px;
         color: var(--color-text-mut);
     }
     .report-item-body {
-        margin-top: 12px;
-        padding: 12px;
+        display: flex;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        margin-top: 0;
+        padding: 0 12px;
         background-color: var(--color-bg-main);
         border-radius: 8px;
-        display: none; /* toggled by .expanded */
         align-items: center;
         justify-content: space-between;
         gap: 12px;
+        transition: max-height 0.3s ease, opacity 0.2s ease, margin-top 0.3s ease, padding 0.3s ease;
     }
     body.dark-mode .report-item-body {
         background-color: #111827; /* Same as main dark bg */
