@@ -4885,10 +4885,10 @@ body.dark-mode .chat-body-container {
 
 /* Report Items (Teste seu Agente) */
 .report-item {
-    padding: 16px 0;
-}
-.report-item.border-b {
-    border-bottom: 1px solid var(--color-border);
+    padding: 16px;
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
 }
 .report-item-header {
     display: flex;
