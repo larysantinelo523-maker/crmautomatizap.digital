@@ -37,7 +37,40 @@
         .admin-section.active {
             display: block;
         }
-    </style>
+    
+                                    .admin-table td:nth-child(2)::before { content: "Email responsável"; }
+                                    .admin-table td:nth-child(3)::before { content: "Vencimento"; }
+                                    .admin-table td:nth-child(4)::before { content: "Valor Cobrado"; }
+                                    .admin-table td:nth-child(5)::before { content: "Status" !important; display: block !important; }
+                                    .admin-table td:nth-child(6)::before { content: "API"; }
+
+
+                                    .admin-table td:nth-child(5) {
+                                        position: static !important;
+                                        width: 100% !important;
+                                        margin: 0 !important;
+                                        padding: 6px 0 !important;
+                                        border-radius: 0 !important;
+                                        display: flex !important;
+                                        justify-content: space-between !important;
+                                        align-items: center !important;
+                                        overflow: visible !important;
+                                        border-top: 1px solid var(--color-border);
+                                        padding-top: 12px !important;
+                                        margin-top: 6px !important;
+                                    }
+                                    .admin-table td:nth-child(6) {
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                        padding-top: 12px;
+                                    }
+                                    .admin-table td:nth-child(6) .btn-copy-id {
+                                        position: relative !important;
+                                        right: auto !important;
+                                    }
+
+</style>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 
 
@@ -405,7 +438,7 @@
 
                                     .admin-table tr {
                                         display: grid;
-                                        grid-template-columns: repeat(6, 1fr);
+                                        grid-template-columns: 1.5fr 1.5fr 1fr 1fr 1fr 1.2fr;
                                         gap: 12px;
                                         align-items: center;
                                         border-bottom: 1px solid var(--color-border);
@@ -428,44 +461,21 @@
                                 }
 
                                 @media (max-width: 768px) {
-                                    .admin-table td:nth-child(2)::before {
-                                        content: "Email Responsável";
-                                    }
+                                    
 
-                                    .admin-table td:nth-child(3)::before {
-                                        content: "Data de Vencimento";
-                                    }
+                                    
 
-                                    .admin-table td:nth-child(4)::before {
-                                        content: "Dias Restantes";
-                                    }
+                                    
 
-                                    .admin-table td:nth-child(5)::before {
-                                        content: "Total de Leads";
-                                    }
+                                    
 
-                                    .admin-table td:nth-child(6)::before {
-                                        content: "Status" !important;
-                                        display: block !important;
-                                    }
+                                    
 
-                                    .admin-table td:nth-child(7)::before {
-                                        content: "Chave de API";
-                                    }
+                                    
+
+                                    
 
                                     .admin-table td:nth-child(5) {
-                                        position: static !important;
-                                        width: 100% !important;
-                                        margin: 0 !important;
-                                        padding: 6px 0 !important;
-                                        border-radius: 0 !important;
-                                        display: flex !important;
-                                        justify-content: space-between !important;
-                                        align-items: center !important;
-                                        overflow: visible !important;
-                                    }
-
-                                    .admin-table td:nth-child(6) {
                                         display: flex;
                                         justify-content: space-between;
                                         align-items: center;
@@ -474,7 +484,7 @@
                                         margin-top: 6px;
                                     }
 
-                                    .admin-table td:nth-child(6) .btn-copy-id {
+                                    .admin-table td:nth-child(5) .btn-copy-id {
                                         position: relative !important;
                                         right: auto !important;
                                     }
@@ -484,12 +494,11 @@
                                 <thead>
                                     <tr>
                                         <th>Empresa</th>
-                                        <th>Email Responsável</th>
-                                        <th>Data de Vencimento</th>
-                                        <th>Dias Restantes</th>
-                                        <th>Total de Leads</th>
+                                        <th>Email responsável</th>
+                                        <th>Vencimento</th>
+                                        <th>Valor Cobrado</th>
                                         <th>Status</th>
-                                        <th>Chave de API</th>
+                                        <th>API</th>
                                     </tr>
                                 </thead>
                                 <tbody id="empresas-tbody">
