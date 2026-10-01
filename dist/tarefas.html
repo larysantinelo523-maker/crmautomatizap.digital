@@ -364,21 +364,112 @@
                     </section>
 
                     <!-- Painel de Resumo da Conversa (Oculto por Padrão) -->
-                    <section class="card summary-panel d-none-important" id="conversation-panel" style="height: 100%; flex-direction: column;">
-                        <div class="conversation-header" style="margin-bottom: 20px;">
-                            <button type="button" id="back-to-summary" onclick="window.closeConversation()" style="background: none; border: none; cursor: pointer; color: var(--color-text-mut); font-size: 13px; text-decoration: underline; margin-bottom: 12px; display: inline-block; padding: 0;">voltar</button>
-                            <h3 style="font-size: 20px; font-weight: 700; color: var(--color-text-main); margin-bottom: 4px;">Resumo da Conversa</h3>
-                            <p style="font-size: 13px; color: var(--color-text-sec);">Cliente: <span id="conv-client-name" style="color: var(--color-primary); font-weight: 500;">...</span></p>
+                    <section class="card summary-panel d-none-important" id="conversation-panel" style="height: 100%; flex-direction: column; overflow-y: auto;">
+                        <div class="conversation-header" style="margin-bottom: 24px;">
+                            <button type="button" id="back-to-summary" onclick="window.closeConversation()" style="background: none; border: none; cursor: pointer; color: var(--color-text-mut); font-size: 13px; text-decoration: underline; margin-bottom: 16px; display: inline-block; padding: 0;">voltar</button>
+                            
+                            <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                                <div style="background: rgba(34, 197, 94, 0.1); color: #16a34a; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;">
+                                    <i class="ph ph-calendar-blank" style="font-size: 14px;"></i>
+                                    <span>Agendado</span>
+                                </div>
+                            </div>
+
+                            <h3 id="conv-meeting-title" style="font-size: 24px; font-weight: 800; color: var(--color-text-main); margin-bottom: 8px; line-height: 1.2;">Consulta agendada</h3>
+                            <p id="conv-meeting-time" style="font-size: 14px; color: var(--color-text-sec); display: flex; align-items: center; gap: 6px;">
+                                <i class="ph ph-clock" style="font-size: 16px;"></i>
+                                <span>Seg, 21 de setembro de 2026 • 14:30</span>
+                            </p>
                         </div>
                         
-                        <div class="conversation-body" style="flex: 1; overflow-y: auto;">
-                            <div class="conv-section" style="margin-bottom: 24px;">
-                                <h4 style="font-size: 14px; font-weight: 600; color: var(--color-text-main); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;"><i class="ph-fill ph-user text-primary" style="font-size: 16px;"></i> O que o cliente disse:</h4>
-                                <p id="conv-client-text" style="font-size: 14px; color: var(--color-text-sec); line-height: 1.5;">...</p>
+                        <div class="conversation-body" style="flex: 1; display: flex; flex-direction: column; gap: 24px;">
+                            <!-- Identificação do Lead -->
+                            <div style="display: flex; align-items: flex-start; gap: 16px;">
+                                <div id="conv-lead-avatar" style="width: 56px; height: 56px; border-radius: 50%; background: var(--color-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; flex-shrink: 0; overflow: hidden;">
+                                    LP
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                                        <h4 id="conv-lead-name" style="font-size: 16px; font-weight: 700; color: var(--color-text-main); margin: 0;">Lore Portela</h4>
+                                        <div id="conv-lead-badge" style="background: rgba(34, 197, 94, 0.1); color: #16a34a; display: flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 600;">
+                                            <i class="ph-fill ph-star" style="font-size: 10px;"></i>
+                                            <span>Lead Qualificado</span>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--color-text-mut); margin-bottom: 4px;">
+                                        <i class="ph ph-whatsapp-logo" style="color: #25D366; font-size: 14px;"></i>
+                                        <span id="conv-lead-phone">(00) 0 0000-0000</span>
+                                        <i class="ph ph-copy" style="cursor: pointer; font-size: 14px; color: var(--color-text-sec);" onclick="navigator.clipboard.writeText(document.getElementById('conv-lead-phone').innerText)" title="Copiar"></i>
+                                    </div>
+                                    <div id="conv-lead-location-wrapper" style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--color-text-mut);">
+                                        <i class="ph ph-map-pin" style="font-size: 14px;"></i>
+                                        <span id="conv-lead-location">Não informado</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="conv-section" style="margin-bottom: 24px;">
-                                <h4 style="font-size: 14px; font-weight: 600; color: var(--color-text-main); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;"><i class="ph-fill ph-robot" style="color: #6366f1; font-size: 16px;"></i> O que a IA respondeu:</h4>
-                                <p id="conv-ai-text" style="font-size: 14px; color: var(--color-text-sec); line-height: 1.5;">...</p>
+
+                            <hr style="border: none; border-top: 1px solid var(--color-border); margin: 0;">
+
+                            <!-- Grid de Informações -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <!-- Interesse principal -->
+                                <div style="display: flex; gap: 10px;">
+                                    <i class="ph ph-briefcase" style="font-size: 18px; color: var(--color-text-mut); margin-top: 2px;"></i>
+                                    <div>
+                                        <div style="font-size: 11px; font-weight: 600; color: var(--color-text-mut); margin-bottom: 4px;">Interesse principal</div>
+                                        <div id="conv-info-interesse" style="font-size: 13px; color: var(--color-text-main); line-height: 1.4;">Não informado</div>
+                                    </div>
+                                </div>
+                                <!-- Objetivo -->
+                                <div style="display: flex; gap: 10px;">
+                                    <i class="ph ph-target" style="font-size: 18px; color: var(--color-text-mut); margin-top: 2px;"></i>
+                                    <div>
+                                        <div style="font-size: 11px; font-weight: 600; color: var(--color-text-mut); margin-bottom: 4px;">Objetivo</div>
+                                        <div id="conv-info-objetivo" style="font-size: 13px; color: var(--color-text-main); line-height: 1.4;">Não informado</div>
+                                    </div>
+                                </div>
+                                <!-- Empresa -->
+                                <div style="display: flex; gap: 10px;">
+                                    <i class="ph ph-buildings" style="font-size: 18px; color: var(--color-text-mut); margin-top: 2px;"></i>
+                                    <div>
+                                        <div style="font-size: 11px; font-weight: 600; color: var(--color-text-mut); margin-bottom: 4px;">Empresa</div>
+                                        <div id="conv-info-empresa" style="font-size: 13px; color: var(--color-text-main); line-height: 1.4;">Não informado</div>
+                                    </div>
+                                </div>
+                                <!-- Orçamento estimado -->
+                                <div style="display: flex; gap: 10px;">
+                                    <i class="ph ph-currency-circle-dollar" style="font-size: 18px; color: var(--color-text-mut); margin-top: 2px;"></i>
+                                    <div>
+                                        <div style="font-size: 11px; font-weight: 600; color: var(--color-text-mut); margin-bottom: 4px;">Orçamento estimado</div>
+                                        <div id="conv-info-orcamento" style="font-size: 13px; color: var(--color-text-main); line-height: 1.4;">Não informado</div>
+                                    </div>
+                                </div>
+                                <!-- Cargo -->
+                                <div style="display: flex; gap: 10px;">
+                                    <i class="ph ph-user" style="font-size: 18px; color: var(--color-text-mut); margin-top: 2px;"></i>
+                                    <div>
+                                        <div style="font-size: 11px; font-weight: 600; color: var(--color-text-mut); margin-bottom: 4px;">Cargo</div>
+                                        <div id="conv-info-cargo" style="font-size: 13px; color: var(--color-text-main); line-height: 1.4;">Não informado</div>
+                                    </div>
+                                </div>
+                                <!-- Como nos conheceu -->
+                                <div style="display: flex; gap: 10px;">
+                                    <i class="ph ph-chat-circle-text" style="font-size: 18px; color: var(--color-text-mut); margin-top: 2px;"></i>
+                                    <div>
+                                        <div style="font-size: 11px; font-weight: 600; color: var(--color-text-mut); margin-bottom: 4px;">Como nos conheceu</div>
+                                        <div id="conv-info-origem" style="font-size: 13px; color: var(--color-text-main); line-height: 1.4;">Não informado</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Resumo da IA -->
+                            <div style="background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.15); border-radius: 12px; padding: 16px; margin-top: 8px;">
+                                <h4 style="font-size: 13px; font-weight: 700; color: #16a34a; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                                    <i class="ph-fill ph-chat-circle-dots" style="font-size: 16px;"></i> Resumo do atendimento (IA)
+                                </h4>
+                                <p id="conv-ia-summary" style="font-size: 13px; color: var(--color-text-sec); line-height: 1.5; margin: 0;">
+                                    Resumo ainda não disponível.
+                                </p>
                             </div>
                         </div>
                     </section>
