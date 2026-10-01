@@ -366,8 +366,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             
                             <!-- VIEW MOBILE -->
-                            <div class="dt-info-mobile" style="font-size: 14px; font-weight: 700; color: var(--color-text); margin-bottom: 2px;">
-                                ${t.client}
+                            <div class="dt-info-mobile" style="font-size: 14px; font-weight: 700; color: var(--color-text); margin-bottom: 2px; display: flex; align-items: center; gap: 6px;">
+                                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${t.client}</span>
+                                <span style="color: var(--color-text-mut); font-weight: 400; font-size: 13px;"><i class="ph ph-clock" style="margin-right: 4px;"></i>${t.time}</span>
                             </div>
 
                             <div style="font-size: 11px; color: var(--color-text-mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
