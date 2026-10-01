@@ -361,18 +361,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="day-task-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border: 1px solid var(--color-border); border-radius: 8px; margin-bottom: 0px; cursor: pointer; background: var(--color-bg-card);" onclick="window.openConversation(this)" 
                         data-client="${esc(t.client)}" 
                         data-text="${esc(t.text)}" 
-                        data-phone="(11) 9 9999-9999" 
+                        data-phone="${esc(t.telefone)}" 
                         data-time="${esc(t.time)}" 
                         data-avatar-html="${esc(fotoHtml)}"
-                        data-tipo="Reunião de Negociação"
-                        data-localizacao="Recife - PE"
+                        data-tipo="Detalhes da Reunião"
+                        data-localizacao="${esc(t.localizacao)}"
                         data-interesse="${esc(t.interesse)}"
-                        data-objetivo="Entender melhor a solução e fechar contrato"
-                        data-empresa="Ferreira Soluções LTDA"
-                        data-orcamento="R$ 2.000 - R$ 5.000/mês"
-                        data-cargo="Proprietário"
-                        data-origem="Google Maps"
-                        data-resumo="Lead demonstrou interesse em automatizar o atendimento do WhatsApp e integrar com CRM. Já possui equipe comercial e busca aumentar a conversão de leads. Demonstrou interesse no plano intermediário e pediu mais detalhes sobre integrações e prazos de implementação."
+                        data-objetivo="${esc(t.objetivo)}"
+                        data-empresa="${esc(t.empresa)}"
+                        data-local-reuniao="${esc(t.localReuniao)}"
+                        data-cargo="${esc(t.cargo)}"
+                        data-resumo="${esc(t.resumoIa)}"
                         data-full-date="${esc(fDate)}"
                         >
                         
@@ -583,9 +582,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 let actionText = `Consulta agendada para as ${timeStr}`;
                 
                 // Buscar dados reais do lead
-                const lead = leads.find(l => l.id === ag.lead_id);
-                const foto = lead ? lead.foto_perfil : null;
-                const interesse = lead && lead.interesse ? lead.interesse : 'Não informado';
+                const lead = leads.find(l => l.id === ag.lead_id) || {};
+                const foto = lead.foto_perfil || null;
+                const interesse = lead.interesse || 'Não informado';
+                const empresa = lead.empresa || 'Não informado';
+                const cargo = lead.cargo || 'Não informado';
+                const objetivo = lead.objetivo || 'Não informado';
+                const localReuniao = lead.local_reuniao || 'Não informado';
+                const resumoIa = lead.resumo_ia || 'Resumo ainda não disponível.';
+                const telefone = lead.telefone || '(00) 0 0000-0000';
+                const localizacao = lead.localizacao || '';
                 
                 calendarData[dateKey].kpis.reunioes++;
                 
@@ -596,7 +602,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     text: actionText,
                     status: ag.status || 'Agendado',
                     foto: foto,
-                    interesse: interesse
+                    interesse: interesse,
+                    empresa: empresa,
+                    cargo: cargo,
+                    objetivo: objetivo,
+                    localReuniao: localReuniao,
+                    resumoIa: resumoIa,
+                    telefone: telefone,
+                    localizacao: localizacao
                 });
             });
 
@@ -659,14 +672,13 @@ window.openConversation = function(element) {
         const avatarStr = element.getAttribute('data-avatar-html') || 'CL';
         
         // Dados mocked para visual (ainda não existem no BD)
-        const tipoReuniao = element.getAttribute('data-tipo') || 'Consulta agendada';
+        const tipoReuniao = element.getAttribute('data-tipo') || 'Detalhes da Reunião';
         const localizacao = element.getAttribute('data-localizacao') || '';
         const interesse = element.getAttribute('data-interesse') || 'Não informado';
         const objetivo = element.getAttribute('data-objetivo') || 'Não informado';
         const empresa = element.getAttribute('data-empresa') || 'Não informado';
-        const orcamento = element.getAttribute('data-orcamento') || 'Não informado';
+        const localReuniao = element.getAttribute('data-local-reuniao') || 'Não informado';
         const cargo = element.getAttribute('data-cargo') || 'Não informado';
-        const origem = element.getAttribute('data-origem') || 'Não informado';
         const resumoIa = element.getAttribute('data-resumo') || 'Resumo ainda não disponível.';
         const fullDate = element.getAttribute('data-full-date') || 'Seg, 21 de setembro de 2026';
         
@@ -688,9 +700,15 @@ window.openConversation = function(element) {
         document.getElementById('conv-info-interesse').textContent = interesse;
         document.getElementById('conv-info-objetivo').textContent = objetivo;
         document.getElementById('conv-info-empresa').textContent = empresa;
-        document.getElementById('conv-info-orcamento').textContent = orcamento;
+        
+        const localEl = document.getElementById('conv-info-local');
+        if (localEl) localEl.textContent = localReuniao;
+        
         document.getElementById('conv-info-cargo').textContent = cargo;
-        document.getElementById('conv-info-origem').textContent = origem;
+        
+        const origemEl = document.getElementById('conv-info-origem');
+        if (origemEl) origemEl.textContent = element.getAttribute('data-origem') || 'Não informado';
+        
         document.getElementById('conv-ia-summary').textContent = resumoIa;
         
         // Esconde o painel atual (main ou all-leads)
