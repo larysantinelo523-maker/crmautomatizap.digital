@@ -4993,3 +4993,12 @@ body.dark-mode .chat-body-container {
         color: white;
     }
 }
+
+@media (max-width: 991px) {
+    .chat-layout:not(.show-chat) .chat-right-wrapper {
+        display: none !important;
+    }
+    .chat-layout.show-chat .card {
+        display: none !important;
+    }
+}

@@ -416,8 +416,13 @@
             
             async function toggleBotLogic(newState) {
                 if(currentLeadId) {
+                    const toggle = document.getElementById('bot-switch');
+                    if(toggle) toggle.checked = newState;
                     await window.dbAPI.toggleBotState(currentLeadId, newState);
-                    carregarMensagens({ id: currentLeadId, nome: document.getElementById('chat-header-name').innerText }); // recarrega pra mostrar o aviso
+                    const updatedLead = await window.dbAPI.fetchLeadById(currentLeadId);
+                    if (updatedLead) {
+                        carregarMensagens(updatedLead);
+                    }
                 } else {
                     alert('Selecione uma conversa primeiro para alterar o status do agente.');
                 }
@@ -464,13 +469,11 @@
                 container.innerHTML = '<div style="text-align: center; padding: 20px; color: #888; font-size: 12px;">Nenhuma mensagem ainda. Envie a primeira!</div>';
             }
 
-            // Descobrir estado do toggle lendo a ultima mensagem de sistema ou humano
+            // O status do agente agora vem diretamente da coluna status_agente na tabela leads
             let isBotActive = true;
-            for(let i = mensagens.length - 1; i >= 0; i--) {
-                if(mensagens[i].bot_ativo !== null && mensagens[i].bot_ativo !== undefined) {
-                    isBotActive = mensagens[i].bot_ativo;
-                    break;
-                }
+            if (lead.status_agente === 'desativado') {
+                isBotActive = false;
+            }
             }
             const toggle = document.getElementById('bot-switch');
             if(toggle) toggle.checked = isBotActive;
@@ -530,7 +533,7 @@
             
             // Adiciona a mensagem de sistema UMA ÚNICA VEZ no final, apenas se o bot estiver pausado
             if (isBotActive === false) {
-                html += `<div style="align-self: center; background: #fef08a; padding: 4px 10px; border-radius: 6px; font-size: 11px; color: #854d0e; margin-bottom: 12px; box-shadow: 0 1px 1px rgba(0,0,0,0.05); z-index: 2;">⚙️ Bot foi pausado pelo administrador.</div>`;
+                html += `<div style="align-self: center; background: #fef08a; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 500; color: #854d0e; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); z-index: 2; border: 1px solid #fde047;">⚠️ Agente pausado</div>`;
             }
             
             container.innerHTML += html;
