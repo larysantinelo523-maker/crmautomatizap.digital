@@ -508,11 +508,11 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                     // Inicializa os dados da página específica
                     if (window.location.pathname.indexOf('index.html') > -1 || window.location.pathname.endsWith('/')) {
                         if (window.initDashboard) window.initDashboard();
-                    } else if (window.location.pathname.indexOf('leads.html') > -1) {
+                    } else if (window.location.pathname.includes('leads')) {
                         if (window.initLeads) window.initLeads();
-                    } else if (window.location.pathname.indexOf('conversas.html') > -1) {
+                    } else if (window.location.pathname.includes('conversas')) {
                         if (window.initConversations) window.initConversations();
-                    } else if (window.location.pathname.indexOf('configuracoes.html') > -1) {
+                    } else if (window.location.pathname.includes('configuracoes')) {
                         if (window.initSettings) window.initSettings();
                     }
                     
