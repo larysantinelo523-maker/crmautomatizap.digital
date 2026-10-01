@@ -591,7 +591,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 const localReuniao = lead.local_reuniao || 'Não informado';
                 const resumoIa = lead.resumo_ia || 'Resumo ainda não disponível.';
                 const telefone = lead.telefone || '(00) 0 0000-0000';
-                const localizacao = lead.localizacao || '';
+                
+                let localizacao = lead.localizacao || '';
+                if (!localizacao && telefone) {
+                    const match = telefone.match(/\((\d{2})\)/);
+                    if (match && match[1]) {
+                        const ddd = match[1];
+                        if (ddd === '81') localizacao = 'Recife - PE';
+                        else if (ddd === '21') localizacao = 'Rio de Janeiro - RJ';
+                        else if (ddd === '11') localizacao = 'São Paulo - SP';
+                        else if (ddd === '31') localizacao = 'Belo Horizonte - MG';
+                        else if (ddd === '41') localizacao = 'Curitiba - PR';
+                        else if (ddd === '51') localizacao = 'Porto Alegre - RS';
+                        else if (ddd === '61') localizacao = 'Brasília - DF';
+                        else if (ddd === '71') localizacao = 'Salvador - BA';
+                        else if (ddd === '85') localizacao = 'Fortaleza - CE';
+                    }
+                }
                 
                 calendarData[dateKey].kpis.reunioes++;
                 
