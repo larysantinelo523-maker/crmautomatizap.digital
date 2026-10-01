@@ -57,9 +57,9 @@
     </script>
   <script type="module" crossorigin src="/assets/supabase-DUkCiNAm.js"></script>
   <script type="module" crossorigin src="/assets/data-CEV4NcjX.js"></script>
-  <script type="module" crossorigin src="/assets/script-CFPFvZ94.js"></script>
+  <script type="module" crossorigin src="/assets/script-CoyTvA8g.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-uujqkUzH.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-BVhJxM9e.css">
 </head>
 
 <body>
@@ -425,10 +425,7 @@
                                 <div class="detail-label"><i class="ph ph-currency-dollar"></i> Orçamento</div>
                                 <div class="detail-value" style="font-weight: 500;" id="lead-highlight-budget">--</div>
                             </div>
-                            <div class="detail-item">
-                                <div class="detail-label"><i class="ph ph-star"></i> Qualificação</div>
-                                <div class="detail-value" style="font-weight: 500;" id="lead-highlight-qualification">--</div>
-                            </div>
+
                             <div class="detail-item">
                                 <div class="detail-label"><i class="ph ph-check-circle"></i> Status</div>
                                 <div class="detail-value"><span class="badge primary-light" id="lead-highlight-status">--</span></div>
@@ -648,11 +645,17 @@
             }
             document.getElementById('lead-highlight-name').textContent = lead.nome;
             document.getElementById('lead-highlight-phone').textContent = lead.telefone;
-            document.getElementById('lead-highlight-status').textContent = lead.status;
+            const statusEl = document.getElementById('lead-highlight-status');
+            statusEl.textContent = lead.status;
+            let currentBadgeClass = 'primary-light';
+            let st = lead.status ? lead.status.trim().toLowerCase() : '';
+            if (st === 'em atendimento') currentBadgeClass = 'warning-light';
+            else if (st === 'qualificado') currentBadgeClass = 'primary-light';
+            statusEl.className = `badge ${currentBadgeClass}`;
             
             document.getElementById('lead-highlight-interest').textContent = lead.interesse || 'Não informado';
             document.getElementById('lead-highlight-budget').textContent = lead.orcamento || 'Não informado';
-            document.getElementById('lead-highlight-qualification').textContent = lead.qualificacao || 'Não informada';
+
 
             const summaryBox = document.getElementById('lead-highlight-summary-box');
             const painText = document.getElementById('lead-pain');

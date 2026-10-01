@@ -377,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         <!-- Lado Direito: Badge e Seta -->
                         <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0; margin-left: 8px;">
-                            <div class="badge primary-light" style="font-size: 11px; padding: 4px 8px;">
+                            <div class="badge primary-light desktop-only" style="font-size: 11px; padding: 4px 8px;">
                                 Qualificado
                             </div>
                             <i class="ph ph-caret-right" style="color: var(--color-text-mut);"></i>
