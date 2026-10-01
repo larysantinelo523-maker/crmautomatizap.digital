@@ -422,10 +422,7 @@
                                 <div class="detail-label"><i class="ph ph-currency-dollar"></i> Orçamento</div>
                                 <div class="detail-value" style="font-weight: 500;" id="lead-highlight-budget">--</div>
                             </div>
-                            <div class="detail-item">
-                                <div class="detail-label"><i class="ph ph-star"></i> Qualificação</div>
-                                <div class="detail-value" style="font-weight: 500;" id="lead-highlight-qualification">--</div>
-                            </div>
+
                             <div class="detail-item">
                                 <div class="detail-label"><i class="ph ph-check-circle"></i> Status</div>
                                 <div class="detail-value"><span class="badge primary-light" id="lead-highlight-status">--</span></div>
@@ -657,7 +654,7 @@
             
             document.getElementById('lead-highlight-interest').textContent = lead.interesse || 'Não informado';
             document.getElementById('lead-highlight-budget').textContent = lead.orcamento || 'Não informado';
-            document.getElementById('lead-highlight-qualification').textContent = lead.qualificacao || 'Não informada';
+
 
             const summaryBox = document.getElementById('lead-highlight-summary-box');
             const painText = document.getElementById('lead-pain');
