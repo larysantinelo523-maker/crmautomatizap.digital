@@ -2409,15 +2409,15 @@ body.dark-mode .accordion-content {
     }
 
     .data-table td:nth-child(2)::before {
-        content: "Origem";
-    }
-
-    .data-table td:nth-child(3)::before {
         content: "Interesse";
     }
 
-    .data-table td:nth-child(4)::before {
+    .data-table td:nth-child(3)::before {
         content: "Status";
+    }
+
+    .data-table td:nth-child(4)::before {
+        content: "Lead criado em:";
     }
 
     .data-table td:nth-child(5)::before {
