@@ -2108,7 +2108,7 @@ body.dark-mode .accordion-content {
 }
 
 .bot-switch-input:not(:checked)+.bot-switch-label .bot-switch-ball {
-    transform: translateX(34px);
+    transform: translateX(0px);
 }
 
 .bot-switch-input:not(:checked)+.bot-switch-label .icon-bot {

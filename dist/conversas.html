@@ -53,11 +53,11 @@
         });
       });
     </script>
-  <script type="module" crossorigin src="/assets/conversas-B-87PPXo.js"></script>
+  <script type="module" crossorigin src="/assets/conversas-CP4eCdfL.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
   <link rel="modulepreload" crossorigin href="/assets/data-kDiLz9kC.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-DMJJA-Gs.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-D7w8zniJ.css">
 </head>
 
 <body>
@@ -320,8 +320,8 @@
                                     <i class="ph ph-robot"></i> <span id="text-ativacao" class="desktop-only">Ativar Agente</span>
                                 </button>
                                 <div class="bot-toggle-container mobile-only" style="display: none; margin-left: 8px;" title="Intervenção Humana (Liga/Desliga Robô)">
-                                    <input type="checkbox" id="bot-switch" class="bot-switch-input" checked>
-                                    <label for="bot-switch" class="bot-switch-label" style="transform: scale(0.8); transform-origin: right center;">
+                                    <input type="checkbox" id="bot-switch-desktop" class="bot-switch-input" checked>
+                                    <label for="bot-switch-desktop" class="bot-switch-label" style="transform: scale(0.8); transform-origin: right center;">
                                         <i class="ph ph-robot icon-bot"></i><i class="ph ph-user icon-user"></i><div class="bot-switch-ball"></div>
                                     </label>
                                 </div>
@@ -413,14 +413,14 @@
             // O teclado simulado iOS usa os botões do teclado fake
 
             // Configurar chave seletora e botões desktop
-            const toggle = document.getElementById('bot-switch');
+            const toggles = document.querySelectorAll('.bot-switch-input');
             const btnIntervencao = document.getElementById('btn-intervencao');
             const btnAtivacao = document.getElementById('btn-ativacao');
             
             async function toggleBotLogic(newState) {
                 if(currentLeadId) {
-                    const toggle = document.getElementById('bot-switch');
-                    if(toggle) toggle.checked = newState;
+                    const toggles = document.querySelectorAll('.bot-switch-input');
+                    toggles.forEach(t => t.checked = newState);
                     await window.dbAPI.toggleBotState(currentLeadId, newState);
                     const updatedLead = await window.dbAPI.fetchLeadById(currentLeadId);
                     if (updatedLead) {
@@ -431,11 +431,7 @@
                 }
             }
 
-            if(toggle) {
-                toggle.addEventListener('change', function() {
-                    toggleBotLogic(this.checked);
-                });
-            }
+            toggles.forEach(toggle => { toggle.addEventListener('change', function() { toggleBotLogic(this.checked); }); });
             if(btnIntervencao) {
                 btnIntervencao.addEventListener('click', function() {
                     toggleBotLogic(false);
@@ -478,8 +474,8 @@
                 isBotActive = false;
             }
             }
-            const toggle = document.getElementById('bot-switch');
-            if(toggle) toggle.checked = isBotActive;
+            const toggles = document.querySelectorAll('.bot-switch-input');
+            toggles.forEach(t => t.checked = isBotActive);
             
             const btnIntervencao = document.getElementById('btn-intervencao');
             const btnAtivacao = document.getElementById('btn-ativacao');
