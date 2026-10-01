@@ -220,6 +220,7 @@ window.dbAPI = {
     fetchUserData,
     sendMessage,
     toggleBotState,
+    fetchLeadById,
     seedFakeData,
     subscribeToMessages,
     unsubscribeFromMessages
