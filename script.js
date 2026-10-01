@@ -1003,12 +1003,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const endStr = `${rangeEnd.getDate().toString().padStart(2, '0')}/${(rangeEnd.getMonth() + 1).toString().padStart(2, '0')}/${rangeEnd.getFullYear()}`;
                 dateText.textContent = `${startStr} - ${endStr}`;
             } else {
-                const now = new Date();
-                const startM = new Date(now.getFullYear(), now.getMonth(), 1);
-                const endM = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-                const startStr = `${startM.getDate().toString().padStart(2, '0')}/${(startM.getMonth() + 1).toString().padStart(2, '0')}/${startM.getFullYear()}`;
-                const endStr = `${endM.getDate().toString().padStart(2, '0')}/${(endM.getMonth() + 1).toString().padStart(2, '0')}/${endM.getFullYear()}`;
-                dateText.textContent = `${startStr} - ${endStr}`;
+                dateText.textContent = `Todo o período`;
             }
         }
         // Update on load

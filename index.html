@@ -484,10 +484,8 @@
                 startDt = new Date(filterStart);
                 endDt = null;
             } else {
-                // Se não tiver filtro (ou limpou), padrão é o mês atual!
-                const agora = new Date();
-                startDt = new Date(agora.getFullYear(), agora.getMonth(), 1);
-                endDt = new Date(agora.getFullYear(), agora.getMonth() + 1, 0);
+                startDt = null;
+                endDt = null;
             }
             
             if (startDt) {
