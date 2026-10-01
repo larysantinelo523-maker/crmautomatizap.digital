@@ -1379,7 +1379,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
 
                         // Lógica do botão Aplicar
-                        applyBtn.addEventListener('click', () => {
+                        applyBtn.addEventListener('click', async () => {
                             // Salva as datas selecionadas no local storage
                             if (window._calendarRangeStart && window._calendarRangeEnd) {
                                 localStorage.setItem('calendar_filter_start', window._calendarRangeStart.toISOString());
@@ -1398,6 +1398,12 @@ document.addEventListener('DOMContentLoaded', () => {
                                 btn.classList.add('filter-active');
                             }
                             
+                            // Dispara atualização geral para as datas
+                            window.dispatchEvent(new Event('calendarFilterChanged'));
+                            if (typeof window.initDashboard === 'function') await window.initDashboard();
+                            if (typeof window.initLeads === 'function') await window.initLeads();
+                            if (typeof window.initRelatorios === 'function') await window.initRelatorios();
+                            
                             const tableRows = document.querySelectorAll('.data-table tbody tr');
                             tableRows.forEach(row => {
                                 if (selectedMobileStatus === 'Todos') {
@@ -1415,12 +1421,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                     }
                                 }
                             });
-                            
-                            // Dispara atualização geral para as datas
-                            window.dispatchEvent(new Event('calendarFilterChanged'));
-                            if (typeof window.initDashboard === 'function') window.initDashboard();
-                            if (typeof window.initLeads === 'function') window.initLeads();
-                            if (typeof window.initRelatorios === 'function') window.initRelatorios();
                             
                             closeModal();
                         });
