@@ -732,24 +732,11 @@
 
 
 
+
 <!-- FIX MOBILE KEYBOARD CHAT LAYOUT -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         if (window.innerWidth <= 768) {
-            // DEBUG LABEL
-            const debugLabel = document.createElement('div');
-            debugLabel.id = 'kb-debug-label';
-            debugLabel.style.position = 'fixed';
-            debugLabel.style.top = '10px';
-            debugLabel.style.right = '10px';
-            debugLabel.style.background = 'rgba(0,0,0,0.8)';
-            debugLabel.style.color = 'lime';
-            debugLabel.style.padding = '5px 10px';
-            debugLabel.style.fontSize = '12px';
-            debugLabel.style.zIndex = '99999';
-            debugLabel.style.pointerEvents = 'none';
-            document.body.appendChild(debugLabel);
-
             let maxViewportHeight = window.screen.availHeight || window.innerHeight;
             if (window.visualViewport) maxViewportHeight = Math.max(maxViewportHeight, window.visualViewport.height);
             
@@ -761,11 +748,8 @@
                 
                 document.documentElement.style.setProperty('--vvh', currentHeight + 'px');
                 
-                // If the current viewport is less than 85% of the max, the keyboard is likely open
                 const isKeyboardOpen = currentHeight < (maxViewportHeight * 0.85);
                 
-                debugLabel.innerHTML = `H: ${currentHeight} <br> Max: ${maxViewportHeight} <br> KB: ${isKeyboardOpen}`;
-
                 if (isKeyboardOpen) {
                     if (!document.body.classList.contains('keyboard-open')) {
                         document.body.classList.add('keyboard-open');
@@ -791,7 +775,7 @@
             if (input) {
                 input.addEventListener('focus', () => {
                     setTimeout(() => window.scrollTo(0, 0), 100);
-                    setTimeout(setViewport, 300); // Força checagem depois de um tempinho
+                    setTimeout(setViewport, 300);
                 });
             }
         }
@@ -812,7 +796,6 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Garante que a lista de contatos não tenha rolagem interna no mobile */
         .chat-left-sidebar {
             height: auto !important;
         }
@@ -821,14 +804,10 @@
             flex: none !important;
         }
 
-        /* SOMENTE quando o teclado abrir, aplicamos o travamento de tela e layout de app */
         body.keyboard-open {
             height: var(--vvh) !important;
             min-height: var(--vvh) !important;
             overflow: hidden !important;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
             width: 100% !important;
             display: flex !important;
             flex-direction: column !important;
@@ -859,7 +838,7 @@
             display: flex !important;
             flex-direction: column !important;
             overflow: hidden !important;
-            padding: 0 !important; /* FORCA REMOCAO DE PADDING DO GRID */
+            padding: 0 !important;
         }
 
         body.keyboard-open .chat-right-wrapper {
@@ -868,7 +847,7 @@
             height: 100% !important;
             display: flex !important;
             flex-direction: column !important;
-            padding: 0 !important; /* FORCA REMOCAO DO PADDING PRA CABER TUDO */
+            padding: 0 !important;
         }
 
         body.keyboard-open .chat-card {
@@ -877,17 +856,17 @@
             display: flex !important;
             flex-direction: column !important;
             margin: 0 !important;
-            border-radius: 0 !important; /* Tira borda redonda pra parecer tela cheia */
+            border-radius: 0 !important;
         }
 
         body.keyboard-open #chat-messages-container {
             flex: 1 !important;
             min-height: 0 !important;
             overflow-y: auto !important;
-            padding: 12px !important; /* padding interno menor */
+            padding: 12px !important;
+            pointer-events: auto !important;
         }
 
-        /* Ocultar tudo o que não for o chat ativo para dar espaco */
         body.keyboard-open .sidebar,
         body.keyboard-open .sidebar-nav,
         body.keyboard-open .glass-bubble,
