@@ -966,6 +966,11 @@
 
     /* Keyboard Styles */
     #virtual-keyboard-container {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
         flex-shrink: 0;
         background-color: #D1D5DB;
         padding: 0 !important;
@@ -1030,6 +1035,7 @@
     .vk-enter { flex: 1.2; font-size: 16px; font-weight: 500; }
     
     body.virtual-keyboard-active .sidebar-footer { display: none !important; }
+    body.virtual-keyboard-active .chat-card { padding-bottom: 260px !important; }
     
 </style>
 
