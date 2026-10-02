@@ -302,6 +302,7 @@
                         <!-- Cabecalho Chat -->
                         <div style="padding: 16px 24px; border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center; background-color: var(--color-bg-card);">
                             <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                                <button id="btn-voltar-chat" class="mobile-only" onclick="document.body.classList.remove('mobile-chat-active')" style="display: none; background: none; border: none; color: var(--color-primary); font-size: 20px; padding: 0 12px 0 0; cursor: pointer; align-items: center; justify-content: center;"><i class="ph ph-arrow-left"></i></button>
                                 <div id="chat-header-avatar" class="avatar" style="width: 48px; height: 48px; min-width: 48px; background: var(--color-primary); color: white; font-size: 16px; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 50%; overflow: hidden;">--</div>
                                 <div style="flex: 1; min-width: 0;">
                                     <h3 id="chat-header-name" style="margin: 0; font-size: 15px; font-weight: 600; color: var(--color-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Selecione um lead</h3>
@@ -435,6 +436,10 @@
                     document.querySelectorAll('.chat-contact-item').forEach(el => el.style.background = 'transparent');
                     div.style.background = 'var(--color-bg-main)';
                     carregarMensagens(lead);
+                    
+                    if (window.innerWidth <= 768) {
+                        document.body.classList.add('mobile-chat-active');
+                    }
                     
                     // On mobile, both list and chat are now stacked vertically, so no hide/show logic is needed.
                 };
@@ -877,6 +882,7 @@
     }
 </style>
 
+
 <!-- VIRTUAL KEYBOARD INJECTION -->
 <div id="virtual-keyboard-container" class="virtual-keyboard-hidden">
     <div class="vk-row">
@@ -935,9 +941,24 @@
 </div>
 
 <style>
+    @media (max-width: 768px) {
+        /* NAVEGAÇÃO MOBILE: LISTA vs CHAT */
+        .chat-left-sidebar { display: flex !important; }
+        .chat-right-wrapper { display: none !important; }
+        
+        body.mobile-chat-active .mobile-page-header { display: none !important; }
+        body.mobile-chat-active .chat-left-sidebar { display: none !important; }
+        body.mobile-chat-active .chat-right-wrapper { display: flex !important; width: 100%; height: 100%; }
+        body.mobile-chat-active #btn-voltar-chat { display: flex !important; }
+
+        .chat-card {
+            position: relative; /* Para ancorar o teclado absoluto dentro dela */
+        }
+    }
+
     /* Keyboard Styles */
     #virtual-keyboard-container {
-        position: fixed;
+        position: absolute;
         bottom: 0;
         left: 0;
         width: 100%;
@@ -951,10 +972,12 @@
         transition: transform 0.25s ease-out;
         user-select: none;
         -webkit-user-select: none;
+        visibility: hidden; /* Evita focar enquanto invisível */
     }
 
     #virtual-keyboard-container.vk-open {
         transform: translateY(0);
+        visibility: visible;
     }
 
     .vk-row {
@@ -962,7 +985,7 @@
         justify-content: center;
         gap: 6px;
         width: 100%;
-        touch-action: none; /* impede zoom/scroll na linha */
+        touch-action: none;
     }
 
     .vk-key {
@@ -984,81 +1007,41 @@
         outline: none;
         touch-action: none;
         -webkit-tap-highlight-color: transparent;
-        text-transform: none; /* Controlado via JS para Shift */
+        text-transform: none;
     }
 
-    .vk-key:active {
-        background-color: #E5E7EB;
-    }
-
-    .vk-special {
-        background-color: #BFC3C8;
-    }
-
-    .vk-special:active {
-        background-color: #FFFFFF;
-    }
-
-    .vk-shift {
-        flex: 1.2;
-    }
-
-    .vk-shift.active {
-        background-color: #FFFFFF;
-        color: #000;
-    }
+    .vk-key:active { background-color: #E5E7EB; }
+    .vk-special { background-color: #BFC3C8; }
+    .vk-special:active { background-color: #FFFFFF; }
+    .vk-shift { flex: 1.2; }
+    .vk-shift.active { background-color: #FFFFFF; color: #000; }
+    .vk-shift.caps { background-color: #FFFFFF; color: var(--color-primary, #0F5B46); }
+    .vk-mode { flex: 1.2; font-size: 16px; }
+    .vk-space { flex: 4; font-size: 14px; color: #6B7280; }
+    .vk-enter { flex: 1.2; font-size: 16px; font-weight: 500; }
     
-    .vk-shift.caps {
-        background-color: #FFFFFF;
-        color: var(--color-primary, #0F5B46);
-    }
-
-    .vk-mode {
-        flex: 1.2;
-        font-size: 16px;
-    }
-
-    .vk-space {
-        flex: 4;
-        font-size: 14px;
-        color: #6B7280;
-    }
-
-    .vk-enter {
-        flex: 1.2;
-        font-size: 16px;
-        font-weight: 500;
-    }
-    
-    body.virtual-keyboard-active .sidebar-footer {
-        display: none !important;
-    }
-    
-    body.virtual-keyboard-active {
-        padding-bottom: 260px !important; /* Aproximadamente a altura do teclado */
-    }
-
-    /* Para o layout de símbolos */
-    .vk-mode-symbols .vk-key[data-key] {
-        /* JS vai trocar o textContent, mas essa classe pode ajudar */
+    body.virtual-keyboard-active .sidebar-footer { display: none !important; }
+    body.virtual-keyboard-active #chat-messages-container {
+        padding-bottom: 260px !important; /* Libera espaço pras mensagens deslizarem acima do teclado */
     }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        if (window.innerWidth > 768) return; // Só ativa no mobile
-
-        const USE_VIRTUAL_KEYBOARD = true; // Chave de ativação geral
-        if (!USE_VIRTUAL_KEYBOARD) return;
+        if (window.innerWidth > 768) return; 
 
         const input = document.getElementById('real-chat-input');
         const sendBtn = document.getElementById('btn-send-message');
         const keyboard = document.getElementById('virtual-keyboard-container');
-        const keys = keyboard.querySelectorAll('.vk-key');
+        const chatCard = document.querySelector('.chat-card');
         
-        if (!input || !keyboard) return;
+        if (!input || !keyboard || !chatCard) return;
 
-        // Impede o teclado nativo de abrir
+        // Move o teclado para DENTRO do chat-card
+        chatCard.appendChild(keyboard);
+
+        const keys = keyboard.querySelectorAll('.vk-key');
+
         input.setAttribute('inputmode', 'none');
 
         let isShift = false;
@@ -1069,17 +1052,11 @@
         let backspaceInterval = null;
         let backspaceTimeout = null;
 
-        // Mapeamento Letras <-> Símbolos (Linhas 1, 2, 3)
-        const row1Letters = ['1','2','3','4','5','6','7','8','9','0'];
         const row1Symbols = ['[',']','{','}','#','%','^','*','+','='];
-        const row2Letters = ['q','w','e','r','t','y','u','i','o','p'];
-        const row2Symbols = ['_','\\','|','~','<','>','€','£','¥','¢'];
-        const row3Letters = ['a','s','d','f','g','h','j','k','l'];
+        const row2Symbols = ['_','\\\\','|','~','<','>','€','£','¥','¢'];
         const row3Symbols = ['-','/',':',';','(',')','$','&','@'];
-        const row4Letters = ['z','x','c','v','b','n','m'];
         const row4Symbols = ['"',"'",',','.','?','!','`'];
 
-        // Atualiza a visualização do teclado (Maiúsculas e Símbolos)
         const updateKeyboardVisuals = () => {
             const letterKeys = Array.from(keys).filter(k => k.hasAttribute('data-key'));
             const shiftBtn = keyboard.querySelector('.vk-shift');
@@ -1087,13 +1064,9 @@
 
             if (isSymbols) {
                 modeBtn.textContent = 'ABC';
-                // Linha 1
                 for(let i=0; i<10; i++) { letterKeys[i].textContent = row1Symbols[i]; letterKeys[i].dataset.val = row1Symbols[i]; }
-                // Linha 2
                 for(let i=0; i<10; i++) { letterKeys[i+10].textContent = row2Symbols[i]; letterKeys[i+10].dataset.val = row2Symbols[i]; }
-                // Linha 3
                 for(let i=0; i<9; i++) { letterKeys[i+20].textContent = row3Symbols[i]; letterKeys[i+20].dataset.val = row3Symbols[i]; }
-                // Linha 4
                 for(let i=0; i<7; i++) { letterKeys[i+29].textContent = row4Symbols[i]; letterKeys[i+29].dataset.val = row4Symbols[i]; }
             } else {
                 modeBtn.textContent = '!#1';
@@ -1105,7 +1078,6 @@
                 });
             }
 
-            // Atualiza visual do Shift
             shiftBtn.classList.remove('active', 'caps');
             shiftBtn.innerHTML = '<i class="ph ph-arrow-up"></i>';
             if (isCaps) {
@@ -1116,9 +1088,8 @@
             }
         };
 
-        updateKeyboardVisuals(); // setup inicial
+        updateKeyboardVisuals();
 
-        // Abrir Teclado
         input.addEventListener('focus', () => {
             keyboard.classList.add('vk-open');
             document.body.classList.add('virtual-keyboard-active');
@@ -1128,23 +1099,20 @@
             }, 100);
         });
 
-        // Fechar teclado clicando fora
         document.addEventListener('pointerdown', (e) => {
             if (!keyboard.contains(e.target) && e.target !== input && !e.target.closest('#btn-send-message') && !e.target.closest('.bot-toggle-container')) {
                 keyboard.classList.remove('vk-open');
                 document.body.classList.remove('virtual-keyboard-active');
-                input.blur(); // Tira foco do input para não reabrir sem querer
+                input.blur();
             }
         });
 
-        // Função de Inserir Texto no Cursor
         const insertText = (text) => {
             const start = input.selectionStart;
             const end = input.selectionEnd;
             const val = input.value;
             input.value = val.substring(0, start) + text + val.substring(end);
             input.selectionStart = input.selectionEnd = start + text.length;
-            // Disparar evento de input para que o restante do app perceba a digitação (se houver hooks)
             input.dispatchEvent(new Event('input', { bubbles: true }));
         };
 
@@ -1162,15 +1130,12 @@
             input.dispatchEvent(new Event('input', { bubbles: true }));
         };
 
-        const vibrate = () => {
-            if (navigator.vibrate) navigator.vibrate(15);
-        };
+        const vibrate = () => { if (navigator.vibrate) navigator.vibrate(15); };
 
-        // Escutando as teclas
         keys.forEach(key => {
             key.addEventListener('pointerdown', (e) => {
-                e.preventDefault(); // MANTÉM FOCO NO INPUT
-                input.focus(); // Garante foco
+                e.preventDefault(); 
+                input.focus(); 
                 vibrate();
 
                 const action = key.getAttribute('data-action');
@@ -1178,25 +1143,15 @@
                 if (key.hasAttribute('data-key')) {
                     const char = key.dataset.val || key.textContent;
                     insertText(char);
-                    if (isShift && !isCaps) {
-                        isShift = false;
-                        updateKeyboardVisuals();
-                    }
+                    if (isShift && !isCaps) { isShift = false; updateKeyboardVisuals(); }
                 } 
-                else if (action === 'space') {
-                    insertText(' ');
-                }
-                else if (action === 'enter') {
-                    sendBtn.click();
-                    isShift = false;
-                    updateKeyboardVisuals();
-                }
+                else if (action === 'space') insertText(' ');
+                else if (action === 'enter') { sendBtn.click(); isShift = false; updateKeyboardVisuals(); }
                 else if (action === 'shift') {
                     shiftClicks++;
                     if (shiftClicks === 1) {
                         shiftTimeout = setTimeout(() => {
                             if (shiftClicks === 1) {
-                                // Single tap
                                 if (isCaps) { isCaps = false; isShift = false; }
                                 else { isShift = !isShift; }
                                 updateKeyboardVisuals();
@@ -1220,19 +1175,12 @@
                 else if (action === 'backspace') {
                     deleteText();
                     backspaceTimeout = setTimeout(() => {
-                        backspaceInterval = setInterval(() => {
-                            deleteText();
-                            vibrate();
-                        }, 60);
+                        backspaceInterval = setInterval(() => { deleteText(); vibrate(); }, 60);
                     }, 400);
                 }
             });
 
-            // Parar o backspace quando soltar a tecla
-            const stopBackspace = () => {
-                clearTimeout(backspaceTimeout);
-                clearInterval(backspaceInterval);
-            };
+            const stopBackspace = () => { clearTimeout(backspaceTimeout); clearInterval(backspaceInterval); };
             key.addEventListener('pointerup', stopBackspace);
             key.addEventListener('pointerleave', stopBackspace);
             key.addEventListener('pointercancel', stopBackspace);
