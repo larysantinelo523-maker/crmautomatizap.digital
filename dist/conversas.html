@@ -372,7 +372,7 @@
             leads.forEach((lead, index) => {
                 const date = new Date(lead.criado_em);
                 const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                const initials = lead.nome.charAt(0).toUpperCase();
+                const safeNome = lead.nome || 'Desconhecido'; const initials = safeNome.charAt(0).toUpperCase();
                 const avatarContent = lead.foto_perfil ? `<img src="${lead.foto_perfil}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : initials;
                 const avatarStyle = lead.foto_perfil ? 'background: transparent;' : 'background: var(--color-primary); color: white; font-weight: bold;';
 
@@ -383,7 +383,7 @@
                     <div class="avatar-placeholder" style="${avatarStyle} width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden;">${avatarContent}</div>
                     <div style="flex: 1;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                            <strong style="font-size: 14px;">${lead.nome}</strong>
+                            <strong style="font-size: 14px;">${safeNome}</strong>
                             <span style="font-size: 11px; color: var(--color-text-mut);">${timeStr}</span>
                         </div>
                         <p style="font-size: 13px; color: var(--color-text-sec); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">Clique para ver as mensagens</p>
@@ -450,14 +450,14 @@
             container.innerHTML = '<div style="text-align: center; padding: 20px;">Carregando...</div>';
 
             // Atualiza cabeçalho do celular
-            document.getElementById('chat-header-name').innerText = lead.nome;
+            document.getElementById('chat-header-name').innerText = lead.nome || 'Desconhecido';
             document.getElementById('chat-header-status').innerText = lead.status;
             const avatar = document.getElementById('chat-header-avatar');
             if (lead.foto_perfil) {
                 avatar.innerHTML = `<img src="${lead.foto_perfil}" alt="Foto" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
                 avatar.style.background = 'transparent';
             } else {
-                avatar.innerText = lead.nome.charAt(0).toUpperCase();
+                avatar.innerText = (lead.nome || 'Desconhecido').charAt(0).toUpperCase();
                 avatar.style.background = 'var(--color-primary)';
             }
 
