@@ -53,11 +53,11 @@
         });
       });
     </script>
-  <script type="module" crossorigin src="/assets/conversas-BfnF5vw4.js"></script>
+  <script type="module" crossorigin src="/assets/conversas-PdNRDnRB.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
   <link rel="modulepreload" crossorigin href="/assets/data-kDiLz9kC.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-D7w8zniJ.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-CLKHEhpG.css">
 </head>
 
 <body>
@@ -244,7 +244,7 @@
                     </div>
                 </div>
                 <!-- Wrapper Geral da Coluna da Direita -->
-                <div class="chat-right-wrapper mobile-hidden" style="display: flex; flex-direction: column; height: 100%; min-height: calc(100vh - 140px); overflow: hidden; background-color: var(--color-bg-main); padding: 16px;">
+                <div class="chat-right-wrapper" style="display: flex; flex-direction: column; height: 100%; min-height: calc(100vh - 140px); overflow: hidden; background-color: var(--color-bg-main); padding: 16px;">
 
                     <!-- Aviso da Chave Seletora (Fora do Mockup) -->
                     <div class="hint-box"
@@ -302,7 +302,7 @@
                         <!-- Cabecalho Chat -->
                         <div style="padding: 16px 24px; border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center; background-color: var(--color-bg-card);">
                             <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                                <i class="ph ph-arrow-left mobile-only" style="font-size: 20px; cursor: pointer; margin-right: 8px;" onclick="document.querySelector('.chat-left-sidebar').classList.remove('mobile-hidden'); document.querySelector('.chat-right-wrapper').classList.add('mobile-hidden');"></i>
+                                <i class="ph ph-arrow-left mobile-only" style="font-size: 20px; cursor: pointer; margin-right: 8px;" onclick="document.querySelector('.chat-layout').classList.remove('show-chat')"></i>
                                 <div id="chat-header-avatar" class="avatar" style="width: 48px; height: 48px; min-width: 48px; background: var(--color-primary); color: white; font-size: 16px; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 50%; overflow: hidden;">--</div>
                                 <div style="flex: 1; min-width: 0;">
                                     <h3 id="chat-header-name" style="margin: 0; font-size: 15px; font-weight: 600; color: var(--color-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Selecione um lead</h3>
@@ -396,10 +396,8 @@
                     carregarMensagens(lead);
                     
                     if(window.innerWidth <= 768) {
-                        const leftSide = document.querySelector('.chat-left-sidebar');
-                        const rightSide = document.querySelector('.chat-right-wrapper');
-                        if (leftSide) leftSide.classList.add('mobile-hidden');
-                        if (rightSide) rightSide.classList.remove('mobile-hidden');
+                        const layout = document.querySelector('.chat-layout');
+                        if (layout) layout.classList.add('show-chat');
                     }
                 };
 

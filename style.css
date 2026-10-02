@@ -4998,7 +4998,7 @@ body.dark-mode .chat-body-container {
     .chat-layout:not(.show-chat) .chat-right-wrapper {
         display: none !important;
     }
-    .chat-layout.show-chat .card {
+    .chat-layout.show-chat .chat-left-sidebar {
         display: none !important;
     }
 }
