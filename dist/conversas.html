@@ -954,6 +954,7 @@
         body.mobile-chat-active #btn-voltar-chat { display: flex !important; }
 
         body.mobile-chat-active .chat-card {
+            margin-bottom: 0 !important;
             position: relative; /* Para ancorar o teclado absoluto dentro dela */
             border-radius: 12px !important;
             border-left: 1px solid var(--color-border) !important;
@@ -968,10 +969,10 @@
     #virtual-keyboard-container {
         flex-shrink: 0;
         background-color: #D1D5DB;
-        padding: 0 4px 0 4px; 
+        padding: 0 !important;
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 0;
         z-index: 99999;
         height: 0;
         transition: height 0.25s ease-out, padding 0.25s ease-out;
@@ -982,7 +983,8 @@
 
     #virtual-keyboard-container.vk-open {
         height: 260px;
-        padding: 8px 4px 20px 4px;
+        padding: 8px 4px 20px 4px !important;
+        gap: 6px;
         visibility: visible;
     }
 
