@@ -4995,10 +4995,8 @@ body.dark-mode .chat-body-container {
 }
 
 @media (max-width: 991px) {
-    .chat-layout:not(.show-chat) .chat-right-wrapper {
-        display: none !important;
-    }
-    .chat-layout.show-chat .chat-left-sidebar {
-        display: none !important;
+    .chat-left-sidebar {
+        height: auto !important;
+        max-height: 250px !important;
     }
 }
