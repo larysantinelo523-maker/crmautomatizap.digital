@@ -731,27 +731,44 @@
         }
     </script>
 
+
 <!-- FIX MOBILE KEYBOARD CHAT LAYOUT -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        if (window.innerWidth <= 768 && window.visualViewport) {
-            let maxViewportHeight = window.visualViewport.height;
+        if (window.innerWidth <= 768) {
+            // DEBUG LABEL
+            const debugLabel = document.createElement('div');
+            debugLabel.id = 'kb-debug-label';
+            debugLabel.style.position = 'fixed';
+            debugLabel.style.top = '10px';
+            debugLabel.style.right = '10px';
+            debugLabel.style.background = 'rgba(0,0,0,0.8)';
+            debugLabel.style.color = 'lime';
+            debugLabel.style.padding = '5px 10px';
+            debugLabel.style.fontSize = '12px';
+            debugLabel.style.zIndex = '99999';
+            debugLabel.style.pointerEvents = 'none';
+            document.body.appendChild(debugLabel);
+
+            let maxViewportHeight = window.screen.availHeight || window.innerHeight;
+            if (window.visualViewport) maxViewportHeight = Math.max(maxViewportHeight, window.visualViewport.height);
             
             const setViewport = () => {
-                if (window.visualViewport.height > maxViewportHeight) {
-                    maxViewportHeight = window.visualViewport.height;
+                const currentHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                if (currentHeight > maxViewportHeight) {
+                    maxViewportHeight = currentHeight;
                 }
                 
-                document.documentElement.style.setProperty('--vvh', window.visualViewport.height + 'px');
+                document.documentElement.style.setProperty('--vvh', currentHeight + 'px');
                 
-                // On Android, window.innerHeight shrinks too, so we compare against the max observed height
                 // If the current viewport is less than 85% of the max, the keyboard is likely open
-                const isKeyboardOpen = window.visualViewport.height < (maxViewportHeight * 0.85);
+                const isKeyboardOpen = currentHeight < (maxViewportHeight * 0.85);
                 
+                debugLabel.innerHTML = `H: ${currentHeight} <br> Max: ${maxViewportHeight} <br> KB: ${isKeyboardOpen}`;
+
                 if (isKeyboardOpen) {
                     if (!document.body.classList.contains('keyboard-open')) {
                         document.body.classList.add('keyboard-open');
-                        // Wait for the layout to snap, then scroll chat to bottom
                         setTimeout(() => {
                             window.scrollTo(0, 0);
                             const container = document.getElementById('chat-messages-container');
@@ -763,14 +780,18 @@
                 }
             };
             
-            window.visualViewport.addEventListener('resize', setViewport);
-            window.visualViewport.addEventListener('scroll', setViewport);
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', setViewport);
+                window.visualViewport.addEventListener('scroll', setViewport);
+            }
+            window.addEventListener('resize', setViewport);
             setViewport();
             
             const input = document.getElementById('real-chat-input');
             if (input) {
                 input.addEventListener('focus', () => {
                     setTimeout(() => window.scrollTo(0, 0), 100);
+                    setTimeout(setViewport, 300); // Força checagem depois de um tempinho
                 });
             }
         }
@@ -805,20 +826,21 @@
             height: var(--vvh) !important;
             min-height: var(--vvh) !important;
             overflow: hidden !important;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
         }
 
         body.keyboard-open #app-container {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-height: 0;
-            width: 100%;
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 !important;
+            min-height: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
         }
 
         body.keyboard-open .main-content {
@@ -837,6 +859,7 @@
             display: flex !important;
             flex-direction: column !important;
             overflow: hidden !important;
+            padding: 0 !important; /* FORCA REMOCAO DE PADDING DO GRID */
         }
 
         body.keyboard-open .chat-right-wrapper {
@@ -845,7 +868,7 @@
             height: 100% !important;
             display: flex !important;
             flex-direction: column !important;
-            padding: 8px !important;
+            padding: 0 !important; /* FORCA REMOCAO DO PADDING PRA CABER TUDO */
         }
 
         body.keyboard-open .chat-card {
@@ -854,12 +877,14 @@
             display: flex !important;
             flex-direction: column !important;
             margin: 0 !important;
+            border-radius: 0 !important; /* Tira borda redonda pra parecer tela cheia */
         }
 
         body.keyboard-open #chat-messages-container {
             flex: 1 !important;
             min-height: 0 !important;
             overflow-y: auto !important;
+            padding: 12px !important; /* padding interno menor */
         }
 
         /* Ocultar tudo o que não for o chat ativo para dar espaco */
@@ -875,5 +900,4 @@
     }
 </style>
 </body>
-
 </html>
