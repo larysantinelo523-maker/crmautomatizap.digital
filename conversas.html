@@ -531,12 +531,8 @@
                 }
             });
             
-            // Update the pinned banner instead of appending a message
-            const pausedBanner = document.getElementById('agente-pausado-banner');
-            if (pausedBanner) {
-                pausedBanner.style.display = isBotActive === false ? 'block' : 'none';
-            }
             
+
             container.innerHTML += html;
             // Scroll to bottom
             container.scrollTop = container.scrollHeight;
