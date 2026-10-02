@@ -964,10 +964,13 @@
         body.mobile-chat-active .chat-left-sidebar { display: none !important; }
         body.mobile-chat-active .sidebar { display: none !important; }
         body.mobile-chat-active .main-content { padding-bottom: 0 !important; height: 100dvh !important; max-height: 100dvh !important; overflow: hidden; }
-        body.mobile-chat-active .chat-right-wrapper { display: flex !important; width: 100%; flex: 1; padding: 0 16px 0 16px !important; }
+        body.mobile-chat-active .chat-right-wrapper { display: flex !important; width: 100%; flex: 1; padding: 0 16px 0 16px !important; min-height: 0 !important; max-height: 100% !important; }
         body.mobile-chat-active #btn-voltar-chat { display: flex !important; }
 
         body.mobile-chat-active .chat-card {
+            height: 100% !important;
+            max-height: 100% !important;
+            min-height: 0 !important;
             margin-bottom: 0 !important;
             position: relative; /* Para ancorar o teclado absoluto dentro dela */
             border-radius: 12px !important;
