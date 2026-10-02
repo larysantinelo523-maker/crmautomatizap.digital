@@ -2078,13 +2078,14 @@ body.dark-mode .accordion-content {
     font-size: 16px;
     z-index: 2;
     transition: opacity 0.3s;
+    opacity: 0;
 }
 
 .bot-switch-label .icon-user {
     color: #69B39B;
     font-size: 16px;
     z-index: 2;
-    opacity: 0.8;
+    opacity: 1;
     transition: opacity 0.3s, color 0.3s;
 }
 
@@ -2099,6 +2100,7 @@ body.dark-mode .accordion-content {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
     z-index: 1;
+    transform: translateX(0px);
 }
 
 /* Estado: Desligado (Humano) */
@@ -2108,16 +2110,15 @@ body.dark-mode .accordion-content {
 }
 
 .bot-switch-input:not(:checked)+.bot-switch-label .bot-switch-ball {
-    transform: translateX(0px);
+    transform: translateX(34px);
 }
 
 .bot-switch-input:not(:checked)+.bot-switch-label .icon-bot {
-    opacity: 0.5;
+    opacity: 1;
 }
 
 .bot-switch-input:not(:checked)+.bot-switch-label .icon-user {
-    opacity: 1;
-    color: white;
+    opacity: 0;
 }
 
 /* ==========================================================================
