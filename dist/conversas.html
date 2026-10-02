@@ -390,10 +390,17 @@
                     </div>
                 `;
                 
-                div.onclick = () => {
+                                div.onclick = () => {
                     document.querySelectorAll('.chat-contact-item').forEach(el => el.style.background = 'transparent');
                     div.style.background = 'var(--color-bg-main)';
                     carregarMensagens(lead);
+                    
+                    if(window.innerWidth <= 768) {
+                        const leftSide = document.querySelector('.chat-left-sidebar');
+                        const rightSide = document.querySelector('.chat-right-wrapper');
+                        if (leftSide) leftSide.classList.add('mobile-hidden');
+                        if (rightSide) rightSide.classList.remove('mobile-hidden');
+                    }
                 };
 
                 container.appendChild(div);
