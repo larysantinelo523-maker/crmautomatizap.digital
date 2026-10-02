@@ -12,7 +12,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web">
+    function autoResizeTextarea(el) {
+        el.style.height = 'auto';
+        el.style.height = (el.scrollHeight) + 'px';
+    }
+    const realInput = document.getElementById('real-chat-input');
+    if(realInput) {
+        realInput.addEventListener('input', function() {
+            autoResizeTextarea(this);
+        });
+    }
+</script>
 
     <!-- CSS -->
     <!-- CSS -->
@@ -340,7 +351,7 @@
                             <div style="flex: 1; display: flex; align-items: center; background-color: var(--color-bg-main); border-radius: 24px; padding: 10px 16px;">
                                 <i class="ph ph-smiley" style="font-size: 20px; color: var(--color-text-mut); margin-right: 12px; cursor: pointer;"></i>
                                 <span class="typing-text" id="fake-typing-text" style="display: none;"></span>
-                                <input type="text" id="real-chat-input" placeholder="Digite uma mensagem..." style="border: none; background: transparent; width: 100%; outline: none; font-size: 14px; color: var(--color-text-main);">
+                                <textarea id="real-chat-input" placeholder="Digite uma mensagem..." rows="1" style="border: none; background: transparent; width: 100%; outline: none; font-size: 14px; color: var(--color-text-main); resize: none; overflow: hidden; min-height: 20px; max-height: 100px; padding: 0; line-height: 20px; font-family: inherit;"></textarea>
                             </div>
                             <button id="btn-send-message" class="btn btn--primary" style="width: 44px; height: 44px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background-color: var(--color-primary); color: white; border: none; cursor: pointer;">
                                 <i class="ph-fill ph-paper-plane-tilt" style="font-size: 20px; color: white !important;"></i>
@@ -1003,6 +1014,27 @@
         touch-action: none;
     }
 
+    
+    .vk-popup {
+        position: absolute;
+        top: -45px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #FFFFFF;
+        color: #000;
+        font-size: 28px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        pointer-events: none;
+        z-index: 100000;
+        display: none;
+        font-family: inherit;
+    }
+    .vk-key {
+        position: relative; /* To anchor the popup */
+    }
+
     .vk-key {
         background-color: #FFFFFF;
         border: none;
@@ -1106,6 +1138,10 @@
 
         input.addEventListener('focus', () => {
             keyboard.classList.add('vk-open');
+            if (input.value.length === 0) {
+                isShift = true;
+                updateKeyboardVisuals();
+            }
             document.body.classList.add('virtual-keyboard-active');
             setTimeout(() => {
                 const container = document.getElementById('chat-messages-container');
