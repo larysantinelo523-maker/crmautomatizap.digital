@@ -425,6 +425,8 @@
                     await window.dbAPI.toggleBotState(currentLeadId, newState);
                     const updatedLead = await window.dbAPI.fetchLeadById(currentLeadId);
                     if (updatedLead) {
+                        const targetLead = leads.find(l => l.id === updatedLead.id);
+                        if (targetLead) targetLead.status_agente = updatedLead.status_agente;
                         carregarMensagens(updatedLead);
                     }
                 } else {
