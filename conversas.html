@@ -665,8 +665,11 @@
             }
 
             if (novoHtml) {
+                const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
                 container.insertAdjacentHTML('beforeend', novoHtml);
-                container.scrollTop = container.scrollHeight;
+                if (isAtBottom) {
+                    container.scrollTop = container.scrollHeight;
+                }
             }
         }
 
@@ -731,16 +734,29 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         if (window.innerWidth <= 768 && window.visualViewport) {
+            let maxViewportHeight = window.visualViewport.height;
+            
             const setViewport = () => {
+                if (window.visualViewport.height > maxViewportHeight) {
+                    maxViewportHeight = window.visualViewport.height;
+                }
+                
                 document.documentElement.style.setProperty('--vvh', window.visualViewport.height + 'px');
                 
-                if (window.visualViewport.height < window.innerHeight - 50) {
-                    document.body.classList.add('keyboard-open');
-                    setTimeout(() => {
-                        const container = document.getElementById('chat-messages-container');
-                        if (container) container.scrollTop = container.scrollHeight;
-                        window.scrollTo(0, 0);
-                    }, 50);
+                // On Android, window.innerHeight shrinks too, so we compare against the max observed height
+                // If the current viewport is less than 85% of the max, the keyboard is likely open
+                const isKeyboardOpen = window.visualViewport.height < (maxViewportHeight * 0.85);
+                
+                if (isKeyboardOpen) {
+                    if (!document.body.classList.contains('keyboard-open')) {
+                        document.body.classList.add('keyboard-open');
+                        // Wait for the layout to snap, then scroll chat to bottom
+                        setTimeout(() => {
+                            window.scrollTo(0, 0);
+                            const container = document.getElementById('chat-messages-container');
+                            if (container) container.scrollTop = container.scrollHeight;
+                        }, 100);
+                    }
                 } else {
                     document.body.classList.remove('keyboard-open');
                 }
@@ -789,6 +805,8 @@
             min-height: var(--vvh) !important;
             overflow: hidden !important;
             position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             display: flex;
             flex-direction: column;
