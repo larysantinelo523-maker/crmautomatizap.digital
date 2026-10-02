@@ -4999,6 +4999,6 @@ body.dark-mode .chat-body-container {
 @media (max-width: 991px) {
     .chat-left-sidebar {
         height: auto !important;
-        max-height: 250px !important;
+        max-height: none !important;
     }
 }

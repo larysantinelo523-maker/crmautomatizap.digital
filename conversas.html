@@ -765,7 +765,26 @@
             --vvh: 100dvh;
         }
 
-        body {
+        #real-chat-input {
+            font-size: 16px !important;
+        }
+        
+        #chat-messages-container {
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Garante que a lista de contatos não tenha rolagem interna no mobile */
+        .chat-left-sidebar {
+            height: auto !important;
+        }
+        #contact-list-container {
+            overflow: visible !important;
+            flex: none !important;
+        }
+
+        /* SOMENTE quando o teclado abrir, aplicamos o travamento de tela e layout de app */
+        body.keyboard-open {
             height: var(--vvh) !important;
             min-height: var(--vvh) !important;
             overflow: hidden !important;
@@ -775,7 +794,7 @@
             flex-direction: column;
         }
 
-        #app-container {
+        body.keyboard-open #app-container {
             display: flex;
             flex-direction: column;
             flex: 1;
@@ -783,17 +802,17 @@
             width: 100%;
         }
 
-        .main-content {
+        body.keyboard-open .main-content {
             flex: 1 !important;
             min-height: 0 !important;
             height: 100% !important;
             overflow: hidden !important;
             display: flex !important;
             flex-direction: column !important;
-            padding-bottom: 70px !important;
+            padding-bottom: 0 !important;
         }
 
-        .dashboard-grid.chat-layout {
+        body.keyboard-open .dashboard-grid.chat-layout {
             flex: 1 !important;
             min-height: 0 !important;
             display: flex !important;
@@ -801,7 +820,7 @@
             overflow: hidden !important;
         }
 
-        .chat-right-wrapper {
+        body.keyboard-open .chat-right-wrapper {
             flex: 1 !important;
             min-height: 0 !important;
             height: 100% !important;
@@ -809,13 +828,8 @@
             flex-direction: column !important;
             padding: 8px !important;
         }
-        
-        .chat-left-sidebar {
-            flex-shrink: 0;
-            max-height: 180px !important;
-        }
 
-        .chat-card {
+        body.keyboard-open .chat-card {
             flex: 1 !important;
             min-height: 0 !important;
             display: flex !important;
@@ -823,28 +837,16 @@
             margin: 0 !important;
         }
 
-        #chat-messages-container {
-            overscroll-behavior: contain;
+        body.keyboard-open #chat-messages-container {
             flex: 1 !important;
             min-height: 0 !important;
             overflow-y: auto !important;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        #real-chat-input {
-            font-size: 16px !important;
         }
 
+        /* Ocultar tudo o que não for o chat ativo para dar espaco */
         body.keyboard-open .sidebar,
         body.keyboard-open .sidebar-nav,
-        body.keyboard-open .glass-bubble {
-            display: none !important;
-        }
-
-        body.keyboard-open .main-content {
-            padding-bottom: 0 !important;
-        }
-
+        body.keyboard-open .glass-bubble,
         body.keyboard-open .mobile-page-header,
         body.keyboard-open .chat-left-sidebar,
         body.keyboard-open .header,
