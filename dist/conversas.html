@@ -312,11 +312,8 @@
                                 </div>
                             </div>
                             <div class="desktop-bot-actions" id="desktop-bot-actions" style="display: flex; gap: 8px;">
-                                <button class="btn-intervencao desktop-only" id="btn-intervencao" style="font-size: 13px; padding: 6px 12px;">
-                                    <i class="ph ph-user"></i> <span id="text-intervencao" class="desktop-only">Intervenção Humana</span>
-                                </button>
-                                <button class="btn-ativacao desktop-only" id="btn-ativacao" style="font-size: 13px; padding: 6px 12px;">
-                                    <i class="ph ph-robot"></i> <span id="text-ativacao" class="desktop-only">Ativar Agente</span>
+                                <button class="btn-toggle-agente desktop-only" id="btn-toggle-agente" style="font-size: 13px; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500;">
+                                    <i class="ph ph-user" id="icon-toggle-agente"></i> <span id="text-toggle-agente" class="desktop-only">Pausar Agente</span>
                                 </button>
                                 <div class="bot-toggle-container mobile-only" style="display: none; margin-left: 8px;" title="Intervenção Humana (Liga/Desliga Robô)">
                                     <input type="checkbox" id="bot-switch-desktop" class="bot-switch-input" checked>
@@ -328,7 +325,7 @@
                         </div>
                         <!-- Aviso Agente Pausado Banner -->
                         <div id="agente-pausado-banner" class="agente-pausado-banner-desktop" style="display: none; background-color: var(--color-bg-main); padding: 16px 24px 0 24px; z-index: 10; flex-shrink: 0; width: 100%; box-sizing: border-box;">
-                            <div style="background: #fef08a; padding: 8px 16px; font-size: 13px; font-weight: 500; color: #854d0e; text-align: center; border-radius: 8px; border: 1px solid #fde047; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                            <div style="background: #fef08a; padding: 8px 16px; font-size: 13px; font-weight: 500; color: #854d0e; text-align: center; border-radius: 8px; border: 1px solid #fde047; box-shadow: 0 2px 4px rgba(0,0,0,0.05); max-width: 400px; margin: 0 auto;">
                                 ⚠️ Agente pausado
                             </div>
                         </div>
@@ -421,85 +418,25 @@
 
             // Configurar chave seletora e botões desktop
             const toggles = document.querySelectorAll('.bot-switch-input');
-            const btnIntervencao = document.getElementById('btn-intervencao');
-            const btnAtivacao = document.getElementById('btn-ativacao');
+            const btnToggleAgenteDesktop = document.getElementById('btn-toggle-agente');
+            const pausedBanner = document.getElementById('agente-pausado-banner');
             
-            async function toggleBotLogic(newState) {
-                if(currentLeadId) {
-                    const toggles = document.querySelectorAll('.bot-switch-input');
-                    toggles.forEach(t => t.checked = newState);
-                    await window.dbAPI.toggleBotState(currentLeadId, newState);
-                    const updatedLead = await window.dbAPI.fetchLeadById(currentLeadId);
-                    if (updatedLead) {
-                        carregarMensagens(updatedLead);
-                    }
+            if (btnToggleAgenteDesktop) {
+                btnToggleAgenteDesktop.setAttribute('data-active', isBotActive);
+                const icon = btnToggleAgenteDesktop.querySelector('i');
+                const text = document.getElementById('text-toggle-agente');
+                if (isBotActive) {
+                    btnToggleAgenteDesktop.style.backgroundColor = 'var(--color-danger)';
+                    btnToggleAgenteDesktop.style.color = 'white';
+                    icon.className = 'ph ph-user';
+                    text.innerText = 'Pausar Agente';
+                    if(pausedBanner) pausedBanner.style.display = 'none';
                 } else {
-                    alert('Selecione uma conversa primeiro para alterar o status do agente.');
-                }
-            }
-
-            toggles.forEach(toggle => { toggle.addEventListener('change', function() { toggleBotLogic(this.checked); }); });
-            if(btnIntervencao) {
-                btnIntervencao.addEventListener('click', function() {
-                    toggleBotLogic(false);
-                });
-            }
-            if(btnAtivacao) {
-                btnAtivacao.addEventListener('click', function() {
-                    toggleBotLogic(true);
-                });
-            }
-        };
-
-        async function carregarMensagens(lead) {
-            currentLeadId = lead.id;
-            const container = document.getElementById('chat-messages-container');
-            container.innerHTML = '<div style="text-align: center; padding: 20px;">Carregando...</div>';
-
-            // Atualiza cabeçalho do celular
-            document.getElementById('chat-header-name').innerText = lead.nome || 'Desconhecido';
-            document.getElementById('chat-header-status').innerText = lead.status;
-            const avatar = document.getElementById('chat-header-avatar');
-            if (lead.foto_perfil) {
-                avatar.innerHTML = `<img src="${lead.foto_perfil}" alt="Foto" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                avatar.style.background = 'transparent';
-            } else {
-                avatar.innerText = (lead.nome || 'Desconhecido').charAt(0).toUpperCase();
-                avatar.style.background = 'var(--color-primary)';
-            }
-
-            const mensagens = await window.dbAPI.fetchConversations(lead.id);
-            container.innerHTML = '';
-            
-            if(mensagens.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 20px; color: #888; font-size: 12px;">Nenhuma mensagem ainda. Envie a primeira!</div>';
-            }
-
-            // O status do agente agora vem diretamente da coluna status_agente na tabela leads
-            let isBotActive = true;
-            if (lead.status_agente === 'desativado') {
-                isBotActive = false;
-            }
-            const toggles = document.querySelectorAll('.bot-switch-input');
-            toggles.forEach(t => t.checked = isBotActive);
-            
-            const btnIntervencao = document.getElementById('btn-intervencao');
-            const btnAtivacao = document.getElementById('btn-ativacao');
-            const textAtivacao = document.getElementById('text-ativacao');
-            
-            if (isBotActive) {
-                // Bot is active -> Ativação state is active
-                if(btnIntervencao) { btnIntervencao.classList.add('inactive'); btnIntervencao.classList.remove('active'); }
-                if(btnAtivacao) { 
-                    btnAtivacao.classList.add('active'); btnAtivacao.classList.remove('inactive'); 
-                    if(textAtivacao) textAtivacao.innerText = 'Agente Ativado';
-                }
-            } else {
-                // Human is active -> Intervenção state is active
-                if(btnIntervencao) { btnIntervencao.classList.add('active'); btnIntervencao.classList.remove('inactive'); }
-                if(btnAtivacao) { 
-                    btnAtivacao.classList.add('inactive'); btnAtivacao.classList.remove('active'); 
-                    if(textAtivacao) textAtivacao.innerText = 'Ativar Agente';
+                    btnToggleAgenteDesktop.style.backgroundColor = 'var(--color-success)';
+                    btnToggleAgenteDesktop.style.color = 'white';
+                    icon.className = 'ph ph-robot';
+                    text.innerText = 'Ativar Agente';
+                    if(pausedBanner) pausedBanner.style.display = 'flex';
                 }
             }
 
