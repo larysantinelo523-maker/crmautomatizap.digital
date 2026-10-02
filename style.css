@@ -4248,7 +4248,7 @@ body.dark-mode .logo-img {
     }
 
     /* Background Pattern for Chat Area */
-    #chat-messages-container {
+    #chat-messages-container, .agente-pausado-banner-desktop {
         background-color: #f0f2f5 !important;
         /* WhatsApp Web BG */
         background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png') !important;
