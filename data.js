@@ -185,6 +185,17 @@ export function unsubscribeFromMessages(channel) {
     if (channel) supabase.removeChannel(channel);
 }
 
+export function subscribeToAllMessages(onNewMessage) {
+    const channel = supabase
+        .channel(`global-mensagens`)
+        .on(
+            'postgres_changes',
+            { event: 'INSERT', schema: 'public', table: 'mensagens' },
+            (payload) => { onNewMessage(payload.new); }
+        ).subscribe();
+    return channel;
+}
+
 // Expõe globalmente para uso rápido no console e scripts
 window.dbAPI = {
     fetchLeads,
@@ -197,5 +208,6 @@ window.dbAPI = {
     fetchLeadById,
     seedFakeData,
     subscribeToMessages,
-    unsubscribeFromMessages
+    unsubscribeFromMessages,
+    subscribeToAllMessages
 };
