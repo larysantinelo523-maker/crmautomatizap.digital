@@ -444,7 +444,7 @@
                 container.appendChild(div);
 
                 // Auto-selecionar o lead passado por parâmetro ou o primeiro
-                if((leadParam && lead.id === leadParam) || (!leadParam && index === 0)) {
+                if((leadParam && lead.id === leadParam) || (!leadParam && index === 0 && window.innerWidth > 768)) {
                     div.click();
                 }
             });
