@@ -20,7 +20,7 @@ const injection = `
             debugLabel.style.pointerEvents = 'none';
             document.body.appendChild(debugLabel);
 
-            let maxViewportHeight = window.innerHeight;
+            let maxViewportHeight = window.screen.availHeight || window.innerHeight;
             if (window.visualViewport) maxViewportHeight = Math.max(maxViewportHeight, window.visualViewport.height);
             
             const setViewport = () => {
@@ -104,7 +104,7 @@ const injection = `
             flex-direction: column !important;
         }
 
-        body.keyboard-open #app-container {
+        body.keyboard-open .layout {
             display: flex !important;
             flex-direction: column !important;
             flex: 1 !important;
@@ -162,16 +162,13 @@ const injection = `
         body.keyboard-open .sidebar-nav,
         body.keyboard-open .glass-bubble,
         body.keyboard-open .mobile-page-header,
-        body.keyboard-open .chat-left-sidebar,
-        body.keyboard-open .header,
-        body.keyboard-open .hint-box {
+        body.keyboard-open .chat-left-sidebar {
             display: none !important;
         }
     }
 </style>
 </body>`;
 
-// Find everything from <!-- FIX MOBILE KEYBOARD CHAT LAYOUT --> to </body>
 const startIndex = html.indexOf('<!-- FIX MOBILE KEYBOARD CHAT LAYOUT -->');
 if(startIndex !== -1) {
     const startStr = html.substring(0, startIndex);

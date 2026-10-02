@@ -731,6 +731,7 @@
     <script type="module" src="script.js?v=1.4"></script>
 
 
+
 <!-- FIX MOBILE KEYBOARD CHAT LAYOUT -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -833,7 +834,7 @@
             flex-direction: column !important;
         }
 
-        body.keyboard-open #app-container {
+        body.keyboard-open .layout {
             display: flex !important;
             flex-direction: column !important;
             flex: 1 !important;
@@ -891,9 +892,7 @@
         body.keyboard-open .sidebar-nav,
         body.keyboard-open .glass-bubble,
         body.keyboard-open .mobile-page-header,
-        body.keyboard-open .chat-left-sidebar,
-        body.keyboard-open .header,
-        body.keyboard-open .hint-box {
+        body.keyboard-open .chat-left-sidebar {
             display: none !important;
         }
     }
