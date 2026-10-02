@@ -5006,3 +5006,5 @@ body.dark-mode .chat-body-container {
 /* Ocultar scrollbar nos textareas de chat */
 textarea::-webkit-scrollbar { display: none !important; }
 textarea { -ms-overflow-style: none !important; scrollbar-width: none !important; }
+
+textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
