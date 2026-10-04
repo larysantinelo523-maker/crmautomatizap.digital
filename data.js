@@ -90,7 +90,7 @@ export async function sendMessage(leadId, messageText) {
             id_empresa: id_empresa,
             lead_id: leadId,
             conteudo: messageText,
-            remetente: 'humano'
+            remetente: 'ia'
         }])
         .select();
 
