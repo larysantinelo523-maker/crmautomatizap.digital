@@ -719,7 +719,14 @@
 
             await window.dbAPI.sendMessage(currentLeadId, text);
             // Recarrega do banco pra garantir
-            carregarMensagens({ id: currentLeadId, nome: document.getElementById('chat-header-name').innerText, status: '' });
+            const fullLead = window.localLeadsData ? window.localLeadsData.find(l => l.id === currentLeadId) : null;
+            const existingAvatarImg = document.getElementById('chat-header-avatar')?.querySelector('img');
+            carregarMensagens(fullLead || { 
+                id: currentLeadId, 
+                nome: document.getElementById('chat-header-name').innerText, 
+                status: '', 
+                foto_perfil: existingAvatarImg ? existingAvatarImg.src : null 
+            });
         }
 
         // Envio via Enter no desktop
@@ -735,7 +742,14 @@
         
         // Inicializa se tiver lead pre-selecionado (pode vir de outra página)
         if (currentLeadId) {
-            carregarMensagens({ id: currentLeadId, nome: document.getElementById('chat-header-name').innerText, status: '' });
+            const fullLead = window.localLeadsData ? window.localLeadsData.find(l => l.id === currentLeadId) : null;
+            const existingAvatarImg = document.getElementById('chat-header-avatar')?.querySelector('img');
+            carregarMensagens(fullLead || { 
+                id: currentLeadId, 
+                nome: document.getElementById('chat-header-name').innerText, 
+                status: '', 
+                foto_perfil: existingAvatarImg ? existingAvatarImg.src : null 
+            });
         }
 
         // Evento para abrir dossiê

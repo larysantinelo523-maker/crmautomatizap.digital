@@ -83,14 +83,14 @@ export async function sendMessage(leadId, messageText) {
     const id_empresa = await fetchCompanyId();
     if (!id_empresa) return null;
 
+    // 1. Salva a mensagem no banco de dados (Supabase)
     const { data, error } = await supabase
         .from('mensagens')
         .insert([{
+            id_empresa: id_empresa,
             lead_id: leadId,
             conteudo: messageText,
-            remetente: 'humano',
-            tipo_mensagem: 'texto',
-            bot_ativo: false // Ao mandar msg manual, assumimos que desativou o bot ou não importa pra lógica imediata
+            remetente: 'humano'
         }])
         .select();
 
@@ -98,6 +98,37 @@ export async function sendMessage(leadId, messageText) {
         console.error('Erro ao enviar mensagem:', error);
         return null;
     }
+
+    // 2. Dispara a mensagem real para o WhatsApp via Evolution API
+    try {
+        const { data: leadData } = await supabase
+            .from('leads')
+            .select('telefone')
+            .eq('id', leadId)
+            .single();
+
+        if (leadData && leadData.telefone) {
+            let number = leadData.telefone.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+            // Garante que o número tem 55 na frente
+            if (!number.startsWith('55')) number = '55' + number;
+
+            await fetch('https://talonedlanternfish-evolution.cloudfy.live/message/sendText/AGENTE', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': '6423A64C-2ED0-4C16-B4D3-C78D2C47B5D4'
+                },
+                body: JSON.stringify({
+                    number: number,
+                    text: messageText
+                })
+            });
+            console.log('Mensagem disparada para o WhatsApp via Evolution API!');
+        }
+    } catch (evoError) {
+        console.error('Erro ao disparar para a Evolution API:', evoError);
+    }
+
     return data[0];
 }
 
