@@ -707,7 +707,17 @@
             const placeholder = document.getElementById('fake-placeholder');
             if(placeholder) placeholder.style.display = 'inline';
             
-            // Dispara o envio. A mensagem aparecerá via Realtime (adicionarMensagemNaTela).
+            // 1. Desativa o bot automaticamente
+            await window.dbAPI.toggleBotState(currentLeadId, false);
+            
+            // Atualiza a UI do toggle se existir
+            const toggleAgent = document.getElementById('toggle-agent');
+            if (toggleAgent) {
+                toggleAgent.checked = false;
+                toggleAgent.parentElement.querySelector('span').textContent = 'Agente Desativado';
+            }
+
+            // 2. Dispara o envio. A mensagem aparecerá via Realtime (adicionarMensagemNaTela).
             window.dbAPI.sendMessage(currentLeadId, text);
         }
 
