@@ -320,7 +320,6 @@
                                 <div style="flex: 1; min-width: 0;">
                                     <h3 id="chat-header-name" style="margin: 0; font-size: 15px; font-weight: 600; color: var(--color-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Selecione um lead</h3>
                                     <div style="display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--color-text-mut); margin-top: 2px;">
-                                        <span style="width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; display: inline-block;"></span>
                                         <span id="chat-header-status" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;"></span>
                                     </div>
                                 </div>
@@ -416,9 +415,11 @@
                 // Realtime Dot Logic
                 let isActiveNow = false;
                 if (lead.ultima_interacao) {
-                    const lastMsgDate = new Date(lead.ultima_interacao);
+                    const ultimaInteracaoIso = lead.ultima_interacao.endsWith('Z') ? lead.ultima_interacao : lead.ultima_interacao + 'Z';
+                    const lastMsgDate = new Date(ultimaInteracaoIso);
                     const now = new Date();
-                    const diffMinutes = (now - lastMsgDate) / (1000 * 60);
+                    // Math.abs garante que fuso horário não gere número negativo
+                    const diffMinutes = Math.abs((now - lastMsgDate) / (1000 * 60));
                     if (diffMinutes <= 5) isActiveNow = true;
                 }
                 const dotColor = isActiveNow ? '#22c55e' : '#ef4444';
@@ -522,6 +523,19 @@
                         const targetLead = leads.find(l => l.id === updatedLead.id);
                         if (targetLead) targetLead.status_agente = updatedLead.status_agente;
                         carregarMensagens(updatedLead);
+                        
+                        // Se for 'Pausar', chama o webhook do n8n
+                        if (newState === false) {
+                            try {
+                                fetch('https://talonedlanternfish-n8n.cloudfy.live/webhook/pausar-agente', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ telefone: updatedLead.telefone })
+                                }).catch(err => console.error('Erro ao chamar webhook n8n:', err));
+                            } catch (e) {
+                                console.error('Erro no fetch n8n:', e);
+                            }
+                        }
                     }
                 } else {
                     alert('Selecione uma conversa primeiro para alterar o status do agente.');
@@ -547,7 +561,22 @@
 
             // Atualiza cabeçalho do celular
             document.getElementById('chat-header-name').innerText = lead.nome || 'Desconhecido';
-            document.getElementById('chat-header-status').innerText = lead.status;
+            
+            // Lógica para Online/Offline baseada na última interação
+            let isOnline = false;
+            if (lead.ultima_interacao) {
+                const ultimaInteracaoIso = lead.ultima_interacao.endsWith('Z') ? lead.ultima_interacao : lead.ultima_interacao + 'Z';
+                const lastMsgDate = new Date(ultimaInteracaoIso);
+                const now = new Date();
+                const diffMinutes = Math.abs((now - lastMsgDate) / (1000 * 60));
+                if (diffMinutes <= 5) isOnline = true;
+            }
+            
+            if (isOnline) {
+                document.getElementById('chat-header-status').innerHTML = '<span style="color: #22c55e;">● Online</span>';
+            } else {
+                document.getElementById('chat-header-status').innerHTML = '<span style="color: #94a3b8;">● Offline</span>';
+            }
             const avatar = document.getElementById('chat-header-avatar');
             if (lead.foto_perfil) {
                 avatar.innerHTML = `<img src="${lead.foto_perfil}" alt="Foto" onerror="this.onerror=null; this.parentElement.innerText=(lead.nome || 'Desconhecido').charAt(0).toUpperCase(); this.parentElement.style.background='var(--color-primary)';" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
@@ -707,17 +736,16 @@
             const placeholder = document.getElementById('fake-placeholder');
             if(placeholder) placeholder.style.display = 'inline';
             
-            // 1. Desativa o bot automaticamente
-            await window.dbAPI.toggleBotState(currentLeadId, false);
-            
-            // Atualiza a UI do toggle se existir
-            const toggleAgent = document.getElementById('toggle-agent');
-            if (toggleAgent) {
-                toggleAgent.checked = false;
-                toggleAgent.parentElement.querySelector('span').textContent = 'Agente Desativado';
-            }
+        async function enviarMensagemDigitada() {
+            if(!currentLeadId) return;
+            const realInput = document.getElementById('real-chat-input');
+            const text = realInput.value.trim();
+            if(!text) return;
 
-            // 2. Dispara o envio. A mensagem aparecerá via Realtime (adicionarMensagemNaTela).
+            // Limpa o input
+            realInput.value = '';
+
+            // Dispara o envio. A mensagem aparecerá via Realtime (adicionarMensagemNaTela).
             window.dbAPI.sendMessage(currentLeadId, text);
         }
 
