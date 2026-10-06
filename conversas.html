@@ -737,15 +737,6 @@
             if(realInput) realInput.value = '';
             const placeholder = document.getElementById('fake-placeholder');
             if(placeholder) placeholder.style.display = 'inline';
-            
-        async function enviarMensagemDigitada() {
-            if(!currentLeadId) return;
-            const realInput = document.getElementById('real-chat-input');
-            const text = realInput.value.trim();
-            if(!text) return;
-
-            // Limpa o input
-            realInput.value = '';
 
             // Dispara o envio. A mensagem aparecerá via Realtime (adicionarMensagemNaTela).
             window.dbAPI.sendMessage(currentLeadId, text);

@@ -69,9 +69,9 @@
         });
       });
     </script>
-  <script type="module" crossorigin src="/assets/conversas-CdcgOVpm.js"></script>
+  <script type="module" crossorigin src="/assets/conversas-Tut9tB2i.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
-  <link rel="modulepreload" crossorigin href="/assets/data-BfkMwONf.js">
+  <link rel="modulepreload" crossorigin href="/assets/data-B0k13ozX.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
   <link rel="stylesheet" crossorigin href="/assets/conversas-DSSNnU3m.css">
 </head>
@@ -323,7 +323,6 @@
                                 <div style="flex: 1; min-width: 0;">
                                     <h3 id="chat-header-name" style="margin: 0; font-size: 15px; font-weight: 600; color: var(--color-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Selecione um lead</h3>
                                     <div style="display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--color-text-mut); margin-top: 2px;">
-                                        
                                         <span id="chat-header-status" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;"></span>
                                     </div>
                                 </div>
@@ -423,6 +422,7 @@
                     const ultimaInteracaoIso = ultimaInteracaoStr.endsWith('Z') ? ultimaInteracaoStr : ultimaInteracaoStr + 'Z';
                     const lastMsgDate = new Date(ultimaInteracaoIso);
                     const now = new Date();
+                    // Math.abs garante que fuso horário não gere número negativo
                     const diffMinutes = Math.abs((now - lastMsgDate) / (1000 * 60));
                     if (diffMinutes <= 5) isActiveNow = true;
                 }
@@ -527,6 +527,19 @@
                         const targetLead = leads.find(l => l.id === updatedLead.id);
                         if (targetLead) targetLead.status_agente = updatedLead.status_agente;
                         carregarMensagens(updatedLead);
+                        
+                        // Se for 'Pausar', chama o webhook do n8n
+                        if (newState === false) {
+                            try {
+                                fetch('https://talonedlanternfish-n8n.cloudfy.live/webhook/pausar-agente', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ telefone: updatedLead.telefone })
+                                }).catch(err => console.error('Erro ao chamar webhook n8n:', err));
+                            } catch (e) {
+                                console.error('Erro no fetch n8n:', e);
+                            }
+                        }
                     }
                 } else {
                     alert('Selecione uma conversa primeiro para alterar o status do agente.');
@@ -552,6 +565,7 @@
 
             // Atualiza cabeçalho do celular
             document.getElementById('chat-header-name').innerText = lead.nome || 'Desconhecido';
+            
             // Lógica para Online/Offline baseada na última interação
             let isOnline = false;
             if (lead.ultima_interacao) {
@@ -726,20 +740,9 @@
             if(realInput) realInput.value = '';
             const placeholder = document.getElementById('fake-placeholder');
             if(placeholder) placeholder.style.display = 'inline';
-            
-            // Mostra otimisticamente
-            const container = document.getElementById('chat-messages-container');
-            const timeStr = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            container.innerHTML += `
-                <div class="msg-bubble-ia" style="opacity: 0.7;">
-                    <p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${text}</p>
-                    <div style="text-align: right; margin-top: 2px; margin-bottom: -2px;"><span style="font-size: 10px; color: #667781;">Enviando...</span></div>
-                </div>`;
-            container.scrollTop = container.scrollHeight;
 
-            await window.dbAPI.sendMessage(currentLeadId, text);
-            // Recarrega do banco pra garantir
-            carregarMensagens({ id: currentLeadId, nome: document.getElementById('chat-header-name').innerText, status: '' });
+            // Dispara o envio. A mensagem aparecerá via Realtime (adicionarMensagemNaTela).
+            window.dbAPI.sendMessage(currentLeadId, text);
         }
 
         // Envio via Enter no desktop
@@ -755,7 +758,14 @@
         
         // Inicializa se tiver lead pre-selecionado (pode vir de outra página)
         if (currentLeadId) {
-            carregarMensagens({ id: currentLeadId, nome: document.getElementById('chat-header-name').innerText, status: '' });
+            const fullLead = window.localLeadsData ? window.localLeadsData.find(l => l.id === currentLeadId) : null;
+            const existingAvatarImg = document.getElementById('chat-header-avatar')?.querySelector('img');
+            carregarMensagens(fullLead || { 
+                id: currentLeadId, 
+                nome: document.getElementById('chat-header-name').innerText, 
+                status: '', 
+                foto_perfil: existingAvatarImg ? existingAvatarImg.src : null 
+            });
         }
 
         // Evento para abrir dossiê
