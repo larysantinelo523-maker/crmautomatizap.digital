@@ -419,7 +419,8 @@
                 // Realtime Dot Logic
                 let isActiveNow = false;
                 if (lead.ultima_interacao) {
-                    const ultimaInteracaoIso = lead.ultima_interacao.endsWith('Z') ? lead.ultima_interacao : lead.ultima_interacao + 'Z';
+                    const ultimaInteracaoStr = String(lead.ultima_interacao);
+                    const ultimaInteracaoIso = ultimaInteracaoStr.endsWith('Z') ? ultimaInteracaoStr : ultimaInteracaoStr + 'Z';
                     const lastMsgDate = new Date(ultimaInteracaoIso);
                     const now = new Date();
                     const diffMinutes = Math.abs((now - lastMsgDate) / (1000 * 60));
@@ -554,7 +555,8 @@
             // Lógica para Online/Offline baseada na última interação
             let isOnline = false;
             if (lead.ultima_interacao) {
-                const ultimaInteracaoIso = lead.ultima_interacao.endsWith('Z') ? lead.ultima_interacao : lead.ultima_interacao + 'Z';
+                const ultimaInteracaoStr = String(lead.ultima_interacao);
+                const ultimaInteracaoIso = ultimaInteracaoStr.endsWith('Z') ? ultimaInteracaoStr : ultimaInteracaoStr + 'Z';
                 const lastMsgDate = new Date(ultimaInteracaoIso);
                 const now = new Date();
                 const diffMinutes = Math.abs((now - lastMsgDate) / (1000 * 60));
