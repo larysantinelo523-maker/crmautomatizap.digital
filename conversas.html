@@ -390,6 +390,12 @@
                             dot.title = 'Conversa ativa agora';
                             dot.parentElement.setAttribute('data-active-now', 'true');
                         }
+                        if (leadId === currentLeadId) {
+                            const headerStatus = document.getElementById('chat-header-status');
+                            if (headerStatus) {
+                                headerStatus.innerHTML = '<span style="color: #22c55e;">● Online</span>';
+                            }
+                        }
                     }
                 });
             }
