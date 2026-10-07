@@ -403,6 +403,40 @@
                 });
             }
 
+            // Vigia de status em tempo real (roda a cada 15 segundos)
+            if (!window.statusWatchdog) {
+                window.statusWatchdog = setInterval(() => {
+                    if (!window.localLeadsData) return;
+                    const now = new Date();
+                    window.localLeadsData.forEach(lead => {
+                        if (lead.ultima_interacao) {
+                            let ultimaInteracaoIso = String(lead.ultima_interacao);
+                            if (!ultimaInteracaoIso.endsWith('Z') && !ultimaInteracaoIso.includes('+') && !ultimaInteracaoIso.match(/-\d{2}:\d{2}$/)) {
+                                ultimaInteracaoIso += 'Z';
+                            }
+                            const lastMsgDate = new Date(ultimaInteracaoIso);
+                            const diffMinutes = Math.abs((now - lastMsgDate) / (1000 * 60));
+                            
+                            if (diffMinutes > 5) {
+                                const dot = document.getElementById('status-dot-' + lead.id);
+                                if (dot && dot.parentElement.getAttribute('data-active-now') === 'true') {
+                                    dot.style.backgroundColor = '#ef4444'; // Red
+                                    dot.style.animation = 'none';
+                                    dot.title = 'Conversa inativa';
+                                    dot.parentElement.setAttribute('data-active-now', 'false');
+                                }
+                                if (lead.id === currentLeadId) {
+                                    const headerStatus = document.getElementById('chat-header-status');
+                                    if (headerStatus && headerStatus.innerText.includes('Online')) {
+                                        headerStatus.innerHTML = '<span style="color: #94a3b8;">● Offline</span>';
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }, 15000);
+            }
+
             container.innerHTML = '';
 
             if(leads.length === 0) {
