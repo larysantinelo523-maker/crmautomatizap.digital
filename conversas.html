@@ -511,6 +511,48 @@
                 });
             }
 
+            // Listen to lead updates globally (e.g. typing status)
+            if (window.dbAPI.subscribeToLeads && !window.globalLeadsChannel) {
+                window.globalLeadsChannel = window.dbAPI.subscribeToLeads((updatedLead) => {
+                    const idx = window.localLeadsData.findIndex(l => l.id === updatedLead.id);
+                    if (idx > -1) {
+                        window.localLeadsData[idx] = { ...window.localLeadsData[idx], ...updatedLead };
+                    }
+                    if (updatedLead.id === currentLeadId) {
+                        const container = document.getElementById('chat-messages-container');
+                        if (!container) return;
+                        let typingDiv = document.getElementById('typing-indicator-msg');
+                        if (updatedLead.is_typing) {
+                            if (!typingDiv) {
+                                typingDiv = document.createElement('div');
+                                typingDiv.id = 'typing-indicator-msg';
+                                typingDiv.style.alignSelf = 'flex-start';
+                                typingDiv.style.display = 'flex';
+                                typingDiv.style.gap = '8px';
+                                typingDiv.style.maxWidth = '90%';
+                                typingDiv.style.marginBottom = '8px';
+                                
+                                const avatarHtml = (updatedLead.nome || 'Desconhecido').charAt(0).toUpperCase();
+                                typingDiv.innerHTML = `
+                                    <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--color-task-green-light); color: var(--color-task-green-text); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0; margin-top: 4px; overflow: hidden;">
+                                        ${updatedLead.foto_perfil ? \`<img src="\${updatedLead.foto_perfil}" onerror="this.onerror=null; this.parentElement.innerHTML='\${avatarHtml}';" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">\` : avatarHtml}
+                                    </div>
+                                    <div class="typing-indicator">
+                                        <span></span><span></span><span></span>
+                                    </div>
+                                `;
+                                container.appendChild(typingDiv);
+                                container.scrollTop = container.scrollHeight;
+                            }
+                        } else {
+                            if (typingDiv) {
+                                typingDiv.remove();
+                            }
+                        }
+                    }
+                });
+            }
+
             // Vigia de status em tempo real (roda a cada 15 segundos)
             if (!window.statusWatchdog) {
                 window.statusWatchdog = setInterval(() => {
@@ -977,7 +1019,19 @@
 
             if (novoHtml) {
                 const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
-                container.insertAdjacentHTML('beforeend', novoHtml);
+                
+                // Keep typing indicator at the very bottom
+                const typingDiv = document.getElementById('typing-indicator-msg');
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = novoHtml.trim();
+                const newMsgElem = tempDiv.firstChild;
+                
+                if (typingDiv) {
+                    container.insertBefore(newMsgElem, typingDiv);
+                } else {
+                    container.appendChild(newMsgElem);
+                }
+                
                 if (isAtBottom) {
                     container.scrollTop = container.scrollHeight;
                 }

@@ -1,18 +1,9 @@
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from './supabase.js';
 
-const supabaseUrl = 'https://qosgrqdfeqzxnzhmwomv.supabase.co';
-const supabaseAnonKey = 'sb_publishable_zoJXnL-UHMj20tx_ml0O7A_tXG29lOZ';
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-async function checkSchema() {
-    const { data: uData, error: uError } = await supabase.from('usuarios').select('*');
-    if (uError) console.error(uError);
-    if (uData && uData.length > 0) {
-        console.log('usuarios:', Object.keys(uData[0]));
-    } else {
-        console.log('No user data', uData);
-    }
+async function main() {
+    // We can't alter tables directly from supabase-js unless we use rpc.
+    // Let's check if the column exists by selecting it
+    const { data, error } = await supabase.from('leads').select('id, is_typing').limit(1);
+    console.log("Check column:", error ? error.message : "Column exists!");
 }
-
-checkSchema();
+main();
