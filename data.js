@@ -136,7 +136,7 @@ export async function toggleBotState(leadId, isActive) {
     const id_empresa = await fetchCompanyId();
     if (!id_empresa) return null;
 
-    const statusStr = isActive ? 'ativado' : 'desativado';
+    const statusStr = isActive ? 'ativado' : 'pausado';
 
     const { error } = await supabase
         .from('leads')

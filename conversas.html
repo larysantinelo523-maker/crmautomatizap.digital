@@ -643,7 +643,7 @@
 
             // O status do agente agora vem diretamente da coluna status_agente na tabela leads
             let isBotActive = true;
-            if (lead.status_agente === 'desativado') {
+            if (lead.status_agente === 'desativado' || lead.status_agente === 'pausado') {
                 isBotActive = false;
             }
             const toggles = document.querySelectorAll('.bot-switch-input');

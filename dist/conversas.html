@@ -69,9 +69,9 @@
         });
       });
     </script>
-  <script type="module" crossorigin src="/assets/conversas-Tut9tB2i.js"></script>
+  <script type="module" crossorigin src="/assets/conversas-Bh70llCm.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
-  <link rel="modulepreload" crossorigin href="/assets/data-B0k13ozX.js">
+  <link rel="modulepreload" crossorigin href="/assets/data-DrWP87is.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
   <link rel="stylesheet" crossorigin href="/assets/conversas-DSSNnU3m.css">
 </head>
@@ -646,7 +646,7 @@
 
             // O status do agente agora vem diretamente da coluna status_agente na tabela leads
             let isBotActive = true;
-            if (lead.status_agente === 'desativado') {
+            if (lead.status_agente === 'desativado' || lead.status_agente === 'pausado') {
                 isBotActive = false;
             }
             const toggles = document.querySelectorAll('.bot-switch-input');
