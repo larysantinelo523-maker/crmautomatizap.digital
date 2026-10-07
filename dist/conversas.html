@@ -61,6 +61,68 @@
         color: #8696a0;
         margin-top: -2px;
     }
+    .custom-image-thumbnail {
+        position: relative;
+        display: inline-block;
+        margin-top: 6px;
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .custom-image-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .custom-image-thumbnail .eye-overlay {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.3);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+    .custom-image-thumbnail:hover .eye-overlay {
+        opacity: 1;
+    }
+    .custom-image-thumbnail .eye-overlay i {
+        color: white;
+        font-size: 24px;
+    }
+    .image-modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.85);
+        z-index: 99999;
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+    .image-modal-overlay.active {
+        display: flex;
+    }
+    .image-modal-overlay img {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 8px;
+        object-fit: contain;
+    }
+    .image-modal-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: white;
+        font-size: 30px;
+        cursor: pointer;
+        background: rgba(0,0,0,0.5);
+        width: 40px; height: 40px;
+        display: flex; justify-content: center; align-items: center;
+        border-radius: 50%;
+    }
     </style>
     <script>
     function autoResizeTextarea(el) {
@@ -749,7 +811,11 @@
                             <audio src="data:${msg.mime_type};base64,${msg.base64}" style="display:none;"></audio>
                         </div>`;
                     } else if (msg.mime_type.includes('image')) {
-                        mediaHtml = `<img src="data:${msg.mime_type};base64,${msg.base64}" style="max-width: 100%; border-radius: 8px; margin-top: 6px;">`;
+                        mediaHtml = `
+                        <div class="custom-image-thumbnail">
+                            <div class="eye-overlay"><i class="ph ph-eye"></i></div>
+                            <img src="data:${msg.mime_type};base64,${msg.base64}">
+                        </div>`;
                     } else if (msg.mime_type.includes('video')) {
                         mediaHtml = `<video controls style="max-width: 100%; border-radius: 8px; margin-top: 6px;"><source src="data:${msg.mime_type};base64,${msg.base64}" type="${msg.mime_type}"></video>`;
                     }
@@ -768,7 +834,11 @@
                             <audio src="${msg.media_url}" style="display:none;"></audio>
                         </div>`;
                     } else if (msg.media_url.endsWith('.jpg') || msg.media_url.endsWith('.png') || msg.media_url.endsWith('.jpeg')) {
-                        mediaHtml = `<img src="${msg.media_url}" style="max-width: 100%; border-radius: 8px; margin-top: 6px;">`;
+                        mediaHtml = `
+                        <div class="custom-image-thumbnail">
+                            <div class="eye-overlay"><i class="ph ph-eye"></i></div>
+                            <img src="${msg.media_url}">
+                        </div>`;
                     } else if (msg.media_url.endsWith('.mp4')) {
                         mediaHtml = `<video controls style="max-width: 100%; border-radius: 8px; margin-top: 6px;"><source src="${msg.media_url}"></video>`;
                     }
@@ -779,7 +849,7 @@
                     <div style="align-self: flex-start; display: flex; gap: 8px; max-width: 90%; margin-bottom: 8px;">
                         <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--color-task-green-light); color: var(--color-task-green-text); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0; margin-top: 4px; overflow: hidden;">${avatarHtml}</div>
                         <div class="msg-bubble-client">
-                            ${(mediaHtml && mediaHtml.includes('custom-audio-player')) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>`}
+                            ${(mediaHtml && (mediaHtml.includes('custom-audio-player') || mediaHtml.includes('custom-image-thumbnail'))) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>`}
                             ${mediaHtml}
                             <div style="text-align: right; margin-top: 2px; margin-bottom: -2px;">
                                 <span style="font-size: 10px; color: #999;">${timeStr}</span>
@@ -789,7 +859,7 @@
                 } else if (msg.remetente.toLowerCase() === 'ia' || msg.remetente.toLowerCase() === 'humano') {
                     html += `
                     <div class="msg-bubble-ia">
-                        ${(mediaHtml && mediaHtml.includes('custom-audio-player')) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>`}
+                        ${(mediaHtml && (mediaHtml.includes('custom-audio-player') || mediaHtml.includes('custom-image-thumbnail'))) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>`}
                         ${mediaHtml}
                         <div style="text-align: right; margin-top: 2px; margin-bottom: -2px; display: flex; justify-content: flex-end; align-items: center; gap: 4px;">
                             <span style="font-size: 10px; color: #667781;">${timeStr}</span>
@@ -850,7 +920,11 @@
                         <audio src="data:${msg.mime_type};base64,${msg.base64}" style="display:none;"></audio>
                     </div>`;
                 } else if (msg.mime_type.includes('image')) {
-                    mediaHtml = `<img src="data:${msg.mime_type};base64,${msg.base64}" style="max-width: 100%; border-radius: 8px; margin-top: 6px;">`;
+                    mediaHtml = `
+                    <div class="custom-image-thumbnail">
+                        <div class="eye-overlay"><i class="ph ph-eye"></i></div>
+                        <img src="data:${msg.mime_type};base64,${msg.base64}">
+                    </div>`;
                 } else if (msg.mime_type.includes('video')) {
                     mediaHtml = `<video controls style="max-width: 100%; border-radius: 8px; margin-top: 6px;"><source src="data:${msg.mime_type};base64,${msg.base64}" type="${msg.mime_type}"></video>`;
                 }
@@ -869,7 +943,11 @@
                         <audio src="${msg.media_url}" style="display:none;"></audio>
                     </div>`;
                 } else if (msg.media_url.endsWith('.jpg') || msg.media_url.endsWith('.png') || msg.media_url.endsWith('.jpeg')) {
-                    mediaHtml = `<img src="${msg.media_url}" style="max-width: 100%; border-radius: 8px; margin-top: 6px;">`;
+                    mediaHtml = `
+                    <div class="custom-image-thumbnail">
+                        <div class="eye-overlay"><i class="ph ph-eye"></i></div>
+                        <img src="${msg.media_url}">
+                    </div>`;
                 } else if (msg.media_url.endsWith('.mp4')) {
                     mediaHtml = `<video controls style="max-width: 100%; border-radius: 8px; margin-top: 6px;"><source src="${msg.media_url}"></video>`;
                 }
@@ -881,7 +959,7 @@
                 <div style="align-self: flex-start; display: flex; gap: 8px; max-width: 90%; margin-bottom: 8px;">
                     <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--color-task-green-light); color: var(--color-task-green-text); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0; margin-top: 4px; overflow: hidden;">${avatarHtml}</div>
                     <div class="msg-bubble-client">
-                        ${(mediaHtml && mediaHtml.includes('custom-audio-player')) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>`}
+                        ${(mediaHtml && (mediaHtml.includes('custom-audio-player') || mediaHtml.includes('custom-image-thumbnail'))) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>`}
                         ${mediaHtml}
                         <div style="text-align: right; margin-top: 2px; margin-bottom: -2px;">
                             <span style="font-size: 10px; color: #999;">${timeStr}</span>
@@ -891,7 +969,7 @@
             } else if (remetente === 'ia' || remetente === 'humano') {
                 novoHtml = `
                 <div class="msg-bubble-ia">
-                    ${(mediaHtml && mediaHtml.includes('custom-audio-player')) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>`}
+                    ${(mediaHtml && (mediaHtml.includes('custom-audio-player') || mediaHtml.includes('custom-image-thumbnail'))) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>`}
                     ${mediaHtml}
                     <div style="text-align: right; margin-top: 2px; margin-bottom: -2px; display: flex; justify-content: flex-end; align-items: center; gap: 4px;">
                         <span style="font-size: 10px; color: #667781;">${timeStr}</span>
@@ -1549,6 +1627,30 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
             if(timeDisplay) timeDisplay.innerText = '0:00';
         }
     }, true);
+    // Image Modal Logic
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.custom-image-thumbnail')) {
+            const wrapper = e.target.closest('.custom-image-thumbnail');
+            const img = wrapper.querySelector('img');
+            if(img) {
+                const modal = document.getElementById('image-modal-overlay');
+                const modalImg = document.getElementById('image-modal-img');
+                modalImg.src = img.src;
+                modal.classList.add('active');
+            }
+        }
+        
+        if (e.target.closest('#image-modal-close') || e.target.id === 'image-modal-overlay') {
+            const modal = document.getElementById('image-modal-overlay');
+            modal.classList.remove('active');
+            document.getElementById('image-modal-img').src = '';
+        }
+    });
     </script>
+    
+    <div class="image-modal-overlay" id="image-modal-overlay">
+        <div class="image-modal-close" id="image-modal-close"><i class="ph ph-x"></i></div>
+        <img src="" id="image-modal-img">
+    </div>
 </body>
 </html>
