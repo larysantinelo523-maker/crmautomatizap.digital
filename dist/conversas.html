@@ -19,9 +19,9 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        min-width: 200px;
-        max-width: 280px;
-        padding: 4px 0;
+        min-width: 250px;
+        max-width: 320px;
+        padding: 0;
     }
     .audio-play-btn {
         font-size: 26px;
@@ -41,8 +41,8 @@
         border-radius: 2px;
         background: #cfd9df;
         outline: none;
-        margin-top: 4px;
-        margin-bottom: 4px;
+        margin-top: 2px;
+        margin-bottom: 2px;
     }
     .audio-slider::-webkit-slider-thumb {
         -webkit-appearance: none;
@@ -58,20 +58,7 @@
         justify-content: space-between;
         font-size: 11px;
         color: #8696a0;
-    }
-    .audio-speed-btn {
-        background: #e9edef;
-        color: #54656f;
-        border-radius: 12px;
-        padding: 4px 8px;
-        font-size: 11px;
-        font-weight: 500;
-        cursor: pointer;
-        flex-shrink: 0;
-        user-select: none;
-    }
-    .msg-bubble-ia .audio-speed-btn {
-        background: #d9fdd3;
+        margin-top: -2px;
     }
     </style>
     <script>
@@ -130,11 +117,11 @@
         });
       });
     </script>
-  <script type="module" crossorigin src="/assets/conversas-Bh70llCm.js"></script>
+  <script type="module" crossorigin src="/assets/conversas-Df-StG-D.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
   <link rel="modulepreload" crossorigin href="/assets/data-DrWP87is.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-DSSNnU3m.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-CoqmZu5K.css">
 </head>
 
 <body>
@@ -758,7 +745,6 @@
                                     <span class="audio-duration">0:00</span>
                                 </div>
                             </div>
-                            <div class="audio-speed-btn">1x</div>
                             <audio src="data:${msg.mime_type};base64,${msg.base64}" style="display:none;"></audio>
                         </div>`;
                     } else if (msg.mime_type.includes('image')) {
@@ -778,7 +764,6 @@
                                     <span class="audio-duration">0:00</span>
                                 </div>
                             </div>
-                            <div class="audio-speed-btn">1x</div>
                             <audio src="${msg.media_url}" style="display:none;"></audio>
                         </div>`;
                     } else if (msg.media_url.endsWith('.jpg') || msg.media_url.endsWith('.png') || msg.media_url.endsWith('.jpeg')) {
@@ -861,7 +846,6 @@
                                 <span class="audio-duration">0:00</span>
                             </div>
                         </div>
-                        <div class="audio-speed-btn">1x</div>
                         <audio src="data:${msg.mime_type};base64,${msg.base64}" style="display:none;"></audio>
                     </div>`;
                 } else if (msg.mime_type.includes('image')) {
@@ -881,7 +865,6 @@
                                 <span class="audio-duration">0:00</span>
                             </div>
                         </div>
-                        <div class="audio-speed-btn">1x</div>
                         <audio src="${msg.media_url}" style="display:none;"></audio>
                     </div>`;
                 } else if (msg.media_url.endsWith('.jpg') || msg.media_url.endsWith('.png') || msg.media_url.endsWith('.jpeg')) {
@@ -1497,22 +1480,6 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
             }
         }
         
-        if (e.target.closest('.audio-speed-btn')) {
-            const btn = e.target.closest('.audio-speed-btn');
-            const player = btn.closest('.custom-audio-player');
-            const audio = player.querySelector('audio');
-            
-            if (audio.playbackRate === 1) {
-                audio.playbackRate = 1.5;
-                btn.innerText = '1.5x';
-            } else if (audio.playbackRate === 1.5) {
-                audio.playbackRate = 2;
-                btn.innerText = '2x';
-            } else {
-                audio.playbackRate = 1;
-                btn.innerText = '1x';
-            }
-        }
     });
 
     document.addEventListener('input', function(e) {
