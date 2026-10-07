@@ -1,4 +1,4 @@
-const CACHE_NAME = 'automatizap-crm-v10';
+const CACHE_NAME = 'automatizap-crm-v11';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

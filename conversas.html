@@ -13,6 +13,67 @@
 
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+    /* Custom WhatsApp Audio Player */
+    .custom-audio-player {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 200px;
+        max-width: 280px;
+        padding: 4px 0;
+    }
+    .audio-play-btn {
+        font-size: 26px;
+        color: #8696a0;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+    .audio-track {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .audio-slider {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 4px;
+        border-radius: 2px;
+        background: #cfd9df;
+        outline: none;
+        margin-top: 4px;
+        margin-bottom: 4px;
+    }
+    .audio-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #00a884;
+        cursor: pointer;
+    }
+    .audio-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: #8696a0;
+    }
+    .audio-speed-btn {
+        background: #e9edef;
+        color: #54656f;
+        border-radius: 12px;
+        padding: 4px 8px;
+        font-size: 11px;
+        font-weight: 500;
+        cursor: pointer;
+        flex-shrink: 0;
+        user-select: none;
+    }
+    .msg-bubble-ia .audio-speed-btn {
+        background: #d9fdd3;
+    }
+    </style>
     <script>
     function autoResizeTextarea(el) {
         el.style.height = 'auto';
@@ -684,7 +745,19 @@
                 let mediaHtml = '';
                 if (msg.base64 && msg.mime_type) {
                     if (msg.mime_type.includes('audio')) {
-                        mediaHtml = `<audio controls style="max-width: 100%; height: 35px; margin-top: 6px; outline: none; border-radius: 8px;"><source src="data:${msg.mime_type};base64,${msg.base64}" type="${msg.mime_type}">Seu navegador não suporta áudio.</audio>`;
+                        mediaHtml = `
+                        <div class="custom-audio-player">
+                            <div class="audio-play-btn"><i class="ph-fill ph-play"></i></div>
+                            <div class="audio-track">
+                                <input type="range" min="0" max="100" value="0" class="audio-slider">
+                                <div class="audio-meta">
+                                    <span class="audio-current-time">0:00</span>
+                                    <span class="audio-duration">0:00</span>
+                                </div>
+                            </div>
+                            <div class="audio-speed-btn">1x</div>
+                            <audio src="data:${msg.mime_type};base64,${msg.base64}" style="display:none;"></audio>
+                        </div>`;
                     } else if (msg.mime_type.includes('image')) {
                         mediaHtml = `<img src="data:${msg.mime_type};base64,${msg.base64}" style="max-width: 100%; border-radius: 8px; margin-top: 6px;">`;
                     } else if (msg.mime_type.includes('video')) {
@@ -692,7 +765,19 @@
                     }
                 } else if (msg.media_url) {
                     if (msg.media_url.endsWith('.ogg') || msg.media_url.endsWith('.mp3')) {
-                        mediaHtml = `<audio controls style="max-width: 100%; height: 35px; margin-top: 6px; outline: none; border-radius: 8px;"><source src="${msg.media_url}">Seu navegador não suporta áudio.</audio>`;
+                        mediaHtml = `
+                        <div class="custom-audio-player">
+                            <div class="audio-play-btn"><i class="ph-fill ph-play"></i></div>
+                            <div class="audio-track">
+                                <input type="range" min="0" max="100" value="0" class="audio-slider">
+                                <div class="audio-meta">
+                                    <span class="audio-current-time">0:00</span>
+                                    <span class="audio-duration">0:00</span>
+                                </div>
+                            </div>
+                            <div class="audio-speed-btn">1x</div>
+                            <audio src="${msg.media_url}" style="display:none;"></audio>
+                        </div>`;
                     } else if (msg.media_url.endsWith('.jpg') || msg.media_url.endsWith('.png') || msg.media_url.endsWith('.jpeg')) {
                         mediaHtml = `<img src="${msg.media_url}" style="max-width: 100%; border-radius: 8px; margin-top: 6px;">`;
                     } else if (msg.media_url.endsWith('.mp4')) {
@@ -705,7 +790,7 @@
                     <div style="align-self: flex-start; display: flex; gap: 8px; max-width: 90%; margin-bottom: 8px;">
                         <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--color-task-green-light); color: var(--color-task-green-text); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0; margin-top: 4px; overflow: hidden;">${avatarHtml}</div>
                         <div class="msg-bubble-client">
-                            <p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>
+                            ${(mediaHtml && mediaHtml.includes('custom-audio-player')) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>`}
                             ${mediaHtml}
                             <div style="text-align: right; margin-top: 2px; margin-bottom: -2px;">
                                 <span style="font-size: 10px; color: #999;">${timeStr}</span>
@@ -715,7 +800,7 @@
                 } else if (msg.remetente.toLowerCase() === 'ia' || msg.remetente.toLowerCase() === 'humano') {
                     html += `
                     <div class="msg-bubble-ia">
-                        <p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>
+                        ${(mediaHtml && mediaHtml.includes('custom-audio-player')) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>`}
                         ${mediaHtml}
                         <div style="text-align: right; margin-top: 2px; margin-bottom: -2px; display: flex; justify-content: flex-end; align-items: center; gap: 4px;">
                             <span style="font-size: 10px; color: #667781;">${timeStr}</span>
@@ -763,7 +848,19 @@
             let mediaHtml = '';
             if (msg.base64 && msg.mime_type) {
                 if (msg.mime_type.includes('audio')) {
-                    mediaHtml = `<audio controls style="max-width: 100%; height: 35px; margin-top: 6px; outline: none; border-radius: 8px;"><source src="data:${msg.mime_type};base64,${msg.base64}" type="${msg.mime_type}">Seu navegador não suporta áudio.</audio>`;
+                    mediaHtml = `
+                    <div class="custom-audio-player">
+                        <div class="audio-play-btn"><i class="ph-fill ph-play"></i></div>
+                        <div class="audio-track">
+                            <input type="range" min="0" max="100" value="0" class="audio-slider">
+                            <div class="audio-meta">
+                                <span class="audio-current-time">0:00</span>
+                                <span class="audio-duration">0:00</span>
+                            </div>
+                        </div>
+                        <div class="audio-speed-btn">1x</div>
+                        <audio src="data:${msg.mime_type};base64,${msg.base64}" style="display:none;"></audio>
+                    </div>`;
                 } else if (msg.mime_type.includes('image')) {
                     mediaHtml = `<img src="data:${msg.mime_type};base64,${msg.base64}" style="max-width: 100%; border-radius: 8px; margin-top: 6px;">`;
                 } else if (msg.mime_type.includes('video')) {
@@ -771,7 +868,19 @@
                 }
             } else if (msg.media_url) {
                 if (msg.media_url.endsWith('.ogg') || msg.media_url.endsWith('.mp3')) {
-                    mediaHtml = `<audio controls style="max-width: 100%; height: 35px; margin-top: 6px; outline: none; border-radius: 8px;"><source src="${msg.media_url}">Seu navegador não suporta áudio.</audio>`;
+                    mediaHtml = `
+                    <div class="custom-audio-player">
+                        <div class="audio-play-btn"><i class="ph-fill ph-play"></i></div>
+                        <div class="audio-track">
+                            <input type="range" min="0" max="100" value="0" class="audio-slider">
+                            <div class="audio-meta">
+                                <span class="audio-current-time">0:00</span>
+                                <span class="audio-duration">0:00</span>
+                            </div>
+                        </div>
+                        <div class="audio-speed-btn">1x</div>
+                        <audio src="${msg.media_url}" style="display:none;"></audio>
+                    </div>`;
                 } else if (msg.media_url.endsWith('.jpg') || msg.media_url.endsWith('.png') || msg.media_url.endsWith('.jpeg')) {
                     mediaHtml = `<img src="${msg.media_url}" style="max-width: 100%; border-radius: 8px; margin-top: 6px;">`;
                 } else if (msg.media_url.endsWith('.mp4')) {
@@ -785,7 +894,7 @@
                 <div style="align-self: flex-start; display: flex; gap: 8px; max-width: 90%; margin-bottom: 8px;">
                     <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--color-task-green-light); color: var(--color-task-green-text); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0; margin-top: 4px; overflow: hidden;">${avatarHtml}</div>
                     <div class="msg-bubble-client">
-                        <p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>
+                        ${(mediaHtml && mediaHtml.includes('custom-audio-player')) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>`}
                         ${mediaHtml}
                         <div style="text-align: right; margin-top: 2px; margin-bottom: -2px;">
                             <span style="font-size: 10px; color: #999;">${timeStr}</span>
@@ -795,7 +904,7 @@
             } else if (remetente === 'ia' || remetente === 'humano') {
                 novoHtml = `
                 <div class="msg-bubble-ia">
-                    <p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>
+                    ${(mediaHtml && mediaHtml.includes('custom-audio-player')) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>`}
                     ${mediaHtml}
                     <div style="text-align: right; margin-top: 2px; margin-bottom: -2px; display: flex; justify-content: flex-end; align-items: center; gap: 4px;">
                         <span style="font-size: 10px; color: #667781;">${timeStr}</span>
@@ -1361,5 +1470,116 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
     });
 </script>
 <!-- END VIRTUAL KEYBOARD INJECTION -->
+    <script>
+    // Custom WhatsApp Audio Player Logic
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.audio-play-btn')) {
+            const btn = e.target.closest('.audio-play-btn');
+            const player = btn.closest('.custom-audio-player');
+            const audio = player.querySelector('audio');
+            const icon = btn.querySelector('i');
+            
+            if (audio.paused) {
+                document.querySelectorAll('.custom-audio-player audio').forEach(a => {
+                    if (a !== audio && !a.paused) {
+                        a.pause();
+                        const otherIcon = a.closest('.custom-audio-player').querySelector('.audio-play-btn i');
+                        if(otherIcon) otherIcon.className = 'ph-fill ph-play';
+                    }
+                });
+
+                audio.play();
+                icon.className = 'ph-fill ph-pause';
+            } else {
+                audio.pause();
+                icon.className = 'ph-fill ph-play';
+            }
+        }
+        
+        if (e.target.closest('.audio-speed-btn')) {
+            const btn = e.target.closest('.audio-speed-btn');
+            const player = btn.closest('.custom-audio-player');
+            const audio = player.querySelector('audio');
+            
+            if (audio.playbackRate === 1) {
+                audio.playbackRate = 1.5;
+                btn.innerText = '1.5x';
+            } else if (audio.playbackRate === 1.5) {
+                audio.playbackRate = 2;
+                btn.innerText = '2x';
+            } else {
+                audio.playbackRate = 1;
+                btn.innerText = '1x';
+            }
+        }
+    });
+
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('audio-slider')) {
+            const slider = e.target;
+            const player = slider.closest('.custom-audio-player');
+            const audio = player.querySelector('audio');
+            const timeDisplay = player.querySelector('.audio-current-time');
+            
+            if (!isNaN(audio.duration) && audio.duration > 0) {
+                const time = (slider.value / 100) * audio.duration;
+                audio.currentTime = time;
+                
+                const mins = Math.floor(time / 60);
+                const secs = Math.floor(time % 60);
+                timeDisplay.innerText = mins + ':' + (secs < 10 ? '0' : '') + secs;
+            }
+        }
+    });
+
+    document.addEventListener('timeupdate', function(e) {
+        if (e.target.tagName && e.target.tagName.toLowerCase() === 'audio' && e.target.closest('.custom-audio-player')) {
+            const audio = e.target;
+            const player = audio.closest('.custom-audio-player');
+            const slider = player.querySelector('.audio-slider');
+            const timeDisplay = player.querySelector('.audio-current-time');
+            
+            if (!isNaN(audio.duration) && audio.duration > 0) {
+                const progress = (audio.currentTime / audio.duration) * 100;
+                slider.value = progress;
+                
+                const time = audio.currentTime;
+                const mins = Math.floor(time / 60);
+                const secs = Math.floor(time % 60);
+                timeDisplay.innerText = mins + ':' + (secs < 10 ? '0' : '') + secs;
+            }
+        }
+    }, true);
+
+    document.addEventListener('loadedmetadata', function(e) {
+        if (e.target.tagName && e.target.tagName.toLowerCase() === 'audio' && e.target.closest('.custom-audio-player')) {
+            const audio = e.target;
+            const player = audio.closest('.custom-audio-player');
+            const durationDisplay = player.querySelector('.audio-duration');
+            
+            const time = audio.duration;
+            if (!isNaN(time) && time !== Infinity && time > 0) {
+                const mins = Math.floor(time / 60);
+                const secs = Math.floor(time % 60);
+                durationDisplay.innerText = mins + ':' + (secs < 10 ? '0' : '') + secs;
+            }
+        }
+    }, true);
+
+    document.addEventListener('ended', function(e) {
+        if (e.target.tagName && e.target.tagName.toLowerCase() === 'audio' && e.target.closest('.custom-audio-player')) {
+            const audio = e.target;
+            const player = audio.closest('.custom-audio-player');
+            const icon = player.querySelector('.audio-play-btn i');
+            const slider = player.querySelector('.audio-slider');
+            
+            if(icon) icon.className = 'ph-fill ph-play';
+            if(slider) slider.value = 0;
+            audio.currentTime = 0;
+            const timeDisplay = player.querySelector('.audio-current-time');
+            if(timeDisplay) timeDisplay.innerText = '0:00';
+        }
+    }, true);
+    </script>
 </body>
 </html>
