@@ -682,10 +682,22 @@
                 const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 
                 let mediaHtml = '';
-                if (msg.base64 && msg.mime_type && msg.mime_type.includes('audio')) {
-                    mediaHtml = `<audio controls style="max-width: 100%; height: 35px; margin-top: 6px; outline: none; border-radius: 8px;"><source src="data:${msg.mime_type};base64,${msg.base64}" type="${msg.mime_type}">Seu navegador não suporta áudio.</audio>`;
-                } else if (msg.media_url && (msg.media_url.endsWith('.ogg') || msg.media_url.endsWith('.mp3'))) {
-                    mediaHtml = `<audio controls style="max-width: 100%; height: 35px; margin-top: 6px; outline: none; border-radius: 8px;"><source src="${msg.media_url}">Seu navegador não suporta áudio.</audio>`;
+                if (msg.base64 && msg.mime_type) {
+                    if (msg.mime_type.includes('audio')) {
+                        mediaHtml = `<audio controls style="max-width: 100%; height: 35px; margin-top: 6px; outline: none; border-radius: 8px;"><source src="data:${msg.mime_type};base64,${msg.base64}" type="${msg.mime_type}">Seu navegador não suporta áudio.</audio>`;
+                    } else if (msg.mime_type.includes('image')) {
+                        mediaHtml = `<img src="data:${msg.mime_type};base64,${msg.base64}" style="max-width: 100%; border-radius: 8px; margin-top: 6px;">`;
+                    } else if (msg.mime_type.includes('video')) {
+                        mediaHtml = `<video controls style="max-width: 100%; border-radius: 8px; margin-top: 6px;"><source src="data:${msg.mime_type};base64,${msg.base64}" type="${msg.mime_type}"></video>`;
+                    }
+                } else if (msg.media_url) {
+                    if (msg.media_url.endsWith('.ogg') || msg.media_url.endsWith('.mp3')) {
+                        mediaHtml = `<audio controls style="max-width: 100%; height: 35px; margin-top: 6px; outline: none; border-radius: 8px;"><source src="${msg.media_url}">Seu navegador não suporta áudio.</audio>`;
+                    } else if (msg.media_url.endsWith('.jpg') || msg.media_url.endsWith('.png') || msg.media_url.endsWith('.jpeg')) {
+                        mediaHtml = `<img src="${msg.media_url}" style="max-width: 100%; border-radius: 8px; margin-top: 6px;">`;
+                    } else if (msg.media_url.endsWith('.mp4')) {
+                        mediaHtml = `<video controls style="max-width: 100%; border-radius: 8px; margin-top: 6px;"><source src="${msg.media_url}"></video>`;
+                    }
                 }
 
                 if (msg.remetente.toLowerCase() === 'cliente') {
@@ -749,10 +761,22 @@
             const remetente = (msg.remetente || '').toLowerCase();
 
             let mediaHtml = '';
-            if (msg.base64 && msg.mime_type && msg.mime_type.includes('audio')) {
-                mediaHtml = `<audio controls style="max-width: 100%; height: 35px; margin-top: 6px; outline: none; border-radius: 8px;"><source src="data:${msg.mime_type};base64,${msg.base64}" type="${msg.mime_type}">Seu navegador não suporta áudio.</audio>`;
-            } else if (msg.media_url && (msg.media_url.endsWith('.ogg') || msg.media_url.endsWith('.mp3'))) {
-                mediaHtml = `<audio controls style="max-width: 100%; height: 35px; margin-top: 6px; outline: none; border-radius: 8px;"><source src="${msg.media_url}">Seu navegador não suporta áudio.</audio>`;
+            if (msg.base64 && msg.mime_type) {
+                if (msg.mime_type.includes('audio')) {
+                    mediaHtml = `<audio controls style="max-width: 100%; height: 35px; margin-top: 6px; outline: none; border-radius: 8px;"><source src="data:${msg.mime_type};base64,${msg.base64}" type="${msg.mime_type}">Seu navegador não suporta áudio.</audio>`;
+                } else if (msg.mime_type.includes('image')) {
+                    mediaHtml = `<img src="data:${msg.mime_type};base64,${msg.base64}" style="max-width: 100%; border-radius: 8px; margin-top: 6px;">`;
+                } else if (msg.mime_type.includes('video')) {
+                    mediaHtml = `<video controls style="max-width: 100%; border-radius: 8px; margin-top: 6px;"><source src="data:${msg.mime_type};base64,${msg.base64}" type="${msg.mime_type}"></video>`;
+                }
+            } else if (msg.media_url) {
+                if (msg.media_url.endsWith('.ogg') || msg.media_url.endsWith('.mp3')) {
+                    mediaHtml = `<audio controls style="max-width: 100%; height: 35px; margin-top: 6px; outline: none; border-radius: 8px;"><source src="${msg.media_url}">Seu navegador não suporta áudio.</audio>`;
+                } else if (msg.media_url.endsWith('.jpg') || msg.media_url.endsWith('.png') || msg.media_url.endsWith('.jpeg')) {
+                    mediaHtml = `<img src="${msg.media_url}" style="max-width: 100%; border-radius: 8px; margin-top: 6px;">`;
+                } else if (msg.media_url.endsWith('.mp4')) {
+                    mediaHtml = `<video controls style="max-width: 100%; border-radius: 8px; margin-top: 6px;"><source src="${msg.media_url}"></video>`;
+                }
             }
 
             let novoHtml = '';
