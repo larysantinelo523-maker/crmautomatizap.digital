@@ -484,6 +484,17 @@
         window.initConversations = async function() {
             if(!window.dbAPI) return;
             const leads = await window.dbAPI.fetchLeads();
+            
+            // Preserva a ultima_interacao_cliente (calculada localmente)
+            if (window.localLeadsData && window.localLeadsData.length > 0) {
+                leads.forEach(newLead => {
+                    const oldLead = window.localLeadsData.find(l => l.id === newLead.id);
+                    if (oldLead && oldLead.ultima_interacao_cliente) {
+                        newLead.ultima_interacao_cliente = oldLead.ultima_interacao_cliente;
+                    }
+                });
+            }
+            
             const container = document.getElementById('contact-list-container');
             window.activeLeadsFilter = false;
             window.localLeadsData = leads; // Store globally for filter
@@ -495,6 +506,7 @@
                     const lead = window.localLeadsData.find(l => l.id === leadId);
                     if (lead) {
                         if (msg.remetente === 'cliente') {
+                            lead.ultima_interacao_cliente = msg.criado_em;
                             lead.ultima_interacao = msg.criado_em;
                             const dot = document.getElementById('status-dot-' + leadId);
                             if (dot) {
@@ -580,8 +592,9 @@
                     if (!window.localLeadsData) return;
                     const now = new Date();
                     window.localLeadsData.forEach(lead => {
-                        if (lead.ultima_interacao) {
-                            let ultimaInteracaoIso = String(lead.ultima_interacao);
+                        const targetTime = lead.ultima_interacao_cliente || lead.ultima_interacao;
+                        if (targetTime) {
+                            let ultimaInteracaoIso = String(targetTime);
                             if (!ultimaInteracaoIso.endsWith('Z') && !ultimaInteracaoIso.includes('+') && !ultimaInteracaoIso.match(/-\d{2}:\d{2}$/)) {
                                 ultimaInteracaoIso += 'Z';
                             }
@@ -628,8 +641,9 @@
                 
                 // Realtime Dot Logic
                 let isActiveNow = false;
-                if (lead.ultima_interacao) {
-                    const ultimaInteracaoStr = String(lead.ultima_interacao);
+                const targetTime = lead.ultima_interacao_cliente || lead.ultima_interacao;
+                if (targetTime) {
+                    const ultimaInteracaoStr = String(targetTime);
                     let ultimaInteracaoIso = ultimaInteracaoStr;
                     if (!ultimaInteracaoIso.endsWith('Z') && !ultimaInteracaoIso.includes('+') && !ultimaInteracaoIso.match(/-\d{2}:\d{2}$/)) {
                         ultimaInteracaoIso += 'Z';
@@ -811,8 +825,9 @@
             
             // Lógica para Online/Offline baseada na última interação
             let isOnline = false;
-            if (lead.ultima_interacao) {
-                const ultimaInteracaoStr = String(lead.ultima_interacao);
+            const targetTime = lead.ultima_interacao_cliente || lead.ultima_interacao;
+            if (targetTime) {
+                const ultimaInteracaoStr = String(targetTime);
                 let ultimaInteracaoIso = ultimaInteracaoStr;
                 if (!ultimaInteracaoIso.endsWith('Z') && !ultimaInteracaoIso.includes('+') && !ultimaInteracaoIso.match(/-\d{2}:\d{2}$/)) {
                     ultimaInteracaoIso += 'Z';
@@ -838,6 +853,45 @@
             }
 
             const mensagens = await window.dbAPI.fetchConversations(lead.id);
+            
+            // Encontra a última mensagem do cliente para corrigir o status Online/Offline de vez
+            let lastClientMsgDate = null;
+            for (let i = 0; i < mensagens.length; i++) {
+                if (mensagens[i].remetente && mensagens[i].remetente.toLowerCase() === 'cliente') {
+                    if (!lastClientMsgDate || new Date(mensagens[i].criado_em) > new Date(lastClientMsgDate)) {
+                        lastClientMsgDate = mensagens[i].criado_em;
+                    }
+                }
+            }
+            if (lastClientMsgDate) {
+                lead.ultima_interacao_cliente = lastClientMsgDate;
+                let isoStr = String(lastClientMsgDate);
+                if (!isoStr.endsWith('Z') && !isoStr.includes('+') && !isoStr.match(/-\d{2}:\d{2}$/)) isoStr += 'Z';
+                const diffMins = Math.abs((new Date() - new Date(isoStr)) / (1000 * 60));
+                isOnline = diffMins <= 5;
+                
+                // Atualiza o header se mudou ou só garante o valor correto
+                if (isOnline) {
+                    document.getElementById('chat-header-status').innerHTML = '<span style="color: #22c55e;">● Online</span>';
+                } else {
+                    document.getElementById('chat-header-status').innerHTML = '<span style="color: #94a3b8;">● Offline</span>';
+                }
+                
+                // Atualiza o dot na lista lateral também
+                const dot = document.getElementById('status-dot-' + lead.id);
+                if (dot) {
+                    if (isOnline) {
+                        dot.style.backgroundColor = '#22c55e';
+                        dot.style.animation = 'pulse 2s infinite';
+                        dot.parentElement.setAttribute('data-active-now', 'true');
+                    } else {
+                        dot.style.backgroundColor = '#ef4444';
+                        dot.style.animation = 'none';
+                        dot.parentElement.setAttribute('data-active-now', 'false');
+                    }
+                }
+            }
+            
             container.innerHTML = '';
             
             if(mensagens.length === 0) {
