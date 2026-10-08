@@ -365,7 +365,12 @@
                             <i class="ph ph-magnifying-glass"></i>
                             <input type="text" id="chat-search-input" placeholder="Buscar conversa...">
                         </div>
-                        <div id="total-leads-count" style="text-align: right; margin-top: 8px; font-size: 11px; color: var(--color-text-mut); font-weight: 500;">Total: 0</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                            <button onclick="location.reload()" style="background: none; border: none; color: var(--color-primary); font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 500; padding: 0; outline: none;" title="Atualizar a página">
+                                <i class="ph ph-arrows-clockwise"></i> Atualizar conversas
+                            </button>
+                            <div id="total-leads-count" style="text-align: right; font-size: 11px; color: var(--color-text-mut); font-weight: 500;">Total: 0</div>
+                        </div>
                     </div>
                     <div id="contact-list-container" style="overflow-y: auto; flex: 1; min-height: 0;">
                         <!-- Contatos dinâmicos -->
