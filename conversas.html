@@ -503,6 +503,24 @@
                             dot.title = 'Conversa ativa agora';
                             dot.parentElement.setAttribute('data-active-now', 'true');
                         }
+                        // Mover contato para o topo
+                        const contactItem = document.getElementById('contact-item-' + leadId);
+                        const containerList = document.getElementById('contact-list-container');
+                        if (contactItem && containerList) {
+                            containerList.prepend(contactItem);
+                        }
+                        
+                        // Atualizar badge de não lidas se não estiver na conversa ativa
+                        if (leadId !== currentLeadId) {
+                            const badge = document.getElementById('unread-badge-' + leadId);
+                            if (badge) {
+                                let currentCount = parseInt(badge.innerText) || 0;
+                                currentCount++;
+                                badge.innerText = currentCount;
+                                badge.style.display = 'flex';
+                            }
+                        }
+
                         if (leadId === currentLeadId) {
                             const headerStatus = document.getElementById('chat-header-status');
                             if (headerStatus) {
@@ -629,6 +647,7 @@
 
                 const div = document.createElement('div');
                 div.className = 'chat-contact-item';
+                div.id = 'contact-item-' + lead.id;
                 div.setAttribute('data-active-now', isActiveNow ? 'true' : 'false');
                 div.setAttribute('data-lead-name', safeNome.toLowerCase());
                 div.style = 'padding: 10px 16px; border-bottom: 1px solid var(--color-border); display: flex; gap: 12px; align-items: center; cursor: pointer; transition: background 0.2s;';
@@ -642,13 +661,21 @@
                             </div>
                             <span style="font-size: 11px; color: var(--color-text-mut);">${timeStr}</span>
                         </div>
-                        <p style="font-size: 13px; color: var(--color-text-sec); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">Clique para ver as mensagens</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <p style="font-size: 13px; color: var(--color-text-sec); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">Clique para ver as mensagens</p>
+                            <span id="unread-badge-${lead.id}" style="display: none; background: var(--color-primary); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: bold; align-items: center; justify-content: center; margin-left: 8px;">0</span>
+                        </div>
                     </div>
                 `;
                 
                                 div.onclick = () => {
                     document.querySelectorAll('.chat-contact-item').forEach(el => el.style.background = 'transparent');
                     div.style.background = 'var(--color-bg-main)';
+                    const badge = document.getElementById('unread-badge-' + lead.id);
+                    if (badge) {
+                        badge.style.display = 'none';
+                        badge.innerText = '0';
+                    }
                     carregarMensagens(lead);
                     
                     if (window.innerWidth <= 768) {
