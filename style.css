@@ -5051,3 +5051,50 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
         opacity: 1;
     }
 }
+
+/* FIX FOR CHAT LAYOUT OVERFLOW */
+@media (min-width: 992px) {
+    .dashboard-grid.chat-layout {
+        display: grid !important;
+        grid-template-columns: 25% 75% !important;
+        grid-template-rows: minmax(0, 1fr) !important;
+        height: calc(100vh - 120px) !important;
+        overflow: hidden !important;
+        align-items: stretch !important;
+    }
+    
+    .chat-left-sidebar {
+        height: 100% !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    #contact-list-container {
+        flex: 1 1 auto !important;
+        overflow-y: auto !important;
+        min-height: 0 !important;
+    }
+    
+    .chat-right-wrapper {
+        height: 100% !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    .chat-card {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    #chat-messages-container {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+    }
+}
