@@ -360,11 +360,12 @@
 
                 <div class="card chat-left-sidebar"
                     style="padding: 0; display: flex; flex-direction: column; height: 100%; border-radius: 0; border: none; border-right: 1px solid var(--color-border); min-height: 0; box-sizing: border-box;">
-                    <div style="padding: 16px; border-bottom: 1px solid var(--color-border);">
+                    <div style="padding: 16px; border-bottom: 1px solid var(--color-border); position: relative;">
                         <div class="search-input" style="width: 100%;">
                             <i class="ph ph-magnifying-glass"></i>
-                            <input type="text" placeholder="Buscar conversa...">
+                            <input type="text" id="chat-search-input" placeholder="Buscar conversa...">
                         </div>
+                        <div id="total-leads-count" style="text-align: right; margin-top: 8px; font-size: 11px; color: var(--color-text-mut); font-weight: 500;">Total: 0</div>
                     </div>
                     <div id="contact-list-container" style="overflow-y: auto; flex: 1; min-height: 0;">
                         <!-- Contatos dinâmicos -->
@@ -671,16 +672,20 @@
             const iconFilterActive = document.getElementById('icon-filter-active');
             const searchInput = document.getElementById('chat-search-input');
 
-            function applyFilters() {
+                        function applyFilters() {
                 const term = searchInput ? searchInput.value.toLowerCase() : '';
                 const items = document.querySelectorAll('.chat-contact-item');
+                let visibleCount = 0;
                 items.forEach(item => {
                     const name = item.getAttribute('data-lead-name') || '';
                     const isActive = item.getAttribute('data-active-now') === 'true';
                     let show = name.includes(term);
                     if (window.activeLeadsFilter && !isActive) show = false;
                     item.style.display = show ? 'flex' : 'none';
+                    if (show) visibleCount++;
                 });
+                const totalEl = document.getElementById('total-leads-count');
+                if (totalEl) totalEl.innerText = `Total: ${visibleCount}`;
             }
 
             if (btnFilterActive) {
@@ -699,6 +704,7 @@
             if (searchInput) {
                 searchInput.addEventListener('input', applyFilters);
             }
+            applyFilters();
 
             // Configurar botões de envio
             const btnSend = document.getElementById('btn-send-message');
