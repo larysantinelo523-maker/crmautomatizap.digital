@@ -292,90 +292,12 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                         </div>
 
                         <!-- Corpo do Chat -->
-                        <div class="chat-body-container"
+                        <div class="chat-body-container" id="chat-messages"
                             style="flex: 1; padding: 24px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; min-height: 0;">
                             <div style="text-align: center; margin-bottom: 8px;">
                                 <span
                                     style="background-color: #E5E7EB; color: var(--color-text-mut); font-size: 11px; padding: 4px 12px; border-radius: 12px; font-weight: 500;">Hoje</span>
                             </div>
-
-                            <!-- Mensagem Cliente -->
-                            <div style="display: flex; justify-content: flex-end; width: 100%;">
-                                <div
-                                    style="background-color: #DCFCE7; color: #065F46; padding: 10px 14px; border-radius: 14px 14px 0 14px; max-width: 80%; position: relative; font-size: 13px; line-height: 1.4;">
-                                    Quanto custa uma limpeza de pele?
-                                    <div
-                                        style="display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; font-size: 10px; color: #16A34A;">
-                                        14:32 <i class="ph ph-checks"></i>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Mensagem AGENTE -->
-                            <div style="display: flex; justify-content: flex-start; width: 100%; gap: 8px;">
-                                <img src="robot.gif" onerror="this.src='robot.png'" alt="Robot" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; margin-top: auto; border: 1px solid var(--color-primary); background-color: white;">
-                                <div
-                                    style="background-color: var(--color-bg-card); color: var(--color-text-main); padding: 10px 14px; border-radius: 14px 14px 14px 0; max-width: 80%; border: 1px solid var(--color-border); font-size: 13px; line-height: 1.4;">
-                                    Nossa limpeza de pele sai R$150, e a avaliação inicial é gratuita! Quer agendar um
-                                    horário?
-                                    <div
-                                        style="text-align: right; margin-top: 4px; font-size: 10px; color: var(--color-text-mut);">
-                                        14:32
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Mensagem Cliente -->
-                            <div style="display: flex; justify-content: flex-end; width: 100%;">
-                                <div
-                                    style="background-color: #DCFCE7; color: #065F46; padding: 10px 14px; border-radius: 14px 14px 0 14px; max-width: 80%; position: relative; font-size: 13px; line-height: 1.4;">
-                                    Qual o horário de atendimento?
-                                    <div
-                                        style="display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; font-size: 10px; color: #16A34A;">
-                                        14:33 <i class="ph ph-checks"></i>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Mensagem AGENTE -->
-                            <div style="display: flex; justify-content: flex-start; width: 100%; gap: 8px;">
-                                <img src="robot.gif" onerror="this.src='robot.png'" alt="Robot" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; margin-top: auto; border: 1px solid var(--color-primary); background-color: white;">
-                                <div
-                                    style="background-color: var(--color-bg-card); color: var(--color-text-main); padding: 10px 14px; border-radius: 14px 14px 14px 0; max-width: 80%; border: 1px solid var(--color-border); font-size: 13px; line-height: 1.4;">
-                                    Nosso horário de atendimento é de segunda a sexta, das 08h às 18h, e aos sábados das
-                                    08h às 12h.
-                                    <div
-                                        style="text-align: right; margin-top: 4px; font-size: 10px; color: var(--color-text-mut);">
-                                        14:33
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Mensagem Cliente -->
-                            <div style="display: flex; justify-content: flex-end; width: 100%;">
-                                <div
-                                    style="background-color: #DCFCE7; color: #065F46; padding: 10px 14px; border-radius: 14px 14px 0 14px; max-width: 80%; position: relative; font-size: 13px; line-height: 1.4;">
-                                    Certo, pode me ajudar a agendar?
-                                    <div
-                                        style="display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; font-size: 10px; color: #16A34A;">
-                                        14:34 <i class="ph ph-checks"></i>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Mensagem AGENTE -->
-                            <div style="display: flex; justify-content: flex-start; width: 100%; gap: 8px;">
-                                <img src="robot.gif" onerror="this.src='robot.png'" alt="Robot" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; margin-top: auto; border: 1px solid var(--color-primary); background-color: white;">
-                                <div
-                                    style="background-color: var(--color-bg-card); color: var(--color-text-main); padding: 10px 14px; border-radius: 14px 14px 14px 0; max-width: 80%; border: 1px solid var(--color-border); font-size: 13px; line-height: 1.4;">
-                                    Claro! Posso te ajudar a agendar agora mesmo. Qual dia e horário você prefere?
-                                    <div
-                                        style="text-align: right; margin-top: 4px; font-size: 10px; color: var(--color-text-mut);">
-                                        14:34
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
 
                         <!-- Rodape Chat -->
@@ -385,10 +307,10 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                                 style="flex: 1; display: flex; align-items: center; background-color: var(--color-bg-main); border-radius: 24px; padding: 10px 16px;">
                                 <i class="ph ph-smiley"
                                     style="font-size: 20px; color: var(--color-text-mut); margin-right: 12px; cursor: pointer;"></i>
-                                <textarea placeholder="Digite sua mensagem..." rows="1" style="border: none; background: transparent; flex: 1; min-width: 0; width: 100%; outline: none; font-size: 13px; color: var(--color-text-main); resize: none; overflow-y: auto; min-height: 24px; max-height: 120px; padding: 0; line-height: 24px; font-family: inherit; word-break: break-word; white-space: pre-wrap; display: block; box-sizing: border-box;" oninput="this.style.height='auto'; this.style.height=(this.scrollHeight)+'px'"></textarea>
+                                <textarea id="test-chat-input" placeholder="Digite sua mensagem..." rows="1" style="border: none; background: transparent; flex: 1; min-width: 0; width: 100%; outline: none; font-size: 13px; color: var(--color-text-main); resize: none; overflow-y: auto; min-height: 24px; max-height: 120px; padding: 0; line-height: 24px; font-family: inherit; word-break: break-word; white-space: pre-wrap; display: block; box-sizing: border-box;" oninput="this.style.height='auto'; this.style.height=(this.scrollHeight)+'px'"></textarea>
                             </div>
-                            <button class="btn btn--primary"
-                                style="width: 44px; height: 44px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background-color: var(--color-primary); color: white; border: none;">
+                            <button id="test-chat-send" class="btn btn--primary"
+                                style="width: 44px; height: 44px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background-color: var(--color-primary); color: white; border: none; cursor: pointer;">
                                 <i class="ph-fill ph-paper-plane-tilt" style="font-size: 20px;"></i>
                             </button>
                         </div>
@@ -502,40 +424,6 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
 
                         </div>
 
-                        <!-- Ultimos Reportes -->
-                        <div style="margin-top: 32px;">
-                            <h4
-                                style="font-size: 13px; color: var(--color-text-mut); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
-                                <i class="ph ph-clock"></i> Últimos reportes enviados
-                            </h4>
-
-                            <div style="display: flex; flex-direction: column; gap: 8px;">
-                                <!-- Report 1 -->
-                                <div
-                                    style="background-color: #F9FAFB; border: 1px solid var(--color-border); border-radius: 8px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s;">
-                                    <span
-                                        style="font-size: 13px; color: var(--color-text-sec); line-height: 1.4; flex: 1; padding-right: 16px;">O
-                                        agente não sabia informar o horário de funcionamento aos sábados</span>
-                                    <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
-                                        <span style="font-size: 12px; color: var(--color-text-mut);">24/09</span>
-                                        <i class="ph ph-caret-right" style="color: var(--color-text-mut);"></i>
-                                    </div>
-                                </div>
-
-                                <!-- Report 2 -->
-                                <div
-                                    style="background-color: #F9FAFB; border: 1px solid var(--color-border); border-radius: 8px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s;">
-                                    <span
-                                        style="font-size: 13px; color: var(--color-text-sec); line-height: 1.4; flex: 1; padding-right: 16px;">O
-                                        agente respondeu um valor incorreto para o procedimento</span>
-                                    <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
-                                        <span style="font-size: 12px; color: var(--color-text-mut);">22/09</span>
-                                        <i class="ph ph-caret-right" style="color: var(--color-text-mut);"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
             </div>
@@ -545,222 +433,55 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
     <script type="module" src="tutorial.js"></script>
     <script type="module" src="script.js"></script>
     <script>
-        window.initDashboard = async function () {
-            if (!window.dbAPI) return;
-            let leads = await window.dbAPI.fetchLeads();
+        // Chat interativo para teste do agente
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatInput = document.getElementById('test-chat-input');
+            const sendBtn = document.getElementById('test-chat-send');
+            const chatContainer = document.getElementById('chat-messages');
 
-            // Filter by date
-            const filterStart = localStorage.getItem('calendar_filter_start');
-            const filterEnd = localStorage.getItem('calendar_filter_end');
+            function sendUserMessage() {
+                if (!chatInput || !chatContainer) return;
+                const text = chatInput.value.trim();
+                if (!text) return;
 
-            let startDt, endDt;
+                const now = new Date();
+                const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 
-            if (filterStart && filterEnd) {
-                startDt = new Date(filterStart);
-                endDt = new Date(filterEnd);
-            } else if (filterStart) {
-                startDt = new Date(filterStart);
-                endDt = null;
-            } else {
-                startDt = null;
-                endDt = null;
+                const msgEl = document.createElement('div');
+                msgEl.style.cssText = 'display: flex; justify-content: flex-end; width: 100%;';
+                
+                const bubble = document.createElement('div');
+                bubble.style.cssText = 'background-color: #DCFCE7; color: #065F46; padding: 10px 14px; border-radius: 14px 14px 0 14px; max-width: 80%; position: relative; font-size: 13px; line-height: 1.4; word-break: break-word;';
+                
+                const textSpan = document.createElement('span');
+                textSpan.textContent = text;
+                
+                const metaDiv = document.createElement('div');
+                metaDiv.style.cssText = 'display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; font-size: 10px; color: #16A34A;';
+                metaDiv.innerHTML = `${timeStr} <i class="ph ph-checks"></i>`;
+                
+                bubble.appendChild(textSpan);
+                bubble.appendChild(metaDiv);
+                msgEl.appendChild(bubble);
+                chatContainer.appendChild(msgEl);
+
+                chatInput.value = '';
+                chatInput.style.height = 'auto';
+                chatContainer.scrollTop = chatContainer.scrollHeight;
             }
 
-            if (startDt) {
-                startDt.setHours(0, 0, 0, 0);
-                leads = leads.filter(l => {
-                    const lDate = new Date(l.criado_em);
-                    return lDate >= startDt;
-                });
+            if (sendBtn) {
+                sendBtn.addEventListener('click', sendUserMessage);
             }
-            if (endDt) {
-                endDt.setHours(23, 59, 59, 999);
-                leads = leads.filter(l => {
-                    const lDate = new Date(l.criado_em);
-                    return lDate <= endDt;
-                });
-            }
-            // Função para animar os KPIs do dashboard do usuário
-            function animateValueUser(id, start, end, duration, formatFn) {
-                const obj = document.getElementById(id);
-                if (!obj) return;
-
-                let startTimestamp = null;
-                const step = (timestamp) => {
-                    if (!startTimestamp) startTimestamp = timestamp;
-                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-
-                    const easeProgress = progress * (2 - progress);
-                    const currentVal = start + (end - start) * easeProgress;
-
-                    obj.textContent = formatFn ? formatFn(currentVal) : Math.round(currentVal);
-
-                    if (progress < 1) {
-                        window.requestAnimationFrame(step);
-                    } else {
-                        obj.textContent = formatFn ? formatFn(end) : Math.round(end);
+            if (chatInput) {
+                chatInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendUserMessage();
                     }
-                };
-                window.requestAnimationFrame(step);
-            }
-
-            // Atualizar contadores KPI
-
-            const leadsAtendidos = leads.length; // Agora todo lead no banco é lead atendido
-            animateValueUser('kpi-atendidos', 0, leadsAtendidos, 1500);
-
-            let agendamentos = await window.dbAPI.fetchAgendamentos();
-            if (startDt) {
-                agendamentos = agendamentos.filter(a => {
-                    const aDate = new Date(a.created_at || a.criado_em || a.data_agendamento);
-                    return aDate >= startDt;
                 });
             }
-            if (endDt) {
-                agendamentos = agendamentos.filter(a => {
-                    const aDate = new Date(a.created_at || a.criado_em || a.data_agendamento);
-                    return aDate <= endDt;
-                });
-            }
-            const reunioesMarcadas = agendamentos.filter(a => a.status && a.status.trim().toLowerCase() === 'qualificado').length;
-            animateValueUser('kpi-reunioes', 0, reunioesMarcadas, 1500);
-
-            const leadsRecuperar = 0; // A definir nova regra de negócio futuramente
-            animateValueUser('kpi-recuperar', 0, leadsRecuperar, 1500);
-
-            // Atualizar paginação
-            const paginationEl = document.getElementById('dashboard-pagination-info');
-            if (paginationEl) paginationEl.textContent = `Mostrando ${Math.min(5, leads.length)} de ${leads.length} leads`;
-
-            // Atualizar tabela
-            const tbody = document.querySelector('.data-table tbody');
-            if (tbody) tbody.innerHTML = '';
-
-            if (leads.length === 0 && tbody) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 32px; color: var(--color-text-mut);">Nenhum lead encontrado.</td></tr>';
-            } else {
-                // DEBUG: imprime os dados no console
-                console.log('[DEBUG foto_perfil] Leads retornados:', leads.slice(0, 5).map(l => ({ nome: l.nome, foto_perfil: l.foto_perfil })));
-                leads.slice(0, 5).forEach(lead => {
-                    let badgeClass = 'primary-light';
-                    let st = lead.status ? lead.status.trim().toLowerCase() : '';
-                    if (st === 'em atendimento') badgeClass = 'success';
-                    else if (st === 'qualificado') badgeClass = 'primary-light';
-
-                    const date = new Date(lead.criado_em);
-                    const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    const initials = lead.nome.charAt(0).toUpperCase();
-                    const avatarContent = lead.foto_perfil ? `<img src="${lead.foto_perfil}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : initials;
-                    const avatarStyle = lead.foto_perfil ? 'background: transparent;' : 'background: var(--color-primary); color: white; font-weight: 600;';
-
-                    const tr = document.createElement('tr');
-                    tr.style.cursor = 'pointer';
-                    tr.onclick = (e) => {
-                        e.stopPropagation();
-                        abrirDossie(lead, badgeClass, formattedDate, tr);
-                    };
-
-                    tr.innerHTML = `
-                            <td>
-                                <div class="user-cell" style="display: flex; align-items: center; gap: 12px;">
-                                    <div style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; overflow: hidden; ${avatarStyle}">${avatarContent}</div>
-                                    <span class="user-name" style="font-weight: 500;">${lead.nome}</span>
-                                </div>
-                            </td>
-                            <td class="mobile-interesse">${lead.interesse || 'Não informado'}</td>
-                            <td class="mobile-status"><span class="badge ${badgeClass}">${lead.status}</span></td>
-                            <td class="mobile-date">${formattedDate}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
-        };
-
-        window.currentOpenLeadId = null;
-        window.fecharDossie = function () {
-            document.querySelector('.dashboard-grid').classList.remove('has-dossier');
-            const card = document.getElementById('lead-highlight-card');
-            if (window.innerWidth <= 1024) card.style.display = 'none';
-            document.querySelectorAll('.data-table tbody tr.active-row').forEach(el => el.classList.remove('active-row'));
-            window.currentOpenLeadId = null;
-        };
-
-        function abrirDossie(lead, badgeClass, dateStr, trElement) {
-            const grid = document.querySelector('.dashboard-grid');
-            const card = document.getElementById('lead-highlight-card');
-
-            if (window.currentOpenLeadId === lead.id && grid.classList.contains('has-dossier')) {
-                window.fecharDossie();
-                return;
-            }
-
-            document.querySelectorAll('.data-table tbody tr.active-row').forEach(el => el.classList.remove('active-row'));
-            if (trElement) trElement.classList.add('active-row');
-
-            window.currentOpenLeadId = lead.id;
-            grid.classList.add('has-dossier');
-
-            if (window.innerWidth <= 1024) {
-                card.style.display = 'block';
-                setTimeout(() => {
-                    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 100);
-            } else {
-                card.style.display = '';
-            }
-
-            // Preenche os dados
-            const avatarEl = document.getElementById('lead-highlight-avatar');
-            if (lead.foto_perfil) {
-                avatarEl.innerHTML = `<img src="${lead.foto_perfil}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                avatarEl.style.background = 'transparent';
-            } else {
-                avatarEl.textContent = lead.nome.charAt(0).toUpperCase();
-                avatarEl.style.background = '';
-            }
-            document.getElementById('lead-highlight-name').textContent = lead.nome;
-            document.getElementById('lead-highlight-phone').textContent = lead.telefone;
-            const statusEl = document.getElementById('lead-highlight-status');
-            statusEl.textContent = lead.status;
-            let currentBadgeClass = 'primary-light';
-            let st = lead.status ? lead.status.trim().toLowerCase() : '';
-            if (st === 'em atendimento') currentBadgeClass = 'warning-light';
-            else if (st === 'qualificado') currentBadgeClass = 'primary-light';
-            statusEl.className = `badge ${currentBadgeClass}`;
-
-            document.getElementById('lead-highlight-interest').textContent = lead.interesse || 'Não informado';
-            document.getElementById('lead-highlight-budget').textContent = lead.orcamento || 'Não informado';
-            document.getElementById('lead-highlight-qualification').textContent = lead.qualificacao || 'Não informada';
-
-            const summaryBox = document.getElementById('lead-highlight-summary-box');
-            const painText = document.getElementById('lead-pain');
-            const objectionText = document.getElementById('lead-objection');
-            const nextStepText = document.getElementById('lead-next-step');
-
-            let dor = lead.dor_principal;
-            let objecao = lead.objecao;
-            let proximoPasso = lead.proximo_passo;
-
-            painText.textContent = dor || 'Aguardando AGENTE extrair esta informação...';
-            objectionText.textContent = objecao || 'Nenhuma objeção registrada pelo AGENTE.';
-            nextStepText.textContent = proximoPasso || 'Aguardando definição estratégica.';
-
-            summaryBox.style.display = 'block';
-
-            document.getElementById('lead-highlight-last-contact').innerHTML = `<i class="ph ph-clock"></i> Último contato: ${dateStr}`;
-
-            const leadDateObj = new Date(lead.criado_em);
-            const leadDateFormatted = `${leadDateObj.getFullYear()}-${(leadDateObj.getMonth() + 1).toString().padStart(2, '0')}-${leadDateObj.getDate().toString().padStart(2, '0')}`;
-
-            document.getElementById('lead-highlight-actions').innerHTML = `
-                <button class="btn primary full-width" onclick="window.location.href='tarefas.html?date=${leadDateFormatted}'">
-                    <i class="ph ph-calendar-check"></i> Abrir Tarefa
-                </button>
-            `;
-
-        }
-
-        // fecharDossie já está definido acima
+        });
     </script>
 
     <!-- Modal de Reporte -->
@@ -789,7 +510,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
             <div style="display: flex; justify-content: flex-end; gap: 12px;">
                 <button id="btn-cancel-modal" class="btn outline" style="padding: 10px 20px;">Cancelar</button>
                 <button id="btn-submit-modal" class="btn btn--primary" style="padding: 10px 20px; display: flex; align-items: center; gap: 8px;">
-                    <i class="ph ph-paper-plane-right"></i> Enviar Reporte
+                    <i class="ph ph-paper-plane-right"></i> Enviar Correção
                 </button>
             </div>
         </div>
