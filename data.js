@@ -39,7 +39,7 @@ export async function fetchConversations(leadId) {
 export async function fetchLatestMessages() {
     const { data, error } = await supabase
         .from('mensagens')
-        .select('lead_id, conteudo, remetente, tipo_mensagem, criado_em, mime_type')
+        .select('lead_id, conteudo, remetente, tipo_mensagem, criado_em, mime_type, media_url')
         .order('criado_em', { ascending: false });
 
     if (error) {

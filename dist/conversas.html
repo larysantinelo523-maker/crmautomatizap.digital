@@ -180,9 +180,9 @@
         });
       });
     </script>
-  <script type="module" crossorigin src="/assets/conversas-A9pWQbQq.js"></script>
+  <script type="module" crossorigin src="/assets/conversas-Ck0vbhKc.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
-  <link rel="modulepreload" crossorigin href="/assets/data-BaSzW3s-.js">
+  <link rel="modulepreload" crossorigin href="/assets/data-AT2CF9-b.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
   <link rel="stylesheet" crossorigin href="/assets/conversas-DyELXVDP.css">
 </head>
@@ -484,6 +484,105 @@
         let currentLeadId = null;
         let realtimeChannel = null; // canal de realtime ativo
 
+        
+        function formatMessagePreview(msg) {
+            if (!msg) return '';
+            let prefix = (msg.remetente === 'ia' || msg.remetente === 'empresa') ? '<span style="color: var(--color-primary); font-weight: 500;">Você: </span>' : '';
+            let content = msg.conteudo || '';
+
+            if (msg.tipo_mensagem === 'audio' || (msg.mime_type && msg.mime_type.includes('audio')) || content === '[Áudio enviado]') {
+                content = '<i class="ph ph-microphone" style="vertical-align: middle;"></i> Áudio';
+            } else if (msg.tipo_mensagem === 'imagem' || content === '[Foto]' || content === '[Imagem]' || (msg.mime_type && msg.mime_type.includes('image') && (msg.base64 || msg.media_url || content === '[Mídia não suportada]' || !content))) {
+                content = '<i class="ph ph-image" style="vertical-align: middle;"></i> Foto';
+            } else if (msg.tipo_mensagem === 'video' || (msg.mime_type && msg.mime_type.includes('video'))) {
+                content = '<i class="ph ph-video-camera" style="vertical-align: middle;"></i> Vídeo';
+            } else if (content === '[Mídia não suportada]') {
+                content = '<i class="ph ph-file" style="vertical-align: middle;"></i> Mídia';
+            }
+            return prefix + content;
+        }
+
+        function renderMediaAndText(msg) {
+            let mediaHtml = '';
+            if (msg.base64) {
+                let mime = msg.mime_type || '';
+                if (!mime) {
+                    if (msg.base64.startsWith('T2dnU')) mime = 'audio/ogg';
+                    else if (msg.base64.startsWith('UklGR')) mime = 'image/webp';
+                    else if (msg.base64.startsWith('/9j/')) mime = 'image/jpeg';
+                    else if (msg.base64.startsWith('iVBORw')) mime = 'image/png';
+                    else if (msg.base64.startsWith('AAAAG')) mime = 'video/mp4';
+                    else mime = 'image/jpeg';
+                }
+                const src = msg.base64.startsWith('data:') ? msg.base64 : `data:${mime};base64,${msg.base64}`;
+                if (mime.includes('audio')) {
+                    mediaHtml = `
+                    <div class="custom-audio-player">
+                        <div class="audio-play-btn"><i class="ph-fill ph-play"></i></div>
+                        <div class="audio-track">
+                            <input type="range" min="0" max="100" value="0" class="audio-slider">
+                            <div class="audio-meta">
+                                <span class="audio-current-time">0:00</span>
+                                <span class="audio-duration">0:00</span>
+                            </div>
+                        </div>
+                        <audio src="${src}" style="display:none;"></audio>
+                    </div>`;
+                } else if (mime.includes('image')) {
+                    mediaHtml = `
+                    <div class="custom-image-thumbnail">
+                        <div class="eye-overlay"><i class="ph ph-eye"></i></div>
+                        <img src="${src}">
+                    </div>`;
+                } else if (mime.includes('video')) {
+                    mediaHtml = `<video controls style="max-width: 100%; border-radius: 8px; margin-top: 6px;"><source src="${src}" type="${mime}"></video>`;
+                }
+            } else if (msg.media_url) {
+                const url = msg.media_url;
+                const urlLower = url.toLowerCase();
+                if (urlLower.includes('.ogg') || urlLower.includes('.mp3') || (msg.mime_type && msg.mime_type.includes('audio'))) {
+                    mediaHtml = `
+                    <div class="custom-audio-player">
+                        <div class="audio-play-btn"><i class="ph-fill ph-play"></i></div>
+                        <div class="audio-track">
+                            <input type="range" min="0" max="100" value="0" class="audio-slider">
+                            <div class="audio-meta">
+                                <span class="audio-current-time">0:00</span>
+                                <span class="audio-duration">0:00</span>
+                            </div>
+                        </div>
+                        <audio src="${url}" style="display:none;"></audio>
+                    </div>`;
+                } else if (urlLower.includes('.mp4') || (msg.mime_type && msg.mime_type.includes('video'))) {
+                    mediaHtml = `<video controls style="max-width: 100%; border-radius: 8px; margin-top: 6px;"><source src="${url}"></video>`;
+                } else {
+                    mediaHtml = `
+                    <div class="custom-image-thumbnail">
+                        <div class="eye-overlay"><i class="ph ph-eye"></i></div>
+                        <img src="${url}">
+                    </div>`;
+                }
+            }
+
+            let showText = true;
+            if (mediaHtml) {
+                if (!msg.conteudo || msg.conteudo === '[Mídia não suportada]' || msg.conteudo === '[Áudio enviado]' || msg.conteudo === '[Foto]' || msg.conteudo === '[Imagem]') {
+                    showText = false;
+                }
+            }
+            
+            let textHtml = '';
+            if (showText && msg.conteudo) {
+                if (msg.conteudo === '[Mídia não suportada]' && !mediaHtml) {
+                    textHtml = `<p style="margin: 0; font-size: 13px; color: #888; font-style: italic;"><i class="ph ph-file-warning" style="vertical-align: middle;"></i> [Mídia não suportada]</p>`;
+                } else {
+                    textHtml = `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35; ${mediaHtml ? 'margin-top: 6px;' : ''}">${msg.conteudo}</p>`;
+                }
+            }
+
+            return mediaHtml ? (mediaHtml + textHtml) : textHtml;
+        }
+
         window.initConversations = async function() {
             if(!window.dbAPI) return;
             const [leads, latestMsgs] = await Promise.all([
@@ -522,14 +621,7 @@
                         // Atualiza preview da mensagem na lista lateral
                         const previewEl = document.getElementById('contact-preview-' + leadId);
                         if (previewEl) {
-                            let prefix = (msg.remetente === 'ia' || msg.remetente === 'empresa') ? '<span style="color: var(--color-primary); font-weight: 500;">Você: </span>' : '';
-                            let content = msg.conteudo || '';
-                            if ((msg.mime_type && msg.mime_type.includes('audio')) || content === '[Áudio enviado]') {
-                                content = '<i class="ph ph-microphone" style="vertical-align: middle;"></i> Áudio';
-                            } else if (msg.mime_type && msg.mime_type.includes('image')) {
-                                content = '<i class="ph ph-image" style="vertical-align: middle;"></i> Foto';
-                            }
-                            previewEl.innerHTML = prefix + content;
+                            previewEl.innerHTML = formatMessagePreview(msg);
                         }
 
                         // Atualiza horário na lista lateral
@@ -683,14 +775,7 @@
 
                 let previewSnippet = lead.telefone || 'Clique para ver as mensagens';
                 if (lastMsg) {
-                    let prefix = (lastMsg.remetente === 'ia' || lastMsg.remetente === 'empresa') ? '<span style="color: var(--color-primary); font-weight: 500;">Você: </span>' : '';
-                    let content = lastMsg.conteudo || '';
-                    if ((lastMsg.mime_type && lastMsg.mime_type.includes('audio')) || content === '[Áudio enviado]') {
-                        content = '<i class="ph ph-microphone" style="vertical-align: middle;"></i> Áudio';
-                    } else if ((lastMsg.mime_type && lastMsg.mime_type.includes('image')) || content === '[Foto]' || content === '[Imagem]') {
-                        content = '<i class="ph ph-image" style="vertical-align: middle;"></i> Foto';
-                    }
-                    previewSnippet = prefix + content;
+                    previewSnippet = formatMessagePreview(lastMsg);
                 }
                 const avatarContent = lead.foto_perfil ? `<img src="${lead.foto_perfil}" onerror="this.onerror=null; this.parentElement.innerHTML='${initials}'; this.parentElement.style.background='var(--color-primary)'; this.parentElement.style.color='white'; this.parentElement.style.fontWeight='bold';" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : initials;
                 const avatarStyle = lead.foto_perfil ? 'background: transparent;' : 'background: var(--color-primary); color: white; font-weight: bold;';
@@ -997,63 +1082,14 @@
             mensagens.forEach(msg => {
                 const date = new Date(msg.criado_em);
                 const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                
-                let mediaHtml = '';
-                if (msg.base64 && msg.mime_type) {
-                    if (msg.mime_type.includes('audio')) {
-                        mediaHtml = `
-                        <div class="custom-audio-player">
-                            <div class="audio-play-btn"><i class="ph-fill ph-play"></i></div>
-                            <div class="audio-track">
-                                <input type="range" min="0" max="100" value="0" class="audio-slider">
-                                <div class="audio-meta">
-                                    <span class="audio-current-time">0:00</span>
-                                    <span class="audio-duration">0:00</span>
-                                </div>
-                            </div>
-                            <audio src="data:${msg.mime_type};base64,${msg.base64}" style="display:none;"></audio>
-                        </div>`;
-                    } else if (msg.mime_type.includes('image')) {
-                        mediaHtml = `
-                        <div class="custom-image-thumbnail">
-                            <div class="eye-overlay"><i class="ph ph-eye"></i></div>
-                            <img src="data:${msg.mime_type};base64,${msg.base64}">
-                        </div>`;
-                    } else if (msg.mime_type.includes('video')) {
-                        mediaHtml = `<video controls style="max-width: 100%; border-radius: 8px; margin-top: 6px;"><source src="data:${msg.mime_type};base64,${msg.base64}" type="${msg.mime_type}"></video>`;
-                    }
-                } else if (msg.media_url) {
-                    if (msg.media_url.endsWith('.ogg') || msg.media_url.endsWith('.mp3')) {
-                        mediaHtml = `
-                        <div class="custom-audio-player">
-                            <div class="audio-play-btn"><i class="ph-fill ph-play"></i></div>
-                            <div class="audio-track">
-                                <input type="range" min="0" max="100" value="0" class="audio-slider">
-                                <div class="audio-meta">
-                                    <span class="audio-current-time">0:00</span>
-                                    <span class="audio-duration">0:00</span>
-                                </div>
-                            </div>
-                            <audio src="${msg.media_url}" style="display:none;"></audio>
-                        </div>`;
-                    } else if (msg.media_url.endsWith('.jpg') || msg.media_url.endsWith('.png') || msg.media_url.endsWith('.jpeg')) {
-                        mediaHtml = `
-                        <div class="custom-image-thumbnail">
-                            <div class="eye-overlay"><i class="ph ph-eye"></i></div>
-                            <img src="${msg.media_url}">
-                        </div>`;
-                    } else if (msg.media_url.endsWith('.mp4')) {
-                        mediaHtml = `<video controls style="max-width: 100%; border-radius: 8px; margin-top: 6px;"><source src="${msg.media_url}"></video>`;
-                    }
-                }
+                const contentHtml = renderMediaAndText(msg);
 
                 if (msg.remetente.toLowerCase() === 'cliente') {
                     html += `
                     <div style="align-self: flex-start; display: flex; gap: 8px; max-width: 90%; margin-bottom: 8px;">
                         <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--color-task-green-light); color: var(--color-task-green-text); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0; margin-top: 4px; overflow: hidden;">${avatarHtml}</div>
                         <div class="msg-bubble-client">
-                            ${(mediaHtml && (mediaHtml.includes('custom-audio-player') || mediaHtml.includes('custom-image-thumbnail'))) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>`}
-                            ${mediaHtml}
+                            ${contentHtml}
                             <div style="text-align: right; margin-top: 2px; margin-bottom: -2px;">
                                 <span style="font-size: 10px; color: #999;">${timeStr}</span>
                             </div>
@@ -1062,8 +1098,7 @@
                 } else if (msg.remetente.toLowerCase() === 'ia' || msg.remetente.toLowerCase() === 'humano') {
                     html += `
                     <div class="msg-bubble-ia">
-                        ${(mediaHtml && (mediaHtml.includes('custom-audio-player') || mediaHtml.includes('custom-image-thumbnail'))) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>`}
-                        ${mediaHtml}
+                        ${contentHtml}
                         <div style="text-align: right; margin-top: 2px; margin-bottom: -2px; display: flex; justify-content: flex-end; align-items: center; gap: 4px;">
                             <span style="font-size: 10px; color: #667781;">${timeStr}</span>
                             <i class="ph-fill ph-checks" style="color: #53bdeb; font-size: 14px;"></i>
