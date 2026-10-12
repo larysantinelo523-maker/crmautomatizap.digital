@@ -504,7 +504,7 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                 }
 
                 // Se estiver logado, carrega o módulo de dados
-                import('./data.js').then(async (module) => {
+                import('./data.js?v=1.5').then(async (module) => {
                     // Inicializa os dados da página específica
                     if (window.location.pathname.indexOf('index.html') > -1 || window.location.pathname.endsWith('/')) {
                         if (window.initDashboard) window.initDashboard();

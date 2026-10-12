@@ -180,9 +180,9 @@
         });
       });
     </script>
-  <script type="module" crossorigin src="/assets/conversas-Ck0vbhKc.js"></script>
+  <script type="module" crossorigin src="/assets/conversas-BM9104oQ.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
-  <link rel="modulepreload" crossorigin href="/assets/data-AT2CF9-b.js">
+  <link rel="modulepreload" crossorigin href="/assets/data-BAvSXlR4.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
   <link rel="stylesheet" crossorigin href="/assets/conversas-DyELXVDP.css">
 </head>
@@ -585,10 +585,20 @@
 
         window.initConversations = async function() {
             if(!window.dbAPI) return;
-            const [leads, latestMsgs] = await Promise.all([
-                window.dbAPI.fetchLeads(),
-                window.dbAPI.fetchLatestMessages ? window.dbAPI.fetchLatestMessages() : Promise.resolve({})
-            ]);
+            let leads = [];
+            let latestMsgs = {};
+            try {
+                const leadsPromise = window.dbAPI.fetchLeads();
+                const latestPromise = (window.dbAPI && window.dbAPI.fetchLatestMessages)
+                    ? window.dbAPI.fetchLatestMessages()
+                    : impo/assets/data-CO8k7PWP.js?v=1.5=1.5').then(m => m.fetchLatestMessages ? m.fetchLatestMessages() : {});
+                const res = await Promise.all([leadsPromise, latestPromise]);
+                leads = res[0] || [];
+                latestMsgs = res[1] || {};
+            } catch (e) {
+                console.error('Erro ao carregar leads/mensagens:', e);
+                leads = await window.dbAPI.fetchLeads();
+            }
             window.latestMessagesMap = latestMsgs || {};
 
             // Ordena leads pelo horário da última mensagem/interação (como no WhatsApp)
