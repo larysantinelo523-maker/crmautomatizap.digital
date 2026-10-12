@@ -123,7 +123,18 @@
         display: flex; justify-content: center; align-items: center;
         border-radius: 50%;
     }
-    </style>
+    
+    .chat-contact-item {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+    #contact-list-container {
+        overflow-x: hidden !important;
+    }
+
+</style>
     <script>
     function autoResizeTextarea(el) {
         el.style.height = 'auto';
@@ -364,7 +375,7 @@
                         </div>
                         <div id="total-leads-count" style="text-align: right; margin-top: 8px; font-size: 11px; color: var(--color-text-mut); font-weight: 500;">Total: 0</div>
                     </div>
-                    <div id="contact-list-container" style="overflow-y: auto; flex: 1; min-height: 0;">
+                    <div id="contact-list-container" style="overflow-y: auto; overflow-x: hidden; flex: 1; min-height: 0; width: 100%; box-sizing: border-box;">
                         <!-- Contatos dinâmicos -->
                     </div>
                 </div>
@@ -495,6 +506,12 @@
                 content = '<i class="ph ph-video-camera" style="vertical-align: middle;"></i> Vídeo';
             } else if (content === '[Mídia não suportada]') {
                 content = '<i class="ph ph-file" style="vertical-align: middle;"></i> Mídia';
+            } else {
+                // Abreviação de textos longos com reticências
+                const maxChars = prefix ? 26 : 32;
+                if (content.length > maxChars) {
+                    content = content.substring(0, maxChars).trim() + '...';
+                }
             }
             return prefix + content;
         }
