@@ -180,11 +180,11 @@
         });
       });
     </script>
-  <script type="module" crossorigin src="/assets/conversas-DahrtRoj.js"></script>
+  <script type="module" crossorigin src="/assets/conversas-A9pWQbQq.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
-  <link rel="modulepreload" crossorigin href="/assets/data-B5jHjUAr.js">
+  <link rel="modulepreload" crossorigin href="/assets/data-BaSzW3s-.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-djHoE8cV.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-DyELXVDP.css">
 </head>
 
 <body>
@@ -486,7 +486,18 @@
 
         window.initConversations = async function() {
             if(!window.dbAPI) return;
-            const leads = await window.dbAPI.fetchLeads();
+            const [leads, latestMsgs] = await Promise.all([
+                window.dbAPI.fetchLeads(),
+                window.dbAPI.fetchLatestMessages ? window.dbAPI.fetchLatestMessages() : Promise.resolve({})
+            ]);
+            window.latestMessagesMap = latestMsgs || {};
+
+            // Ordena leads pelo horário da última mensagem/interação (como no WhatsApp)
+            leads.sort((a, b) => {
+                const timeA = (window.latestMessagesMap[a.id]?.criado_em) || a.ultima_interacao_cliente || a.ultima_interacao || a.criado_em;
+                const timeB = (window.latestMessagesMap[b.id]?.criado_em) || b.ultima_interacao_cliente || b.ultima_interacao || b.criado_em;
+                return new Date(timeB) - new Date(timeA);
+            });
             
             // Preserva a ultima_interacao_cliente (calculada localmente)
             if (window.localLeadsData && window.localLeadsData.length > 0) {
@@ -508,10 +519,39 @@
                     const leadId = msg.lead_id;
                     const lead = window.localLeadsData.find(l => l.id === leadId);
                     if (lead) {
-                        lead.ultima_interacao = msg.criado_em;
-                        const dot = document.getElementById('status-dot-' + leadId);
-                        if (dot) {
-                            dot.style.backgroundColor = '#22c55e'; // Green
+                        // Atualiza preview da mensagem na lista lateral
+                        const previewEl = document.getElementById('contact-preview-' + leadId);
+                        if (previewEl) {
+                            let prefix = (msg.remetente === 'ia' || msg.remetente === 'empresa') ? '<span style="color: var(--color-primary); font-weight: 500;">Você: </span>' : '';
+                            let content = msg.conteudo || '';
+                            if ((msg.mime_type && msg.mime_type.includes('audio')) || content === '[Áudio enviado]') {
+                                content = '<i class="ph ph-microphone" style="vertical-align: middle;"></i> Áudio';
+                            } else if (msg.mime_type && msg.mime_type.includes('image')) {
+                                content = '<i class="ph ph-image" style="vertical-align: middle;"></i> Foto';
+                            }
+                            previewEl.innerHTML = prefix + content;
+                        }
+
+                        // Atualiza horário na lista lateral
+                        const timeEl = document.getElementById('contact-time-' + leadId);
+                        if (timeEl) {
+                            const msgDate = new Date(msg.criado_em);
+                            timeEl.innerText = msgDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                        }
+
+                        // Mover contato para o topo
+                        const contactItem = document.getElementById('contact-item-' + leadId);
+                        const containerList = document.getElementById('contact-list-container');
+                        if (contactItem && containerList) {
+                            containerList.prepend(contactItem);
+                        }
+
+                        if (msg.remetente === 'cliente') {
+                            lead.ultima_interacao_cliente = msg.criado_em;
+                            lead.ultima_interacao = msg.criado_em;
+                            const dot = document.getElementById('status-dot-' + leadId);
+                            if (dot) {
+                                dot.style.backgroundColor = '#22c55e'; // Green
                             dot.style.animation = 'pulse-green 2s infinite';
                             dot.title = 'Conversa ativa agora';
                             dot.parentElement.setAttribute('data-active-now', 'true');
@@ -539,6 +579,7 @@
                             if (headerStatus) {
                                 headerStatus.innerHTML = '<span style="color: #22c55e;">● Online</span>';
                             }
+                        }
                         }
                     }
                 });
@@ -633,9 +674,24 @@
             const leadParam = urlParams.get('lead');
 
             leads.forEach((lead, index) => {
-                const date = new Date(lead.criado_em);
+                const lastMsg = (window.latestMessagesMap && window.latestMessagesMap[lead.id]) || null;
+                const targetMsgTime = lastMsg ? lastMsg.criado_em : (lead.ultima_interacao_cliente || lead.ultima_interacao || lead.criado_em);
+                const date = new Date(targetMsgTime);
                 const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                const safeNome = lead.nome || 'Desconhecido'; const initials = safeNome.charAt(0).toUpperCase();
+                const safeNome = lead.nome || lead.telefone || 'Desconhecido';
+                const initials = safeNome.charAt(0).toUpperCase();
+
+                let previewSnippet = lead.telefone || 'Clique para ver as mensagens';
+                if (lastMsg) {
+                    let prefix = (lastMsg.remetente === 'ia' || lastMsg.remetente === 'empresa') ? '<span style="color: var(--color-primary); font-weight: 500;">Você: </span>' : '';
+                    let content = lastMsg.conteudo || '';
+                    if ((lastMsg.mime_type && lastMsg.mime_type.includes('audio')) || content === '[Áudio enviado]') {
+                        content = '<i class="ph ph-microphone" style="vertical-align: middle;"></i> Áudio';
+                    } else if ((lastMsg.mime_type && lastMsg.mime_type.includes('image')) || content === '[Foto]' || content === '[Imagem]') {
+                        content = '<i class="ph ph-image" style="vertical-align: middle;"></i> Foto';
+                    }
+                    previewSnippet = prefix + content;
+                }
                 const avatarContent = lead.foto_perfil ? `<img src="${lead.foto_perfil}" onerror="this.onerror=null; this.parentElement.innerHTML='${initials}'; this.parentElement.style.background='var(--color-primary)'; this.parentElement.style.color='white'; this.parentElement.style.fontWeight='bold';" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : initials;
                 const avatarStyle = lead.foto_perfil ? 'background: transparent;' : 'background: var(--color-primary); color: white; font-weight: bold;';
                 
@@ -673,10 +729,10 @@
                                 <strong style="font-size: 14px;">${safeNome}</strong>
                                 <div id="status-dot-${lead.id}" title="${dotTitle}" style="width: 8px; height: 8px; border-radius: 50%; background-color: ${dotColor}; animation: ${dotAnim}; flex-shrink: 0;"></div>
                             </div>
-                            <span style="font-size: 11px; color: var(--color-text-mut);">${timeStr}</span>
+                            <span id="contact-time-${lead.id}" style="font-size: 11px; color: var(--color-text-mut); flex-shrink: 0; margin-left: 6px;">${timeStr}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <p style="font-size: 13px; color: var(--color-text-sec); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">Clique para ver as mensagens</p>
+                            <p id="contact-preview-${lead.id}" style="font-size: 12.5px; color: var(--color-text-sec); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">${previewSnippet}</p>
                             <span id="unread-badge-${lead.id}" style="display: none; background: var(--color-primary); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: bold; align-items: center; justify-content: center; margin-left: 8px;">0</span>
                         </div>
                     </div>
@@ -839,9 +895,11 @@
             }
             
             if (isOnline) {
-                document.getElementById('chat-header-status').innerHTML = '<span style="color: #22c55e;">● Online</span>';
+                const phoneInfo = lead.telefone ? ' • <span style="opacity: 0.85;">' + lead.telefone + '</span>' : '';
+                    document.getElementById('chat-header-status').innerHTML = '<span style="color: #22c55e;">● Online</span>' + phoneInfo;
             } else {
-                document.getElementById('chat-header-status').innerHTML = '<span style="color: #94a3b8;">● Offline</span>';
+                const phoneInfoOffline = lead.telefone ? ' • <span style="opacity: 0.85;">' + lead.telefone + '</span>' : '';
+                    document.getElementById('chat-header-status').innerHTML = '<span style="color: #94a3b8;">● Offline</span>' + phoneInfoOffline;
             }
             const avatar = document.getElementById('chat-header-avatar');
             if (lead.foto_perfil) {
@@ -872,9 +930,11 @@
                 
                 // Atualiza o header se mudou ou só garante o valor correto
                 if (isOnline) {
-                    document.getElementById('chat-header-status').innerHTML = '<span style="color: #22c55e;">● Online</span>';
+                    const phoneInfo = lead.telefone ? ' • <span style="opacity: 0.85;">' + lead.telefone + '</span>' : '';
+                    document.getElementById('chat-header-status').innerHTML = '<span style="color: #22c55e;">● Online</span>' + phoneInfo;
                 } else {
-                    document.getElementById('chat-header-status').innerHTML = '<span style="color: #94a3b8;">● Offline</span>';
+                    const phoneInfoOffline = lead.telefone ? ' • <span style="opacity: 0.85;">' + lead.telefone + '</span>' : '';
+                    document.getElementById('chat-header-status').innerHTML = '<span style="color: #94a3b8;">● Offline</span>' + phoneInfoOffline;
                 }
                 
                 // Atualiza o dot na lista lateral também

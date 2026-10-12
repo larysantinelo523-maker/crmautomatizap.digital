@@ -36,6 +36,26 @@ export async function fetchConversations(leadId) {
     return data;
 }
 
+export async function fetchLatestMessages() {
+    const { data, error } = await supabase
+        .from('mensagens')
+        .select('lead_id, conteudo, remetente, tipo_mensagem, criado_em, mime_type')
+        .order('criado_em', { ascending: false });
+
+    if (error) {
+        console.error('Erro ao buscar últimas mensagens:', error);
+        return {};
+    }
+
+    const latest = {};
+    data.forEach(m => {
+        if (!latest[m.lead_id]) {
+            latest[m.lead_id] = m;
+        }
+    });
+    return latest;
+}
+
 export async function fetchTasks() {
     const { data, error } = await supabase
         .from('tarefas')
@@ -242,6 +262,7 @@ export function subscribeToLeads(onLeadUpdate) {
 window.dbAPI = {
     fetchLeads,
     fetchConversations,
+    fetchLatestMessages,
     fetchTasks,
     fetchAgendamentos,
     fetchUserData,
