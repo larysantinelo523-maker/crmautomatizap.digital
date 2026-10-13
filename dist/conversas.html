@@ -19,8 +19,10 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        min-width: 250px;
-        max-width: 320px;
+        min-width: 180px;
+        max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
         padding: 0;
         margin-bottom: -12px;
     }
@@ -134,6 +136,42 @@
         overflow-x: hidden !important;
     }
 
+    /* Prevent horizontal scroll in chat page */
+    html, body {
+        overflow-x: hidden !important;
+        max-width: 100% !important;
+    }
+    .main-content {
+        overflow-x: hidden !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .dashboard-grid.chat-layout {
+        overflow-x: hidden !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .chat-right-wrapper {
+        overflow-x: hidden !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .hint-box {
+        max-width: calc(100% - 32px) !important;
+        width: auto !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+    #chat-messages-container {
+        overflow-x: hidden !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
 </style>
     <script>
     function autoResizeTextarea(el) {
@@ -191,11 +229,11 @@
         });
       });
     </script>
-  <script type="module" crossorigin src="/assets/conversas-BM9104oQ.js"></script>
+  <script type="module" crossorigin src="/assets/conversas-BuVXX28p.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
-  <link rel="modulepreload" crossorigin href="/assets/data-BAvSXlR4.js">
+  <link rel="modulepreload" crossorigin href="/assets/data-BG-H1LmU.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-DyELXVDP.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-CPAuj8e5.css">
 </head>
 
 <body>
@@ -388,7 +426,7 @@
                     <!-- Aviso da Chave Seletora (Fora do Mockup) -->
                     <div class="hint-box"
                         onclick="const content = this.querySelector('.hint-content'); const icon = this.querySelector('.hint-icon'); if(content.style.display === 'none'){ content.style.display = 'flex'; icon.style.transform = 'rotate(180deg)'; } else { content.style.display = 'none'; icon.style.transform = 'rotate(0deg)'; }"
-                        style="background-color: var(--color-bg-card); border: 1px solid var(--color-success); border-left: 4px solid var(--color-success); color: var(--color-text-main); border-radius: var(--radius-md); z-index: 10; max-width: 90%; box-shadow: var(--shadow-card); cursor: pointer; transition: all 0.3s; flex-shrink: 0; width: max-content; margin: 0 auto 16px;">
+                        style="background-color: var(--color-bg-card); border: 1px solid var(--color-success); border-left: 4px solid var(--color-success); color: var(--color-text-main); border-radius: var(--radius-md); z-index: 10; max-width: calc(100% - 16px); width: fit-content; box-sizing: border-box; box-shadow: var(--shadow-card); cursor: pointer; transition: all 0.3s; flex-shrink: 0; margin: 0 auto 16px;">
 
                         <!-- Cabeçalho (Sempre Visível) -->
                         <div
@@ -593,7 +631,7 @@
                 if (msg.conteudo === '[Mídia não suportada]' && !mediaHtml) {
                     textHtml = `<p style="margin: 0; font-size: 13px; color: #888; font-style: italic;"><i class="ph ph-file-warning" style="vertical-align: middle;"></i> [Mídia não suportada]</p>`;
                 } else {
-                    textHtml = `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35; ${mediaHtml ? 'margin-top: 6px;' : ''}">${msg.conteudo}</p>`;
+                    textHtml = `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35; word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap; ${mediaHtml ? 'margin-top: 6px;' : ''}">${msg.conteudo}</p>`;
                 }
             }
 
@@ -608,7 +646,7 @@
                 const leadsPromise = window.dbAPI.fetchLeads();
                 const latestPromise = (window.dbAPI && window.dbAPI.fetchLatestMessages)
                     ? window.dbAPI.fetchLatestMessages()
-                    : impo/assets/data-CO8k7PWP.js?v=1.5=1.5').then(m => m.fetchLatestMessages ? m.fetchLatestMessages() : {});
+                    : impo/assets/data-FL8CSLcB.js?v=1.5=1.5').then(m => m.fetchLatestMessages ? m.fetchLatestMessages() : {});
                 const res = await Promise.all([leadsPromise, latestPromise]);
                 leads = res[0] || [];
                 latestMsgs = res[1] || {};
@@ -623,6 +661,23 @@
                 const timeA = (window.latestMessagesMap[a.id]?.criado_em) || a.ultima_interacao_cliente || a.ultima_interacao || a.criado_em;
                 const timeB = (window.latestMessagesMap[b.id]?.criado_em) || b.ultima_interacao_cliente || b.ultima_interacao || b.criado_em;
                 return new Date(timeB) - new Date(timeA);
+            });
+
+            // Deduplica contatos por telefone e por ID para garantir que nunca apareçam repetidos na lista
+            const seenPhones = new Set();
+            const seenIds = new Set();
+            leads = leads.filter(lead => {
+                if (!lead || seenIds.has(lead.id)) return false;
+                seenIds.add(lead.id);
+
+                if (lead.telefone) {
+                    const cleanPhone = lead.telefone.replace(/\D/g, '');
+                    if (cleanPhone.length >= 8) {
+                        if (seenPhones.has(cleanPhone)) return false;
+                        seenPhones.add(cleanPhone);
+                    }
+                }
+                return true;
             });
             
             // Preserva a ultima_interacao_cliente (calculada localmente)
@@ -1224,7 +1279,7 @@
                 <div style="align-self: flex-start; display: flex; gap: 8px; max-width: 90%; margin-bottom: 8px;">
                     <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--color-task-green-light); color: var(--color-task-green-text); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0; margin-top: 4px; overflow: hidden;">${avatarHtml}</div>
                     <div class="msg-bubble-client">
-                        ${(mediaHtml && (mediaHtml.includes('custom-audio-player') || mediaHtml.includes('custom-image-thumbnail'))) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>`}
+                        ${(mediaHtml && (mediaHtml.includes('custom-audio-player') || mediaHtml.includes('custom-image-thumbnail'))) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35; word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap;">${msg.conteudo}</p>`}
                         ${mediaHtml}
                         <div style="text-align: right; margin-top: 2px; margin-bottom: -2px;">
                             <span style="font-size: 10px; color: #999;">${timeStr}</span>
@@ -1234,7 +1289,7 @@
             } else if (remetente === 'ia' || remetente === 'humano') {
                 novoHtml = `
                 <div class="msg-bubble-ia">
-                    ${(mediaHtml && (mediaHtml.includes('custom-audio-player') || mediaHtml.includes('custom-image-thumbnail'))) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35;">${msg.conteudo}</p>`}
+                    ${(mediaHtml && (mediaHtml.includes('custom-audio-player') || mediaHtml.includes('custom-image-thumbnail'))) ? '' : `<p style="margin: 0; font-size: 13px; color: #111; line-height: 1.35; word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap;">${msg.conteudo}</p>`}
                     ${mediaHtml}
                     <div style="text-align: right; margin-top: 2px; margin-bottom: -2px; display: flex; justify-content: flex-end; align-items: center; gap: 4px;">
                         <span style="font-size: 10px; color: #667781;">${timeStr}</span>

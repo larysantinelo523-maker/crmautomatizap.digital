@@ -19,7 +19,26 @@ export async function fetchLeads() {
         alert("Erro Supabase: " + (error.message || JSON.stringify(error)));
         return [];
     }
-    return data;
+
+    // Deduplica leads por telefone e por ID para prevenir contatos duplicados em todo o CRM
+    const seenPhones = new Set();
+    const seenIds = new Set();
+    const uniqueLeads = [];
+    for (const lead of data || []) {
+        if (!lead || seenIds.has(lead.id)) continue;
+        seenIds.add(lead.id);
+
+        if (lead.telefone) {
+            const cleanPhone = lead.telefone.replace(/\D/g, '');
+            if (cleanPhone.length >= 8) {
+                if (seenPhones.has(cleanPhone)) continue;
+                seenPhones.add(cleanPhone);
+            }
+        }
+        uniqueLeads.push(lead);
+    }
+
+    return uniqueLeads;
 }
 
 export async function fetchConversations(leadId) {
