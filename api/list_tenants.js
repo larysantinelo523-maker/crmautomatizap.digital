@@ -1,7 +1,7 @@
 const { createClient } = require('@supabase/supabase-js');
 
 export default async function handler(req, res) {
-    if (req.method !== 'GET') {
+    if (req.method !== 'GET' && req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
@@ -13,6 +13,31 @@ export default async function handler(req, res) {
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // ─── MODO UPDATE REPORTE: /api/list_tenants?action=update_reporte (GET ou POST) ───
+    if ((req.query && req.query.action === 'update_reporte') || (req.body && req.body.action === 'update_reporte')) {
+        const id = (req.body && req.body.id) || (req.query && req.query.id);
+        const status = (req.body && req.body.status) || (req.query && req.query.status) || 'Resolvido';
+
+        if (!id) {
+            return res.status(400).json({ error: 'ID do reporte é obrigatório' });
+        }
+
+        try {
+            const { data, error } = await supabase
+                .from('reportes_agente')
+                .update({ status: status })
+                .eq('id', id)
+                .select();
+
+            if (error) throw error;
+            return res.status(200).json({ success: true, data });
+        } catch (err) {
+            console.error('Erro ao atualizar reporte:', err);
+            return res.status(500).json({ error: err.message });
+        }
+    }
+
 
     // ─── MODO REPORTES: /api/list_tenants?action=reportes (&id_empresa=UUID opcional) ───
     if (req.query && req.query.action === 'reportes') {

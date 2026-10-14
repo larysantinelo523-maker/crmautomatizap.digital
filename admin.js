@@ -1634,7 +1634,7 @@ document.querySelectorAll(".toggle-senha").forEach((icon) => {
   });
 });
 
-// Modal: Correções Solicitadas da Empresa
+// Modal: Correções Solicitadas da Empresa (Organizado por Datas / Accordion)
 async function openModalCorrecoesEmpresa(tenantId, tenantObj) {
   const modalEl = document.getElementById("modal-correcoes-empresa");
   if (!modalEl) return;
@@ -1687,7 +1687,7 @@ async function openModalCorrecoesEmpresa(tenantId, tenantObj) {
     }
   }
 
-  // Botão para ver configurações completas
+  // Botão para ver configurações completas da empresa
   if (btnConfig) {
     btnConfig.onclick = () => {
       modalEl.classList.remove("active");
@@ -1746,104 +1746,277 @@ async function openModalCorrecoesEmpresa(tenantId, tenantObj) {
       return;
     }
 
-    // Renderiza a lista de cards com layout proporcional
+    // ─── Agrupamento por Data (DD/MM/YYYY) ───
+    const groupsByDate = {};
+    reportes.forEach((r) => {
+      let dateKey = "Sem data";
+      let dateObj = null;
+      if (r.criado_em) {
+        try {
+          dateObj = new Date(r.criado_em);
+          if (!isNaN(dateObj.getTime())) {
+            const d = String(dateObj.getDate()).padStart(2, "0");
+            const m = String(dateObj.getMonth() + 1).padStart(2, "0");
+            const y = dateObj.getFullYear();
+            dateKey = `${d}/${m}/${y}`;
+          }
+        } catch (e) {}
+      }
+
+      if (!groupsByDate[dateKey]) {
+        groupsByDate[dateKey] = {
+          dateKey: dateKey,
+          dateObj: dateObj,
+          items: [],
+        };
+      }
+      groupsByDate[dateKey].items.push(r);
+    });
+
+    // Ordena as datas da mais recente para a mais antiga
+    const sortedDateKeys = Object.keys(groupsByDate).sort((a, b) => {
+      const da = groupsByDate[a].dateObj ? groupsByDate[a].dateObj.getTime() : 0;
+      const db = groupsByDate[b].dateObj ? groupsByDate[b].dateObj.getTime() : 0;
+      return db - da;
+    });
+
     if (listEl) {
       listEl.innerHTML = "";
-      reportes.forEach((r) => {
-        const card = document.createElement("div");
-        card.className = "correcao-card-item";
 
-        // Cores e Ícones por Motivo
-        const motivo = r.motivo_principal || "Correção do Agente";
-        let badgeBg = "#d1fae5";
-        let badgeColor = "#065f46";
-        let badgeIcon = "ph-chat-circle-dots";
+      // Dica explicativa
+      const tipHeader = document.createElement("div");
+      tipHeader.style.cssText = "font-size: 12px; color: var(--color-text-mut); padding: 2px 4px 6px; display: flex; align-items: center; justify-content: space-between;";
+      tipHeader.innerHTML = `
+        <span><i class="ph ph-folder-open" style="margin-right: 4px;"></i>Clique na data para visualizar as atualizações:</span>
+        <span style="font-weight: 600; color: var(--color-primary);">${sortedDateKeys.length} ${sortedDateKeys.length === 1 ? 'dia' : 'dias'}</span>
+      `;
+      listEl.appendChild(tipHeader);
 
-        if (motivo.toLowerCase().includes("errado") || motivo.toLowerCase().includes("erro")) {
-          badgeBg = "#fee2e2";
-          badgeColor = "#b91c1c";
-          badgeIcon = "ph-warning-circle";
-        } else if (motivo.toLowerCase().includes("tom") || motivo.toLowerCase().includes("legal")) {
-          badgeBg = "#fef3c7";
-          badgeColor = "#b45309";
-          badgeIcon = "ph-microphone";
-        } else if (motivo.toLowerCase().includes("demorou") || motivo.toLowerCase().includes("tempo")) {
-          badgeBg = "#ede9fe";
-          badgeColor = "#6d28d9";
-          badgeIcon = "ph-clock-countdown";
-        }
+      const today = new Date();
+      const todayKey = `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayKey = `${String(yesterday.getDate()).padStart(2, "0")}/${String(yesterday.getMonth() + 1).padStart(2, "0")}/${yesterday.getFullYear()}`;
 
-        // Formatação de data amigável
-        let dataFormatada = "Data recente";
-        if (r.criado_em) {
-          try {
-            const dt = new Date(r.criado_em);
-            dataFormatada = dt.toLocaleDateString("pt-BR", {
-              day: "2-digit",
-              month: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit"
-            });
-          } catch (e) {}
-        }
+      sortedDateKeys.forEach((dKey, groupIndex) => {
+        const group = groupsByDate[dKey];
+        const items = group.items;
+        const totalCount = items.length;
 
-        const isResolvido = (r.status || "").toLowerCase() === "resolvido";
+        // Ordena itens do dia por hora mais recente
+        items.sort((a, b) => new Date(b.criado_em || 0) - new Date(a.criado_em || 0));
 
-        card.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
-                <i class="ph-fill ${badgeIcon}"></i>
-                <span>${motivo}</span>
-              </span>
+        let pendingCount = items.filter(
+          (x) => (x.status || "").toLowerCase() !== "resolvido"
+        ).length;
+
+        // Rótulo amigável
+        let dateTitle = dKey;
+        if (dKey === todayKey) dateTitle = `Hoje (${dKey})`;
+        else if (dKey === yesterdayKey) dateTitle = `Ontem (${dKey})`;
+
+        const groupCard = document.createElement("div");
+        groupCard.className = "date-group-card";
+
+        groupCard.innerHTML = `
+          <button type="button" class="date-group-btn" id="btn-group-${groupIndex}">
+            <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+              <div style="width: 34px; height: 34px; border-radius: 8px; background: var(--color-primary-light); color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+                <i class="ph-bold ph-calendar"></i>
+              </div>
+              <div style="min-width: 0;">
+                <span style="font-size: 13.5px; font-weight: 700; color: var(--color-text-main); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${dateTitle}</span>
+                <span class="group-subtitle" style="font-size: 11.5px; color: var(--color-text-mut); display: block; margin-top: 1px;">
+                  ${totalCount} ${totalCount === 1 ? "atualização" : "atualizações"} • ${pendingCount > 0 ? `<span style="color: #b45309; font-weight: 600;">${pendingCount} pendente${pendingCount > 1 ? "s" : ""}</span>` : `<span style="color: #15803d; font-weight: 600;">Todas resolvidas</span>`}
+                </span>
+              </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 11px; color: var(--color-text-mut); font-weight: 500;">${dataFormatada}</span>
-              <span id="badge-status-${r.id}" style="font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: ${isResolvido ? "#dcfce7" : "#fef3c7"}; color: ${isResolvido ? "#15803d" : "#b45309"};">
-                ${r.status || "Pendente"}
+            <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+              <span class="group-count-badge" style="background: var(--color-primary-light); color: var(--color-primary); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px;">
+                ${totalCount}
               </span>
+              <i class="ph-bold ph-caret-down group-chevron" style="font-size: 14px; color: var(--color-text-mut); transition: transform 0.25s ease;"></i>
             </div>
-          </div>
-          <div style="font-size: 13px; color: var(--color-text-main); background: var(--color-bg, #f3f4f6); padding: 10px 12px; border-radius: 8px; border-left: 3px solid var(--color-primary); line-height: 1.5; word-break: break-word;">
-            ${r.descricao_detalhada ? r.descricao_detalhada.replace(/</g, "&lt;").replace(/>/g, "&gt;") : '<em style="color: var(--color-text-mut);">Sem descrição detalhada fornecida pelo usuário.</em>'}
-          </div>
-          <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 2px;">
-            <button type="button" class="btn-toggle-status" style="background: none; border: none; font-size: 11.5px; font-weight: 500; color: var(--color-primary); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 4px 6px; border-radius: 4px;">
-              <i class="ph ${isResolvido ? 'ph-arrow-counter-clockwise' : 'ph-check'}"></i>
-              <span>${isResolvido ? 'Reabrir como Pendente' : 'Marcar como Resolvido'}</span>
-            </button>
+          </button>
+          <div class="date-group-content" id="content-group-${groupIndex}" style="display: none;">
           </div>
         `;
 
-        // Interação para alternar status
-        const btnToggle = card.querySelector(".btn-toggle-status");
-        if (btnToggle) {
-          btnToggle.addEventListener("click", async (e) => {
-            e.stopPropagation();
-            const novoStatus = isResolvido ? "Pendente" : "Resolvido";
-            btnToggle.disabled = true;
-            btnToggle.innerHTML = `<i class="ph ph-spinner-gap ph-spin"></i> Atualizando...`;
+        const btnGroup = groupCard.querySelector(".date-group-btn");
+        const contentGroup = groupCard.querySelector(".date-group-content");
+        const chevron = groupCard.querySelector(".group-chevron");
 
+        btnGroup.addEventListener("click", () => {
+          const isHidden = contentGroup.style.display === "none";
+          contentGroup.style.display = isHidden ? "flex" : "none";
+          chevron.style.transform = isHidden ? "rotate(180deg)" : "rotate(0deg)";
+        });
+
+        // Renderiza cada card de correção daquele dia específico
+        items.forEach((r) => {
+          const card = document.createElement("div");
+          card.className = "correcao-card-item";
+
+          // Cores por motivo
+          const motivo = r.motivo_principal || "Correção do Agente";
+          let badgeBg = "#d1fae5";
+          let badgeColor = "#065f46";
+          let badgeIcon = "ph-chat-circle-dots";
+
+          if (motivo.toLowerCase().includes("errado") || motivo.toLowerCase().includes("erro")) {
+            badgeBg = "#fee2e2";
+            badgeColor = "#b91c1c";
+            badgeIcon = "ph-warning-circle";
+          } else if (motivo.toLowerCase().includes("tom") || motivo.toLowerCase().includes("legal")) {
+            badgeBg = "#fef3c7";
+            badgeColor = "#b45309";
+            badgeIcon = "ph-microphone";
+          } else if (motivo.toLowerCase().includes("demorou") || motivo.toLowerCase().includes("tempo")) {
+            badgeBg = "#ede9fe";
+            badgeColor = "#6d28d9";
+            badgeIcon = "ph-clock-countdown";
+          }
+
+          // Hora do envio
+          let horaFormatada = "--:--";
+          if (r.criado_em) {
             try {
-              const { error: updErr } = await supabase
-                .from("reportes_agente")
-                .update({ status: novoStatus })
-                .eq("id", r.id);
+              const dt = new Date(r.criado_em);
+              horaFormatada = dt.toLocaleTimeString("pt-BR", {
+                hour: "2-digit",
+                minute: "2-digit"
+              });
+            } catch (e) {}
+          }
 
-              if (updErr) throw updErr;
+          const isResolvido = (r.status || "").toLowerCase() === "resolvido";
 
-              r.status = novoStatus;
-              openModalCorrecoesEmpresa(tenantId, tenant);
-            } catch (errUpd) {
-              console.error("Erro ao atualizar status:", errUpd);
-              alert("Não foi possível alterar o status: " + errUpd.message);
-              btnToggle.disabled = false;
-              btnToggle.innerHTML = `<i class="ph ${isResolvido ? 'ph-arrow-counter-clockwise' : 'ph-check'}"></i> <span>${isResolvido ? 'Reabrir como Pendente' : 'Marcar como Resolvido'}</span>`;
-            }
-          });
-        }
+          card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
+                  <i class="ph-fill ${badgeIcon}"></i>
+                  <span>${motivo}</span>
+                </span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 11px; color: var(--color-text-mut); font-weight: 500;">${horaFormatada}</span>
+                <span class="badge-status-pill" style="font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: ${isResolvido ? "#dcfce7" : "#fef3c7"}; color: ${isResolvido ? "#15803d" : "#b45309"};">
+                  ${r.status || "Pendente"}
+                </span>
+              </div>
+            </div>
+            <div style="font-size: 13px; color: var(--color-text-main); background: var(--color-bg, #f3f4f6); padding: 10px 12px; border-radius: 8px; border-left: 3px solid var(--color-primary); line-height: 1.5; word-break: break-word;">
+              ${r.descricao_detalhada ? r.descricao_detalhada.replace(/</g, "&lt;").replace(/>/g, "&gt;") : '<em style="color: var(--color-text-mut);">Sem descrição detalhada fornecida pelo usuário.</em>'}
+            </div>
+            <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 2px;">
+              <button type="button" class="btn-toggle-status" style="background: none; border: none; font-size: 11.5px; font-weight: 500; color: ${isResolvido ? 'var(--color-text-mut)' : 'var(--color-primary)'}; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 4px 6px; border-radius: 4px; transition: all 0.2s ease;">
+                <i class="ph ${isResolvido ? 'ph-arrow-counter-clockwise' : 'ph-check'}"></i>
+                <span>${isResolvido ? 'Reabrir como Pendente' : 'Marcar como Resolvido'}</span>
+              </button>
+            </div>
+          `;
 
-        listEl.appendChild(card);
+          // Ação de alternar status com atualização real no banco de dados via service role
+          const btnToggle = card.querySelector(".btn-toggle-status");
+          const badgeStatusPill = card.querySelector(".badge-status-pill");
+
+          if (btnToggle) {
+            btnToggle.addEventListener("click", async (e) => {
+              e.stopPropagation();
+              const currentResolvido = (r.status || "").toLowerCase() === "resolvido";
+              const novoStatus = currentResolvido ? "Pendente" : "Resolvido";
+              
+              btnToggle.disabled = true;
+              btnToggle.innerHTML = `<i class="ph ph-spinner-gap ph-spin"></i> Atualizando banco...`;
+
+              try {
+                let atualizadoComSucesso = false;
+
+                // 1. Tenta API com service role (ignora restrições de RLS do client)
+                try {
+                  const apiRes = await fetch(`/api/list_tenants?action=update_reporte&id=${encodeURIComponent(r.id)}&status=${encodeURIComponent(novoStatus)}`);
+                  if (apiRes.ok) {
+                    const json = await apiRes.json();
+                    if (json.success) atualizadoComSucesso = true;
+                  }
+                } catch (errApi) {
+                  console.warn("Falha no GET update_reporte:", errApi);
+                }
+
+                // 2. Se falhar, tenta via POST
+                if (!atualizadoComSucesso) {
+                  try {
+                    const postRes = await fetch("/api/list_tenants", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ action: "update_reporte", id: r.id, status: novoStatus })
+                    });
+                    if (postRes.ok) {
+                      const postJson = await postRes.json();
+                      if (postJson.success) atualizadoComSucesso = true;
+                    }
+                  } catch (errPost) {
+                    console.warn("Falha no POST update_reporte:", errPost);
+                  }
+                }
+
+                // 3. Fallback client Supabase
+                if (!atualizadoComSucesso) {
+                  const { error: sbErr } = await supabase
+                    .from("reportes_agente")
+                    .update({ status: novoStatus })
+                    .eq("id", r.id);
+                  if (sbErr) throw sbErr;
+                }
+
+                // Atualiza o objeto na memória
+                r.status = novoStatus;
+                const isNowResolvido = novoStatus === "Resolvido";
+
+                // Atualiza a pílula de status no card visualmente
+                if (badgeStatusPill) {
+                  badgeStatusPill.style.background = isNowResolvido ? "#dcfce7" : "#fef3c7";
+                  badgeStatusPill.style.color = isNowResolvido ? "#15803d" : "#b45309";
+                  badgeStatusPill.textContent = novoStatus;
+                }
+
+                // Atualiza o botão
+                btnToggle.innerHTML = isNowResolvido
+                  ? `<i class="ph ph-arrow-counter-clockwise"></i> <span>Reabrir como Pendente</span>`
+                  : `<i class="ph ph-check"></i> <span>Marcar como Resolvido</span>`;
+                btnToggle.style.color = isNowResolvido ? "var(--color-text-mut)" : "var(--color-primary)";
+
+                // Recalcula as pendências deste grupo de data
+                const newPending = items.filter(
+                  (x) => (x.status || "").toLowerCase() !== "resolvido"
+                ).length;
+
+                const groupSubtitle = groupCard.querySelector(".group-subtitle");
+                if (groupSubtitle) {
+                  groupSubtitle.innerHTML = `${totalCount} ${totalCount === 1 ? "atualização" : "atualizações"} • ${newPending > 0 ? `<span style="color: #b45309; font-weight: 600;">${newPending} pendente${newPending > 1 ? "s" : ""}</span>` : `<span style="color: #15803d; font-weight: 600;">Todas resolvidas</span>`}`;
+                }
+
+                // Sincroniza o sininho de notificações do admin
+                if (typeof loadAdminNotifications === "function") {
+                  loadAdminNotifications();
+                }
+              } catch (errUpd) {
+                console.error("Erro ao atualizar status do reporte no banco:", errUpd);
+                alert("Não foi possível salvar o status no banco de dados: " + (errUpd.message || "Tente novamente"));
+                btnToggle.innerHTML = currentResolvido
+                  ? `<i class="ph ph-arrow-counter-clockwise"></i> <span>Reabrir como Pendente</span>`
+                  : `<i class="ph ph-check"></i> <span>Marcar como Resolvido</span>`;
+              } finally {
+                btnToggle.disabled = false;
+              }
+            });
+          }
+
+          contentGroup.appendChild(card);
+        });
+
+        listEl.appendChild(groupCard);
       });
     }
   } catch (err) {

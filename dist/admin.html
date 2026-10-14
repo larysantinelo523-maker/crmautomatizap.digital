@@ -53,8 +53,60 @@
             box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
         }
 
-        .correcao-card-item {
+        /* Grupos de Datas no Histórico */
+        .date-group-card {
+            border: 1px solid var(--color-border, #e5e7eb);
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--color-bg-card, #ffffff);
+            transition: all 0.2s ease;
+        }
+
+        .date-group-card:hover {
+            border-color: var(--color-primary, #00A884);
+        }
+
+        .date-group-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
             background: var(--color-bg-main, #f9fafb);
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            gap: 10px;
+            transition: background 0.2s ease;
+        }
+
+        body.dark-mode .date-group-btn {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .date-group-btn:hover {
+            background: rgba(0, 168, 132, 0.06);
+        }
+
+        body.dark-mode .date-group-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .date-group-content {
+            display: none;
+            padding: 12px;
+            flex-direction: column;
+            gap: 10px;
+            border-top: 1px solid var(--color-border, #e5e7eb);
+            background: var(--color-bg, #f3f4f6);
+        }
+
+        body.dark-mode .date-group-content {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .correcao-card-item {
+            background: var(--color-bg-card, #ffffff);
             border: 1px solid var(--color-border, #e5e7eb);
             border-radius: 10px;
             padding: 13px 15px;
@@ -117,6 +169,10 @@
                 font-size: 11.5px !important;
             }
 
+            .date-group-btn {
+                padding: 10px 12px !important;
+            }
+
             .modal-correcoes-actions {
                 flex-direction: column-reverse !important;
                 gap: 8px !important;
@@ -174,7 +230,7 @@
             });
         });
     </script>
-  <script type="module" crossorigin src="/assets/admin-BrrBxAa2.js"></script>
+  <script type="module" crossorigin src="/assets/admin-SGjSgLAq.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
   <link rel="stylesheet" crossorigin href="/assets/conversas-3hzlO6-i.css">
 </head>
