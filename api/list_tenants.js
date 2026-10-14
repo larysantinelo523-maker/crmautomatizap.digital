@@ -71,7 +71,7 @@ export default async function handler(req, res) {
         }
 
         try {
-            const webhookUrl = 'https://talonedlanternfish-n8n.cloudfy.live/webhook/simulador-chat-geremias';
+            const webhookUrl = 'https://talonedlanternfish-n8n.cloudfy.live/webhook/simulador-crm';
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 65000); // 65s timeout
 
