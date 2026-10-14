@@ -1098,8 +1098,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
       };
 
-      // Tenta primeiro via API serverless (service role, sem restrição de RLS)
-      fetch(`/api/get_reportes?id_empresa=${encodeURIComponent(id)}`)
+      // Tenta primeiro via endpoint serverless existente (service role, sem restrição de RLS)
+      fetch(`/api/list_tenants?action=reportes&id_empresa=${encodeURIComponent(id)}`)
         .then((res) => {
           if (!res.ok) throw new Error("HTTP " + res.status);
           return res.json();
@@ -1108,20 +1108,27 @@ document.addEventListener("DOMContentLoaded", async () => {
           renderReportesList(data);
         })
         .catch((err) => {
-          console.warn("Falha no /api/get_reportes, tentando direto via Supabase client:", err);
-          supabase
-            .from("reportes_agente")
-            .select("*")
-            .eq("id_empresa", id)
-            .order("criado_em", { ascending: false })
-            .then(({ data, error }) => {
-              if (error) {
-                console.error("Erro ao carregar reportes:", error);
-                cardsContainer.innerHTML =
-                  '<div style="text-align: center; color: var(--color-text-mut); padding: 24px; font-size: 13px;">Nenhuma correção solicitada</div>';
-              } else {
-                renderReportesList(data || []);
-              }
+          console.warn("Falha no /api/list_tenants?action=reportes, tentando detalhe do tenant:", err);
+          fetch(`/api/list_tenants?id=${encodeURIComponent(id)}`)
+            .then((res) => res.json())
+            .then((data) => {
+              renderReportesList(data.reportes || []);
+            })
+            .catch((fallbackErr) => {
+              console.error("Erro ao carregar reportes:", fallbackErr);
+              supabase
+                .from("reportes_agente")
+                .select("*")
+                .eq("id_empresa", id)
+                .order("criado_em", { ascending: false })
+                .then(({ data, error }) => {
+                  if (error || !data || data.length === 0) {
+                    cardsContainer.innerHTML =
+                      '<div style="text-align: center; color: var(--color-text-mut); padding: 24px; font-size: 13px;">Nenhuma correção solicitada</div>';
+                  } else {
+                    renderReportesList(data);
+                  }
+                });
             });
         });
     }
@@ -1631,7 +1638,7 @@ async function loadAdminNotifications() {
   try {
     let reportes = [];
     try {
-      const res = await fetch("/api/get_reportes");
+      const res = await fetch("/api/list_tenants?action=reportes");
       if (res.ok) {
         reportes = await res.json();
       } else {

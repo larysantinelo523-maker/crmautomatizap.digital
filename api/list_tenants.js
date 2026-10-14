@@ -14,6 +14,25 @@ export default async function handler(req, res) {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // ─── MODO REPORTES: /api/list_tenants?action=reportes (&id_empresa=UUID opcional) ───
+    if (req.query && req.query.action === 'reportes') {
+        const id_empresa = req.query.id_empresa;
+        try {
+            let q = supabase.from('reportes_agente').select('*').order('criado_em', { ascending: false });
+            if (id_empresa) {
+                q = q.eq('id_empresa', id_empresa);
+            } else {
+                q = q.limit(30);
+            }
+            const { data, error } = await q;
+            if (error) throw error;
+            return res.status(200).json(data || []);
+        } catch (err) {
+            console.error('Erro ao buscar reportes:', err);
+            return res.status(500).json({ error: err.message });
+        }
+    }
+
     // ─── MODO DETALHE: /api/list_tenants?id=UUID ────────────────────────────────
     if (req.query && req.query.id) {
         const id = req.query.id;
@@ -69,13 +88,26 @@ export default async function handler(req, res) {
                 else evaluatedStatus = 'pago';
             }
 
+            let reportes = [];
+            try {
+                const { data: repData, error: repError } = await supabase
+                    .from('reportes_agente')
+                    .select('*')
+                    .eq('id_empresa', id)
+                    .order('criado_em', { ascending: false });
+                if (!repError && repData) reportes = repData;
+            } catch (e) {
+                console.error('Erro ao buscar reportes no detalhe:', e);
+            }
+
             return res.status(200).json({
                 usuario,
                 horarios: horarios || [],
                 status: evaluatedStatus,
                 diasRestantes: diffDays,
                 total_leads: leadsCount || 0,
-                reunioes_marcadas: reunioesCount || 0
+                reunioes_marcadas: reunioesCount || 0,
+                reportes: reportes || []
             });
 
         } catch (err) {
