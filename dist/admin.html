@@ -301,9 +301,9 @@
             });
         });
     </script>
-  <script type="module" crossorigin src="/assets/admin-366DZQKq.js"></script>
+  <script type="module" crossorigin src="/assets/admin-CXuZgVR5.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-B4WAY5ta.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-kTMy5Fuw.css">
 </head>
 
 <body>
@@ -322,9 +322,10 @@
                     <span>Visão Geral Master</span>
                 </a>
 
-                <a href="#" class="nav-item" data-target="configuracoes">
-                    <i class="ph ph-gear"></i>
-                    <span>Configurações</span>
+                <a href="#" class="nav-item" data-target="notificacoes">
+                    <i class="ph ph-bell"></i>
+                    <span>Notificações</span>
+                    <span id="sidebar-notif-badge" class="badge" style="display: none; margin-left: auto; background: var(--color-primary-light); color: var(--color-primary); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 10px;">0</span>
                 </a>
             </nav>
 
@@ -458,6 +459,9 @@
                                         <i class="ph-fill ph-moon icon-moon"></i>
                                     </span>
                                 </label>
+                            </div>
+                            <div class="dropdown-item" id="btn-dropdown-config" style="cursor: pointer;">
+                                <i class="ph ph-lock-key"></i> Alterar Senha
                             </div>
                             <div class="dropdown-divider"></div>
                             <div class="dropdown-item" id="btn-logout" style="color: var(--color-danger);">

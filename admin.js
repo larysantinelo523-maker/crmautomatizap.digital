@@ -124,6 +124,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
+  // Item do menu do usuário para Alterar Senha
+  const btnDropdownConfig = document.getElementById("btn-dropdown-config");
+  if (btnDropdownConfig) {
+    btnDropdownConfig.addEventListener("click", (e) => {
+      e.preventDefault();
+      navItems.forEach((n) => n.classList.remove("active"));
+      showSection("configuracoes");
+      const userDropdown = document.getElementById("user-dropdown");
+      if (userDropdown) userDropdown.classList.remove("show");
+    });
+  }
+
   // 3. Funcionalidade de Logout e Relógio
   document.getElementById("btn-logout").addEventListener("click", async () => {
     await supabase.auth.signOut();
@@ -2095,11 +2107,17 @@ function markSingleNotificationAsRead(key) {
   ).length;
   const badgeEl = document.getElementById("notif-badge");
   const notifDot = document.querySelector(".notification-dot");
+  const sideBadge = document.getElementById("sidebar-notif-badge");
   if (unreadCount > 0) {
     if (badgeEl) badgeEl.textContent = unreadCount;
+    if (sideBadge) {
+      sideBadge.textContent = unreadCount;
+      sideBadge.style.display = "inline-flex";
+    }
   } else {
     if (badgeEl) badgeEl.style.display = "none";
     if (notifDot) notifDot.style.display = "none";
+    if (sideBadge) sideBadge.style.display = "none";
   }
 }
 window.markSingleNotificationAsRead = markSingleNotificationAsRead;
@@ -2115,11 +2133,13 @@ function markAllNotificationsAsRead() {
   localStorage.setItem("admin_read_notif_keys", JSON.stringify(merged));
   localStorage.setItem("admin_last_read_all_time", Date.now().toString());
 
-  // Esconde ponto vermelho e badge
+  // Esconde ponto vermelho e badges
   const dot = document.querySelector(".notification-dot");
   if (dot) dot.style.display = "none";
   const badge = document.getElementById("notif-badge");
   if (badge) badge.style.display = "none";
+  const sideBadge = document.getElementById("sidebar-notif-badge");
+  if (sideBadge) sideBadge.style.display = "none";
 
   // Remove classe unread dos cards
   document
@@ -2468,6 +2488,7 @@ async function loadAdminNotifications() {
   }
 
   // Indicador de novidades
+  const sideBadge = document.getElementById("sidebar-notif-badge");
   if (unreadCount > 0) {
     if (badgeEl) {
       badgeEl.textContent = unreadCount;
@@ -2476,9 +2497,14 @@ async function loadAdminNotifications() {
     if (notifDot) {
       notifDot.style.display = "block";
     }
+    if (sideBadge) {
+      sideBadge.textContent = unreadCount;
+      sideBadge.style.display = "inline-flex";
+    }
   } else {
     if (badgeEl) badgeEl.style.display = "none";
     if (notifDot) notifDot.style.display = "none";
+    if (sideBadge) sideBadge.style.display = "none";
   }
 
   listEl.innerHTML = "";

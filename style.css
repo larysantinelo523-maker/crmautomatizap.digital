@@ -5118,3 +5118,8 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
         overflow-y: auto !important;
     }
 }
+
+.nav-item.active #sidebar-notif-badge {
+    background: rgba(255, 255, 255, 0.25) !important;
+    color: #ffffff !important;
+}
