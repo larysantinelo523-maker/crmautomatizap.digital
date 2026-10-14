@@ -58,6 +58,59 @@ export default async function handler(req, res) {
         }
     }
 
+    // ─── MODO CHAT TEST (SIMULADOR DO AGENTE N8N): /api/list_tenants?action=chat_test ───
+    if ((req.query && req.query.action === 'chat_test') || (req.body && req.body.action === 'chat_test')) {
+        const body = req.body || {};
+        const query = req.query || {};
+        const mensagem = body.mensagem || query.mensagem;
+        const id_empresa = body.id_empresa || query.id_empresa || 'a0269c72-e0dd-4a5c-91e5-227665905126';
+        const telefone_cliente = body.telefone_cliente || query.telefone_cliente || '558182975691';
+
+        if (!mensagem) {
+            return res.status(400).json({ error: 'Mensagem é obrigatória' });
+        }
+
+        try {
+            const webhookUrl = 'https://talonedlanternfish-n8n.cloudfy.live/webhook/simulador-chat-geremias';
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 65000); // 65s timeout
+
+            const response = await fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    mensagem: mensagem,
+                    telefone_cliente: telefone_cliente,
+                    id_empresa: id_empresa,
+                    origem: 'teste_crm'
+                }),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeout);
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`Erro do servidor de automação (${response.status}): ${errText}`);
+            }
+
+            const json = await response.json();
+            return res.status(200).json({
+                success: true,
+                resposta: json.resposta || 'Olá! Como posso ajudar você hoje?'
+            });
+        } catch (err) {
+            console.error('Erro no proxy chat_test:', err);
+            return res.status(500).json({
+                error: err.name === 'AbortError' 
+                    ? 'A automação demorou para responder. Tente novamente em alguns segundos.' 
+                    : (err.message || 'Erro ao processar mensagem do agente.')
+            });
+        }
+    }
+
     // ─── MODO DETALHE: /api/list_tenants?id=UUID ────────────────────────────────
     if (req.query && req.query.id) {
         const id = req.query.id;

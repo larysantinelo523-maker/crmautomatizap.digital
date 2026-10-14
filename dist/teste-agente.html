@@ -17,7 +17,7 @@
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    <!-- CSS -->
+    <!-- CSS -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 
 
@@ -55,7 +55,7 @@
             });
         });
     </script>
-  <script type="module" crossorigin src="/assets/testeAgente-C3bmrpAB.js"></script>
+  <script type="module" crossorigin src="/assets/testeAgente-tUtOpcjb.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
   <link rel="modulepreload" crossorigin href="/assets/data-BG-H1LmU.js">
   <link rel="modulepreload" crossorigin href="/assets/script-BjgKP-Qg.js">
@@ -258,11 +258,13 @@
   .teste-agente-layout .chat-card { height: calc(100vh - 120px) !important; min-height: 0 !important; flex: none !important; }
   .teste-agente-layout .report-card { height: auto !important; min-height: 0 !important; flex: none !important; }
   
-  /* Botão Sobre o Agente no Mobile: Somente o ícone */
-  .btn-info-agente-text {
+  /* Botões no Mobile: Somente o ícone */
+  .btn-info-agente-text,
+  .btn-reset-text {
     display: none !important;
   }
-  .btn-info-agente {
+  .btn-info-agente,
+  .btn-reset-chat {
     width: 38px !important;
     height: 38px !important;
     min-width: 38px !important;
@@ -273,12 +275,49 @@
     justify-content: center !important;
     flex-shrink: 0 !important;
   }
-  .btn-info-agente i {
-    font-size: 20px !important;
+  .btn-info-agente i,
+  .btn-reset-chat i {
+    font-size: 18px !important;
     margin: 0 !important;
   }
 }
 textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Animações e Estilos do Chat */
+.typing-bubble {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 14px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 14px 14px 14px 2px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    width: fit-content;
+}
+.typing-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-text-mut);
+    display: inline-block;
+    animation: typingBounce 1.3s infinite ease-in-out both;
+}
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+.typing-dot:nth-child(3) { animation-delay: 0s; }
+@keyframes typingBounce {
+    0%, 80%, 100% { transform: scale(0.35); opacity: 0.35; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bubbleFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.chat-msg-anim {
+    animation: bubbleFadeIn 0.25s ease-out;
+}
   </style>
             <div class="content-wrapper" style="padding: 24px;">
                 <!-- Titulo Mobile -->
@@ -311,10 +350,16 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                                     </div>
                                 </div>
                             </div>
-                            <button id="btn-info-agente" class="btn btn-outline btn-info-agente" style="display: flex; align-items: center; gap: 6px; padding: 7px 13px; font-size: 12.5px; font-weight: 600; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text-main); cursor: pointer; transition: all 0.2s;" title="Ver Visão Geral e Comportamento do Agente">
-                                <i class="ph-bold ph-info" style="font-size: 16px; color: var(--color-primary);"></i>
-                                <span class="btn-info-agente-text">Sobre o Agente</span>
-                            </button>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <button id="btn-reset-chat" class="btn btn-outline btn-reset-chat" style="display: flex; align-items: center; gap: 6px; padding: 7px 12px; font-size: 12.5px; font-weight: 600; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text-sec); cursor: pointer; transition: all 0.2s;" title="Reiniciar conversa do teste">
+                                    <i class="ph ph-arrows-counter-clockwise" style="font-size: 16px;"></i>
+                                    <span class="btn-reset-text">Reiniciar</span>
+                                </button>
+                                <button id="btn-info-agente" class="btn btn-outline btn-info-agente" style="display: flex; align-items: center; gap: 6px; padding: 7px 13px; font-size: 12.5px; font-weight: 600; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text-main); cursor: pointer; transition: all 0.2s;" title="Ver Visão Geral e Comportamento do Agente">
+                                    <i class="ph-bold ph-info" style="font-size: 16px; color: var(--color-primary);"></i>
+                                    <span class="btn-info-agente-text">Sobre o Agente</span>
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Corpo do Chat -->
@@ -326,6 +371,20 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                                     <i class="ph ph-clock" style="color: var(--color-primary); font-size: 14px; flex-shrink: 0;"></i>
                                     <span>O agente pode levar até 1 minuto para responder as mensagens no WhatsApp</span>
                                 </span>
+                            </div>
+
+                            <!-- Mensagem inicial do Agente Simulador -->
+                            <div class="chat-agent-msg-wrapper chat-msg-anim" style="display: flex; justify-content: flex-start; align-items: flex-end; gap: 8px; width: 100%;">
+                                <img src="/assets/robot-Ca5pyuxQ.gif" onerror="this.src='robot.png'" alt="Robot" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background-color: white; border: 1px solid var(--color-border); margin-bottom: 2px;">
+                                <div style="background-color: var(--color-bg-card); color: var(--color-text-main); border: 1px solid var(--color-border); padding: 10px 14px; border-radius: 14px 14px 14px 0; max-width: 82%; position: relative; font-size: 13px; line-height: 1.45; word-break: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
+                                    <span>👋 Olá! Eu sou o assistente virtual da <strong class="agente-nome-empresa" style="color: var(--color-primary);">sua empresa</strong>.</span>
+                                    <p style="margin: 6px 0 0; font-size: 12px; color: var(--color-text-sec); line-height: 1.4;">
+                                        Envie uma mensagem abaixo simulando ser um lead interessado (ex: <em>"Olá, qual o valor do corte?"</em> ou <em>"Tem horário para hoje?"</em>).
+                                    </p>
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; font-size: 10px; color: var(--color-text-mut);">
+                                        online
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -458,58 +517,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
             </div>
         </main>
     </div>
-
-    <script>
-        // Chat interativo para teste do agente
-        document.addEventListener('DOMContentLoaded', () => {
-            const chatInput = document.getElementById('test-chat-input');
-            const sendBtn = document.getElementById('test-chat-send');
-            const chatContainer = document.getElementById('chat-messages');
 
-            function sendUserMessage() {
-                if (!chatInput || !chatContainer) return;
-                const text = chatInput.value.trim();
-                if (!text) return;
-
-                const now = new Date();
-                const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-
-                const msgEl = document.createElement('div');
-                msgEl.style.cssText = 'display: flex; justify-content: flex-end; width: 100%;';
-                
-                const bubble = document.createElement('div');
-                bubble.style.cssText = 'background-color: #DCFCE7; color: #065F46; padding: 10px 14px; border-radius: 14px 14px 0 14px; max-width: 80%; position: relative; font-size: 13px; line-height: 1.4; word-break: break-word;';
-                
-                const textSpan = document.createElement('span');
-                textSpan.textContent = text;
-                
-                const metaDiv = document.createElement('div');
-                metaDiv.style.cssText = 'display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; font-size: 10px; color: #16A34A;';
-                metaDiv.innerHTML = `${timeStr} <i class="ph ph-checks"></i>`;
-                
-                bubble.appendChild(textSpan);
-                bubble.appendChild(metaDiv);
-                msgEl.appendChild(bubble);
-                chatContainer.appendChild(msgEl);
-
-                chatInput.value = '';
-                chatInput.style.height = 'auto';
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-
-            if (sendBtn) {
-                sendBtn.addEventListener('click', sendUserMessage);
-            }
-            if (chatInput) {
-                chatInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendUserMessage();
-                    }
-                });
-            }
-        });
-    </script>
 
     <!-- Modal de Reporte -->
     <div id="modal-report" class="modal-overlay" style="display: none; position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.4); z-index: 99999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
@@ -556,7 +564,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
             color: var(--color-text-main);
         }
     </style>
-    
+    
 
 
     <!-- Modal: Informações e Comportamento do Agente -->

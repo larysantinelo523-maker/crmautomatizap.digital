@@ -254,11 +254,13 @@
   .teste-agente-layout .chat-card { height: calc(100vh - 120px) !important; min-height: 0 !important; flex: none !important; }
   .teste-agente-layout .report-card { height: auto !important; min-height: 0 !important; flex: none !important; }
   
-  /* Botão Sobre o Agente no Mobile: Somente o ícone */
-  .btn-info-agente-text {
+  /* Botões no Mobile: Somente o ícone */
+  .btn-info-agente-text,
+  .btn-reset-text {
     display: none !important;
   }
-  .btn-info-agente {
+  .btn-info-agente,
+  .btn-reset-chat {
     width: 38px !important;
     height: 38px !important;
     min-width: 38px !important;
@@ -269,12 +271,49 @@
     justify-content: center !important;
     flex-shrink: 0 !important;
   }
-  .btn-info-agente i {
-    font-size: 20px !important;
+  .btn-info-agente i,
+  .btn-reset-chat i {
+    font-size: 18px !important;
     margin: 0 !important;
   }
 }
 textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Animações e Estilos do Chat */
+.typing-bubble {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 14px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 14px 14px 14px 2px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    width: fit-content;
+}
+.typing-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-text-mut);
+    display: inline-block;
+    animation: typingBounce 1.3s infinite ease-in-out both;
+}
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+.typing-dot:nth-child(3) { animation-delay: 0s; }
+@keyframes typingBounce {
+    0%, 80%, 100% { transform: scale(0.35); opacity: 0.35; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bubbleFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.chat-msg-anim {
+    animation: bubbleFadeIn 0.25s ease-out;
+}
   </style>
             <div class="content-wrapper" style="padding: 24px;">
                 <!-- Titulo Mobile -->
@@ -307,10 +346,16 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                                     </div>
                                 </div>
                             </div>
-                            <button id="btn-info-agente" class="btn btn-outline btn-info-agente" style="display: flex; align-items: center; gap: 6px; padding: 7px 13px; font-size: 12.5px; font-weight: 600; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text-main); cursor: pointer; transition: all 0.2s;" title="Ver Visão Geral e Comportamento do Agente">
-                                <i class="ph-bold ph-info" style="font-size: 16px; color: var(--color-primary);"></i>
-                                <span class="btn-info-agente-text">Sobre o Agente</span>
-                            </button>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <button id="btn-reset-chat" class="btn btn-outline btn-reset-chat" style="display: flex; align-items: center; gap: 6px; padding: 7px 12px; font-size: 12.5px; font-weight: 600; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text-sec); cursor: pointer; transition: all 0.2s;" title="Reiniciar conversa do teste">
+                                    <i class="ph ph-arrows-counter-clockwise" style="font-size: 16px;"></i>
+                                    <span class="btn-reset-text">Reiniciar</span>
+                                </button>
+                                <button id="btn-info-agente" class="btn btn-outline btn-info-agente" style="display: flex; align-items: center; gap: 6px; padding: 7px 13px; font-size: 12.5px; font-weight: 600; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text-main); cursor: pointer; transition: all 0.2s;" title="Ver Visão Geral e Comportamento do Agente">
+                                    <i class="ph-bold ph-info" style="font-size: 16px; color: var(--color-primary);"></i>
+                                    <span class="btn-info-agente-text">Sobre o Agente</span>
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Corpo do Chat -->
@@ -322,6 +367,20 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                                     <i class="ph ph-clock" style="color: var(--color-primary); font-size: 14px; flex-shrink: 0;"></i>
                                     <span>O agente pode levar até 1 minuto para responder as mensagens no WhatsApp</span>
                                 </span>
+                            </div>
+
+                            <!-- Mensagem inicial do Agente Simulador -->
+                            <div class="chat-agent-msg-wrapper chat-msg-anim" style="display: flex; justify-content: flex-start; align-items: flex-end; gap: 8px; width: 100%;">
+                                <img src="robot.gif" onerror="this.src='robot.png'" alt="Robot" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background-color: white; border: 1px solid var(--color-border); margin-bottom: 2px;">
+                                <div style="background-color: var(--color-bg-card); color: var(--color-text-main); border: 1px solid var(--color-border); padding: 10px 14px; border-radius: 14px 14px 14px 0; max-width: 82%; position: relative; font-size: 13px; line-height: 1.45; word-break: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
+                                    <span>👋 Olá! Eu sou o assistente virtual da <strong class="agente-nome-empresa" style="color: var(--color-primary);">sua empresa</strong>.</span>
+                                    <p style="margin: 6px 0 0; font-size: 12px; color: var(--color-text-sec); line-height: 1.4;">
+                                        Envie uma mensagem abaixo simulando ser um lead interessado (ex: <em>"Olá, qual o valor do corte?"</em> ou <em>"Tem horário para hoje?"</em>).
+                                    </p>
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; font-size: 10px; color: var(--color-text-mut);">
+                                        online
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -457,42 +516,237 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
 
     <script type="module" src="tutorial.js"></script>
     <script type="module" src="script.js"></script>
-    <script>
-        // Chat interativo para teste do agente
-        document.addEventListener('DOMContentLoaded', () => {
+    <script type="module">
+        import { supabase } from './supabase.js';
+
+        // Chat interativo para teste do agente conectado à automação real
+        document.addEventListener('DOMContentLoaded', async () => {
             const chatInput = document.getElementById('test-chat-input');
             const sendBtn = document.getElementById('test-chat-send');
             const chatContainer = document.getElementById('chat-messages');
+            const resetBtn = document.getElementById('btn-reset-chat');
 
-            function sendUserMessage() {
-                if (!chatInput || !chatContainer) return;
-                const text = chatInput.value.trim();
-                if (!text) return;
+            let isWaitingResponse = false;
+            let currentUserId = 'a0269c72-e0dd-4a5c-91e5-227665905126'; // Tenant padrão
 
-                const now = new Date();
-                const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user && user.id) {
+                    currentUserId = user.id;
+                }
+            } catch (e) {
+                console.warn('Erro ao obter usuário autenticado:', e);
+            }
 
+            // Salvar estado HTML padrão inicial do chat para resets
+            const initialChatHTML = chatContainer.innerHTML;
+
+            function formatTime(date = new Date()) {
+                return String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0');
+            }
+
+            function formatMessageText(text) {
+                if (!text) return '';
+                let safe = text
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+                safe = safe.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+                safe = safe.replace(/\n/g, '<br>');
+                return safe;
+            }
+
+            function renderUserBubble(text) {
+                const timeStr = formatTime();
                 const msgEl = document.createElement('div');
+                msgEl.className = 'chat-msg-anim';
                 msgEl.style.cssText = 'display: flex; justify-content: flex-end; width: 100%;';
                 
                 const bubble = document.createElement('div');
-                bubble.style.cssText = 'background-color: #DCFCE7; color: #065F46; padding: 10px 14px; border-radius: 14px 14px 0 14px; max-width: 80%; position: relative; font-size: 13px; line-height: 1.4; word-break: break-word;';
+                bubble.style.cssText = 'background-color: #DCFCE7; color: #065F46; padding: 10px 14px; border-radius: 14px 14px 0 14px; max-width: 80%; position: relative; font-size: 13px; line-height: 1.45; word-break: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.03);';
                 
                 const textSpan = document.createElement('span');
-                textSpan.textContent = text;
+                textSpan.innerHTML = formatMessageText(text);
                 
                 const metaDiv = document.createElement('div');
                 metaDiv.style.cssText = 'display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; font-size: 10px; color: #16A34A;';
-                metaDiv.innerHTML = `${timeStr} <i class="ph ph-checks"></i>`;
+                metaDiv.innerHTML = `${timeStr} <i class="ph-bold ph-checks"></i>`;
                 
                 bubble.appendChild(textSpan);
                 bubble.appendChild(metaDiv);
                 msgEl.appendChild(bubble);
                 chatContainer.appendChild(msgEl);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
 
+            function renderAgentBubble(text, isError = false) {
+                const timeStr = formatTime();
+                const wrapper = document.createElement('div');
+                wrapper.className = 'chat-agent-msg-wrapper chat-msg-anim';
+                wrapper.style.cssText = 'display: flex; justify-content: flex-start; align-items: flex-end; gap: 8px; width: 100%;';
+
+                const avatar = document.createElement('img');
+                avatar.src = 'robot.gif';
+                avatar.onerror = () => { avatar.src = 'robot.png'; };
+                avatar.alt = 'Robot';
+                avatar.style.cssText = 'width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background-color: white; border: 1px solid var(--color-border); margin-bottom: 2px;';
+
+                const bubble = document.createElement('div');
+                const bgColor = isError ? '#FEF2F2' : 'var(--color-bg-card)';
+                const textColor = isError ? '#991B1B' : 'var(--color-text-main)';
+                const borderColor = isError ? '#FCA5A5' : 'var(--color-border)';
+
+                bubble.style.cssText = `background-color: ${bgColor}; color: ${textColor}; border: 1px solid ${borderColor}; padding: 10px 14px; border-radius: 14px 14px 14px 0; max-width: 82%; position: relative; font-size: 13px; line-height: 1.45; word-break: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.04);`;
+
+                const textSpan = document.createElement('span');
+                textSpan.innerHTML = formatMessageText(text);
+
+                const metaDiv = document.createElement('div');
+                metaDiv.style.cssText = 'display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; font-size: 10px; color: var(--color-text-mut);';
+                metaDiv.textContent = timeStr;
+
+                bubble.appendChild(textSpan);
+                bubble.appendChild(metaDiv);
+                wrapper.appendChild(avatar);
+                wrapper.appendChild(bubble);
+                chatContainer.appendChild(wrapper);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            function showTypingIndicator() {
+                removeTypingIndicator();
+                const wrapper = document.createElement('div');
+                wrapper.id = 'chat-typing-indicator';
+                wrapper.className = 'chat-msg-anim';
+                wrapper.style.cssText = 'display: flex; justify-content: flex-start; align-items: flex-end; gap: 8px; width: 100%;';
+
+                const avatar = document.createElement('img');
+                avatar.src = 'robot.gif';
+                avatar.onerror = () => { avatar.src = 'robot.png'; };
+                avatar.alt = 'Robot';
+                avatar.style.cssText = 'width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background-color: white; border: 1px solid var(--color-border); margin-bottom: 2px;';
+
+                const bubble = document.createElement('div');
+                bubble.className = 'typing-bubble';
+                bubble.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 4px; margin-right: 6px;">
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                    </div>
+                    <span style="font-size: 11.5px; color: var(--color-text-mut); font-weight: 500;">Agente respondendo...</span>
+                `;
+
+                wrapper.appendChild(avatar);
+                wrapper.appendChild(bubble);
+                chatContainer.appendChild(wrapper);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            function removeTypingIndicator() {
+                const el = document.getElementById('chat-typing-indicator');
+                if (el) el.remove();
+            }
+
+            function setSendingState(waiting) {
+                isWaitingResponse = waiting;
+                if (waiting) {
+                    sendBtn.disabled = true;
+                    sendBtn.innerHTML = '<i class="ph ph-spinner ph-spin" style="font-size: 20px;"></i>';
+                    sendBtn.style.opacity = '0.7';
+                } else {
+                    sendBtn.disabled = false;
+                    sendBtn.innerHTML = '<i class="ph-fill ph-paper-plane-tilt" style="font-size: 20px;"></i>';
+                    sendBtn.style.opacity = '1';
+                    if (window.innerWidth > 768) {
+                        chatInput.focus();
+                    }
+                }
+            }
+
+            async function sendUserMessage() {
+                if (!chatInput || !chatContainer || isWaitingResponse) return;
+                const text = chatInput.value.trim();
+                if (!text) return;
+
+                // 1. Renderiza mensagem do usuário
+                renderUserBubble(text);
+
+                // 2. Limpa input e restaura altura
                 chatInput.value = '';
                 chatInput.style.height = 'auto';
-                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                // 3. Exibe digitando e trava envio
+                setSendingState(true);
+                showTypingIndicator();
+
+                try {
+                    const response = await fetch('/api/list_tenants?action=chat_test', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            mensagem: text,
+                            id_empresa: currentUserId,
+                            telefone_cliente: '558182975691'
+                        })
+                    });
+
+                    const data = await response.json();
+                    removeTypingIndicator();
+
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.error || 'Erro na resposta do agente');
+                    }
+
+                    renderAgentBubble(data.resposta);
+                } catch (err) {
+                    console.error('Erro ao comunicar com o agente:', err);
+                    removeTypingIndicator();
+                    renderAgentBubble('⚠️ Ops! O agente demorou para responder ou houve uma oscilação na conexão. Por favor, tente enviar novamente.', true);
+                } finally {
+                    setSendingState(false);
+                }
+            }
+
+            async function resetConversation() {
+                if (isWaitingResponse) return;
+                if (!confirm('Deseja reiniciar a conversa de teste com o agente?')) return;
+
+                const origHtml = resetBtn.innerHTML;
+                resetBtn.disabled = true;
+                resetBtn.innerHTML = '<i class="ph ph-spinner ph-spin" style="font-size: 16px;"></i> <span class="btn-reset-text">Reiniciando...</span>';
+
+                try {
+                    // Envia reset para a automação n8n limpar memória
+                    await fetch('/api/list_tenants?action=chat_test', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            mensagem: 'reset',
+                            id_empresa: currentUserId,
+                            telefone_cliente: '558182975691'
+                        })
+                    });
+
+                    // Restaura estado inicial do container
+                    chatContainer.innerHTML = initialChatHTML;
+                    chatInput.value = '';
+                    chatInput.style.height = 'auto';
+
+                    // Feedback breve
+                    resetBtn.innerHTML = '<i class="ph-fill ph-check-circle" style="color: #10B981; font-size: 16px;"></i> <span class="btn-reset-text">Reiniciado</span>';
+                    setTimeout(() => {
+                        resetBtn.innerHTML = origHtml;
+                        resetBtn.disabled = false;
+                    }, 1500);
+                } catch (e) {
+                    console.error('Erro ao reiniciar conversa:', e);
+                    chatContainer.innerHTML = initialChatHTML;
+                    resetBtn.innerHTML = origHtml;
+                    resetBtn.disabled = false;
+                }
             }
 
             if (sendBtn) {
@@ -505,6 +759,9 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                         sendUserMessage();
                     }
                 });
+            }
+            if (resetBtn) {
+                resetBtn.addEventListener('click', resetConversation);
             }
         });
     </script>
