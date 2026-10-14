@@ -2068,7 +2068,7 @@ async function loadAdminNotifications() {
     });
   }
 
-  // 2. Notificações de Correção de Agente solicitadas por usuários
+  // 2. Notificações de Correção de Agente agrupadas por empresa
   try {
     let reportes = [];
     try {
@@ -2083,26 +2083,64 @@ async function loadAdminNotifications() {
         .from("reportes_agente")
         .select("*")
         .order("criado_em", { ascending: false })
-        .limit(30);
+        .limit(50);
       if (!error && data) reportes = data;
     }
 
     if (reportes && Array.isArray(reportes)) {
+      // Agrupa todas as correções por empresa para não poluir o dropdown
+      const groupedByEmpresa = {};
+
       reportes.forEach((r) => {
-        let t = Array.isArray(globalTenants) ? globalTenants.find((ten) => ten.id_empresa === r.id_empresa) : null;
-        if (!t) {
-          t = {
-            id_empresa: r.id_empresa,
-            nome: "Usuário (" + (r.id_empresa ? r.id_empresa.substring(0, 8) : "Geral") + ")",
-            email: "Carregando...",
-            status: "ativo"
+        const tenantId = r.id_empresa || "geral";
+        if (!groupedByEmpresa[tenantId]) {
+          groupedByEmpresa[tenantId] = {
+            tenantId: tenantId,
+            reports: [],
+            latestDate: new Date(0),
           };
         }
+        groupedByEmpresa[tenantId].reports.push(r);
+        const dt = new Date(r.criado_em || Date.now());
+        if (dt > groupedByEmpresa[tenantId].latestDate) {
+          groupedByEmpresa[tenantId].latestDate = dt;
+        }
+      });
+
+      // Cria uma única notificação consolidada por empresa
+      Object.values(groupedByEmpresa).forEach((grp) => {
+        let t = Array.isArray(globalTenants)
+          ? globalTenants.find((ten) => ten.id_empresa === grp.tenantId)
+          : null;
+
+        if (!t) {
+          t = {
+            id_empresa: grp.tenantId,
+            nome: "Empresa (" + (grp.tenantId ? grp.tenantId.substring(0, 8) : "Geral") + ")",
+            email: "Carregando...",
+            status: "ativo",
+          };
+        }
+
+        const count = grp.reports.length;
+        const pendingCount = grp.reports.filter(
+          (x) => (x.status || "").toLowerCase() !== "resolvido"
+        ).length;
+
+        let msg = "";
+        if (pendingCount > 0) {
+          msg = `O usuário enviou ${count} ${count === 1 ? "correção" : "correções"} no agente (${pendingCount} ${pendingCount === 1 ? "pendente" : "pendentes"}).`;
+        } else {
+          msg = `${count} ${count === 1 ? "correção registrada" : "correções registradas"} (todas resolvidas).`;
+        }
+
         notifications.push({
           type: "correction",
-          date: new Date(r.criado_em || Date.now()),
-          title: `Correção de Agente - ${t.nome}`,
-          message: `O usuário solicitou uma correção: ${r.motivo_principal || "Outros"}`,
+          date: grp.latestDate,
+          title: t.nome,
+          count: count,
+          pendingCount: pendingCount,
+          message: msg,
           tenantId: t.id_empresa,
           tenantObj: t,
         });
@@ -2170,8 +2208,9 @@ async function loadAdminNotifications() {
       <div style="display: flex; gap: 12px; align-items: flex-start;">
         ${iconHtml}
         <div style="flex: 1; min-width: 0;">
-          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 6px;">
-            <p style="margin: 0; font-size: 13.5px; color: var(--color-text-main); font-weight: 600; line-height: 1.35; word-break: break-word;">${n.title}</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <p style="margin: 0; font-size: 13.5px; color: var(--color-text-main); font-weight: 700; line-height: 1.35; word-break: break-word;">${n.title}</p>
+            ${n.count ? `<span style="background: #fef3c7; color: #b45309; font-weight: 700; font-size: 11px; padding: 2px 8px; border-radius: 10px; flex-shrink: 0; white-space: nowrap;">${n.count} ${n.count === 1 ? 'notificação' : 'notificações'}</span>` : ''}
           </div>
           <p style="margin: 3px 0 0; font-size: 12px; color: var(--color-text-sec); line-height: 1.4; word-break: break-word;">${n.message}</p>
           <span style="display: block; margin-top: 5px; font-size: 11px; color: var(--color-text-mut); font-weight: 500;">${timeAgo(n.date)}</span>
