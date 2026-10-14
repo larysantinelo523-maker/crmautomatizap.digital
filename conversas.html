@@ -171,6 +171,18 @@
         width: 100% !important;
         box-sizing: border-box !important;
     }
+    #chat-messages-container > * {
+        flex-shrink: 0 !important;
+    }
+    .msg-bubble-ia,
+    .msg-bubble-client {
+        flex-shrink: 0 !important;
+        height: auto !important;
+        min-height: fit-content !important;
+        overflow: visible !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+    }
 
 </style>
     <script>
@@ -192,7 +204,7 @@
 
     <!-- CSS -->
     <!-- CSS -->
-    <link rel="stylesheet" href="style.css?v=2.2">
+    <link rel="stylesheet" href="style.css?v=2.3">
     <link rel="stylesheet" href="tutorial.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 

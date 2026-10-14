@@ -4333,6 +4333,10 @@ body.dark-mode .logo-img {
 }
 
 /* Chat message bubbles styles */
+#chat-messages-container > * {
+    flex-shrink: 0 !important;
+}
+
 .msg-bubble-client {
     align-self: flex-start;
     background: #fff;
@@ -4341,9 +4345,12 @@ body.dark-mode .logo-img {
     min-width: 60px;
     max-width: 90%;
     box-sizing: border-box;
-    overflow: hidden;
-    word-break: break-word;
-    overflow-wrap: break-word;
+    overflow: visible !important;
+    flex-shrink: 0 !important;
+    height: auto !important;
+    min-height: fit-content !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     margin-bottom: 12px;
     position: relative;
@@ -4360,9 +4367,12 @@ body.dark-mode .logo-img {
     min-width: 60px;
     max-width: 90%;
     box-sizing: border-box;
-    overflow: hidden;
-    word-break: break-word;
-    overflow-wrap: break-word;
+    overflow: visible !important;
+    flex-shrink: 0 !important;
+    height: auto !important;
+    min-height: fit-content !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     margin-bottom: 12px;
     position: relative;
