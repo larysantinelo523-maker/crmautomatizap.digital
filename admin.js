@@ -2077,8 +2077,43 @@ window.openModalCorrecoesEmpresa = openModalCorrecoesEmpresa;
 // ─── Lógica Completa de Notificações ───
 let currentNotifFilter = "all";
 
+function markSingleNotificationAsRead(key) {
+  if (!key) return;
+  const existing = JSON.parse(
+    localStorage.getItem("admin_read_notif_keys") || "[]"
+  );
+  if (!existing.includes(key)) {
+    existing.push(key);
+    localStorage.setItem("admin_read_notif_keys", JSON.stringify(existing));
+  }
+  if (Array.isArray(window.cachedAdminNotifications)) {
+    const item = window.cachedAdminNotifications.find((x) => x.key === key);
+    if (item) item.isUnread = false;
+  }
+  const unreadCount = (window.cachedAdminNotifications || []).filter(
+    (x) => x.isUnread
+  ).length;
+  const badgeEl = document.getElementById("notif-badge");
+  const notifDot = document.querySelector(".notification-dot");
+  if (unreadCount > 0) {
+    if (badgeEl) badgeEl.textContent = unreadCount;
+  } else {
+    if (badgeEl) badgeEl.style.display = "none";
+    if (notifDot) notifDot.style.display = "none";
+  }
+}
+window.markSingleNotificationAsRead = markSingleNotificationAsRead;
+
 function markAllNotificationsAsRead() {
-  localStorage.setItem("admin_last_read_notif_time", new Date().toISOString());
+  const allNotifs = window.cachedAdminNotifications || [];
+  const currentKeys = allNotifs.map((n) => n.key);
+  const existing = JSON.parse(
+    localStorage.getItem("admin_read_notif_keys") || "[]"
+  );
+  const merged = Array.from(new Set([...existing, ...currentKeys]));
+
+  localStorage.setItem("admin_read_notif_keys", JSON.stringify(merged));
+  localStorage.setItem("admin_last_read_all_time", Date.now().toString());
 
   // Esconde ponto vermelho e badge
   const dot = document.querySelector(".notification-dot");
@@ -2087,7 +2122,9 @@ function markAllNotificationsAsRead() {
   if (badge) badge.style.display = "none";
 
   // Remove classe unread dos cards
-  document.querySelectorAll(".notif-item.unread").forEach((el) => el.classList.remove("unread"));
+  document
+    .querySelectorAll(".notif-item.unread")
+    .forEach((el) => el.classList.remove("unread"));
   document.querySelectorAll(".full-notif-card.unread").forEach((el) => {
     el.classList.remove("unread");
     el.style.borderLeft = "1px solid var(--color-border)";
@@ -2095,6 +2132,11 @@ function markAllNotificationsAsRead() {
     const newBadge = el.querySelector(".badge-nova");
     if (newBadge) newBadge.remove();
   });
+
+  // Atualiza cache em memória
+  if (Array.isArray(window.cachedAdminNotifications)) {
+    window.cachedAdminNotifications.forEach((n) => (n.isUnread = false));
+  }
 
   // Feedback nos botões
   const btnReadAll = document.getElementById("btn-read-all");
@@ -2111,10 +2153,12 @@ function markAllNotificationsAsRead() {
 
   const btnPageReadAll = document.getElementById("btn-page-read-all");
   if (btnPageReadAll) {
-    btnPageReadAll.innerHTML = '<i class="ph-fill ph-check-circle" style="color: #10B981;"></i> <span>Todas marcadas como lidas!</span>';
+    btnPageReadAll.innerHTML =
+      '<i class="ph-fill ph-check-circle" style="color: #10B981;"></i> <span>Todas marcadas como lidas!</span>';
     setTimeout(() => {
       if (btnPageReadAll) {
-        btnPageReadAll.innerHTML = '<i class="ph-bold ph-checks"></i> <span>Marcar todas como lidas</span>';
+        btnPageReadAll.innerHTML =
+          '<i class="ph-bold ph-checks"></i> <span>Marcar todas como lidas</span>';
       }
     }, 2500);
   }
@@ -2193,7 +2237,7 @@ function renderFullNotificationsPage(filter = currentNotifFilter) {
   };
 
   filtered.forEach((n) => {
-    const isUnread = n.date > lastReadTime;
+    const isUnread = !!n.isUnread;
     const card = document.createElement("div");
     card.className = "card full-notif-card" + (isUnread ? " unread" : "");
     card.style.cssText = `
@@ -2249,6 +2293,12 @@ function renderFullNotificationsPage(filter = currentNotifFilter) {
     `;
 
     card.addEventListener("click", () => {
+      if (n.key) markSingleNotificationAsRead(n.key);
+      card.classList.remove("unread");
+      card.style.borderLeft = "1px solid var(--color-border)";
+      card.style.background = "var(--color-bg-card)";
+      const bNova = card.querySelector(".badge-nova");
+      if (bNova) bNova.remove();
       if (n.type === "correction" && n.tenantId) {
         openModalCorrecoesEmpresa(n.tenantId, n.tenantObj);
       } else if (n.tenantId) {
@@ -2278,7 +2328,11 @@ async function loadAdminNotifications() {
       if (t.status === "pago" && t.vencimento && t.vencimento !== "N/A") {
         const dtVenc = new Date(t.vencimento.split("T")[0]);
         dtVenc.setMonth(dtVenc.getMonth() - 1);
-        if (dtVenc > new Date()) dtVenc.setFullYear(dtVenc.getFullYear() - 1);
+        // Garante que a data da notificação de pagamento NUNCA fique no futuro (anos 2035/2036 etc)
+        let notifDate = dtVenc;
+        if (dtVenc > new Date()) {
+          notifDate = t.criado_em ? new Date(t.criado_em) : new Date(2026, 0, 1);
+        }
 
         let valorNum = parseFloat(t.mensalidade);
         let valor = t.mensalidade
@@ -2288,8 +2342,10 @@ async function loadAdminNotifications() {
           : "seu plano";
 
         notifications.push({
+          key: `pay_${t.id_empresa}_${t.vencimento}`,
           type: "payment",
-          date: dtVenc,
+          date: notifDate,
+          timestamp: notifDate.getTime(),
           title: "Pagamento Processado",
           message: `A assinatura de ${t.nome} no valor de ${valor} foi renovada com sucesso!`,
           tenantId: t.id_empresa,
@@ -2364,8 +2420,10 @@ async function loadAdminNotifications() {
         }
 
         notifications.push({
+          key: `corr_${grp.tenantId}_${count}_${grp.latestDate.getTime()}`,
           type: "correction",
           date: grp.latestDate,
+          timestamp: grp.latestDate.getTime(),
           title: t.nome,
           count: count,
           pendingCount: pendingCount,
@@ -2386,11 +2444,20 @@ async function loadAdminNotifications() {
   // Guarda em cache para a tela de Ver Todas
   window.cachedAdminNotifications = notifications;
 
-  const lastReadTime = localStorage.getItem("admin_last_read_notif_time")
-    ? new Date(localStorage.getItem("admin_last_read_notif_time"))
-    : new Date(0);
+  const readKeys = new Set(
+    JSON.parse(localStorage.getItem("admin_read_notif_keys") || "[]")
+  );
+  const lastReadAllTime = Number(
+    localStorage.getItem("admin_last_read_all_time") || 0
+  );
 
-  const unreadCount = notifications.filter((n) => n.date > lastReadTime).length;
+  notifications.forEach((n) => {
+    const isExplicitlyRead = readKeys.has(n.key);
+    const isBeforeReadAll = lastReadAllTime > 0 && n.timestamp <= lastReadAllTime;
+    n.isUnread = !isExplicitlyRead && !isBeforeReadAll;
+  });
+
+  const unreadCount = notifications.filter((n) => n.isUnread).length;
 
   if (notifications.length === 0) {
     listEl.innerHTML =
@@ -2428,7 +2495,7 @@ async function loadAdminNotifications() {
   };
 
   notifications.forEach((n) => {
-    const isUnread = n.date > lastReadTime;
+    const isUnread = n.isUnread;
     const item = document.createElement("div");
     item.className = "notif-item" + (isUnread ? " unread" : "");
     item.style.cssText =
@@ -2464,6 +2531,8 @@ async function loadAdminNotifications() {
     `;
 
     item.addEventListener("click", () => {
+      if (n.key) markSingleNotificationAsRead(n.key);
+      item.classList.remove("unread");
       const drop = document.getElementById("notification-dropdown");
       if (drop) drop.classList.remove("show");
 
