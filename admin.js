@@ -1,9 +1,10 @@
 import { supabase } from "./supabase.js";
 
+let globalTenants = [];
+
 document.addEventListener("DOMContentLoaded", async () => {
   let adminStartDate = null;
   let adminEndDate = null;
-  let globalTenants = [];
   let adminChartInstance = null; // 1. Autenticação e Tema
   const {
     data: { session },
@@ -824,6 +825,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       localStorage.removeItem("adminLastTenantId");
     });
 
+  window.loadTenantDetails = loadTenantDetails;
   async function loadTenantDetails(id, nome, email) {
     currentTenantId = id;
     currentTenantName = nome;
@@ -1632,6 +1634,231 @@ document.querySelectorAll(".toggle-senha").forEach((icon) => {
   });
 });
 
+// Modal: Correções Solicitadas da Empresa
+async function openModalCorrecoesEmpresa(tenantId, tenantObj) {
+  const modalEl = document.getElementById("modal-correcoes-empresa");
+  if (!modalEl) return;
+
+  // Objeto da empresa
+  const tenant = tenantObj || (Array.isArray(globalTenants) && globalTenants.find(t => t.id_empresa === tenantId)) || {
+    id_empresa: tenantId,
+    nome: "Empresa",
+    email: "Sem e-mail",
+    status: "ativo"
+  };
+
+  // Preenche dados da empresa no Card/Cabeçalho
+  const avatarEl = document.getElementById("modal-correcoes-avatar");
+  const nomeEl = document.getElementById("modal-correcoes-nome");
+  const emailEl = document.getElementById("modal-correcoes-email");
+  const statusEl = document.getElementById("modal-correcoes-status");
+  const badgeTotalEl = document.getElementById("modal-correcoes-badge-total");
+  const listEl = document.getElementById("modal-correcoes-list");
+  const btnConfig = document.getElementById("modal-correcoes-btn-config");
+
+  // Iniciais do Avatar
+  const rawNome = (tenant.nome || "Empresa").trim();
+  const words = rawNome.split(" ").filter(Boolean);
+  const initials = words.length >= 2 
+    ? (words[0][0] + words[1][0]).toUpperCase() 
+    : rawNome.slice(0, 2).toUpperCase();
+  
+  if (avatarEl) avatarEl.textContent = initials || "EM";
+  if (nomeEl) nomeEl.textContent = rawNome.toUpperCase();
+  if (emailEl) {
+    emailEl.innerHTML = `<i class="ph-fill ph-envelope-simple"></i><span>${tenant.email || "Sem e-mail cadastrado"}</span>`;
+  }
+
+  // Status Badge
+  if (statusEl) {
+    const st = (tenant.status || "").toLowerCase();
+    if (st === "pago" || st === "ativo") {
+      statusEl.style.backgroundColor = "#22c55e";
+      statusEl.textContent = "Pago / Ativo";
+    } else if (st === "vencido" || st === "inadimplente" || st === "cancelado") {
+      statusEl.style.backgroundColor = "#ef4444";
+      statusEl.textContent = "Inadimplente";
+    } else if (st.includes("aviso")) {
+      statusEl.style.backgroundColor = "#f59e0b";
+      statusEl.textContent = "Aviso Prévio";
+    } else {
+      statusEl.style.backgroundColor = "#10b981";
+      statusEl.textContent = tenant.status || "Ativo";
+    }
+  }
+
+  // Botão para ver configurações completas
+  if (btnConfig) {
+    btnConfig.onclick = () => {
+      modalEl.classList.remove("active");
+      if (typeof window.loadTenantDetails === "function") {
+        window.loadTenantDetails(tenantId, tenant.nome, tenant.email);
+      }
+    };
+  }
+
+  // Abre o modal em estado de loading
+  if (badgeTotalEl) badgeTotalEl.textContent = "Carregando...";
+  if (listEl) {
+    listEl.innerHTML = `
+      <div style="text-align: center; color: var(--color-text-mut); padding: 36px 16px; font-size: 13px;">
+        <i class="ph ph-spinner-gap ph-spin" style="font-size: 26px; display: block; margin: 0 auto 10px; color: var(--color-primary);"></i>
+        Buscando histórico de correções...
+      </div>
+    `;
+  }
+  modalEl.classList.add("active");
+
+  // Busca as correções da empresa
+  try {
+    let reportes = [];
+    try {
+      const res = await fetch(`/api/list_tenants?action=reportes&id_empresa=${encodeURIComponent(tenantId)}`);
+      if (res.ok) {
+        reportes = await res.json();
+      } else {
+        throw new Error("HTTP " + res.status);
+      }
+    } catch (errApi) {
+      console.warn("Falha no /api/list_tenants?action=reportes, tentando Supabase direto:", errApi);
+      const { data, error } = await supabase
+        .from("reportes_agente")
+        .select("*")
+        .eq("id_empresa", tenantId)
+        .order("criado_em", { ascending: false });
+      if (!error && data) reportes = data;
+    }
+
+    if (badgeTotalEl) {
+      badgeTotalEl.textContent = `${reportes.length} ${reportes.length === 1 ? "correção" : "correções"}`;
+    }
+
+    if (!reportes || reportes.length === 0) {
+      if (listEl) {
+        listEl.innerHTML = `
+          <div style="text-align: center; color: var(--color-text-mut); padding: 36px 16px;">
+            <i class="ph ph-check-circle" style="font-size: 36px; color: #10B981; display: block; margin: 0 auto 10px;"></i>
+            <span style="font-size: 14px; font-weight: 600; color: var(--color-text-main); display: block;">Tudo em ordem!</span>
+            <span style="font-size: 12.5px; color: var(--color-text-sec); margin-top: 4px; display: block;">Nenhuma correção pendente para esta empresa.</span>
+          </div>
+        `;
+      }
+      return;
+    }
+
+    // Renderiza a lista de cards com layout proporcional
+    if (listEl) {
+      listEl.innerHTML = "";
+      reportes.forEach((r) => {
+        const card = document.createElement("div");
+        card.className = "correcao-card-item";
+
+        // Cores e Ícones por Motivo
+        const motivo = r.motivo_principal || "Correção do Agente";
+        let badgeBg = "#d1fae5";
+        let badgeColor = "#065f46";
+        let badgeIcon = "ph-chat-circle-dots";
+
+        if (motivo.toLowerCase().includes("errado") || motivo.toLowerCase().includes("erro")) {
+          badgeBg = "#fee2e2";
+          badgeColor = "#b91c1c";
+          badgeIcon = "ph-warning-circle";
+        } else if (motivo.toLowerCase().includes("tom") || motivo.toLowerCase().includes("legal")) {
+          badgeBg = "#fef3c7";
+          badgeColor = "#b45309";
+          badgeIcon = "ph-microphone";
+        } else if (motivo.toLowerCase().includes("demorou") || motivo.toLowerCase().includes("tempo")) {
+          badgeBg = "#ede9fe";
+          badgeColor = "#6d28d9";
+          badgeIcon = "ph-clock-countdown";
+        }
+
+        // Formatação de data amigável
+        let dataFormatada = "Data recente";
+        if (r.criado_em) {
+          try {
+            const dt = new Date(r.criado_em);
+            dataFormatada = dt.toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit"
+            });
+          } catch (e) {}
+        }
+
+        const isResolvido = (r.status || "").toLowerCase() === "resolvido";
+
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
+                <i class="ph-fill ${badgeIcon}"></i>
+                <span>${motivo}</span>
+              </span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 11px; color: var(--color-text-mut); font-weight: 500;">${dataFormatada}</span>
+              <span id="badge-status-${r.id}" style="font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: ${isResolvido ? "#dcfce7" : "#fef3c7"}; color: ${isResolvido ? "#15803d" : "#b45309"};">
+                ${r.status || "Pendente"}
+              </span>
+            </div>
+          </div>
+          <div style="font-size: 13px; color: var(--color-text-main); background: var(--color-bg, #f3f4f6); padding: 10px 12px; border-radius: 8px; border-left: 3px solid var(--color-primary); line-height: 1.5; word-break: break-word;">
+            ${r.descricao_detalhada ? r.descricao_detalhada.replace(/</g, "&lt;").replace(/>/g, "&gt;") : '<em style="color: var(--color-text-mut);">Sem descrição detalhada fornecida pelo usuário.</em>'}
+          </div>
+          <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 2px;">
+            <button type="button" class="btn-toggle-status" style="background: none; border: none; font-size: 11.5px; font-weight: 500; color: var(--color-primary); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 4px 6px; border-radius: 4px;">
+              <i class="ph ${isResolvido ? 'ph-arrow-counter-clockwise' : 'ph-check'}"></i>
+              <span>${isResolvido ? 'Reabrir como Pendente' : 'Marcar como Resolvido'}</span>
+            </button>
+          </div>
+        `;
+
+        // Interação para alternar status
+        const btnToggle = card.querySelector(".btn-toggle-status");
+        if (btnToggle) {
+          btnToggle.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            const novoStatus = isResolvido ? "Pendente" : "Resolvido";
+            btnToggle.disabled = true;
+            btnToggle.innerHTML = `<i class="ph ph-spinner-gap ph-spin"></i> Atualizando...`;
+
+            try {
+              const { error: updErr } = await supabase
+                .from("reportes_agente")
+                .update({ status: novoStatus })
+                .eq("id", r.id);
+
+              if (updErr) throw updErr;
+
+              r.status = novoStatus;
+              openModalCorrecoesEmpresa(tenantId, tenant);
+            } catch (errUpd) {
+              console.error("Erro ao atualizar status:", errUpd);
+              alert("Não foi possível alterar o status: " + errUpd.message);
+              btnToggle.disabled = false;
+              btnToggle.innerHTML = `<i class="ph ${isResolvido ? 'ph-arrow-counter-clockwise' : 'ph-check'}"></i> <span>${isResolvido ? 'Reabrir como Pendente' : 'Marcar como Resolvido'}</span>`;
+            }
+          });
+        }
+
+        listEl.appendChild(card);
+      });
+    }
+  } catch (err) {
+    console.error("Erro ao carregar correções no modal:", err);
+    if (listEl) {
+      listEl.innerHTML = `
+        <div style="text-align: center; color: #ef4444; padding: 24px 16px; font-size: 13px;">
+          Falha ao carregar as correções. Tente novamente.
+        </div>
+      `;
+    }
+  }
+}
+window.openModalCorrecoesEmpresa = openModalCorrecoesEmpresa;
+
 // Função de Notificações
 async function loadAdminNotifications() {
   const listEl = document.getElementById("notif-list");
@@ -1641,33 +1868,34 @@ async function loadAdminNotifications() {
 
   let notifications = [];
 
-  // 1. Puxar "Pagamento Processado"
-  globalTenants.forEach((t) => {
-    if (t.status === "pago" && t.vencimento && t.vencimento !== "N/A") {
-      const dtVenc = new Date(t.vencimento.split("T")[0]);
-      dtVenc.setMonth(dtVenc.getMonth() - 1);
-      if (dtVenc > new Date()) dtVenc.setFullYear(dtVenc.getFullYear() - 1); // safety
+  // 1. Notificações de Pagamentos Processados
+  if (Array.isArray(globalTenants)) {
+    globalTenants.forEach((t) => {
+      if (t.status === "pago" && t.vencimento && t.vencimento !== "N/A") {
+        const dtVenc = new Date(t.vencimento.split("T")[0]);
+        dtVenc.setMonth(dtVenc.getMonth() - 1);
+        if (dtVenc > new Date()) dtVenc.setFullYear(dtVenc.getFullYear() - 1);
 
-      // Format mensalidade
-      let valorNum = parseFloat(t.mensalidade);
-      let valor = t.mensalidade
-        ? isNaN(valorNum)
-          ? t.mensalidade
-          : "R$ " + valorNum.toFixed(2).replace(".", ",")
-        : "seu plano";
+        let valorNum = parseFloat(t.mensalidade);
+        let valor = t.mensalidade
+          ? isNaN(valorNum)
+            ? t.mensalidade
+            : "R$ " + valorNum.toFixed(2).replace(".", ",")
+          : "seu plano";
 
-      notifications.push({
-        type: "payment",
-        date: dtVenc,
-        title: "Pagamento Processado",
-        message: `A assinatura de ${t.nome} no valor de ${valor} foi renovada com sucesso!`,
-        tenantId: t.id_empresa,
-        tenantObj: t,
-      });
-    }
-  });
+        notifications.push({
+          type: "payment",
+          date: dtVenc,
+          title: "Pagamento Processado",
+          message: `A assinatura de ${t.nome} no valor de ${valor} foi renovada com sucesso!`,
+          tenantId: t.id_empresa,
+          tenantObj: t,
+        });
+      }
+    });
+  }
 
-  // 2. Puxar "Correção de Agente"
+  // 2. Notificações de Correção de Agente solicitadas por usuários
   try {
     let reportes = [];
     try {
@@ -1688,29 +1916,36 @@ async function loadAdminNotifications() {
 
     if (reportes && Array.isArray(reportes)) {
       reportes.forEach((r) => {
-        const t = globalTenants.find((ten) => ten.id_empresa === r.id_empresa);
-        if (t) {
-          notifications.push({
-            type: "correction",
-            date: new Date(r.criado_em),
-            title: `Correção de Agente - ${t.nome}`,
-            message: `O usuário solicitou uma correção: ${r.motivo_principal || "Outros"}`,
-            tenantId: t.id_empresa,
-            tenantObj: t,
-          });
+        let t = Array.isArray(globalTenants) ? globalTenants.find((ten) => ten.id_empresa === r.id_empresa) : null;
+        if (!t) {
+          t = {
+            id_empresa: r.id_empresa,
+            nome: "Usuário (" + (r.id_empresa ? r.id_empresa.substring(0, 8) : "Geral") + ")",
+            email: "Carregando...",
+            status: "ativo"
+          };
         }
+        notifications.push({
+          type: "correction",
+          date: new Date(r.criado_em || Date.now()),
+          title: `Correção de Agente - ${t.nome}`,
+          message: `O usuário solicitou uma correção: ${r.motivo_principal || "Outros"}`,
+          tenantId: t.id_empresa,
+          tenantObj: t,
+        });
       });
     }
   } catch (e) {
     console.error("Erro ao carregar notificações de correção:", e);
   }
 
+  // Ordena por data (mais recente primeiro)
   notifications.sort((a, b) => b.date - a.date);
   notifications = notifications.slice(0, 30);
 
   if (notifications.length === 0) {
     listEl.innerHTML =
-      '<div style="padding: 20px; text-align: center; color: var(--color-text-mut); font-size: 13px;">Nenhuma notificação.</div>';
+      '<div style="padding: 24px 16px; text-align: center; color: var(--color-text-mut); font-size: 13px;">Nenhuma notificação recente.</div>';
     if (badgeEl) badgeEl.style.display = "none";
     if (notifDot) notifDot.style.display = "none";
     return;
@@ -1741,45 +1976,74 @@ async function loadAdminNotifications() {
     const item = document.createElement("div");
     item.className = "notif-item unread";
     item.style.cssText =
-      "padding: 16px; border-bottom: 1px solid var(--color-border); cursor: pointer; transition: 0.2s;";
+      "padding: 14px 16px; border-bottom: 1px solid var(--color-border); cursor: pointer; transition: background 0.2s;";
 
     let iconHtml = "";
     if (n.type === "payment") {
       iconHtml = `
-                <div style="width: 32px; height: 32px; border-radius: 50%; background-color: var(--color-task-green-light); color: var(--color-task-green-text); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
-                    <i class="ph ph-currency-dollar"></i>
-                </div>
-            `;
+        <div style="width: 32px; height: 32px; border-radius: 50%; background-color: var(--color-task-green-light, #d1fae5); color: var(--color-task-green-text, #065f46); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+          <i class="ph-fill ph-currency-dollar"></i>
+        </div>
+      `;
     } else {
       iconHtml = `
-                <div style="width: 32px; height: 32px; border-radius: 50%; background-color: var(--color-warning-light); color: #B45309; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
-                    <i class="ph ph-warning-circle"></i>
-                </div>
-            `;
+        <div style="width: 32px; height: 32px; border-radius: 50%; background-color: #fef3c7; color: #b45309; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+          <i class="ph-fill ph-warning-circle"></i>
+        </div>
+      `;
     }
 
     item.innerHTML = `
-            <div style="display: flex; gap: 12px;">
-                ${iconHtml}
-                <div style="flex: 1;">
-                    <p style="margin: 0; font-size: 13.5px; color: var(--color-text-main); font-weight: 500; line-height: 1.3;">${n.title}</p>
-                    <p style="margin: 4px 0 0; font-size: 12px; color: var(--color-text-sec); line-height: 1.4;">${n.message}</p>
-                    <span style="display: block; margin-top: 6px; font-size: 11px; color: var(--color-text-mut);">${timeAgo(n.date)}</span>
-                </div>
-            </div>
-        `;
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        ${iconHtml}
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 6px;">
+            <p style="margin: 0; font-size: 13.5px; color: var(--color-text-main); font-weight: 600; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${n.title}</p>
+          </div>
+          <p style="margin: 3px 0 0; font-size: 12px; color: var(--color-text-sec); line-height: 1.4; word-break: break-word;">${n.message}</p>
+          <span style="display: block; margin-top: 5px; font-size: 11px; color: var(--color-text-mut); font-weight: 500;">${timeAgo(n.date)}</span>
+        </div>
+      </div>
+    `;
 
+    // Ao clicar na notificação: se for correção, abre o modal de card do usuário!
     item.addEventListener("click", () => {
-      if (n.tenantId) {
-        loadTenantDetails(n.tenantId, n.tenantObj ? n.tenantObj.nome : "", n.tenantObj ? n.tenantObj.email : "");
+      const drop = document.getElementById("notification-dropdown");
+      if (drop) drop.classList.remove("show");
+
+      if (n.type === "correction" && n.tenantId) {
+        openModalCorrecoesEmpresa(n.tenantId, n.tenantObj);
+      } else if (n.tenantId) {
+        if (typeof window.loadTenantDetails === "function") {
+          window.loadTenantDetails(n.tenantId, n.tenantObj ? n.tenantObj.nome : "", n.tenantObj ? n.tenantObj.email : "");
+        }
       } else if (typeof openConfiguracoes === "function" && n.tenantObj) {
         openConfiguracoes(n.tenantObj);
       }
-      // Remove dropdown and click
-      const drop = document.getElementById("notification-dropdown");
-      if (drop) drop.classList.remove("show");
     });
 
     listEl.appendChild(item);
   });
 }
+window.loadAdminNotifications = loadAdminNotifications;
+
+// ─── Realtime & Polling para Notificações Imediatas ───
+try {
+  supabase
+    .channel("admin-reportes-live")
+    .on(
+      "postgres_changes",
+      { event: "INSERT", schema: "public", table: "reportes_agente" },
+      (payload) => {
+        console.log("🔔 Nova solicitação de correção recebida em tempo real:", payload);
+        loadAdminNotifications();
+      }
+    )
+    .subscribe();
+} catch (e) {
+  console.warn("Realtime subscription error:", e);
+}
+
+// Polling suave a cada 25 segundos e ao focar na aba
+setInterval(loadAdminNotifications, 25000);
+window.addEventListener("focus", loadAdminNotifications);
