@@ -420,7 +420,7 @@
                                 <div style="padding: 20px; text-align: center; color: var(--color-text-mut); font-size: 13px;">Carregando notificações...</div>
                             </div>
                             <div class="notif-footer" style="padding: 12px; text-align: center; border-top: 1px solid var(--color-border); background: #F9FAFB;">
-                                <a href="#" style="font-size: 13px; font-weight: 500; color: var(--color-primary); text-decoration: none;">Ver todas</a>
+                                <a href="#" id="btn-ver-todas-notif" style="font-size: 13px; font-weight: 600; color: var(--color-primary); text-decoration: none; cursor: pointer;">Ver todas</a>
                             </div>
                         </div>
                     </div>
@@ -912,6 +912,50 @@
                             <button type="submit" class="btn btn-primary" id="btn-change-password"
                                 style="width: 100%;">Atualizar Senha Master</button>
                         </form>
+                    </div>
+                </section>
+
+                <!-- Secao Central de Notificacoes -->
+                <section id="sec-notificacoes" class="admin-section">
+                    <div style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+                        <!-- Header Card com Métricas e Ações -->
+                        <div class="card" style="padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                            <div style="display: flex; align-items: center; gap: 14px;">
+                                <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--color-primary-light); color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 22px;">
+                                    <i class="ph-bold ph-bell"></i>
+                                </div>
+                                <div>
+                                    <h2 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--color-text-main);">Central de Notificações</h2>
+                                    <p style="margin: 3px 0 0; font-size: 13px; color: var(--color-text-mut);">Histórico completo de pagamentos, alertas e solicitações de correção.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <button type="button" class="btn btn-outline" id="btn-page-read-all" style="display: flex; align-items: center; gap: 6px; font-size: 13px; padding: 9px 14px; border-color: var(--color-border); cursor: pointer;">
+                                    <i class="ph-bold ph-checks"></i>
+                                    <span>Marcar todas como lidas</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Filtros por tipo -->
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="notif-filters-container">
+                            <button type="button" class="btn btn-sm btn-filter-notif active" data-filter="all" style="padding: 7px 16px; border-radius: 20px; font-size: 12.5px; font-weight: 600; cursor: pointer; background: var(--color-primary); color: #fff; border: none;">
+                                Todas <span id="filter-count-all" style="background: rgba(255,255,255,0.25); padding: 1px 7px; border-radius: 10px; margin-left: 4px; font-size: 11px;">0</span>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-filter-notif" data-filter="correcoes" style="padding: 7px 16px; border-radius: 20px; font-size: 12.5px; font-weight: 600; cursor: pointer; background: var(--color-bg); color: var(--color-text-main); border: 1px solid var(--color-border);">
+                                <i class="ph-fill ph-warning-circle" style="color: #b45309; margin-right: 4px;"></i>
+                                Correções de Agente <span id="filter-count-correcoes" style="background: var(--color-primary-light); color: var(--color-primary); padding: 1px 7px; border-radius: 10px; margin-left: 4px; font-size: 11px;">0</span>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-filter-notif" data-filter="pagamentos" style="padding: 7px 16px; border-radius: 20px; font-size: 12.5px; font-weight: 600; cursor: pointer; background: var(--color-bg); color: var(--color-text-main); border: 1px solid var(--color-border);">
+                                <i class="ph-fill ph-currency-dollar" style="color: #10B981; margin-right: 4px;"></i>
+                                Pagamentos <span id="filter-count-pagamentos" style="background: var(--color-primary-light); color: var(--color-primary); padding: 1px 7px; border-radius: 10px; margin-left: 4px; font-size: 11px;">0</span>
+                            </button>
+                        </div>
+
+                        <!-- Lista Completa de Notificações -->
+                        <div id="full-notif-page-list" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div style="padding: 36px; text-align: center; color: var(--color-text-mut); font-size: 13.5px;">Carregando notificações...</div>
+                        </div>
                     </div>
                 </section>
 

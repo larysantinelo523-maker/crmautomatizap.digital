@@ -83,6 +83,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       title: "Configurações",
       sub: "Gerencie a segurança da sua conta master.",
     },
+    notificacoes: {
+      title: "Central de Notificações",
+      sub: "Histórico completo de pagamentos, alertas e solicitações de correção.",
+    },
     "detalhes-empresa": {
       title: "Visão Geral da Empresa",
       sub: "Acompanhe de perto as métricas deste cliente específico.",
@@ -99,6 +103,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       pageSubtitle.textContent = sectionTitles[target].sub;
     }
 
+    if (target === "notificacoes") {
+      renderFullNotificationsPage();
+    }
     if (target === "dashboard") {
       loadDashboardStats();
       loadTenantsList();
@@ -165,12 +172,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       e.stopPropagation();
       notifDropdown.classList.toggle("show");
 
-      if (notifDropdown.classList.contains("show")) {
-        const btnReadAll = document.getElementById("btn-read-all");
-        if (btnReadAll && btnReadAll.style.display !== "none") {
-          btnReadAll.click();
-        }
-      }
       if (typeof userDropdown !== "undefined" && userDropdown)
         userDropdown.classList.remove("show");
     });
@@ -1486,6 +1487,46 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
   // ─── Funções Globais para Horários ───
+  
+  // Ouvintes do Dropdown e da Central de Notificações
+  const btnReadAll = document.getElementById("btn-read-all");
+  if (btnReadAll) {
+    btnReadAll.addEventListener("click", (e) => {
+      e.stopPropagation();
+      markAllNotificationsAsRead();
+    });
+  }
+
+  const btnPageReadAll = document.getElementById("btn-page-read-all");
+  if (btnPageReadAll) {
+    btnPageReadAll.addEventListener("click", () => {
+      markAllNotificationsAsRead();
+    });
+  }
+
+  const btnVerTodas = document.getElementById("btn-ver-todas-notif");
+  if (btnVerTodas) {
+    btnVerTodas.addEventListener("click", (e) => {
+      e.preventDefault();
+      const drop = document.getElementById("notification-dropdown");
+      if (drop) drop.classList.remove("show");
+
+      navItems.forEach((n) => n.classList.remove("active"));
+      const notifNav = document.querySelector('.nav-item[data-target="notificacoes"]');
+      if (notifNav) notifNav.classList.add("active");
+
+      showSection("notificacoes");
+    });
+  }
+
+  // Filtros da Central de Notificações
+  document.querySelectorAll(".btn-filter-notif").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const filter = btn.getAttribute("data-filter");
+      renderFullNotificationsPage(filter);
+    });
+  });
+
   window.toggleEditHorario = function (idx) {
     const el = document.getElementById("edit-horario-" + idx);
     if (el) {
@@ -2032,6 +2073,196 @@ async function openModalCorrecoesEmpresa(tenantId, tenantObj) {
 }
 window.openModalCorrecoesEmpresa = openModalCorrecoesEmpresa;
 
+
+// ─── Lógica Completa de Notificações ───
+let currentNotifFilter = "all";
+
+function markAllNotificationsAsRead() {
+  localStorage.setItem("admin_last_read_notif_time", new Date().toISOString());
+
+  // Esconde ponto vermelho e badge
+  const dot = document.querySelector(".notification-dot");
+  if (dot) dot.style.display = "none";
+  const badge = document.getElementById("notif-badge");
+  if (badge) badge.style.display = "none";
+
+  // Remove classe unread dos cards
+  document.querySelectorAll(".notif-item.unread").forEach((el) => el.classList.remove("unread"));
+  document.querySelectorAll(".full-notif-card.unread").forEach((el) => {
+    el.classList.remove("unread");
+    el.style.borderLeft = "1px solid var(--color-border)";
+    el.style.background = "var(--color-bg-card)";
+    const newBadge = el.querySelector(".badge-nova");
+    if (newBadge) newBadge.remove();
+  });
+
+  // Feedback nos botões
+  const btnReadAll = document.getElementById("btn-read-all");
+  if (btnReadAll) {
+    btnReadAll.innerHTML = '<i class="ph ph-check" style="color: #10B981;"></i> Todas lidas';
+    btnReadAll.style.color = "var(--color-text-mut)";
+    setTimeout(() => {
+      if (btnReadAll) {
+        btnReadAll.textContent = "Marcar lidas";
+        btnReadAll.style.color = "var(--color-primary)";
+      }
+    }, 2500);
+  }
+
+  const btnPageReadAll = document.getElementById("btn-page-read-all");
+  if (btnPageReadAll) {
+    btnPageReadAll.innerHTML = '<i class="ph-fill ph-check-circle" style="color: #10B981;"></i> <span>Todas marcadas como lidas!</span>';
+    setTimeout(() => {
+      if (btnPageReadAll) {
+        btnPageReadAll.innerHTML = '<i class="ph-bold ph-checks"></i> <span>Marcar todas como lidas</span>';
+      }
+    }, 2500);
+  }
+}
+window.markAllNotificationsAsRead = markAllNotificationsAsRead;
+
+function renderFullNotificationsPage(filter = currentNotifFilter) {
+  currentNotifFilter = filter;
+  const container = document.getElementById("full-notif-page-list");
+  if (!container) return;
+
+  const lastReadTime = localStorage.getItem("admin_last_read_notif_time")
+    ? new Date(localStorage.getItem("admin_last_read_notif_time"))
+    : new Date(0);
+
+  const list = window.cachedAdminNotifications || [];
+
+  // Atualiza contadores dos filtros
+  const countAll = list.length;
+  const countCorrecoes = list.filter((n) => n.type === "correction").length;
+  const countPagamentos = list.filter((n) => n.type === "payment").length;
+
+  const elCountAll = document.getElementById("filter-count-all");
+  if (elCountAll) elCountAll.textContent = countAll;
+  const elCountCorr = document.getElementById("filter-count-correcoes");
+  if (elCountCorr) elCountCorr.textContent = countCorrecoes;
+  const elCountPag = document.getElementById("filter-count-pagamentos");
+  if (elCountPag) elCountPag.textContent = countPagamentos;
+
+  // Atualiza botões ativos de filtro
+  document.querySelectorAll(".btn-filter-notif").forEach((btn) => {
+    const f = btn.getAttribute("data-filter");
+    if (f === filter) {
+      btn.classList.add("active");
+      btn.style.background = "var(--color-primary)";
+      btn.style.color = "#fff";
+      btn.style.border = "none";
+    } else {
+      btn.classList.remove("active");
+      btn.style.background = "var(--color-bg)";
+      btn.style.color = "var(--color-text-main)";
+      btn.style.border = "1px solid var(--color-border)";
+    }
+  });
+
+  // Filtra itens
+  let filtered = list;
+  if (filter === "correcoes") {
+    filtered = list.filter((n) => n.type === "correction");
+  } else if (filter === "pagamentos") {
+    filtered = list.filter((n) => n.type === "payment");
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="card" style="padding: 48px 24px; text-align: center; color: var(--color-text-mut);">
+        <i class="ph ph-bell-slash" style="font-size: 42px; opacity: 0.35; display: block; margin-bottom: 12px;"></i>
+        <h3 style="margin: 0; font-size: 15px; color: var(--color-text-main);">Nenhuma notificação encontrada</h3>
+        <p style="margin: 4px 0 0; font-size: 12.5px;">Não há notificações para este filtro no momento.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = "";
+
+  const timeAgo = (date) => {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    if (seconds < 60) return "Agora mesmo";
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `Há ${minutes} minuto${minutes > 1 ? "s" : ""}`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `Há ${hours} hora${hours > 1 ? "s" : ""}`;
+    const days = Math.floor(hours / 24);
+    return `Há ${days} dia${days > 1 ? "s" : ""}`;
+  };
+
+  filtered.forEach((n) => {
+    const isUnread = n.date > lastReadTime;
+    const card = document.createElement("div");
+    card.className = "card full-notif-card" + (isUnread ? " unread" : "");
+    card.style.cssText = `
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: 1px solid var(--color-border);
+      ${isUnread ? "border-left: 4px solid var(--color-primary); background: rgba(0, 168, 132, 0.04);" : "background: var(--color-bg-card);"}
+    `;
+
+    let iconHtml = "";
+    if (n.type === "payment") {
+      iconHtml = `
+        <div style="width: 42px; height: 42px; border-radius: 10px; background-color: var(--color-task-green-light, #d1fae5); color: var(--color-task-green-text, #065f46); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
+          <i class="ph-fill ph-currency-dollar"></i>
+        </div>
+      `;
+    } else {
+      iconHtml = `
+        <div style="width: 42px; height: 42px; border-radius: 10px; background-color: #fef3c7; color: #b45309; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
+          <i class="ph-fill ph-warning-circle"></i>
+        </div>
+      `;
+    }
+
+    card.innerHTML = `
+      <div style="display: flex; gap: 14px; align-items: center; flex: 1; min-width: 0;">
+        ${iconHtml}
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: var(--color-text-main);">${n.title}</h4>
+            ${n.count ? `<span style="background: #fef3c7; color: #b45309; font-weight: 700; font-size: 11px; padding: 2px 8px; border-radius: 10px;">${n.count} ${n.count === 1 ? 'notificação' : 'notificações'}</span>` : ''}
+            ${isUnread ? `<span class="badge-nova" style="background: var(--color-primary-light); color: var(--color-primary); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 6px;">Nova</span>` : ''}
+          </div>
+          <p style="margin: 4px 0 0; font-size: 13px; color: var(--color-text-sec); line-height: 1.4; word-break: break-word;">${n.message}</p>
+          <div style="display: flex; align-items: center; gap: 12px; margin-top: 6px; font-size: 11.5px; color: var(--color-text-mut);">
+            <span><i class="ph ph-clock" style="margin-right: 4px;"></i>${timeAgo(n.date)}</span>
+            <span>•</span>
+            <span>${n.date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+        </div>
+      </div>
+      <div style="flex-shrink: 0;">
+        <button type="button" class="btn btn-outline" style="padding: 8px 14px; font-size: 12.5px; display: flex; align-items: center; gap: 6px; border-color: var(--color-border); border-radius: 8px;">
+          <span>${n.type === 'correction' ? 'Ver Correções' : 'Ver Detalhes'}</span>
+          <i class="ph ph-caret-right"></i>
+        </button>
+      </div>
+    `;
+
+    card.addEventListener("click", () => {
+      if (n.type === "correction" && n.tenantId) {
+        openModalCorrecoesEmpresa(n.tenantId, n.tenantObj);
+      } else if (n.tenantId) {
+        if (typeof window.loadTenantDetails === "function") {
+          window.loadTenantDetails(n.tenantId, n.tenantObj ? n.tenantObj.nome : "", n.tenantObj ? n.tenantObj.email : "");
+        }
+      }
+    });
+
+    container.appendChild(card);
+  });
+}
+window.renderFullNotificationsPage = renderFullNotificationsPage;
+
 // Função de Notificações
 async function loadAdminNotifications() {
   const listEl = document.getElementById("notif-list");
@@ -2088,7 +2319,6 @@ async function loadAdminNotifications() {
     }
 
     if (reportes && Array.isArray(reportes)) {
-      // Agrupa todas as correções por empresa para não poluir o dropdown
       const groupedByEmpresa = {};
 
       reportes.forEach((r) => {
@@ -2107,7 +2337,6 @@ async function loadAdminNotifications() {
         }
       });
 
-      // Cria uma única notificação consolidada por empresa
       Object.values(groupedByEmpresa).forEach((grp) => {
         let t = Array.isArray(globalTenants)
           ? globalTenants.find((ten) => ten.id_empresa === grp.tenantId)
@@ -2152,7 +2381,16 @@ async function loadAdminNotifications() {
 
   // Ordena por data (mais recente primeiro)
   notifications.sort((a, b) => b.date - a.date);
-  notifications = notifications.slice(0, 30);
+  notifications = notifications.slice(0, 40);
+
+  // Guarda em cache para a tela de Ver Todas
+  window.cachedAdminNotifications = notifications;
+
+  const lastReadTime = localStorage.getItem("admin_last_read_notif_time")
+    ? new Date(localStorage.getItem("admin_last_read_notif_time"))
+    : new Date(0);
+
+  const unreadCount = notifications.filter((n) => n.date > lastReadTime).length;
 
   if (notifications.length === 0) {
     listEl.innerHTML =
@@ -2162,12 +2400,18 @@ async function loadAdminNotifications() {
     return;
   }
 
-  if (badgeEl) {
-    badgeEl.textContent = notifications.length;
-    badgeEl.style.display = "inline-flex";
-  }
-  if (notifDot) {
-    notifDot.style.display = "block";
+  // Indicador de novidades
+  if (unreadCount > 0) {
+    if (badgeEl) {
+      badgeEl.textContent = unreadCount;
+      badgeEl.style.display = "inline-flex";
+    }
+    if (notifDot) {
+      notifDot.style.display = "block";
+    }
+  } else {
+    if (badgeEl) badgeEl.style.display = "none";
+    if (notifDot) notifDot.style.display = "none";
   }
 
   listEl.innerHTML = "";
@@ -2184,8 +2428,9 @@ async function loadAdminNotifications() {
   };
 
   notifications.forEach((n) => {
+    const isUnread = n.date > lastReadTime;
     const item = document.createElement("div");
-    item.className = "notif-item unread";
+    item.className = "notif-item" + (isUnread ? " unread" : "");
     item.style.cssText =
       "padding: 14px 16px; border-bottom: 1px solid var(--color-border); cursor: pointer; transition: background 0.2s;";
 
@@ -2218,7 +2463,6 @@ async function loadAdminNotifications() {
       </div>
     `;
 
-    // Ao clicar na notificação: se for correção, abre o modal de card do usuário!
     item.addEventListener("click", () => {
       const drop = document.getElementById("notification-dropdown");
       if (drop) drop.classList.remove("show");
@@ -2236,6 +2480,12 @@ async function loadAdminNotifications() {
 
     listEl.appendChild(item);
   });
+
+  // Se a tela de notificações estiver aberta, atualiza ela também
+  const notifSec = document.getElementById("sec-notificacoes");
+  if (notifSec && notifSec.classList.contains("active")) {
+    renderFullNotificationsPage();
+  }
 }
 window.loadAdminNotifications = loadAdminNotifications;
 
