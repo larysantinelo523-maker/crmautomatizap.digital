@@ -1,4 +1,4 @@
-﻿import { supabase } from "./supabase.js";
+import { supabase } from "./supabase.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   let adminStartDate = null;
@@ -1011,87 +1011,118 @@ document.addEventListener("DOMContentLoaded", async () => {
             `;
     }
 
-    document.getElementById("edit-nome").value = usuario.nome_completo || "";
-    document.getElementById("edit-email").value = usuario.email || "";
-    document.getElementById("edit-mensalidade").value =
+    const usuario = window.tempUsuario || t || {};
+
+    if (document.getElementById("edit-nome")) document.getElementById("edit-nome").value = usuario.nome_completo || "";
+    if (document.getElementById("edit-email")) document.getElementById("edit-email").value = usuario.email || "";
+    if (document.getElementById("edit-mensalidade")) document.getElementById("edit-mensalidade").value =
       usuario.mensalidade || "";
-    document.getElementById("edit-vencimento").value =
-      usuario.data_vencimento && usuario.data_vencimento !== "N/A"
-        ? usuario.data_vencimento
-        : "";
-    document.getElementById("edit-segmento").value = usuario.segmento || "";
-    document.getElementById("edit-descricao").value = usuario.descricao || "";
+    if (document.getElementById("edit-vencimento")) {
+      document.getElementById("edit-vencimento").value =
+        usuario.data_vencimento && usuario.data_vencimento !== "N/A"
+          ? usuario.data_vencimento
+          : (usuario.vencimento && usuario.vencimento !== "N/A" ? usuario.vencimento : "");
+    }
+    if (document.getElementById("edit-segmento")) document.getElementById("edit-segmento").value = usuario.segmento || "";
+    if (document.getElementById("edit-descricao")) document.getElementById("edit-descricao").value = usuario.descricao || "";
 
-    document.getElementById("config-fuso").value =
-      usuario.fuso_horario || "America/Recife";
-    document.getElementById("config-horas-parado").value =
-      usuario.horas_lead_parado || 24;
+    if (document.getElementById("config-fuso")) {
+      document.getElementById("config-fuso").value =
+        usuario.fuso_horario || "America/Recife";
+    }
+    if (document.getElementById("config-horas-parado")) {
+      document.getElementById("config-horas-parado").value =
+        usuario.horas_lead_parado || 24;
+    }
 
-    renderConfigDias(horarios || []);
+    if (typeof renderConfigDias === "function") renderConfigDias(horarios || []);
 
     // Fetch Correções Solicitadas
     const cardsContainer = document.getElementById("correcoes-cards-container");
     if (cardsContainer) {
       cardsContainer.innerHTML =
         '<div style="text-align: center; color: var(--color-text-mut); padding: 24px; font-size: 13px;">Carregando correções...</div>';
-      supabase
-        .from("reportes_agente")
-        .select("*")
-        .eq("id_empresa", id)
-        .order("criado_em", { ascending: false })
-        .then(({ data, error }) => {
-          if (error || !data || data.length === 0) {
-            cardsContainer.innerHTML =
-              '<div style="text-align: center; color: var(--color-text-mut); padding: 24px; font-size: 13px;">Nenhuma correção solicitada</div>';
-          } else {
-            cardsContainer.innerHTML = "";
-            data.forEach((rep) => {
-              const dt = new Date(rep.criado_em);
-              const dateStr =
-                dt.toLocaleDateString("pt-BR", {
-                  timeZone: "America/Sao_Paulo",
-                }) +
-                " às " +
-                dt.toLocaleTimeString("pt-BR", {
-                  timeZone: "America/Sao_Paulo",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                });
 
-              const card = document.createElement("div");
-              card.style.cssText =
-                "background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 16px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);";
-
-              let motivoColor = "var(--color-primary)";
-              let motivoBg = "var(--color-primary-light)";
-              if (
-                rep.motivo_principal &&
-                rep.motivo_principal.includes("errado")
-              ) {
-                motivoColor = "#DC2626";
-                motivoBg = "#FEE2E2";
-              } else if (
-                rep.motivo_principal &&
-                rep.motivo_principal.includes("esqueceu")
-              ) {
-                motivoColor = "#D97706";
-                motivoBg = "#FEF3C7";
-              }
-
-              card.innerHTML = `
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                <span style="background: ${motivoBg}; color: ${motivoColor}; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
-                                    ${rep.motivo_principal || "Outros"}
-                                </span>
-                                <span style="font-size: 12px; color: var(--color-text-mut);">${dateStr}</span>
-                            </div>
-                            <p style="margin: 0; font-size: 13.5px; color: var(--color-text-main); line-height: 1.4;">
-                                ${rep.descricao_detalhada || "Sem descrição"}
-                            </p>
-                        `;
-              cardsContainer.appendChild(card);
+      const renderReportesList = (data) => {
+        if (!data || data.length === 0) {
+          cardsContainer.innerHTML =
+            '<div style="text-align: center; color: var(--color-text-mut); padding: 24px; font-size: 13px;">Nenhuma correção solicitada</div>';
+          return;
+        }
+        cardsContainer.innerHTML = "";
+        data.forEach((rep) => {
+          const dt = new Date(rep.criado_em);
+          const dateStr =
+            dt.toLocaleDateString("pt-BR", {
+              timeZone: "America/Sao_Paulo",
+            }) +
+            " às " +
+            dt.toLocaleTimeString("pt-BR", {
+              timeZone: "America/Sao_Paulo",
+              hour: "2-digit",
+              minute: "2-digit",
             });
+
+          const card = document.createElement("div");
+          card.style.cssText =
+            "background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 16px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);";
+
+          let motivoColor = "var(--color-primary)";
+          let motivoBg = "var(--color-primary-light)";
+          if (
+            rep.motivo_principal &&
+            rep.motivo_principal.includes("errado")
+          ) {
+            motivoColor = "#DC2626";
+            motivoBg = "#FEE2E2";
+          } else if (
+            rep.motivo_principal &&
+            rep.motivo_principal.includes("esqueceu")
+          ) {
+            motivoColor = "#D97706";
+            motivoBg = "#FEF3C7";
           }
+
+          card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <span style="background: ${motivoBg}; color: ${motivoColor}; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
+                    ${rep.motivo_principal || "Outros"}
+                </span>
+                <span style="font-size: 12px; color: var(--color-text-mut);">${dateStr}</span>
+            </div>
+            <p style="margin: 0; font-size: 13.5px; color: var(--color-text-main); line-height: 1.4;">
+                ${rep.descricao_detalhada || "Sem descrição"}
+            </p>
+          `;
+          cardsContainer.appendChild(card);
+        });
+      };
+
+      // Tenta primeiro via API serverless (service role, sem restrição de RLS)
+      fetch(`/api/get_reportes?id_empresa=${encodeURIComponent(id)}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return res.json();
+        })
+        .then((data) => {
+          renderReportesList(data);
+        })
+        .catch((err) => {
+          console.warn("Falha no /api/get_reportes, tentando direto via Supabase client:", err);
+          supabase
+            .from("reportes_agente")
+            .select("*")
+            .eq("id_empresa", id)
+            .order("criado_em", { ascending: false })
+            .then(({ data, error }) => {
+              if (error) {
+                console.error("Erro ao carregar reportes:", error);
+                cardsContainer.innerHTML =
+                  '<div style="text-align: center; color: var(--color-text-mut); padding: 24px; font-size: 13px;">Nenhuma correção solicitada</div>';
+              } else {
+                renderReportesList(data || []);
+              }
+            });
         });
     }
   }
@@ -1598,12 +1629,24 @@ async function loadAdminNotifications() {
 
   // 2. Puxar "Correção de Agente"
   try {
-    const { data: reportes, error } = await supabase
-      .from("reportes_agente")
-      .select("*")
-      .order("criado_em", { ascending: false })
-      .limit(30);
-    if (!error && reportes) {
+    let reportes = [];
+    try {
+      const res = await fetch("/api/get_reportes");
+      if (res.ok) {
+        reportes = await res.json();
+      } else {
+        throw new Error("HTTP " + res.status);
+      }
+    } catch (apiErr) {
+      const { data, error } = await supabase
+        .from("reportes_agente")
+        .select("*")
+        .order("criado_em", { ascending: false })
+        .limit(30);
+      if (!error && data) reportes = data;
+    }
+
+    if (reportes && Array.isArray(reportes)) {
       reportes.forEach((r) => {
         const t = globalTenants.find((ten) => ten.id_empresa === r.id_empresa);
         if (t) {
@@ -1619,7 +1662,7 @@ async function loadAdminNotifications() {
       });
     }
   } catch (e) {
-    console.error(e);
+    console.error("Erro ao carregar notificações de correção:", e);
   }
 
   notifications.sort((a, b) => b.date - a.date);
@@ -1687,7 +1730,9 @@ async function loadAdminNotifications() {
         `;
 
     item.addEventListener("click", () => {
-      if (typeof openConfiguracoes === "function" && n.tenantObj) {
+      if (n.tenantId) {
+        loadTenantDetails(n.tenantId, n.tenantObj ? n.tenantObj.nome : "", n.tenantObj ? n.tenantObj.email : "");
+      } else if (typeof openConfiguracoes === "function" && n.tenantObj) {
         openConfiguracoes(n.tenantObj);
       }
       // Remove dropdown and click
