@@ -234,6 +234,35 @@
                 padding: 11px 12px !important;
             }
         }
+    
+        /* Dropdown de Notificações - Largura proporcional no Desktop e Sem Scroll Horizontal */
+        .notification-dropdown {
+            width: 410px !important;
+            max-width: calc(100vw - 32px) !important;
+            right: -10px !important;
+            overflow-x: hidden !important;
+        }
+
+        .notif-list {
+            max-height: 380px !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+        }
+
+        .notif-item {
+            width: 100% !important;
+            box-sizing: border-box !important;
+            overflow-x: hidden !important;
+        }
+
+        @media (max-width: 640px) {
+            .notification-dropdown {
+                width: auto !important;
+                left: 12px !important;
+                right: 12px !important;
+            }
+        }
+
     </style>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 
@@ -272,9 +301,9 @@
             });
         });
     </script>
-  <script type="module" crossorigin src="/assets/admin-DXsS7B6x.js"></script>
+  <script type="module" crossorigin src="/assets/admin-4WdqHTUW.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-3hzlO6-i.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-B4WAY5ta.css">
 </head>
 
 <body>

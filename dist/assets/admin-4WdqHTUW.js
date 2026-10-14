@@ -156,7 +156,7 @@ import{supabase as G}from"./supabase-DUkCiNAm.js";/* empty css              */le
         ${g}
         <div style="flex: 1; min-width: 0;">
           <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 6px;">
-            <p style="margin: 0; font-size: 13.5px; color: var(--color-text-main); font-weight: 600; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${s.title}</p>
+            <p style="margin: 0; font-size: 13.5px; color: var(--color-text-main); font-weight: 600; line-height: 1.35; word-break: break-word;">${s.title}</p>
           </div>
           <p style="margin: 3px 0 0; font-size: 12px; color: var(--color-text-sec); line-height: 1.4; word-break: break-word;">${s.message}</p>
           <span style="display: block; margin-top: 5px; font-size: 11px; color: var(--color-text-mut); font-weight: 500;">${me(s.date)}</span>
