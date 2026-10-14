@@ -643,13 +643,17 @@
                                         <span id="info-vencimento" style="font-weight: 500; font-size: 14px;">...</span>
                                     </div>
                                 </div></div>
-                            <!-- Correções Solicitadas -->
-                            <div style="margin-top: 24px; border-top: 1px solid var(--color-border); padding-top: 24px;">
-                                <div class="card-title" style="margin-bottom: 16px;">
-                                    <i class="ph-fill ph-warning-circle text-primary"></i>
-                                    <h3 style="font-size: 15px;">Correções Solicitadas pelo Usuário</h3>
+                            <!-- Correções Solicitadas (Dropdown / Accordion) -->
+                            <div style="margin-top: 24px; border-top: 1px solid var(--color-border); padding-top: 20px;">
+                                <div id="correcoes-accordion-btn" class="accordion-correcoes-btn" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background-color: var(--color-bg); border: 1px solid var(--color-border); border-radius: 8px; cursor: pointer; user-select: none; transition: all 0.2s ease;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <i class="ph-fill ph-warning-circle text-primary" style="font-size: 18px;"></i>
+                                        <h3 style="font-size: 14.5px; font-weight: 600; margin: 0; color: var(--color-text-main);">Correções Solicitadas pelo Usuário</h3>
+                                        <span id="correcoes-count-badge" style="background: var(--color-primary-light); color: var(--color-primary); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; display: none;">0</span>
+                                    </div>
+                                    <i id="correcoes-chevron" class="ph ph-caret-down" style="font-size: 18px; color: var(--color-text-sec); transition: transform 0.25s ease;"></i>
                                 </div>
-                                <div id="correcoes-cards-container" style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 4px;">
+                                <div id="correcoes-cards-container" style="display: none; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 4px; margin-top: 12px;">
                                     <div style="text-align: center; color: var(--color-text-mut); padding: 24px; font-size: 13px;">Carregando correções...</div>
                                 </div>
                             </div></div><!-- Right -->

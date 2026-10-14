@@ -1037,18 +1037,32 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (typeof renderConfigDias === "function") renderConfigDias(horarios || []);
 
-    // Fetch Correções Solicitadas
+    // Fetch Correções Solicitadas (Dropdown / Accordion)
     const cardsContainer = document.getElementById("correcoes-cards-container");
+    const countBadge = document.getElementById("correcoes-count-badge");
+    const chevron = document.getElementById("correcoes-chevron");
+
     if (cardsContainer) {
       cardsContainer.innerHTML =
         '<div style="text-align: center; color: var(--color-text-mut); padding: 24px; font-size: 13px;">Carregando correções...</div>';
+      // Inicia recolhido por padrão
+      cardsContainer.style.display = "none";
+      if (chevron) chevron.style.transform = "rotate(0deg)";
+      if (countBadge) countBadge.style.display = "none";
 
       const renderReportesList = (data) => {
         if (!data || data.length === 0) {
+          if (countBadge) countBadge.style.display = "none";
           cardsContainer.innerHTML =
             '<div style="text-align: center; color: var(--color-text-mut); padding: 24px; font-size: 13px;">Nenhuma correção solicitada</div>';
           return;
         }
+
+        if (countBadge) {
+          countBadge.textContent = data.length;
+          countBadge.style.display = "inline-flex";
+        }
+
         cardsContainer.innerHTML = "";
         data.forEach((rep) => {
           const dt = new Date(rep.criado_em);
@@ -1132,6 +1146,25 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         });
     }
+  }
+
+  // Lógica de Toggle do Accordion de Correções
+  const accordionCorrecoesBtn = document.getElementById("correcoes-accordion-btn");
+  if (accordionCorrecoesBtn) {
+    accordionCorrecoesBtn.addEventListener("click", () => {
+      const cContainer = document.getElementById("correcoes-cards-container");
+      const cChevron = document.getElementById("correcoes-chevron");
+      if (cContainer) {
+        const isClosed = cContainer.style.display === "none" || cContainer.style.display === "";
+        if (isClosed) {
+          cContainer.style.display = "flex";
+          if (cChevron) cChevron.style.transform = "rotate(180deg)";
+        } else {
+          cContainer.style.display = "none";
+          if (cChevron) cChevron.style.transform = "rotate(0deg)";
+        }
+      }
+    });
   }
 
   // Lógica do Modal de Cadastrar Empresa
