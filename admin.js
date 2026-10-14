@@ -1820,22 +1820,22 @@ async function openModalCorrecoesEmpresa(tenantId, tenantObj) {
 
         groupCard.innerHTML = `
           <button type="button" class="date-group-btn" id="btn-group-${groupIndex}">
-            <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-              <div style="width: 34px; height: 34px; border-radius: 8px; background: var(--color-primary-light); color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+            <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
+              <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--color-primary-light); color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
                 <i class="ph-bold ph-calendar"></i>
               </div>
-              <div style="min-width: 0;">
-                <span style="font-size: 13.5px; font-weight: 700; color: var(--color-text-main); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${dateTitle}</span>
-                <span class="group-subtitle" style="font-size: 11.5px; color: var(--color-text-mut); display: block; margin-top: 1px;">
+              <div style="min-width: 0; flex: 1;">
+                <span style="font-size: 14px; font-weight: 700; color: var(--color-text-main); display: block; line-height: 1.3;">${dateTitle}</span>
+                <span class="group-subtitle" style="font-size: 12px; color: var(--color-text-mut); display: block; margin-top: 3px; line-height: 1.3;">
                   ${totalCount} ${totalCount === 1 ? "atualização" : "atualizações"} • ${pendingCount > 0 ? `<span style="color: #b45309; font-weight: 600;">${pendingCount} pendente${pendingCount > 1 ? "s" : ""}</span>` : `<span style="color: #15803d; font-weight: 600;">Todas resolvidas</span>`}
                 </span>
               </div>
             </div>
             <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-              <span class="group-count-badge" style="background: var(--color-primary-light); color: var(--color-primary); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px;">
+              <span class="group-count-badge" style="background: var(--color-primary-light); color: var(--color-primary); font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 10px;">
                 ${totalCount}
               </span>
-              <i class="ph-bold ph-caret-down group-chevron" style="font-size: 14px; color: var(--color-text-mut); transition: transform 0.25s ease;"></i>
+              <i class="ph-bold ph-caret-down group-chevron" style="font-size: 15px; color: var(--color-text-mut); transition: transform 0.25s ease;"></i>
             </div>
           </button>
           <div class="date-group-content" id="content-group-${groupIndex}" style="display: none;">

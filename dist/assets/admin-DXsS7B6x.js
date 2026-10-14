@@ -95,22 +95,22 @@ import{supabase as G}from"./supabase-DUkCiNAm.js";/* empty css              */le
         <span style="font-weight: 600; color: var(--color-primary);">${oe.length} ${oe.length===1?"dia":"dias"}</span>
       `,_.appendChild(b);const S=new Date,B=`${String(S.getDate()).padStart(2,"0")}/${String(S.getMonth()+1).padStart(2,"0")}/${S.getFullYear()}`,z=new Date;z.setDate(z.getDate()-1);const pe=`${String(z.getDate()).padStart(2,"0")}/${String(z.getMonth()+1).padStart(2,"0")}/${z.getFullYear()}`;oe.forEach((j,V)=>{const Z=C[j].items,q=Z.length;Z.sort((h,N)=>new Date(N.criado_em||0)-new Date(h.criado_em||0));let W=Z.filter(h=>(h.status||"").toLowerCase()!=="resolvido").length,ue=j;j===B?ue=`Hoje (${j})`:j===pe&&(ue=`Ontem (${j})`);const k=document.createElement("div");k.className="date-group-card",k.innerHTML=`
           <button type="button" class="date-group-btn" id="btn-group-${V}">
-            <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-              <div style="width: 34px; height: 34px; border-radius: 8px; background: var(--color-primary-light); color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+            <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
+              <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--color-primary-light); color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
                 <i class="ph-bold ph-calendar"></i>
               </div>
-              <div style="min-width: 0;">
-                <span style="font-size: 13.5px; font-weight: 700; color: var(--color-text-main); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${ue}</span>
-                <span class="group-subtitle" style="font-size: 11.5px; color: var(--color-text-mut); display: block; margin-top: 1px;">
+              <div style="min-width: 0; flex: 1;">
+                <span style="font-size: 14px; font-weight: 700; color: var(--color-text-main); display: block; line-height: 1.3;">${ue}</span>
+                <span class="group-subtitle" style="font-size: 12px; color: var(--color-text-mut); display: block; margin-top: 3px; line-height: 1.3;">
                   ${q} ${q===1?"atualização":"atualizações"} • ${W>0?`<span style="color: #b45309; font-weight: 600;">${W} pendente${W>1?"s":""}</span>`:'<span style="color: #15803d; font-weight: 600;">Todas resolvidas</span>'}
                 </span>
               </div>
             </div>
             <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-              <span class="group-count-badge" style="background: var(--color-primary-light); color: var(--color-primary); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px;">
+              <span class="group-count-badge" style="background: var(--color-primary-light); color: var(--color-primary); font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 10px;">
                 ${q}
               </span>
-              <i class="ph-bold ph-caret-down group-chevron" style="font-size: 14px; color: var(--color-text-mut); transition: transform 0.25s ease;"></i>
+              <i class="ph-bold ph-caret-down group-chevron" style="font-size: 15px; color: var(--color-text-mut); transition: transform 0.25s ease;"></i>
             </div>
           </button>
           <div class="date-group-content" id="content-group-${V}" style="display: none;">
