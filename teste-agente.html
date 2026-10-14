@@ -530,7 +530,9 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
         }
     </style>
     
-    <script>
+    <script type="module">
+        import { supabase } from './supabase.js';
+
         document.addEventListener('DOMContentLoaded', () => {
             const reportButtons = document.querySelectorAll('.btn-report-issue');
             const modal = document.getElementById('modal-report');
@@ -563,7 +565,6 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
             
             reportButtons.forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    // Get the text from the previous span element
                     const container = btn.closest('.report-item');
                     const span = container.querySelector('span');
                     const iconBox = container.querySelector('div[style*="border-radius: 50%"]');
@@ -597,16 +598,44 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                     return;
                 }
                 
-                // Show success state
                 const originalText = btnSubmit.innerHTML;
-                btnSubmit.innerHTML = '<i class="ph ph-check-circle"></i> Enviado!';
-                btnSubmit.style.backgroundColor = '#10B981';
-                
-                setTimeout(() => {
-                    closeModal();
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Enviando...';
+
+                try {
+                    const { data: userData, error: userError } = await supabase.auth.getUser();
+                    if (userError || !userData?.user) {
+                        throw new Error('Usuário não autenticado.');
+                    }
+
+                    const motivoTitle = modalTitle.textContent.trim();
+                    const { error: insertError } = await supabase.from('reportes_agente').insert({
+                        id_empresa: userData.user.id,
+                        motivo_principal: motivoTitle,
+                        descricao_detalhada: text,
+                        status: 'Pendente'
+                    });
+
+                    if (insertError) {
+                        throw insertError;
+                    }
+
+                    // Feedback visual de sucesso
+                    btnSubmit.innerHTML = '<i class="ph-fill ph-check-circle"></i> Enviado com sucesso!';
+                    btnSubmit.style.backgroundColor = '#10B981';
+                    
+                    setTimeout(() => {
+                        closeModal();
+                        btnSubmit.disabled = false;
+                        btnSubmit.innerHTML = originalText;
+                        btnSubmit.style.backgroundColor = '';
+                    }, 1500);
+                } catch (err) {
+                    console.error('Erro ao enviar reporte:', err);
+                    alert('Erro ao enviar correção: ' + (err.message || 'Tente novamente'));
+                    btnSubmit.disabled = false;
                     btnSubmit.innerHTML = originalText;
-                    btnSubmit.style.backgroundColor = '';
-                }, 1500);
+                }
             });
         });
     </script>

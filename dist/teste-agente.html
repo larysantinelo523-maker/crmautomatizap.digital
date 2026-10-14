@@ -55,9 +55,10 @@
             });
         });
     </script>
-  <script type="module" crossorigin src="/assets/supabase-DUkCiNAm.js"></script>
-  <script type="module" crossorigin src="/assets/data-BG-H1LmU.js"></script>
-  <script type="module" crossorigin src="/assets/script-BjgKP-Qg.js"></script>
+  <script type="module" crossorigin src="/assets/testeAgente-BgTIcNwp.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
+  <link rel="modulepreload" crossorigin href="/assets/data-BG-H1LmU.js">
+  <link rel="modulepreload" crossorigin href="/assets/script-BjgKP-Qg.js">
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
   <link rel="stylesheet" crossorigin href="/assets/conversas-3hzlO6-i.css">
 </head>
@@ -530,87 +531,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
             color: var(--color-text-main);
         }
     </style>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const reportButtons = document.querySelectorAll('.btn-report-issue');
-            const modal = document.getElementById('modal-report');
-            const modalTitle = document.getElementById('modal-report-title');
-            const modalIconBox = document.getElementById('modal-report-icon-box');
-            const modalIcon = document.getElementById('modal-report-icon');
-            const btnClose = document.getElementById('btn-close-modal');
-            const btnCancel = document.getElementById('btn-cancel-modal');
-            const btnSubmit = document.getElementById('btn-submit-modal');
-            const textarea = document.getElementById('modal-report-text');
-            
-            function openModal(title, iconEl, bgColor, color) {
-                modalTitle.textContent = title;
-                textarea.value = '';
-                if (iconEl) {
-                    modalIconBox.style.display = 'flex';
-                    modalIconBox.style.backgroundColor = bgColor;
-                    modalIconBox.style.color = color;
-                    modalIcon.className = iconEl.className;
-                } else {
-                    modalIconBox.style.display = 'none';
-                }
-                modal.style.display = 'flex';
-                setTimeout(() => textarea.focus(), 100);
-            }
-            
-            function closeModal() {
-                modal.style.display = 'none';
-            }
-            
-            reportButtons.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    // Get the text from the previous span element
-                    const container = btn.closest('.report-item');
-                    const span = container.querySelector('span');
-                    const iconBox = container.querySelector('div[style*="border-radius: 50%"]');
-                    let iconEl = null, bgColor = '', color = '';
-                    if (iconBox) {
-                        iconEl = iconBox.querySelector('i');
-                        bgColor = iconBox.style.backgroundColor;
-                        color = iconBox.style.color;
-                    }
-                    
-                    if (span) {
-                        openModal(span.textContent.trim(), iconEl, bgColor, color);
-                    } else {
-                        openModal("Reportar Problema", null, '', '');
-                    }
-                });
-            });
-            
-            btnClose.addEventListener('click', closeModal);
-            btnCancel.addEventListener('click', closeModal);
-            
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
-            });
-            
-            btnSubmit.addEventListener('click', async () => {
-                const text = textarea.value.trim();
-                if(!text) {
-                    textarea.style.borderColor = 'red';
-                    setTimeout(() => textarea.style.borderColor = 'var(--color-primary)', 1500);
-                    return;
-                }
-                
-                // Show success state
-                const originalText = btnSubmit.innerHTML;
-                btnSubmit.innerHTML = '<i class="ph ph-check-circle"></i> Enviado!';
-                btnSubmit.style.backgroundColor = '#10B981';
-                
-                setTimeout(() => {
-                    closeModal();
-                    btnSubmit.innerHTML = originalText;
-                    btnSubmit.style.backgroundColor = '';
-                }, 1500);
-            });
-        });
-    </script>
+    
 
 </body>
 
