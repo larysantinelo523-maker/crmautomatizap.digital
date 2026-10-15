@@ -650,6 +650,37 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                 console.warn('Erro ao obter usuário autenticado:', e);
             }
 
+            // --- PERSISTÊNCIA DO HISTÓRICO DO SIMULADOR NO LOCALSTORAGE ---
+            function getStorageKey() {
+                return `teste_agente_history_${currentUserId}`;
+            }
+
+            function loadSavedMessages() {
+                try {
+                    const raw = localStorage.getItem(getStorageKey());
+                    return raw ? JSON.parse(raw) : [];
+                } catch (e) {
+                    console.warn('Erro ao carregar mensagens do localStorage:', e);
+                    return [];
+                }
+            }
+
+            function saveMessage(msgObj) {
+                try {
+                    const list = loadSavedMessages();
+                    list.push(msgObj);
+                    localStorage.setItem(getStorageKey(), JSON.stringify(list));
+                } catch (e) {
+                    console.warn('Erro ao salvar mensagem no localStorage:', e);
+                }
+            }
+
+            function clearSavedMessages() {
+                try {
+                    localStorage.removeItem(getStorageKey());
+                } catch (e) {}
+            }
+
             // Sincroniza o ID da última mensagem IA conhecida no início
             async function syncLatestAgentMessageId() {
                 try {
@@ -665,29 +696,6 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                 }
             }
             syncLatestAgentMessageId();
-
-            // Ouvinte em tempo real via Supabase Realtime (WebSocket instantâneo!)
-            try {
-                supabase
-                    .channel('simulador-agente-' + Date.now())
-                    .on('postgres_changes', {
-                        event: 'INSERT',
-                        schema: 'public',
-                        table: 'mensagens',
-                        filter: `id_empresa=eq.${currentUserId}`
-                    }, (payload) => {
-                        const newMsg = payload.new;
-                        if (newMsg && newMsg.remetente === 'ia' && isPolling) {
-                            if (newMsg.id !== lastKnownAgentMessageId) {
-                                lastKnownAgentMessageId = newMsg.id;
-                                handleAgentResponseReceived(newMsg.conteudo);
-                            }
-                        }
-                    })
-                    .subscribe();
-            } catch (e) {
-                console.warn('Erro ao assinar Realtime:', e);
-            }
 
             // Salvar estado HTML padrão inicial do chat para resets
             const initialChatHTML = chatContainer.innerHTML;
@@ -707,8 +715,8 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                 return safe;
             }
 
-            function renderUserBubble(text) {
-                const timeStr = formatTime();
+            function renderUserBubble(text, timeStr = null, shouldSave = true) {
+                const formattedTime = timeStr || formatTime();
                 const msgEl = document.createElement('div');
                 msgEl.className = 'chat-msg-anim';
                 msgEl.style.cssText = 'display: flex; justify-content: flex-end; width: 100%;';
@@ -721,17 +729,21 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                 
                 const metaDiv = document.createElement('div');
                 metaDiv.style.cssText = 'display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; font-size: 10px; color: #16A34A;';
-                metaDiv.innerHTML = `${timeStr} <i class="ph-bold ph-checks"></i>`;
+                metaDiv.innerHTML = `${formattedTime} <i class="ph-bold ph-checks"></i>`;
                 
                 bubble.appendChild(textSpan);
                 bubble.appendChild(metaDiv);
                 msgEl.appendChild(bubble);
                 chatContainer.appendChild(msgEl);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                if (shouldSave) {
+                    saveMessage({ sender: 'user', text, time: formattedTime });
+                }
             }
 
-            function renderAgentBubble(text, isError = false) {
-                const timeStr = formatTime();
+            function renderAgentBubble(text, isError = false, timeStr = null, shouldSave = true, msgId = null) {
+                const formattedTime = timeStr || formatTime();
                 const wrapper = document.createElement('div');
                 wrapper.className = 'chat-agent-msg-wrapper chat-msg-anim';
                 wrapper.style.cssText = 'display: flex; justify-content: flex-start; align-items: flex-end; gap: 8px; width: 100%;';
@@ -754,7 +766,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
 
                 const metaDiv = document.createElement('div');
                 metaDiv.style.cssText = 'display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; font-size: 10px; color: var(--color-text-mut);';
-                metaDiv.textContent = timeStr;
+                metaDiv.textContent = formattedTime;
 
                 bubble.appendChild(textSpan);
                 bubble.appendChild(metaDiv);
@@ -762,6 +774,58 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                 wrapper.appendChild(bubble);
                 chatContainer.appendChild(wrapper);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                if (shouldSave) {
+                    saveMessage({ sender: 'agent', text, isError, time: formattedTime, id: msgId });
+                }
+            }
+
+            // Restaura mensagens do histórico salvo ao carregar a página
+            function restoreChatHistory() {
+                const saved = loadSavedMessages();
+                if (!saved || saved.length === 0) return;
+
+                saved.forEach(msg => {
+                    if (msg.sender === 'user') {
+                        renderUserBubble(msg.text, msg.time, false);
+                    } else if (msg.sender === 'agent') {
+                        if (msg.id) lastKnownAgentMessageId = msg.id;
+                        renderAgentBubble(msg.text, msg.isError || false, msg.time, false, msg.id);
+                    }
+                });
+
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                // Se a última mensagem foi do usuário e o usuário deu refresh enquanto esperava resposta
+                const lastMsg = saved[saved.length - 1];
+                if (lastMsg && lastMsg.sender === 'user') {
+                    showTypingIndicator();
+                    startPollingForAgentResponse();
+                }
+            }
+            restoreChatHistory();
+
+            // Ouvinte em tempo real via Supabase Realtime (WebSocket instantâneo!)
+            try {
+                supabase
+                    .channel('simulador-agente-' + Date.now())
+                    .on('postgres_changes', {
+                        event: 'INSERT',
+                        schema: 'public',
+                        table: 'mensagens',
+                        filter: `id_empresa=eq.${currentUserId}`
+                    }, (payload) => {
+                        const newMsg = payload.new;
+                        if (newMsg && newMsg.remetente === 'ia' && isPolling) {
+                            if (newMsg.id !== lastKnownAgentMessageId) {
+                                lastKnownAgentMessageId = newMsg.id;
+                                handleAgentResponseReceived(newMsg.conteudo, newMsg.id);
+                            }
+                        }
+                    })
+                    .subscribe();
+            } catch (e) {
+                console.warn('Erro ao assinar Realtime:', e);
             }
 
             function showTypingIndicator() {
@@ -799,11 +863,11 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                 if (el) el.remove();
             }
 
-            function handleAgentResponseReceived(respostaText) {
+            function handleAgentResponseReceived(respostaText, msgId = null) {
                 if (!isPolling) return;
                 stopPolling();
                 removeTypingIndicator();
-                renderAgentBubble(respostaText);
+                renderAgentBubble(respostaText, false, null, true, msgId);
             }
 
             function startPollingForAgentResponse() {
@@ -829,7 +893,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                         const data = await res.json();
                         if (data && data.hasNew && data.resposta) {
                             lastKnownAgentMessageId = data.id;
-                            handleAgentResponseReceived(data.resposta);
+                            handleAgentResponseReceived(data.resposta, data.id);
                         }
                     } catch (e) {
                         console.warn('Erro durante polling:', e);
@@ -854,7 +918,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                 const text = chatInput.value.trim();
                 if (!text) return;
 
-                // 1. Renderiza mensagem do usuário imediatamente na tela
+                // 1. Renderiza mensagem do usuário imediatamente na tela (e salva no histórico)
                 renderUserBubble(text);
 
                 // 2. Limpa input e restaura altura
@@ -899,6 +963,9 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                 resetBtn.innerHTML = '<i class="ph ph-spinner ph-spin" style="font-size: 16px;"></i> <span class="btn-reset-text">Reiniciando...</span>';
 
                 try {
+                    // Limpa histórico do localStorage imediatamente
+                    clearSavedMessages();
+
                     // Envia reset para a automação n8n limpar memória Redis
                     await fetch('/api/list_tenants?action=chat_test_send', {
                         method: 'POST',
@@ -926,6 +993,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                     }, 1500);
                 } catch (e) {
                     console.error('Erro ao reiniciar conversa:', e);
+                    clearSavedMessages();
                     chatContainer.innerHTML = initialChatHTML;
                     resetBtn.innerHTML = origHtml;
                     resetBtn.disabled = false;
