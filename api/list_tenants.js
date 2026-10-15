@@ -125,6 +125,7 @@ export default async function handler(req, res) {
         const body = req.body || {};
         const query = req.query || {};
         const id_empresa = body.id_empresa || query.id_empresa || 'a0269c72-e0dd-4a5c-91e5-227665905126';
+        const last_id = body.last_id || query.last_id; // ID da última mensagem IA conhecida
         const since = body.since || query.since; // ISO string
 
         try {
@@ -136,19 +137,55 @@ export default async function handler(req, res) {
                 .order('criado_em', { ascending: false })
                 .limit(1);
 
-            if (since) {
-                q = q.gt('criado_em', since);
-            }
-
             const { data, error } = await q;
             if (error) throw error;
 
             if (data && data.length > 0) {
+                const latest = data[0];
+
+                // 1. Se informou last_id: nova mensagem é qualquer uma com ID diferente
+                if (last_id) {
+                    if (latest.id !== last_id) {
+                        return res.status(200).json({
+                            success: true,
+                            hasNew: true,
+                            resposta: latest.conteudo,
+                            id: latest.id,
+                            criado_em: latest.criado_em
+                        });
+                    } else {
+                        return res.status(200).json({
+                            success: true,
+                            hasNew: false
+                        });
+                    }
+                }
+
+                // 2. Se informou since (com margem de 45s para desvio de relógio entre cliente e servidor):
+                if (since) {
+                    const msgTime = new Date(latest.criado_em).getTime();
+                    const sinceTime = new Date(since).getTime();
+                    if (msgTime > (sinceTime - 45000)) {
+                        return res.status(200).json({
+                            success: true,
+                            hasNew: true,
+                            resposta: latest.conteudo,
+                            id: latest.id,
+                            criado_em: latest.criado_em
+                        });
+                    } else {
+                        return res.status(200).json({
+                            success: true,
+                            hasNew: false
+                        });
+                    }
+                }
+
+                // 3. Chamada inicial de sincronização (obtém ID atual)
                 return res.status(200).json({
                     success: true,
-                    hasNew: true,
-                    resposta: data[0].conteudo,
-                    criado_em: data[0].criado_em
+                    hasNew: false,
+                    currentId: latest.id
                 });
             }
 

@@ -534,7 +534,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
             const resetBtn = document.getElementById('btn-reset-chat');
 
             let currentUserId = 'a0269c72-e0dd-4a5c-91e5-227665905126'; // Tenant padrão
-            let lastMessageSentTimestamp = null;
+            let lastKnownAgentMessageId = null;
             let pollInterval = null;
             let pollTimeout = null;
             let isPolling = false;
@@ -546,6 +546,45 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                 }
             } catch (e) {
                 console.warn('Erro ao obter usuário autenticado:', e);
+            }
+
+            // Sincroniza o ID da última mensagem IA conhecida no início
+            async function syncLatestAgentMessageId() {
+                try {
+                    const res = await fetch(`/api/list_tenants?action=chat_test_poll&id_empresa=${encodeURIComponent(currentUserId)}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data && (data.currentId || data.id)) {
+                            lastKnownAgentMessageId = data.currentId || data.id;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Erro ao sincronizar último ID:', e);
+                }
+            }
+            syncLatestAgentMessageId();
+
+            // Ouvinte em tempo real via Supabase Realtime (WebSocket instantâneo!)
+            try {
+                supabase
+                    .channel('simulador-agente-' + Date.now())
+                    .on('postgres_changes', {
+                        event: 'INSERT',
+                        schema: 'public',
+                        table: 'mensagens',
+                        filter: `id_empresa=eq.${currentUserId}`
+                    }, (payload) => {
+                        const newMsg = payload.new;
+                        if (newMsg && newMsg.remetente === 'ia' && isPolling) {
+                            if (newMsg.id !== lastKnownAgentMessageId) {
+                                lastKnownAgentMessageId = newMsg.id;
+                                handleAgentResponseReceived(newMsg.conteudo);
+                            }
+                        }
+                    })
+                    .subscribe();
+            } catch (e) {
+                console.warn('Erro ao assinar Realtime:', e);
             }
 
             // Salvar estado HTML padrão inicial do chat para resets
@@ -658,35 +697,42 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                 if (el) el.remove();
             }
 
-            function startPollingForAgentResponse(sinceTimestamp) {
+            function handleAgentResponseReceived(respostaText) {
+                if (!isPolling) return;
+                stopPolling();
+                removeTypingIndicator();
+                renderAgentBubble(respostaText);
+            }
+
+            function startPollingForAgentResponse() {
                 if (pollInterval) clearInterval(pollInterval);
                 if (pollTimeout) clearTimeout(pollTimeout);
                 isPolling = true;
 
-                // Timeout de 90 segundos caso n8n demore ou caia
+                // Timeout de 70 segundos caso n8n demore ou caia
                 pollTimeout = setTimeout(() => {
                     if (isPolling) {
                         stopPolling();
                         removeTypingIndicator();
-                        renderAgentBubble('⚠️ O agente demorou para responder. Se você enviou uma mensagem complexa ou houve oscilação na conexão, tente enviar um novo "olá".', true);
+                        renderAgentBubble('⚠️ O agente demorou para responder. Tente enviar uma nova mensagem de teste.', true);
                     }
-                }, 90000);
+                }, 70000);
 
                 pollInterval = setInterval(async () => {
                     try {
-                        const url = `/api/list_tenants?action=chat_test_poll&id_empresa=${encodeURIComponent(currentUserId)}&since=${encodeURIComponent(sinceTimestamp)}`;
+                        const lastIdParam = lastKnownAgentMessageId ? `&last_id=${encodeURIComponent(lastKnownAgentMessageId)}` : '';
+                        const url = `/api/list_tenants?action=chat_test_poll&id_empresa=${encodeURIComponent(currentUserId)}${lastIdParam}`;
                         const res = await fetch(url);
                         if (!res.ok) return;
                         const data = await res.json();
                         if (data && data.hasNew && data.resposta) {
-                            stopPolling();
-                            removeTypingIndicator();
-                            renderAgentBubble(data.resposta);
+                            lastKnownAgentMessageId = data.id;
+                            handleAgentResponseReceived(data.resposta);
                         }
                     } catch (e) {
                         console.warn('Erro durante polling:', e);
                     }
-                }, 1500);
+                }, 1200);
             }
 
             function stopPolling() {
@@ -716,19 +762,13 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                     chatInput.focus();
                 }
 
-                // 3. Marca o timestamp para o polling (se já não estiver pollando)
-                if (!isPolling) {
-                    // Pega timestamp atual menos 2 segundos de margem
-                    lastMessageSentTimestamp = new Date(Date.now() - 2000).toISOString();
-                }
-
-                // 4. Mostra indicador de digitação
+                // 3. Mostra indicador de digitação
                 showTypingIndicator();
 
-                // 5. Inicia o poller aguardando o debounce do n8n finalizar
-                startPollingForAgentResponse(lastMessageSentTimestamp);
+                // 4. Inicia monitoramento de resposta (Realtime + Polling com last_id)
+                startPollingForAgentResponse();
 
-                // 6. Dispara a mensagem imediatamente para o n8n
+                // 5. Dispara a mensagem imediatamente para o n8n
                 try {
                     await fetch('/api/list_tenants?action=chat_test_send', {
                         method: 'POST',
@@ -767,6 +807,9 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                             telefone_cliente: '558182975691'
                         })
                     });
+
+                    // Sincroniza novo ID para não confundir com mensagem antiga
+                    await syncLatestAgentMessageId();
 
                     // Restaura estado inicial do container
                     chatContainer.innerHTML = initialChatHTML;
