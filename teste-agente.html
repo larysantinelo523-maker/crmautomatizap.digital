@@ -391,17 +391,6 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                             </div>
                         </div>
 
-                        <!-- Vigia / Debounce Banner -->
-                        <div id="debounce-vigia-banner" style="display: none; padding: 10px 18px; background: rgba(34, 197, 94, 0.08); border-top: 1px solid rgba(34, 197, 94, 0.25); align-items: center; justify-content: space-between; font-size: 12px; color: var(--color-text-sec);">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span class="vigia-pulse-dot" style="width: 9px; height: 9px; border-radius: 50%; background-color: #22c55e; display: inline-block;"></span>
-                                <span>Aguardando você terminar... <strong id="debounce-countdown" style="color: var(--color-primary); font-weight: 700;">10s</strong></span>
-                            </div>
-                            <button id="btn-force-send" type="button" style="background: var(--color-bg-card); border: 1px solid var(--color-primary); color: var(--color-primary); padding: 5px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all 0.2s;" title="Enviar imediatamente sem aguardar os 10s">
-                                <i class="ph-fill ph-lightning"></i> Responder agora
-                            </button>
-                        </div>
-
                         <!-- Rodape Chat -->
                         <div
                             style="padding: 16px 24px; border-top: 1px solid var(--color-border); background-color: var(--color-bg-card); display: flex; align-items: center; gap: 12px; border-radius: 0 0 12px 12px;">
@@ -544,18 +533,11 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
             const chatContainer = document.getElementById('chat-messages');
             const resetBtn = document.getElementById('btn-reset-chat');
 
-            let isWaitingResponse = false;
             let currentUserId = 'a0269c72-e0dd-4a5c-91e5-227665905126'; // Tenant padrão
-
-            // Debounce / Vigia de 10s
-            let debounceTimer = null;
-            let countdownInterval = null;
-            let remainingSeconds = 10;
-            let pendingMessages = [];
-
-            const vigiaBanner = document.getElementById('debounce-vigia-banner');
-            const countdownEl = document.getElementById('debounce-countdown');
-            const btnForceSend = document.getElementById('btn-force-send');
+            let lastMessageSentTimestamp = null;
+            let pollInterval = null;
+            let pollTimeout = null;
+            let isPolling = false;
 
             try {
                 const { data: { user } } = await supabase.auth.getUser();
@@ -662,7 +644,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                         <span class="typing-dot"></span>
                         <span class="typing-dot"></span>
                     </div>
-                    <span style="font-size: 11.5px; color: var(--color-text-mut); font-weight: 500;">Agente respondendo...</span>
+                    <span style="font-size: 11.5px; color: var(--color-text-mut); font-weight: 500;">Agente digitando...</span>
                 `;
 
                 wrapper.appendChild(avatar);
@@ -676,94 +658,55 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                 if (el) el.remove();
             }
 
-            function setSendingState(waiting) {
-                isWaitingResponse = waiting;
-                if (waiting) {
-                    sendBtn.disabled = true;
-                    sendBtn.innerHTML = '<i class="ph ph-spinner ph-spin" style="font-size: 20px;"></i>';
-                    sendBtn.style.opacity = '0.7';
-                } else {
-                    sendBtn.disabled = false;
-                    sendBtn.innerHTML = '<i class="ph-fill ph-paper-plane-tilt" style="font-size: 20px;"></i>';
-                    sendBtn.style.opacity = '1';
-                    if (window.innerWidth > 768) {
-                        chatInput.focus();
+            function startPollingForAgentResponse(sinceTimestamp) {
+                if (pollInterval) clearInterval(pollInterval);
+                if (pollTimeout) clearTimeout(pollTimeout);
+                isPolling = true;
+
+                // Timeout de 90 segundos caso n8n demore ou caia
+                pollTimeout = setTimeout(() => {
+                    if (isPolling) {
+                        stopPolling();
+                        removeTypingIndicator();
+                        renderAgentBubble('⚠️ O agente demorou para responder. Se você enviou uma mensagem complexa ou houve oscilação na conexão, tente enviar um novo "olá".', true);
                     }
+                }, 90000);
+
+                pollInterval = setInterval(async () => {
+                    try {
+                        const url = `/api/list_tenants?action=chat_test_poll&id_empresa=${encodeURIComponent(currentUserId)}&since=${encodeURIComponent(sinceTimestamp)}`;
+                        const res = await fetch(url);
+                        if (!res.ok) return;
+                        const data = await res.json();
+                        if (data && data.hasNew && data.resposta) {
+                            stopPolling();
+                            removeTypingIndicator();
+                            renderAgentBubble(data.resposta);
+                        }
+                    } catch (e) {
+                        console.warn('Erro durante polling:', e);
+                    }
+                }, 1500);
+            }
+
+            function stopPolling() {
+                isPolling = false;
+                if (pollInterval) {
+                    clearInterval(pollInterval);
+                    pollInterval = null;
+                }
+                if (pollTimeout) {
+                    clearTimeout(pollTimeout);
+                    pollTimeout = null;
                 }
             }
 
-            function resetDebounceVigia() {
-                if (debounceTimer) clearTimeout(debounceTimer);
-                if (countdownInterval) clearInterval(countdownInterval);
-
-                remainingSeconds = 10;
-                if (countdownEl) countdownEl.textContent = `${remainingSeconds}s`;
-                if (vigiaBanner) {
-                    vigiaBanner.style.display = 'flex';
-                }
-
-                countdownInterval = setInterval(() => {
-                    remainingSeconds--;
-                    if (countdownEl) countdownEl.textContent = `${remainingSeconds}s`;
-                    if (remainingSeconds <= 0) {
-                        clearInterval(countdownInterval);
-                    }
-                }, 1000);
-
-                debounceTimer = setTimeout(() => {
-                    flushPendingMessages();
-                }, 10000);
-            }
-
-            async function flushPendingMessages() {
-                if (debounceTimer) clearTimeout(debounceTimer);
-                if (countdownInterval) clearInterval(countdownInterval);
-                if (vigiaBanner) vigiaBanner.style.display = 'none';
-
-                if (pendingMessages.length === 0 || isWaitingResponse) return;
-
-                const fullMessage = pendingMessages.join('\n');
-                pendingMessages = [];
-
-                setSendingState(true);
-                showTypingIndicator();
-
-                try {
-                    const response = await fetch('/api/list_tenants?action=chat_test', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            mensagem: fullMessage,
-                            id_empresa: currentUserId,
-                            telefone_cliente: '558182975691'
-                        })
-                    });
-
-                    const data = await response.json();
-                    removeTypingIndicator();
-
-                    if (!response.ok || !data.success) {
-                        throw new Error(data.error || 'Erro na resposta do agente');
-                    }
-
-                    renderAgentBubble(data.resposta);
-                } catch (err) {
-                    console.error('Erro ao comunicar com o agente:', err);
-                    removeTypingIndicator();
-                    renderAgentBubble('⚠️ Ops! O agente demorou para responder ou houve uma oscilação na conexão. Por favor, tente enviar novamente.', true);
-                } finally {
-                    setSendingState(false);
-                }
-            }
-
-            function sendUserMessage() {
-                if (!chatInput || !chatContainer || isWaitingResponse) return;
+            async function sendUserMessage() {
+                if (!chatInput || !chatContainer) return;
                 const text = chatInput.value.trim();
                 if (!text) return;
 
-                // 1. Renderiza mensagem do usuário imediatamente
+                // 1. Renderiza mensagem do usuário imediatamente na tela
                 renderUserBubble(text);
 
                 // 2. Limpa input e restaura altura
@@ -773,29 +716,49 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                     chatInput.focus();
                 }
 
-                // 3. Adiciona na fila pendente
-                pendingMessages.push(text);
+                // 3. Marca o timestamp para o polling (se já não estiver pollando)
+                if (!isPolling) {
+                    // Pega timestamp atual menos 2 segundos de margem
+                    lastMessageSentTimestamp = new Date(Date.now() - 2000).toISOString();
+                }
 
-                // 4. Inicia ou reinicia o "vigia" de 10 segundos
-                resetDebounceVigia();
+                // 4. Mostra indicador de digitação
+                showTypingIndicator();
+
+                // 5. Inicia o poller aguardando o debounce do n8n finalizar
+                startPollingForAgentResponse(lastMessageSentTimestamp);
+
+                // 6. Dispara a mensagem imediatamente para o n8n
+                try {
+                    await fetch('/api/list_tenants?action=chat_test_send', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            mensagem: text,
+                            id_empresa: currentUserId,
+                            telefone_cliente: '558182975691'
+                        })
+                    });
+                } catch (err) {
+                    console.error('Erro ao enviar mensagem:', err);
+                }
             }
 
             async function resetConversation() {
-                if (isWaitingResponse) return;
                 if (!confirm('Deseja reiniciar a conversa de teste com o agente?')) return;
 
-                if (debounceTimer) clearTimeout(debounceTimer);
-                if (countdownInterval) clearInterval(countdownInterval);
-                pendingMessages = [];
-                if (vigiaBanner) vigiaBanner.style.display = 'none';
+                stopPolling();
+                removeTypingIndicator();
 
                 const origHtml = resetBtn.innerHTML;
                 resetBtn.disabled = true;
                 resetBtn.innerHTML = '<i class="ph ph-spinner ph-spin" style="font-size: 16px;"></i> <span class="btn-reset-text">Reiniciando...</span>';
 
                 try {
-                    // Envia reset para a automação n8n limpar memória
-                    await fetch('/api/list_tenants?action=chat_test', {
+                    // Envia reset para a automação n8n limpar memória Redis
+                    await fetch('/api/list_tenants?action=chat_test_send', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -837,11 +800,6 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
             }
             if (resetBtn) {
                 resetBtn.addEventListener('click', resetConversation);
-            }
-            if (btnForceSend) {
-                btnForceSend.addEventListener('click', () => {
-                    flushPendingMessages();
-                });
             }
         });
     </script>

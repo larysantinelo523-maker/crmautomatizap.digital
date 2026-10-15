@@ -6,10 +6,10 @@ export default async function handler(req, res) {
     }
 
     const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://qosgrqdfeqzxnzhmwomv.supabase.co';
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
     if (!supabaseKey) {
-        return res.status(500).json({ error: 'Missing SUPABASE_SERVICE_ROLE_KEY' });
+        return res.status(500).json({ error: 'Missing SUPABASE_SERVICE_ROLE_KEY or VITE_SUPABASE_ANON_KEY' });
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -58,55 +58,108 @@ export default async function handler(req, res) {
         }
     }
 
-    // ─── MODO CHAT TEST (SIMULADOR DO AGENTE N8N): /api/list_tenants?action=chat_test ───
-    if ((req.query && req.query.action === 'chat_test') || (req.body && req.body.action === 'chat_test')) {
+    // ─── MODO CHAT TEST SEND (ENVIO IMEDIATO PARA O WHATSAPP-CHAT / N8N): /api/list_tenants?action=chat_test_send ───
+    if ((req.query && (req.query.action === 'chat_test_send' || req.query.action === 'chat_test')) || 
+        (req.body && (req.body.action === 'chat_test_send' || req.body.action === 'chat_test'))) {
         const body = req.body || {};
         const query = req.query || {};
         const mensagem = body.mensagem || query.mensagem;
         const id_empresa = body.id_empresa || query.id_empresa || 'a0269c72-e0dd-4a5c-91e5-227665905126';
         const telefone_cliente = body.telefone_cliente || query.telefone_cliente || '558182975691';
+        const nome_cliente = body.nome_cliente || query.nome_cliente || 'Lead Teste';
 
         if (!mensagem) {
             return res.status(400).json({ error: 'Mensagem é obrigatória' });
         }
 
         try {
-            const webhookUrl = 'https://talonedlanternfish-n8n.cloudfy.live/webhook/simulador-crm';
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 65000); // 65s timeout
+            const isReset = mensagem.toLowerCase().trim() === 'reset';
+            const conversationText = isReset ? 'ResetAdmin2026' : mensagem;
+
+            const webhookUrl = 'https://talonedlanternfish-n8n.cloudfy.live/webhook/whatsapp-chat';
+            const payload = {
+                event: 'messages.upsert',
+                instance: 'AGENTE',
+                origem: 'teste_crm',
+                data: {
+                    key: {
+                        remoteJid: `${telefone_cliente}@s.whatsapp.net`,
+                        fromMe: false,
+                        id: 'sim_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7)
+                    },
+                    pushName: nome_cliente,
+                    message: {
+                        conversation: conversationText
+                    }
+                }
+            };
 
             const response = await fetch(webhookUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    mensagem: mensagem,
-                    telefone_cliente: telefone_cliente,
-                    id_empresa: id_empresa,
-                    origem: 'teste_crm'
-                }),
-                signal: controller.signal
+                body: JSON.stringify(payload)
             });
-
-            clearTimeout(timeout);
 
             if (!response.ok) {
                 const errText = await response.text();
-                throw new Error(`Erro do servidor de automação (${response.status}): ${errText}`);
+                throw new Error(`Erro do webhook n8n (${response.status}): ${errText}`);
             }
 
-            const json = await response.json();
             return res.status(200).json({
                 success: true,
-                resposta: json.resposta || 'Olá! Como posso ajudar você hoje?'
+                sentAt: new Date().toISOString(),
+                isReset: isReset
             });
         } catch (err) {
-            console.error('Erro no proxy chat_test:', err);
+            console.error('Erro no envio chat_test_send:', err);
             return res.status(500).json({
-                error: err.name === 'AbortError' 
-                    ? 'A automação demorou para responder. Tente novamente em alguns segundos.' 
-                    : (err.message || 'Erro ao processar mensagem do agente.')
+                error: err.message || 'Erro ao enviar mensagem para automação.'
+            });
+        }
+    }
+
+    // ─── MODO CHAT TEST POLL (CONSULTA RESPOSTA DO AGENTE NO SUPABASE): /api/list_tenants?action=chat_test_poll ───
+    if ((req.query && req.query.action === 'chat_test_poll') || (req.body && req.body.action === 'chat_test_poll')) {
+        const body = req.body || {};
+        const query = req.query || {};
+        const id_empresa = body.id_empresa || query.id_empresa || 'a0269c72-e0dd-4a5c-91e5-227665905126';
+        const since = body.since || query.since; // ISO string
+
+        try {
+            let q = supabase
+                .from('mensagens')
+                .select('id, conteudo, criado_em, remetente, nome_cliente')
+                .eq('id_empresa', id_empresa)
+                .eq('remetente', 'ia')
+                .order('criado_em', { ascending: false })
+                .limit(1);
+
+            if (since) {
+                q = q.gt('criado_em', since);
+            }
+
+            const { data, error } = await q;
+            if (error) throw error;
+
+            if (data && data.length > 0) {
+                return res.status(200).json({
+                    success: true,
+                    hasNew: true,
+                    resposta: data[0].conteudo,
+                    criado_em: data[0].criado_em
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                hasNew: false
+            });
+        } catch (err) {
+            console.error('Erro no polling chat_test_poll:', err);
+            return res.status(500).json({
+                error: err.message || 'Erro ao consultar respostas do agente.'
             });
         }
     }
