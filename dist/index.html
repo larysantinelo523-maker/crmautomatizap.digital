@@ -544,7 +544,7 @@
             const leadsRecuperar = 0; // A definir nova regra de negócio futuramente
             animateValueUser('kpi-recuperar', 0, leadsRecuperar, 1500);
 
-            // Atualizar tabela com paginação de 10 leads por página
+            // Atualizar tabela com paginação de 5 leads por página
             dashboardAllLeads = leads;
             dashboardCurrentPage = 1;
             initDashboardSearch();
@@ -554,7 +554,7 @@
         // Estado da paginação e lista de leads da Visão Geral
         let dashboardAllLeads = [];
         let dashboardCurrentPage = 1;
-        const DASHBOARD_PAGE_SIZE = 10;
+        const DASHBOARD_PAGE_SIZE = 5;
         let dashboardSearchTerm = '';
         let dashboardStatusFilter = 'Todos';
 
