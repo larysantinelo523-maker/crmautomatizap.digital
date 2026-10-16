@@ -810,6 +810,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInputs = document.querySelectorAll('.search-input input');
 
     searchInputs.forEach(input => {
+        if (input.id === 'dashboard-search-input') return; // Gerenciado com paginação no dashboard
         input.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
 
@@ -1399,23 +1400,27 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (typeof window.initLeads === 'function') await window.initLeads();
                             if (typeof window.initRelatorios === 'function') await window.initRelatorios();
                             
-                            const tableRows = document.querySelectorAll('.data-table tbody tr');
-                            tableRows.forEach(row => {
-                                if (selectedMobileStatus === 'Todos') {
-                                    row.style.display = '';
-                                } else {
-                                    const cells = row.querySelectorAll('td');
-                                    if (cells.length > 2) {
-                                        const badge = cells[2].querySelector('.badge');
-                                        const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[2].textContent.trim().toLowerCase();
-                                        if (rowStatus === selectedMobileStatus.toLowerCase()) {
-                                            row.style.display = '';
-                                        } else {
-                                            row.style.display = 'none';
+                            if (typeof window.setDashboardStatusFilter === 'function') {
+                                window.setDashboardStatusFilter(selectedMobileStatus);
+                            } else {
+                                const tableRows = document.querySelectorAll('.data-table tbody tr');
+                                tableRows.forEach(row => {
+                                    if (selectedMobileStatus === 'Todos') {
+                                        row.style.display = '';
+                                    } else {
+                                        const cells = row.querySelectorAll('td');
+                                        if (cells.length > 2) {
+                                            const badge = cells[2].querySelector('.badge');
+                                            const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[2].textContent.trim().toLowerCase();
+                                            if (rowStatus === selectedMobileStatus.toLowerCase()) {
+                                                row.style.display = '';
+                                            } else {
+                                                row.style.display = 'none';
+                                            }
                                         }
                                     }
-                                }
-                            });
+                                });
+                            }
                             
                             closeModal();
                         });
@@ -1489,23 +1494,27 @@ document.addEventListener('DOMContentLoaded', () => {
                                     btn.classList.add('filter-active');
                                 }
                                 
-                                const tableRows = document.querySelectorAll('.data-table tbody tr');
-                                tableRows.forEach(row => {
-                                    if (statusVal === 'Todos') {
-                                        row.style.display = '';
-                                    } else {
-                                        const cells = row.querySelectorAll('td');
-                                        if (cells.length > 2) {
-                                            const badge = cells[2].querySelector('.badge');
-                                            const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[2].textContent.trim().toLowerCase();
-                                            if (rowStatus === statusVal.toLowerCase()) {
-                                                row.style.display = '';
-                                            } else {
-                                                row.style.display = 'none';
+                                if (typeof window.setDashboardStatusFilter === 'function') {
+                                    window.setDashboardStatusFilter(statusVal);
+                                } else {
+                                    const tableRows = document.querySelectorAll('.data-table tbody tr');
+                                    tableRows.forEach(row => {
+                                        if (statusVal === 'Todos') {
+                                            row.style.display = '';
+                                        } else {
+                                            const cells = row.querySelectorAll('td');
+                                            if (cells.length > 2) {
+                                                const badge = cells[2].querySelector('.badge');
+                                                const rowStatus = badge ? badge.textContent.trim().toLowerCase() : cells[2].textContent.trim().toLowerCase();
+                                                if (rowStatus === statusVal.toLowerCase()) {
+                                                    row.style.display = '';
+                                                } else {
+                                                    row.style.display = 'none';
+                                                }
                                             }
                                         }
-                                    }
-                                });
+                                    });
+                                }
                                 
                                 setTimeout(() => {
                                     if (dropdown) dropdown.style.display = 'none';

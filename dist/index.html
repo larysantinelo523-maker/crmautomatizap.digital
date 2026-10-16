@@ -57,9 +57,9 @@
     </script>
   <script type="module" crossorigin src="/assets/supabase-DUkCiNAm.js"></script>
   <script type="module" crossorigin src="/assets/data-BG-H1LmU.js"></script>
-  <script type="module" crossorigin src="/assets/script-BjgKP-Qg.js"></script>
+  <script type="module" crossorigin src="/assets/script-Bo6h1RSN.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/data-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-kTMy5Fuw.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-BLYjpMjf.css">
 </head>
 
 <body>
@@ -353,7 +353,7 @@
                             <div class="table-controls">
                                 <div class="search-input">
                                     <i class="ph ph-magnifying-glass"></i>
-                                    <input type="text" placeholder="Buscar por nome, telefone ou interesse...">
+                                    <input type="text" id="dashboard-search-input" placeholder="Buscar por nome, telefone ou interesse...">
                                 </div>
                                 <button class="btn-icon outline"><i class="ph ph-funnel"></i></button>
                             </div>
@@ -376,14 +376,7 @@
                         </div>
                         <div class="table-footer">
                             <span class="pagination-info" id="dashboard-pagination-info">Mostrando 0 leads</span>
-                            <div class="pagination">
-                                <button class="page-btn"><i class="ph ph-caret-left"></i></button>
-                                <button class="page-btn active">1</button>
-                                <button class="page-btn">2</button>
-                                <button class="page-btn">3</button>
-                                <button class="page-btn">4</button>
-                                <button class="page-btn">5</button>
-                                <button class="page-btn"><i class="ph ph-caret-right"></i></button>
+                            <div class="pagination" id="dashboard-pagination">
                             </div>
                         </div>
                     </section>
@@ -551,53 +544,220 @@
             const leadsRecuperar = 0; // A definir nova regra de negócio futuramente
             animateValueUser('kpi-recuperar', 0, leadsRecuperar, 1500);
 
-            // Atualizar paginação
+            // Atualizar tabela com paginação de 10 leads por página
+            dashboardAllLeads = leads;
+            dashboardCurrentPage = 1;
+            initDashboardSearch();
+            window.renderDashboardTable();
+        };
+
+        // Estado da paginação e lista de leads da Visão Geral
+        let dashboardAllLeads = [];
+        let dashboardCurrentPage = 1;
+        const DASHBOARD_PAGE_SIZE = 10;
+        let dashboardSearchTerm = '';
+        let dashboardStatusFilter = 'Todos';
+
+        function getPaginationPages(currentPage, totalPages) {
+            if (totalPages <= 7) {
+                const pages = [];
+                for (let i = 1; i <= totalPages; i++) pages.push(i);
+                return pages;
+            }
+            if (currentPage <= 4) {
+                return [1, 2, 3, 4, 5, '...', totalPages];
+            }
+            if (currentPage >= totalPages - 3) {
+                return [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+            }
+            return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+        }
+
+        window.renderDashboardTable = function () {
+            // Filtrar os leads por busca e status
+            const filteredLeads = dashboardAllLeads.filter(lead => {
+                // Filtro de busca (nome, telefone, interesse, status)
+                if (dashboardSearchTerm) {
+                    const term = dashboardSearchTerm.toLowerCase();
+                    const nome = (lead.nome || '').toLowerCase();
+                    const rawTelefone = (lead.telefone || '').toLowerCase();
+                    const telefoneDigits = (lead.telefone || '').replace(/\D/g, '');
+                    const interesse = (lead.interesse || '').toLowerCase();
+                    const status = (lead.status || '').toLowerCase();
+                    const termDigits = term.replace(/\D/g, '');
+                    
+                    const matchPhone = termDigits.length > 0 && telefoneDigits.includes(termDigits);
+                    if (!nome.includes(term) && !rawTelefone.includes(term) && !matchPhone && !interesse.includes(term) && !status.includes(term)) {
+                        return false;
+                    }
+                }
+
+                // Filtro de status
+                if (dashboardStatusFilter && dashboardStatusFilter !== 'Todos') {
+                    const st = (lead.status || '').trim().toLowerCase();
+                    if (st !== dashboardStatusFilter.trim().toLowerCase()) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            const total = filteredLeads.length;
+            const totalPages = Math.max(1, Math.ceil(total / DASHBOARD_PAGE_SIZE));
+
+            if (dashboardCurrentPage > totalPages) {
+                dashboardCurrentPage = totalPages;
+            }
+            if (dashboardCurrentPage < 1) {
+                dashboardCurrentPage = 1;
+            }
+
+            const startIdx = (dashboardCurrentPage - 1) * DASHBOARD_PAGE_SIZE;
+            const endIdx = Math.min(startIdx + DASHBOARD_PAGE_SIZE, total);
+            const pageLeads = filteredLeads.slice(startIdx, endIdx);
+
+            // Atualizar texto de paginação
             const paginationEl = document.getElementById('dashboard-pagination-info');
-            if (paginationEl) paginationEl.textContent = `Mostrando ${Math.min(5, leads.length)} de ${leads.length} leads`;
+            if (paginationEl) {
+                if (total === 0) {
+                    paginationEl.textContent = 'Mostrando 0 leads';
+                } else if (startIdx + 1 === endIdx) {
+                    paginationEl.textContent = `Mostrando ${endIdx} de ${total} leads`;
+                } else {
+                    paginationEl.textContent = `Mostrando ${startIdx + 1} a ${endIdx} de ${total} leads`;
+                }
+            }
 
-            // Atualizar tabela
-            const tbody = document.querySelector('.data-table tbody');
-            if (tbody) tbody.innerHTML = '';
+            // Atualizar botões de paginação
+            const paginationContainer = document.getElementById('dashboard-pagination') || document.querySelector('.table-footer .pagination');
+            if (paginationContainer) {
+                paginationContainer.innerHTML = '';
 
-            if (leads.length === 0 && tbody) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 32px; color: var(--color-text-mut);">Nenhum lead encontrado.</td></tr>';
-            } else {
-                // DEBUG: imprime os dados no console
-                console.log('[DEBUG foto_perfil] Leads retornados:', leads.slice(0, 5).map(l => ({nome: l.nome, foto_perfil: l.foto_perfil})));
-                leads.slice(0, 5).forEach(lead => {
-                    let badgeClass = 'primary-light';
-                    let st = lead.status ? lead.status.trim().toLowerCase() : '';
-                    if (st === 'em atendimento') badgeClass = 'warning-light';
-                    else if (st === 'qualificado') badgeClass = 'primary-light';
-
-                    const date = new Date(lead.criado_em);
-                    const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    const initials = lead.nome.charAt(0).toUpperCase();
-                    const avatarContent = lead.foto_perfil ? `<img src="${lead.foto_perfil}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : initials;
-                    const avatarStyle = lead.foto_perfil ? 'background: transparent;' : 'background: var(--color-primary); color: white; font-weight: 600;';
-
-                    const tr = document.createElement('tr');
-                    tr.style.cursor = 'pointer';
-                    tr.onclick = (e) => {
-                        e.stopPropagation();
-                        abrirDossie(lead, badgeClass, formattedDate, tr);
+                // Botão Anterior (<)
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'page-btn';
+                prevBtn.innerHTML = '<i class="ph ph-caret-left"></i>';
+                prevBtn.title = 'Página anterior';
+                if (dashboardCurrentPage <= 1) {
+                    prevBtn.disabled = true;
+                } else {
+                    prevBtn.onclick = () => {
+                        dashboardCurrentPage--;
+                        window.renderDashboardTable();
                     };
+                }
+                paginationContainer.appendChild(prevBtn);
 
-                    tr.innerHTML = `
+                // Páginas numeradas
+                const pageList = getPaginationPages(dashboardCurrentPage, totalPages);
+                pageList.forEach(p => {
+                    if (p === '...') {
+                        const ellipsis = document.createElement('span');
+                        ellipsis.className = 'page-ellipsis';
+                        ellipsis.textContent = '...';
+                        paginationContainer.appendChild(ellipsis);
+                    } else {
+                        const pageBtn = document.createElement('button');
+                        pageBtn.className = 'page-btn' + (p === dashboardCurrentPage ? ' active' : '');
+                        pageBtn.textContent = p;
+                        pageBtn.onclick = () => {
+                            if (dashboardCurrentPage !== p) {
+                                dashboardCurrentPage = p;
+                                window.renderDashboardTable();
+                            }
+                        };
+                        paginationContainer.appendChild(pageBtn);
+                    }
+                });
+
+                // Botão Próximo (>)
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'page-btn';
+                nextBtn.innerHTML = '<i class="ph ph-caret-right"></i>';
+                nextBtn.title = 'Próxima página';
+                if (dashboardCurrentPage >= totalPages) {
+                    nextBtn.disabled = true;
+                } else {
+                    nextBtn.onclick = () => {
+                        dashboardCurrentPage++;
+                        window.renderDashboardTable();
+                    };
+                }
+                paginationContainer.appendChild(nextBtn);
+            }
+
+            // Atualizar corpo da tabela
+            const tbody = document.querySelector('.data-table tbody');
+            if (tbody) {
+                tbody.innerHTML = '';
+
+                if (total === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 32px; color: var(--color-text-mut);">Nenhum lead encontrado.</td></tr>';
+                } else {
+                    pageLeads.forEach(lead => {
+                        let badgeClass = 'primary-light';
+                        let st = lead.status ? lead.status.trim().toLowerCase() : '';
+                        if (st === 'em atendimento') badgeClass = 'warning-light';
+                        else if (st === 'qualificado') badgeClass = 'primary-light';
+
+                        const date = new Date(lead.criado_em);
+                        const formattedDate = !isNaN(date.getTime())
+                            ? (date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }))
+                            : (lead.criado_em || '--');
+                        const initials = (lead.nome || '?').charAt(0).toUpperCase();
+                        const avatarContent = lead.foto_perfil 
+                            ? `<img src="${lead.foto_perfil}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` 
+                            : initials;
+                        const avatarStyle = lead.foto_perfil 
+                            ? 'background: transparent;' 
+                            : 'background: var(--color-primary); color: white; font-weight: 600;';
+
+                        const tr = document.createElement('tr');
+                        tr.style.cursor = 'pointer';
+                        if (window.currentOpenLeadId === lead.id) {
+                            tr.classList.add('active-row');
+                        }
+                        tr.onclick = (e) => {
+                            e.stopPropagation();
+                            abrirDossie(lead, badgeClass, formattedDate, tr);
+                        };
+
+                        tr.innerHTML = `
                             <td>
                                 <div class="user-cell" style="display: flex; align-items: center; gap: 12px;">
                                     <div style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; overflow: hidden; ${avatarStyle}">${avatarContent}</div>
-                                    <span class="user-name" style="font-weight: 500;">${lead.nome}</span>
+                                    <span class="user-name" style="font-weight: 500;">${lead.nome || 'Sem nome'}</span>
                                 </div>
                             </td>
                             <td class="mobile-interesse">${lead.interesse || 'Não informado'}</td>
-                            <td class="mobile-status"><span class="badge ${badgeClass}">${lead.status}</span></td>
+                            <td class="mobile-status"><span class="badge ${badgeClass}">${lead.status || 'Não informado'}</span></td>
                             <td class="mobile-date">${formattedDate}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
             }
         };
+
+        window.setDashboardStatusFilter = function (status) {
+            dashboardStatusFilter = status || 'Todos';
+            dashboardCurrentPage = 1;
+            if (window.renderDashboardTable) window.renderDashboardTable();
+        };
+
+        function initDashboardSearch() {
+            const searchInput = document.getElementById('dashboard-search-input');
+            if (searchInput && !searchInput.dataset.initialized) {
+                searchInput.dataset.initialized = 'true';
+                searchInput.addEventListener('input', (e) => {
+                    dashboardSearchTerm = e.target.value.trim();
+                    dashboardCurrentPage = 1;
+                    if (window.renderDashboardTable) window.renderDashboardTable();
+                });
+            }
+        }
+        document.addEventListener('DOMContentLoaded', initDashboardSearch);
 
         window.currentOpenLeadId = null;
         window.fecharDossie = function() {

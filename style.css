@@ -1581,6 +1581,8 @@ body.dark-mode .accordion-content {
     justify-content: space-between;
     align-items: center;
     margin-top: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
 .pagination-info {
@@ -1591,6 +1593,8 @@ body.dark-mode .accordion-content {
 .pagination {
     display: flex;
     gap: 4px;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .page-btn {
@@ -1602,15 +1606,38 @@ body.dark-mode .accordion-content {
     border-radius: var(--radius-sm);
     font: var(--font-body-sec);
     color: var(--color-text-sec);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
 }
 
-.page-btn:hover {
+.page-btn:hover:not(:disabled):not(.active) {
     background: var(--color-bg-main);
 }
 
 .page-btn.active {
     background: var(--color-primary);
     color: white;
+    cursor: default;
+    font-weight: 600;
+}
+
+.page-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.page-ellipsis {
+    width: 24px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: var(--font-body-sec);
+    color: var(--color-text-mut);
+    user-select: none;
 }
 
 /* ==========================================================================
