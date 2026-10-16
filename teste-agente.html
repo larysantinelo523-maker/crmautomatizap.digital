@@ -702,7 +702,11 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
             const initialChatHTML = chatContainer.innerHTML;
 
             function formatTime(date = new Date()) {
-                return String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0');
+                const d = (date instanceof Date) ? date : new Date(date);
+                const h = String(d.getHours()).padStart(2, '0');
+                const m = String(d.getMinutes()).padStart(2, '0');
+                const s = String(d.getSeconds()).padStart(2, '0');
+                return `${h}:${m}:${s}`;
             }
 
             function formatMessageText(text) {
@@ -823,7 +827,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                         if (newMsg && newMsg.remetente === 'ia' && isPolling) {
                             if (newMsg.id !== lastKnownAgentMessageId) {
                                 lastKnownAgentMessageId = newMsg.id;
-                                handleAgentResponseReceived(newMsg.conteudo, newMsg.id);
+                                handleAgentResponseReceived(newMsg.conteudo, newMsg.id, newMsg.criado_em);
                             }
                         }
                     })
@@ -873,11 +877,12 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                 if (el) el.remove();
             }
 
-            function handleAgentResponseReceived(respostaText, msgId = null) {
+            function handleAgentResponseReceived(respostaText, msgId = null, criadoEm = null) {
                 if (!isPolling) return;
                 stopPolling();
                 removeTypingIndicator();
-                renderAgentBubble(respostaText, false, null, true, msgId);
+                const timeStr = criadoEm ? formatTime(new Date(criadoEm)) : formatTime();
+                renderAgentBubble(respostaText, false, timeStr, true, msgId);
             }
 
             function startPollingForAgentResponse() {
@@ -903,7 +908,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                         const data = await res.json();
                         if (data && data.hasNew && data.resposta) {
                             lastKnownAgentMessageId = data.id;
-                            handleAgentResponseReceived(data.resposta, data.id);
+                            handleAgentResponseReceived(data.resposta, data.id, data.criado_em);
                         }
                     } catch (e) {
                         console.warn('Erro durante polling:', e);
