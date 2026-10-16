@@ -270,6 +270,19 @@ export async function showSystemNotification({ title, body, icon = '/icon-192.pn
 export async function requestNotificationPermission() {
     unlockAudioContext();
 
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+
+    if (isIOS && !isStandalone) {
+        showInAppToast({
+            title: 'Instale o App no iPhone',
+            body: 'Toque no ícone de Compartilhar no Safari e selecione "Adicionar à Tela de Início" para liberar as notificações no seu iPhone.',
+            type: 'lead',
+            duration: 9000
+        });
+        return false;
+    }
+
     if (!('Notification' in window)) {
         showInAppToast({
             title: 'Navegador incompatível',
@@ -333,6 +346,26 @@ export function updateNotificationUI() {
         } else {
             dropdown.prepend(bar);
         }
+    }
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+
+    if (isIOS && !isStandalone) {
+        bar.innerHTML = `
+            <div style="padding: 12px 16px; background: rgba(0, 168, 132, 0.08); border-bottom: 1px solid var(--color-border); display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ph ph-apple-logo" style="font-size: 16px; color: #00a884;"></i>
+                    <div style="font-size: 12px; font-weight: 600; color: var(--color-text-main);">Ativar alertas no iPhone:</div>
+                </div>
+                <div style="font-size: 11px; color: var(--color-text-mut); line-height: 1.4;">
+                    1. Toque em <strong>Compartilhar</strong> (<i class="ph ph-export"></i> no Safari)<br>
+                    2. Toque em <strong>"Adicionar à Tela de Início"</strong><br>
+                    3. Abra pelo ícone do app na tela do celular!
+                </div>
+            </div>
+        `;
+        return;
     }
 
     const permission = ('Notification' in window) ? Notification.permission : 'unsupported';
