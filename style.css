@@ -5150,3 +5150,35 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
     background: rgba(255, 255, 255, 0.25) !important;
     color: #ffffff !important;
 }
+
+/* --- Estilos do Sistema de Notificações Nativas e Toasts --- */
+#crm-notif-permission-bar {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#crm-btn-activate-notif:hover {
+    background-color: #008f6f !important;
+    transform: translateY(-1px);
+}
+
+#crm-btn-test-sound:hover {
+    background: rgba(16, 185, 129, 0.15) !important;
+}
+
+@keyframes crmPulseGreen {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+@media (max-width: 768px) {
+    #crm-toast-container {
+        top: 12px !important;
+        right: 12px !important;
+        left: 12px !important;
+        width: auto !important;
+        max-width: 100% !important;
+    }
+}
+

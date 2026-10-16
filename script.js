@@ -1,5 +1,7 @@
 // --- Verificação de Autenticação Global ---
 import { fetchUserData } from './data.js';
+import { initRealtimeNotifications, updateNotificationUI, playChimeSound, showSystemNotification, requestNotificationPermission } from './notifications.js';
+
 
 window.getBrasiliaDate = function() {
     const str = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
@@ -505,6 +507,14 @@ if (window.location.pathname.indexOf('login.html') === -1) {
 
                 // Se estiver logado, carrega o módulo de dados
                 import('./data.js?v=1.5').then(async (module) => {
+                    // Inicializa notificações sonoras, push e escuta em tempo real
+                    try {
+                        initRealtimeNotifications();
+                        updateNotificationUI();
+                    } catch (e) {
+                        console.warn('Erro ao inicializar notificações:', e);
+                    }
+
                     // Inicializa os dados da página específica
                     if (window.location.pathname.indexOf('index.html') > -1 || window.location.pathname.endsWith('/')) {
                         if (window.initDashboard) window.initDashboard();
@@ -653,7 +663,10 @@ if (window.location.pathname.indexOf('login.html') === -1) {
                     }
 
                     // Aguardar um momento para garantir que a UI foi renderizada
-                    setTimeout(loadNotifications, 500);
+                    setTimeout(() => {
+                        loadNotifications();
+                        if (typeof updateNotificationUI === 'function') updateNotificationUI();
+                    }, 500);
                 });
             }
         });

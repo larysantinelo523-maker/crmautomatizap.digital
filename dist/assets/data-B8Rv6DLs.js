@@ -277,6 +277,17 @@ export function subscribeToLeads(onLeadUpdate) {
     return channel;
 }
 
+export function subscribeToNewLeads(onNewLead) {
+    const channel = supabase
+        .channel(`global-new-leads`)
+        .on(
+            'postgres_changes',
+            { event: 'INSERT', schema: 'public', table: 'leads' },
+            (payload) => { onNewLead(payload.new); }
+        ).subscribe();
+    return channel;
+}
+
 // Expõe globalmente para uso rápido no console e scripts
 window.dbAPI = {
     fetchLeads,
@@ -292,5 +303,7 @@ window.dbAPI = {
     subscribeToMessages,
     unsubscribeFromMessages,
     subscribeToAllMessages,
-    subscribeToLeads
+    subscribeToLeads,
+    subscribeToNewLeads
 };
+
