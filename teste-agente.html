@@ -804,7 +804,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                     if (typingTimer) clearTimeout(typingTimer);
                     typingTimer = setTimeout(() => {
                         if (isPolling) showTypingIndicator();
-                    }, 10000);
+                    }, 25000);
                 }
             }
             restoreChatHistory();
@@ -949,7 +949,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                     if (isPolling) {
                         showTypingIndicator();
                     }
-                }, 10000);
+                }, 25000);
 
                 // 4. Inicia monitoramento de resposta (Realtime + Polling com last_id)
                 startPollingForAgentResponse();
