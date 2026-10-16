@@ -640,6 +640,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
             let pollInterval = null;
             let pollTimeout = null;
             let isPolling = false;
+            let typingTimer = null;
 
             try {
                 const { data: { user } } = await supabase.auth.getUser();
@@ -799,8 +800,11 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                 // Se a última mensagem foi do usuário e o usuário deu refresh enquanto esperava resposta
                 const lastMsg = saved[saved.length - 1];
                 if (lastMsg && lastMsg.sender === 'user') {
-                    showTypingIndicator();
                     startPollingForAgentResponse();
+                    if (typingTimer) clearTimeout(typingTimer);
+                    typingTimer = setTimeout(() => {
+                        if (isPolling) showTypingIndicator();
+                    }, 10000);
                 }
             }
             restoreChatHistory();
@@ -812,7 +816,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                     .on('postgres_changes', {
                         event: 'INSERT',
                         schema: 'public',
-                        table: 'mensagens',
+                        table: 'mensagens_teste',
                         filter: `id_empresa=eq.${currentUserId}`
                     }, (payload) => {
                         const newMsg = payload.new;
@@ -829,7 +833,9 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
             }
 
             function showTypingIndicator() {
-                removeTypingIndicator();
+                const existing = document.getElementById('chat-typing-indicator');
+                if (existing) return;
+
                 const wrapper = document.createElement('div');
                 wrapper.id = 'chat-typing-indicator';
                 wrapper.className = 'chat-msg-anim';
@@ -859,6 +865,10 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
             }
 
             function removeTypingIndicator() {
+                if (typingTimer) {
+                    clearTimeout(typingTimer);
+                    typingTimer = null;
+                }
                 const el = document.getElementById('chat-typing-indicator');
                 if (el) el.remove();
             }
@@ -875,14 +885,14 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                 if (pollTimeout) clearTimeout(pollTimeout);
                 isPolling = true;
 
-                // Timeout de 70 segundos caso n8n demore ou caia
+                // Timeout de 120 segundos para comportar mensagens picadas + 10s de debounce + tempo de resposta da IA
                 pollTimeout = setTimeout(() => {
                     if (isPolling) {
                         stopPolling();
                         removeTypingIndicator();
                         renderAgentBubble('⚠️ O agente demorou para responder. Tente enviar uma nova mensagem de teste.', true);
                     }
-                }, 70000);
+                }, 120000);
 
                 pollInterval = setInterval(async () => {
                     try {
@@ -903,6 +913,10 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
 
             function stopPolling() {
                 isPolling = false;
+                if (typingTimer) {
+                    clearTimeout(typingTimer);
+                    typingTimer = null;
+                }
                 if (pollInterval) {
                     clearInterval(pollInterval);
                     pollInterval = null;
@@ -928,8 +942,14 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                     chatInput.focus();
                 }
 
-                // 3. Mostra indicador de digitação
-                showTypingIndicator();
+                // 3. Regra dos 10 segundos: NÃO mostrar "digitando..." agora!
+                // Remove qualquer indicador anterior e reinicia o timer de 10s a cada mensagem enviada.
+                removeTypingIndicator();
+                typingTimer = setTimeout(() => {
+                    if (isPolling) {
+                        showTypingIndicator();
+                    }
+                }, 10000);
 
                 // 4. Inicia monitoramento de resposta (Realtime + Polling com last_id)
                 startPollingForAgentResponse();

@@ -130,7 +130,7 @@ export default async function handler(req, res) {
 
         try {
             let q = supabase
-                .from('mensagens')
+                .from('mensagens_teste')
                 .select('id, conteudo, criado_em, remetente, nome_cliente')
                 .eq('id_empresa', id_empresa)
                 .eq('remetente', 'ia')
