@@ -4676,7 +4676,18 @@ section.summary-panel.d-none-important {
     }
 }
 
-@media (max-width: 768px) { .teste-agente-layout { flex-direction: column !important; } .teste-agente-layout > .card { flex: 1 1 100% !important; min-width: 100% !important; } }
+@media (max-width: 768px) { 
+    .teste-agente-layout { 
+        display: flex !important;
+        flex-direction: column !important; 
+        gap: 20px !important;
+    } 
+    .teste-agente-layout > .card { 
+        width: 100% !important; 
+        min-width: 100% !important; 
+        box-sizing: border-box !important;
+    } 
+}
 
 .mobile-page-header { display: none; margin-bottom: 24px; }
 .tarefas-container .mobile-page-header {
