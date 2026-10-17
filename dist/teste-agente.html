@@ -55,13 +55,13 @@
             });
         });
     </script>
-  <script type="module" crossorigin src="/assets/testeAgente-D3Myrpox.js"></script>
+  <script type="module" crossorigin src="/assets/testeAgente-DXnKCW6-.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
   <link rel="modulepreload" crossorigin href="/assets/notifications-65vQ67tf.js">
   <link rel="modulepreload" crossorigin href="/assets/tutorial-D_XVJrKS.js">
   <link rel="modulepreload" crossorigin href="/assets/script-CgQVmfvr.js">
   <link rel="stylesheet" crossorigin href="/assets/notifications-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-ffj6acwi.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-BiJRuFp9.css">
 </head>
 
 <body>
@@ -315,6 +315,11 @@
         min-width: 0 !important;
         box-sizing: border-box !important;
     }
+    .teste-agente-layout .report-card:not(.is-open) {
+        height: auto !important;
+        max-height: none !important;
+        align-self: start;
+    }
     #chat-messages {
         flex: 1 1 0% !important;
         min-height: 0 !important;
@@ -335,6 +340,128 @@
 .report-item-btn {
     white-space: nowrap !important;
     flex-shrink: 0 !important;
+}
+
+/* ==========================================================================
+   Dropdown Recolhível: Corrigir meu Agente
+   ========================================================================== */
+.report-card-header {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    padding: 2px 0;
+    transition: opacity 0.2s ease;
+}
+
+.report-card-header:hover {
+    opacity: 0.92;
+}
+
+.report-card-header:active {
+    opacity: 0.8;
+}
+
+.report-card-header-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.report-card-title {
+    font-size: 17px;
+    margin: 0;
+    color: var(--color-text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.report-card-title i {
+    font-size: 22px;
+}
+
+.report-card-subtitle {
+    color: var(--color-text-mut);
+    font-size: 13px;
+    margin: 4px 0 0 0;
+    line-height: 1.4;
+}
+
+.report-card-caret-wrapper {
+    margin-left: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--color-bg-main);
+    border: 1px solid var(--color-border);
+    flex-shrink: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.report-card-main-caret {
+    font-size: 18px;
+    color: var(--color-text-sec);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
+}
+
+.report-card-header:hover .report-card-caret-wrapper {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+}
+
+.report-card-header:hover .report-card-main-caret {
+    color: var(--color-primary);
+}
+
+.report-card.is-open .report-card-main-caret {
+    transform: rotate(180deg);
+    color: var(--color-primary);
+}
+
+.report-card.is-open .report-card-caret-wrapper {
+    background: var(--color-primary-light);
+    border-color: rgba(37, 211, 102, 0.35);
+}
+
+.report-card-body {
+    margin-top: 18px;
+}
+
+/* Estado Recolhido (Fechado) */
+.report-card:not(.is-open) .report-card-body {
+    display: none !important;
+}
+
+/* Estado Aberto (Expandido) */
+.report-card.is-open .report-card-body {
+    display: block !important;
+    animation: fadeInReportCard 0.25s ease-out;
+}
+
+@keyframes fadeInReportCard {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+body.dark-mode .report-card-caret-wrapper {
+    background: #1f2937;
+    border-color: #374151;
+}
+body.dark-mode .report-card.is-open .report-card-caret-wrapper {
+    background: rgba(37, 211, 102, 0.15);
+    border-color: rgba(37, 211, 102, 0.35);
 }
 
 .mobile-page-header { display: none; margin-bottom: 24px; }
@@ -590,20 +717,25 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                         </div>
                     </div>
 
-                    <!-- Coluna Direita: CORRIGIR MEU AGENTE -->
-                    <div class="card report-card">
+                    <!-- Coluna Direita: CORRIGIR MEU AGENTE (Dropdown Recolhível) -->
+                    <div class="card report-card" id="report-card-collapsible">
 
-                        <div style="margin-bottom: 24px;">
-                            <h3
-                                style="font-size: 18px; margin: 0; color: var(--color-text-main); display: flex; align-items: center; gap: 8px;">
-                                <i class="ph ph-gear text-primary" style="font-size: 22px;"></i> Corrigir meu Agente
-                            </h3>
-                            <p style="color: var(--color-text-mut); font-size: 13px; margin-top: 4px;">Encontrou algo
-                                que o AGENTE fez errado? Nos conte aqui.</p>
+                        <!-- Cabeçalho Recolhível -->
+                        <div class="report-card-header" id="report-card-header" role="button" tabindex="0" aria-expanded="false" title="Toque para recolher ou expandir as opções de ajuste">
+                            <div class="report-card-header-content">
+                                <h3 class="report-card-title">
+                                    <i class="ph ph-gear text-primary"></i> Corrigir meu Agente
+                                </h3>
+                                <p class="report-card-subtitle">Encontrou algo que o AGENTE fez errado? Nos conte aqui.</p>
+                            </div>
+                            <div class="report-card-caret-wrapper">
+                                <i class="ph ph-caret-down report-card-main-caret"></i>
+                            </div>
                         </div>
 
-                        <!-- Lista de Botoes de Reporte -->
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- Conteúdo Recolhível (Lista de Botões de Reporte) -->
+                        <div class="report-card-body" id="report-card-body">
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
 
                             <!-- Item 1 -->
                             <div class="report-item" onclick="this.classList.toggle('expanded')">
@@ -695,6 +827,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
                                 </div>
                             </div>
 
+                        </div>
                         </div>
 
                     </div>
