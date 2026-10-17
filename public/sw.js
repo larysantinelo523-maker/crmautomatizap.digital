@@ -110,3 +110,72 @@ self.addEventListener('notificationclick', (event) => {
     })
   );
 });
+
+// --- Modo de Teste Contínuo em Segundo Plano (a cada 2 min ou sob demanda) ---
+let swTestTimer = null;
+let swTestCount = 0;
+
+const SW_MOCK_NOTIFICATIONS = [
+  {
+    title: '🔥 [TESTE] Novo Lead Recebido!',
+    body: 'Mariana Silva acabou de mandar mensagem! Interesse: Automação WhatsApp'
+  },
+  {
+    title: '💬 [TESTE] Nova Mensagem no WhatsApp',
+    body: 'Lucas Pereira: "Olá! Gostaria de saber os valores dos planos."'
+  },
+  {
+    title: '🔥 [TESTE] Novo Lead Qualificado!',
+    body: 'Roberto Costa entrou em contato! Orçamento: R$ 5.000+'
+  },
+  {
+    title: '💬 [TESTE] Nova Mensagem no WhatsApp',
+    body: 'Camila Lima: "Vocês atendem no final de semana?"'
+  },
+  {
+    title: '📅 [TESTE] Reunião Agendada!',
+    body: 'Apresentação com Dr. Paulo confirmada para amanhã às 14:00.'
+  }
+];
+
+function fireSwTestNotification() {
+  const item = SW_MOCK_NOTIFICATIONS[swTestCount % SW_MOCK_NOTIFICATIONS.length];
+  swTestCount++;
+
+  self.registration.showNotification(item.title, {
+    body: item.body,
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    vibrate: [300, 100, 300, 100, 300],
+    tag: 'test-loop-' + Date.now(),
+    renotify: true,
+    data: {
+      url: '/conversas.html'
+    }
+  });
+}
+
+// Escuta comandos do cliente (Iniciar/Pausar testes)
+self.addEventListener('message', (event) => {
+  if (!event.data) return;
+
+  if (event.data.action === 'START_TEST_LOOP') {
+    const intervalMs = event.data.intervalMs || 120000;
+    if (swTestTimer) clearInterval(swTestTimer);
+
+    if (event.data.immediate) {
+      setTimeout(fireSwTestNotification, 600);
+    }
+
+    swTestTimer = setInterval(fireSwTestNotification, intervalMs);
+  } else if (event.data.action === 'STOP_TEST_LOOP') {
+    if (swTestTimer) {
+      clearInterval(swTestTimer);
+      swTestTimer = null;
+    }
+  } else if (event.data.action === 'TRIGGER_IN_SECONDS') {
+    const sec = event.data.seconds || 5;
+    setTimeout(fireSwTestNotification, sec * 1000);
+  }
+});
+
