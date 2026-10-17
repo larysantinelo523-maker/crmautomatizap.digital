@@ -80,31 +80,22 @@ async function initJarvisGreeting() {
     }
 }
 
-// --- 2. SÍNTESE DE VOZ (TEXT-TO-SPEECH) ---
-function speakJarvis(text) {
+// --- 2. SÍNTESE DE VOZ (ELEVENLABS + FALLBACK NATIVO) ---
+let currentAudioPlayer = null;
+
+function speakLocalSpeech(cleanText) {
     return new Promise((resolve) => {
-        if (isMuted || !synthesis) {
+        if (!synthesis || isMuted) {
             resolve();
             return;
         }
 
-        synthesis.cancel(); // Para qualquer fala anterior
-
-        // Remove asteriscos, cerquilhas e formatações markdown para não falar "asterisco"
-        const cleanText = (text || '')
-            .replace(/\*+/g, '')
-            .replace(/#{1,6}\s+/g, '')
-            .replace(/`/g, '')
-            .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-            .trim();
-
         const utterance = new SpeechSynthesisUtterance(cleanText);
         currentUtterance = utterance;
         utterance.lang = 'pt-BR';
-        utterance.rate = 1.05; // Ritmo natural e ágil
+        utterance.rate = 1.05;
         utterance.pitch = 1.0;
 
-        // Tenta selecionar uma voz natural brasileira
         const voices = synthesis.getVoices();
         const ptVoice = voices.find(v => v.lang === 'pt-BR' || v.lang === 'pt_BR');
         if (ptVoice) {
@@ -125,13 +116,77 @@ function speakJarvis(text) {
         };
 
         utterance.onerror = (err) => {
-            console.warn('Erro na síntese de voz:', err);
+            console.warn('Erro na síntese de voz nativa:', err);
             isSpeaking = false;
             setOrbState('idle');
             resolve();
         };
 
         synthesis.speak(utterance);
+    });
+}
+
+function speakJarvis(text, audioUrlOrBase64 = null) {
+    return new Promise((resolve) => {
+        if (isMuted) {
+            if (currentAudioPlayer) {
+                try { currentAudioPlayer.pause(); currentAudioPlayer = null; } catch(e) {}
+            }
+            if (synthesis) synthesis.cancel();
+            resolve();
+            return;
+        }
+
+        // Para qualquer áudio ou voz anterior
+        if (currentAudioPlayer) {
+            try { currentAudioPlayer.pause(); currentAudioPlayer = null; } catch(e) {}
+        }
+        if (synthesis) {
+            synthesis.cancel();
+        }
+
+        // Limpa formatações para texto
+        const cleanText = (text || '')
+            .replace(/\*+/g, '')
+            .replace(/#{1,6}\s+/g, '')
+            .replace(/`/g, '')
+            .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+            .trim();
+
+        // 1. Prioridade Máxima: Áudio Ultra-Realista do ElevenLabs
+        if (audioUrlOrBase64 && typeof audioUrlOrBase64 === 'string' && audioUrlOrBase64.length > 50) {
+            const audio = new Audio(audioUrlOrBase64);
+            currentAudioPlayer = audio;
+
+            audio.onplay = () => {
+                isSpeaking = true;
+                setOrbState('speaking');
+                setStatusText('Jarvis falando...');
+            };
+
+            audio.onended = () => {
+                isSpeaking = false;
+                setOrbState('idle');
+                setStatusText('Toque no microfone para falar');
+                currentAudioPlayer = null;
+                resolve();
+            };
+
+            audio.onerror = (err) => {
+                console.warn('Erro ao reproduzir áudio ElevenLabs, usando fallback de voz:', err);
+                currentAudioPlayer = null;
+                speakLocalSpeech(cleanText).then(resolve);
+            };
+
+            audio.play().catch(err => {
+                console.warn('Autoplay bloqueado pelo navegador, usando fallback:', err);
+                speakLocalSpeech(cleanText).then(resolve);
+            });
+            return;
+        }
+
+        // 2. Fallback: Voz nativa do navegador
+        speakLocalSpeech(cleanText).then(resolve);
     });
 }
 
@@ -272,7 +327,8 @@ async function handleUserMessage(userText) {
         }
 
         addChatMessage('jarvis', aiAnswer);
-        await speakJarvis(aiAnswer);
+        const elevenAudio = (data && (data.audio || data.audio_base64)) || (Array.isArray(data) && data[0] && (data[0].audio || data[0].audio_base64)) || null;
+        await speakJarvis(aiAnswer, elevenAudio);
 
     } catch (err) {
         console.warn('Erro ao consultar Webhook do AI Agent:', err);
