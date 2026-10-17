@@ -90,7 +90,15 @@ function speakJarvis(text) {
 
         synthesis.cancel(); // Para qualquer fala anterior
 
-        const utterance = new SpeechSynthesisUtterance(text);
+        // Remove asteriscos, cerquilhas e formatações markdown para não falar "asterisco"
+        const cleanText = (text || '')
+            .replace(/\*+/g, '')
+            .replace(/#{1,6}\s+/g, '')
+            .replace(/`/g, '')
+            .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+            .trim();
+
+        const utterance = new SpeechSynthesisUtterance(cleanText);
         currentUtterance = utterance;
         utterance.lang = 'pt-BR';
         utterance.rate = 1.05; // Ritmo natural e ágil
