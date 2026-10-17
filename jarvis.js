@@ -48,7 +48,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadLiveCrmMetrics();
 });
 
-// --- 1. SAUDAÇÃO INICIAL AUTOMÁTICA AO ENTRAR NA TELA ---
+// --- 1. SAUDAÇÃO INICIAL AUTOMÁTICA AO ENTRAR NA TELA (ELEVENLABS) ---
+const ELEVENLABS_API_KEY = 'sk_e7cd40a1ccbc8a532e1c833272570bfec741758f0a63d29b';
+const ELEVENLABS_VOICE_ID = 'JBFqnCBsd6RMkjVDRZzb'; // George (Voz Oficial de Estúdio)
+
+async function fetchElevenLabsAudio(text) {
+    if (!text || !text.trim()) return null;
+    try {
+        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}?output_format=mp3_44100_128`, {
+            method: 'POST',
+            headers: {
+                'xi-api-key': ELEVENLABS_API_KEY,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: text,
+                model_id: 'eleven_multilingual_v2',
+                voice_settings: {
+                    stability: 0.5,
+                    similarity_boost: 0.75
+                }
+            })
+        });
+
+        if (!response.ok) {
+            console.warn('ElevenLabs API retornou erro HTTP:', response.status);
+            return null;
+        }
+
+        const blob = await response.blob();
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result); // Base64 data:audio/mp3;base64,...
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+        });
+    } catch (e) {
+        console.warn('Erro ao buscar voz ElevenLabs no cliente:', e);
+        return null;
+    }
+}
+
 async function initJarvisGreeting() {
     if (greetingSpoken) return;
     greetingSpoken = true;
@@ -60,10 +100,13 @@ async function initJarvisGreeting() {
     const now = window.getBrasiliaDate ? window.getBrasiliaDate() : new Date();
     const hour = now.getHours();
     let timeGreeting = 'Bom dia!';
+    let periodKey = 'dia';
     if (hour >= 12 && hour < 18) {
         timeGreeting = 'Boa tarde!';
+        periodKey = 'tarde';
     } else if (hour >= 18 || hour < 5) {
         timeGreeting = 'Boa noite!';
+        periodKey = 'noite';
     }
 
     const greetingText = `Fala ${firstName}, e aí, tudo bom contigo? ${timeGreeting} O que você deseja saber sobre o dia de hoje?`;
@@ -71,8 +114,26 @@ async function initJarvisGreeting() {
     // Adiciona fala ao histórico
     addChatMessage('jarvis', greetingText);
 
-    // Fala por voz
-    await speakJarvis(greetingText);
+    // Cache local no navegador para reprodução instantânea (0ms e sem gastar cota a cada F5)
+    const cacheKey = `jarvis_voice_v3_${periodKey}_${firstName.toLowerCase()}`;
+    let audioData = null;
+    try {
+        audioData = localStorage.getItem(cacheKey);
+    } catch (e) {}
+
+    if (!audioData) {
+        setOrbState('thinking');
+        setStatusText('Sintetizando voz ElevenLabs...');
+        audioData = await fetchElevenLabsAudio(greetingText);
+        if (audioData) {
+            try {
+                localStorage.setItem(cacheKey, audioData);
+            } catch (e) {}
+        }
+    }
+
+    // Fala por voz com a voz oficial George (ElevenLabs)
+    await speakJarvis(greetingText, audioData);
 
     // Após terminar a fala, abre o microfone para escutar
     if (!isMuted) {
@@ -80,69 +141,26 @@ async function initJarvisGreeting() {
     }
 }
 
-// --- 2. SÍNTESE DE VOZ (ELEVENLABS + FALLBACK NATIVO) ---
+// --- 2. REPRODUÇÃO DE ÁUDIO EXCLUSIVA ELEVENLABS (SEM VOZ ROBÓTICA) ---
 let currentAudioPlayer = null;
 
-function speakLocalSpeech(cleanText) {
-    return new Promise((resolve) => {
-        if (!synthesis || isMuted) {
-            resolve();
-            return;
-        }
-
-        const utterance = new SpeechSynthesisUtterance(cleanText);
-        currentUtterance = utterance;
-        utterance.lang = 'pt-BR';
-        utterance.rate = 1.05;
-        utterance.pitch = 1.0;
-
-        const voices = synthesis.getVoices();
-        const ptVoice = voices.find(v => v.lang === 'pt-BR' || v.lang === 'pt_BR');
-        if (ptVoice) {
-            utterance.voice = ptVoice;
-        }
-
-        utterance.onstart = () => {
-            isSpeaking = true;
-            setOrbState('speaking');
-            setStatusText('Jarvis falando...');
-        };
-
-        utterance.onend = () => {
-            isSpeaking = false;
-            setOrbState('idle');
-            setStatusText('Toque no microfone para falar');
-            resolve();
-        };
-
-        utterance.onerror = (err) => {
-            console.warn('Erro na síntese de voz nativa:', err);
-            isSpeaking = false;
-            setOrbState('idle');
-            resolve();
-        };
-
-        synthesis.speak(utterance);
-    });
-}
-
 function speakJarvis(text, audioUrlOrBase64 = null) {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
         if (isMuted) {
             if (currentAudioPlayer) {
                 try { currentAudioPlayer.pause(); currentAudioPlayer = null; } catch(e) {}
             }
-            if (synthesis) synthesis.cancel();
+            if (window.speechSynthesis) window.speechSynthesis.cancel();
             resolve();
             return;
         }
 
-        // Para qualquer áudio ou voz anterior
+        // Para qualquer áudio anterior
         if (currentAudioPlayer) {
             try { currentAudioPlayer.pause(); currentAudioPlayer = null; } catch(e) {}
         }
-        if (synthesis) {
-            synthesis.cancel();
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
         }
 
         // Limpa formatações para texto
@@ -153,9 +171,16 @@ function speakJarvis(text, audioUrlOrBase64 = null) {
             .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
             .trim();
 
-        // 1. Prioridade Máxima: Áudio Ultra-Realista do ElevenLabs
-        if (audioUrlOrBase64 && typeof audioUrlOrBase64 === 'string' && audioUrlOrBase64.length > 50) {
-            const audio = new Audio(audioUrlOrBase64);
+        let finalAudio = audioUrlOrBase64;
+        if (!finalAudio && cleanText.length > 0) {
+            setOrbState('thinking');
+            setStatusText('Gerando voz ElevenLabs...');
+            finalAudio = await fetchElevenLabsAudio(cleanText);
+        }
+
+        // Toca o Áudio Ultra-Realista do ElevenLabs
+        if (finalAudio && typeof finalAudio === 'string' && finalAudio.length > 50) {
+            const audio = new Audio(finalAudio);
             currentAudioPlayer = audio;
 
             audio.onplay = () => {
@@ -173,20 +198,38 @@ function speakJarvis(text, audioUrlOrBase64 = null) {
             };
 
             audio.onerror = (err) => {
-                console.warn('Erro ao reproduzir áudio ElevenLabs, usando fallback de voz:', err);
+                console.warn('Erro ao reproduzir áudio ElevenLabs:', err);
                 currentAudioPlayer = null;
-                speakLocalSpeech(cleanText).then(resolve);
+                isSpeaking = false;
+                setOrbState('idle');
+                setStatusText('Toque no microfone para falar');
+                resolve();
             };
 
             audio.play().catch(err => {
-                console.warn('Autoplay bloqueado pelo navegador, usando fallback:', err);
-                speakLocalSpeech(cleanText).then(resolve);
+                console.warn('Autoplay bloqueado pelo navegador antes do primeiro clique:', err);
+                // NUNCA aciona voz robótica! Registra para tocar com voz ElevenLabs no primeiro clique
+                const playOnFirstInteraction = () => {
+                    document.removeEventListener('click', playOnFirstInteraction);
+                    document.removeEventListener('touchstart', playOnFirstInteraction);
+                    audio.play().catch(() => {});
+                };
+                document.addEventListener('click', playOnFirstInteraction, { once: true });
+                document.addEventListener('touchstart', playOnFirstInteraction, { once: true });
+
+                isSpeaking = false;
+                setOrbState('idle');
+                setStatusText('Toque na tela ou no microfone para ouvir');
+                resolve();
             });
             return;
         }
 
-        // 2. Fallback: Voz nativa do navegador
-        speakLocalSpeech(cleanText).then(resolve);
+        // Sem áudio: finaliza graciosamente sem som mecânico
+        isSpeaking = false;
+        setOrbState('idle');
+        setStatusText('Toque no microfone para falar');
+        resolve();
     });
 }
 
