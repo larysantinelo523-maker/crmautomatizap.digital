@@ -33,12 +33,12 @@
         });
       }
     </script>
-  <script type="module" crossorigin src="/assets/jarvis-CmY4UF8C.js"></script>
+  <script type="module" crossorigin src="/assets/jarvis-DzLu7BDy.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
   <link rel="modulepreload" crossorigin href="/assets/notifications-65vQ67tf.js">
   <link rel="modulepreload" crossorigin href="/assets/script-CgQVmfvr.js">
   <link rel="stylesheet" crossorigin href="/assets/notifications-Cjku4mlo.css">
-  <link rel="stylesheet" crossorigin href="/assets/conversas-DjC6wJhb.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-BFG7vuZ2.css">
 </head>
 
 <body class="jarvis-page">
@@ -236,25 +236,30 @@
                 </div>
 
                 <!-- Dialogue Timeline / Transcript -->
-                <div class="jarvis-transcript-card">
-                    <div class="jarvis-transcript-header">
+                <div class="jarvis-transcript-card" id="jarvis-transcript-card">
+                    <div class="jarvis-transcript-header" id="jarvis-transcript-header">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <i class="ph ph-chat-circle-dots" style="color: var(--color-primary); font-size: 18px;"></i>
                             <h4>Histórico da Conversa</h4>
                         </div>
-                        <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #00a884; font-size: 11px;">Ao Vivo</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #00a884; font-size: 11px;">Ao Vivo</span>
+                            <i class="ph ph-caret-down jarvis-transcript-caret" id="jarvis-transcript-caret"></i>
+                        </div>
                     </div>
 
-                    <div class="jarvis-chat-timeline" id="jarvis-chat-timeline">
-                        <!-- Mensagens injetadas via JS -->
-                    </div>
+                    <div class="jarvis-transcript-body" id="jarvis-transcript-body">
+                        <div class="jarvis-chat-timeline" id="jarvis-chat-timeline">
+                            <!-- Mensagens injetadas via JS -->
+                        </div>
 
-                    <!-- Text input fallback -->
-                    <div class="jarvis-input-bar">
-                        <input type="text" id="jarvis-text-input" placeholder="Digite uma pergunta para o Jarvis..." autocomplete="off">
-                        <button id="btn-jarvis-send" class="btn btn--primary">
-                            <i class="ph ph-paper-plane-right"></i>
-                        </button>
+                        <!-- Text input fallback -->
+                        <div class="jarvis-input-bar">
+                            <input type="text" id="jarvis-text-input" placeholder="Digite uma pergunta para o Jarvis..." autocomplete="off">
+                            <button id="btn-jarvis-send" class="btn btn--primary">
+                                <i class="ph ph-paper-plane-right"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

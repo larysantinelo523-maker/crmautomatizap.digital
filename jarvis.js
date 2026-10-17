@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupControls();
     setupQuickChips();
     setupWebhookModal();
+    setupTranscriptDropdown();
 
     // Carrega dados do usuário e inicia a conversa automaticamente
     try {
@@ -434,6 +435,25 @@ function setupQuickChips() {
             const query = chip.getAttribute('data-query') || chip.innerText.trim();
             handleUserMessage(query);
         };
+    });
+}
+
+// --- 7.1. DROPDOWN DO HISTÓRICO DE CONVERSAS (EXCLUSIVO MOBILE) ---
+function setupTranscriptDropdown() {
+    const header = document.getElementById('jarvis-transcript-header');
+    const card = document.getElementById('jarvis-transcript-card');
+    if (!header || !card) return;
+
+    header.addEventListener('click', () => {
+        // Ativo apenas na versão mobile (<= 768px)
+        if (window.innerWidth <= 768) {
+            const isOpen = card.classList.toggle('is-open');
+            if (isOpen && chatTimelineElement) {
+                setTimeout(() => {
+                    chatTimelineElement.scrollTop = chatTimelineElement.scrollHeight;
+                }, 80);
+            }
+        }
     });
 }
 
