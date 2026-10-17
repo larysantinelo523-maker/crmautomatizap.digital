@@ -490,46 +490,16 @@ export function updateNotificationUI() {
     const permission = ('Notification' in window) ? Notification.permission : 'unsupported';
 
     if (permission === 'granted') {
-        const testActive = isTestModeActive();
-
         bar.innerHTML = `
-            <div style="padding: 12px 16px; background: rgba(0, 168, 132, 0.05); border-bottom: 1px solid var(--color-border); display: flex; flex-direction: column; gap: 10px;">
+            <div style="padding: 10px 16px; background: rgba(0, 168, 132, 0.05); border-bottom: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between;">
                 <!-- Status dos Alertas -->
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);"></span>
-                        <span style="font-size: 12px; font-weight: 600; color: #10b981;">Alertas Conectados</span>
-                    </div>
-                    <button id="crm-btn-test-sound" style="background: var(--color-bg-card, #fff); border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; padding: 3px 8px; font-size: 11px; border-radius: 6px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;">
-                        <i class="ph ph-speaker-high"></i> Ouvir som
-                    </button>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);"></span>
+                    <span style="font-size: 12px; font-weight: 600; color: #10b981;">Alertas Conectados</span>
                 </div>
-
-                <!-- Card Modo Teste Automático -->
-                <div style="background: var(--color-bg-card, #ffffff); border: 1px solid ${testActive ? '#10b981' : 'var(--color-border)'}; border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: ${testActive ? '0 0 10px rgba(16, 185, 129, 0.15)' : 'none'};">
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <i class="ph ph-clock-countdown" style="font-size: 16px; color: ${testActive ? '#10b981' : 'var(--color-primary)'};"></i>
-                            <span style="font-size: 12px; font-weight: 600; color: var(--color-text-main);">Teste a cada 2 min:</span>
-                        </div>
-                        <span style="font-size: 11px; font-weight: 700; color: ${testActive ? '#10b981' : 'var(--color-text-mut)'};">
-                            ${testActive ? '🟢 LIGADO' : '⚪ DESLIGADO'}
-                        </span>
-                    </div>
-                    
-                    <div style="display: flex; gap: 6px;">
-                        <button id="crm-btn-toggle-test" style="flex: 1; padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; border: none; background: ${testActive ? '#ef4444' : '#00a884'}; color: #ffffff; transition: all 0.2s;">
-                            <i class="ph ${testActive ? 'ph-pause' : 'ph-play'}"></i>
-                            ${testActive ? 'Pausar Teste' : 'Iniciar Teste'}
-                        </button>
-                        <button id="crm-btn-quick-test" title="Dispara em 5s para você testar na tela de bloqueio agora" style="padding: 8px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; background: rgba(0, 168, 132, 0.12); color: #00a884; border: 1px solid rgba(0, 168, 132, 0.3);">
-                            <i class="ph ph-lightning"></i> Em 5s
-                        </button>
-                    </div>
-                    <div style="font-size: 10px; color: var(--color-text-mut); line-height: 1.3;">
-                        ${testActive ? 'Enviando notificações mesmo fora do app. Clique em Pausar quando terminar o teste.' : 'Clique em Iniciar para testar o envio a cada 2 minutos mesmo fora do app.'}
-                    </div>
-                </div>
+                <button id="crm-btn-test-sound" style="background: var(--color-bg-card, #fff); border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; padding: 4px 10px; font-size: 11px; border-radius: 6px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;">
+                    <i class="ph ph-speaker-high"></i> Ouvir som
+                </button>
             </div>
         `;
 
@@ -544,26 +514,6 @@ export function updateNotificationUI() {
                     body: 'Som de notificação funcionando perfeitamente!',
                     type: 'info'
                 });
-            };
-        }
-
-        const toggleTestBtn = document.getElementById('crm-btn-toggle-test');
-        if (toggleTestBtn) {
-            toggleTestBtn.onclick = (e) => {
-                e.stopPropagation();
-                if (isTestModeActive()) {
-                    stopTestMode();
-                } else {
-                    startTestMode(2);
-                }
-            };
-        }
-
-        const quickTestBtn = document.getElementById('crm-btn-quick-test');
-        if (quickTestBtn) {
-            quickTestBtn.onclick = (e) => {
-                e.stopPropagation();
-                triggerCountdownTest(5);
             };
         }
     } else if (permission === 'denied') {
@@ -745,25 +695,11 @@ document.addEventListener('DOMContentLoaded', () => {
     registerPwaServiceWorker();
     setupOneSignal();
 
-    // Se o modo teste estava ativo, restaura a sincronização
-    if (isTestModeActive()) {
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.ready.then(reg => {
-                if (reg.active) {
-                    reg.active.postMessage({
-                        action: 'START_TEST_LOOP',
-                        intervalMs: 120000,
-                        immediate: false
-                    });
-                }
-            }).catch(() => {});
-        }
-        if (!testLoopInterval) {
-            testLoopInterval = setInterval(() => {
-                triggerSingleMockNotification();
-            }, 120000);
-        }
-    }
+    // Desativa qualquer loop de teste residual
+    try {
+        localStorage.removeItem('crm_test_notif_active');
+        if (testLoopInterval) clearInterval(testLoopInterval);
+    } catch(e) {}
 
     const notifBtn = document.getElementById('notification-btn');
     if (notifBtn) {
