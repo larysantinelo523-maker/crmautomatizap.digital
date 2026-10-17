@@ -465,10 +465,25 @@ body.dark-mode .report-card.is-open .report-card-caret-wrapper {
 
 @media (max-width: 768px) {
   .mobile-page-header { 
-    display: none !important; 
+    display: block !important; 
+    margin-bottom: 12px !important;
+    padding: 0 4px !important;
+  }
+  .mobile-page-header h1 {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: var(--color-text-main) !important;
+    margin: 0 0 4px 0 !important;
+    letter-spacing: -0.3px !important;
+  }
+  .mobile-page-header p {
+    font-size: 13px !important;
+    color: var(--color-text-mut) !important;
+    line-height: 1.4 !important;
+    margin: 0 !important;
   }
   .content-wrapper {
-    padding: 10px 14px calc(env(safe-area-inset-bottom) + 88px) 14px !important; /* Espaço harmônico logo acima do menu inferior flutuante */
+    padding: 10px 14px calc(env(safe-area-inset-bottom) + 84px) 14px !important; /* Espaço harmônico logo acima do menu inferior flutuante */
     height: auto !important;
     overflow-x: hidden !important;
     overflow-y: visible !important;
