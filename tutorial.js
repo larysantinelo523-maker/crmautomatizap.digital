@@ -181,7 +181,7 @@ window.startPageTutorial = function() {
             {
                 selector: window.innerWidth <= 768 ? '.mobile-bottom-bar' : '.sidebar',
                 title: 'Menu de Navegação',
-                text: 'Aqui ficam todas as ferramentas do CRM. Você pode acessar seus Leads, Conversas, Tarefas e Relatórios com apenas um clique.'
+                text: 'Aqui ficam todas as ferramentas do CRM. Você pode acessar seus Leads, Conversas, Agendamentos e o Jarvis AI com apenas um clique.'
             },
             {
                 selector: '.kpi-card:nth-child(1)',
@@ -247,6 +247,31 @@ window.startPageTutorial = function() {
                 selector: '.map-container-flex',
                 title: 'Mapa Interativo',
                 text: 'Passe o mouse (ou clique no celular) para ver de quais estados do Brasil seus Leads estão vindo com mais frequência e dê zoom para ver detalhes.'
+            }
+        ];
+    }
+    // Passos para o Jarvis AI
+    else if (pathname.includes('jarvis.html')) {
+        steps = [
+            {
+                selector: '#jarvis-orb',
+                title: 'Orbe Inteligente do Jarvis',
+                text: 'Esta orbe reage em tempo real à sua voz e expressa visualmente quando o Jarvis está ouvindo, pensando ou falando.'
+            },
+            {
+                selector: '#btn-jarvis-mic',
+                title: 'Microfone por Voz',
+                text: 'Toque para conversar diretamente por áudio com o Jarvis. Pergunte sobre leads, reuniões e o trabalho de hoje.'
+            },
+            {
+                selector: '.jarvis-chips-container',
+                title: 'Atalhos Rápidos',
+                text: 'Toque nos atalhos para fazer consultas estratégicas imediatas com apenas um clique.'
+            },
+            {
+                selector: '.jarvis-transcript-card',
+                title: 'Histórico e Digitação',
+                text: 'Acompanhe a transcrição em tempo real ou digite perguntas caso esteja em um local com barulho.'
             }
         ];
     }

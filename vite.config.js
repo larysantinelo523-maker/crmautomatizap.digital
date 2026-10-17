@@ -15,7 +15,8 @@ export default defineConfig({
         configuracoes: resolve(__dirname, 'configuracoes.html'),
         notificacoes: resolve(__dirname, 'notificacoes.html'),
         admin: resolve(__dirname, 'admin.html'),
-        testeAgente: resolve(__dirname, 'teste-agente.html')
+        testeAgente: resolve(__dirname, 'teste-agente.html'),
+        jarvis: resolve(__dirname, 'jarvis.html')
       }
     }
   }

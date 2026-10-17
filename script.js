@@ -2189,8 +2189,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // O centro do botão em relação à barra de navegação
                 const centerLeft = (itemRect.left - navRect.left) + (itemRect.width / 2);
-                const bubbleWidth = 72; // Definido no CSS
+                const bubbleWidth = Math.min(itemRect.width > 0 ? itemRect.width + 4 : 52, 56);
                 const targetLeft = centerLeft - (bubbleWidth / 2);
+                bubble.style.width = `${bubbleWidth}px`;
                 
                 if (isInitial) {
                     bubble.style.transition = 'none';

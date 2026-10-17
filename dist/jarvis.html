@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Jarvis AI - AutomatiZAP CRM</title>
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- CSS -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <!-- PWA Setup -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="AutomatiZAP">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js').catch(err => console.log('SW fail: ', err));
+        });
+      }
+    </script>
+  <script type="module" crossorigin src="/assets/jarvis-B1NOhsNo.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
+  <link rel="modulepreload" crossorigin href="/assets/notifications-65vQ67tf.js">
+  <link rel="modulepreload" crossorigin href="/assets/script-CgQVmfvr.js">
+  <link rel="stylesheet" crossorigin href="/assets/notifications-Cjku4mlo.css">
+  <link rel="stylesheet" crossorigin href="/assets/conversas-DjC6wJhb.css">
+</head>
+
+<body class="jarvis-page">
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <img src="/assets/logo-BxJ03jLZ.png" alt="AutomatiZAP CRM" class="logo-img">
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <i class="ph ph-squares-four"></i>
+                    <span>Visão geral</span>
+                </a>
+
+                <a href="conversas.html" class="nav-item">
+                    <i class="ph ph-chat-circle-dots"></i>
+                    <span>Conversas</span>
+                </a>
+                <a href="tarefas.html" class="nav-item">
+                    <i class="ph ph-calendar-blank"></i>
+                    <span>Agendamentos</span>
+                </a>
+                <a href="teste-agente.html" class="nav-item">
+                    <i class="ph ph-robot"></i>
+                    <span>Teste seu Agente</span>
+                </a>
+                <a href="jarvis.html" class="nav-item active">
+                    <i class="ph ph-waveform"></i>
+                    <span>Jarvis</span>
+                </a>
+                <!-- Link de Relatórios preservado oculto -->
+                <!-- <a href="relatorios.html" class="nav-item" style="display:none;"><i class="ph ph-chart-bar"></i><span>Relatórios</span></a> -->
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-clock" id="sidebar-clock"
+                    style="margin-bottom: 12px; padding: 12px; background: var(--color-bg-main); border-radius: 8px; border: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px;">
+                    <i class="ph ph-clock" style="font-size: 20px; color: var(--color-primary);"></i>
+                    <div>
+                        <div id="clock-time"
+                            style="font-size: 15px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">
+                            00:00</div>
+                        <div id="clock-date" style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">
+                            Carregando...</div>
+                    </div>
+                </div>
+
+                <button class="btn-tutorial-sidebar" onclick="window.startPageTutorial()">
+                    <i class="ph ph-question"></i> Como utilizar o CRM
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content jarvis-main-container">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-titles">
+                    <button class="mobile-menu-btn"><i class="ph ph-list"></i></button>
+                    <a href="index.html" class="mobile-logo-header">
+                        <img src="/assets/logo-BxJ03jLZ.png" alt="AutomatiZAP CRM" class="logo-img">
+                    </a>
+                    <div class="desktop-header-title">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <h1>Jarvis AI</h1>
+                            <span class="jarvis-status-badge">
+                                <span class="pulsing-green-dot"></span>
+                                Copiloto de Voz
+                            </span>
+                        </div>
+                        <p>Seu assistente executivo por voz integrado aos dados em tempo real do CRM.</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <!-- Quick action controls -->
+                    <button class="btn-jarvis-icon" id="btn-jarvis-mute" title="Ativar/Desativar Resposta por Voz">
+                        <i class="ph ph-speaker-high"></i>
+                    </button>
+                    <button class="btn-jarvis-icon" id="btn-jarvis-clear" title="Reiniciar conversa">
+                        <i class="ph ph-arrows-counter-clockwise"></i>
+                    </button>
+
+                    <div class="user-menu" id="user-menu-btn">
+                        <div class="avatar dark">AD</div>
+                        <div class="user-info">
+                            <span class="user-name">AutomatiZAP Digital</span>
+                            <span class="user-role">Administrador</span>
+                        </div>
+                        <i class="ph ph-caret-down"></i>
+
+                        <!-- Dropdown do Usuário -->
+                        <div class="user-dropdown" id="user-dropdown">
+                            <div class="mobile-clock-widget"
+                                style="padding: 12px 16px; border-bottom: 1px solid var(--color-border); display: none; align-items: center; gap: 12px; margin-bottom: 4px;">
+                                <i class="ph ph-clock" style="font-size: 20px; color: var(--color-primary);"></i>
+                                <div>
+                                    <div id="mobile-clock-time"
+                                        style="font-size: 14px; font-weight: 600; color: var(--color-text-main); line-height: 1.2;">
+                                        00:00</div>
+                                    <div id="mobile-clock-date"
+                                        style="font-size: 11px; color: var(--color-text-mut); margin-top: 2px;">
+                                        Carregando...</div>
+                                </div>
+                            </div>
+                            <a href="configuracoes.html" class="dropdown-item">
+                                <i class="ph ph-user"></i> Meu Perfil
+                            </a>
+                            <a href="configuracoes.html" class="dropdown-item">
+                                <i class="ph ph-gear"></i> Configurações
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item text-danger" id="btn-logout">
+                                <i class="ph ph-sign-out"></i> Sair do Sistema
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Jarvis Stage Area -->
+            <div class="jarvis-stage-wrapper">
+                <!-- Mini Metrics Bar -->
+                <div class="jarvis-metrics-pill-bar">
+                    <div class="jarvis-metric-item">
+                        <i class="ph ph-users"></i>
+                        <span>Leads Totais: <strong id="metric-total-leads">...</strong></span>
+                    </div>
+                    <div class="jarvis-metric-divider"></div>
+                    <div class="jarvis-metric-item">
+                        <i class="ph ph-calendar-check"></i>
+                        <span>Reuniões: <strong id="metric-total-reunioes">...</strong></span>
+                    </div>
+                    <div class="jarvis-metric-divider"></div>
+                    <div class="jarvis-metric-item">
+                        <i class="ph ph-robot"></i>
+                        <span>Agente WhatsApp: <strong style="color: #10b981;">Online</strong></span>
+                    </div>
+                </div>
+
+                <!-- Central Glowing AI Orb -->
+                <div class="jarvis-hero-center">
+                    <div class="jarvis-orb-container" id="jarvis-orb-container">
+                        <div class="jarvis-glow-ring ring-3"></div>
+                        <div class="jarvis-glow-ring ring-2"></div>
+                        <div class="jarvis-glow-ring ring-1"></div>
+                        
+                        <div class="jarvis-orb" id="jarvis-orb">
+                            <div class="jarvis-orb-core"></div>
+                            <div class="jarvis-orb-shimmer"></div>
+                            <div class="jarvis-soundwaves" id="jarvis-soundwaves">
+                                <span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="jarvis-status-box">
+                        <h3 id="jarvis-status-text">Iniciando o Jarvis...</h3>
+                        <p class="jarvis-hint-sub">Converse naturalmente ou toque nos atalhos rápidos abaixo</p>
+                    </div>
+
+                    <!-- Voice Push-to-Talk / Mic Button -->
+                    <div class="jarvis-voice-controls">
+                        <button class="btn-jarvis-mic" id="btn-jarvis-mic">
+                            <div class="mic-pulse-ring"></div>
+                            <i class="ph ph-microphone"></i>
+                            <span class="mic-label">Toque para Falar</span>
+                        </button>
+                    </div>
+
+                    <!-- Quick Query Chips -->
+                    <div class="jarvis-chips-container">
+                        <button class="jarvis-chip" data-query="Jarvis, me conte o resumo do dia de hoje">
+                            <i class="ph ph-sparkle"></i> Resumo do Dia
+                        </button>
+                        <button class="jarvis-chip" data-query="Quais reuniões e agendamentos temos hoje?">
+                            <i class="ph ph-calendar-blank"></i> Reuniões Marcadas
+                        </button>
+                        <button class="jarvis-chip" data-query="Quais são os clientes e leads mais quentes?">
+                            <i class="ph ph-fire"></i> Leads Quentes
+                        </button>
+                        <button class="jarvis-chip" data-query="Qual é o status do robô no WhatsApp?">
+                            <i class="ph ph-robot"></i> Status do Robô
+                        </button>
+                        <button class="jarvis-chip" data-query="Quais são as principais dúvidas e objeções dos clientes?">
+                            <i class="ph ph-chat-teardrop-text"></i> Dúvidas Frequentes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dialogue Timeline / Transcript -->
+                <div class="jarvis-transcript-card">
+                    <div class="jarvis-transcript-header">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="ph ph-chat-circle-dots" style="color: var(--color-primary); font-size: 18px;"></i>
+                            <h4>Histórico da Conversa</h4>
+                        </div>
+                        <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #00a884; font-size: 11px;">Ao Vivo</span>
+                    </div>
+
+                    <div class="jarvis-chat-timeline" id="jarvis-chat-timeline">
+                        <!-- Mensagens injetadas via JS -->
+                    </div>
+
+                    <!-- Text input fallback -->
+                    <div class="jarvis-input-bar">
+                        <input type="text" id="jarvis-text-input" placeholder="Digite uma pergunta para o Jarvis..." autocomplete="off">
+                        <button id="btn-jarvis-send" class="btn btn--primary">
+                            <i class="ph ph-paper-plane-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+</body>
+
+</html>

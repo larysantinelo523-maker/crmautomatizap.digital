@@ -1,9 +1,11 @@
-const CACHE_NAME = 'automatizap-crm-v18';
+const CACHE_NAME = 'automatizap-crm-v19';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/conversas.html',
   '/tarefas.html',
+  '/teste-agente.html',
+  '/jarvis.html',
   '/relatorios.html',
   '/configuracoes.html',
   '/manifest.json',

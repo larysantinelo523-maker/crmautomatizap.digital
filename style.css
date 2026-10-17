@@ -4701,44 +4701,42 @@ section.summary-panel.d-none-important {
 }
 
 @media (max-width: 1024px) {
-    /* Container Flutuante */
+    /* iOS 26 Inspired Floating Glass Dock */
     .sidebar {
         transform: none !important;
         position: fixed !important;
         top: auto !important;
-        bottom: calc(env(safe-area-inset-bottom) + 12px) !important;
+        bottom: calc(env(safe-area-inset-bottom) + 14px) !important;
         left: 16px !important;
         right: 16px !important;
         width: calc(100% - 32px) !important;
-        max-width: 420px !important;
+        max-width: 410px !important;
         margin: 0 auto !important;
-        height: 68px !important;
-        padding: 8px !important;
+        height: 64px !important;
+        padding: 6px 8px !important;
         flex-direction: row !important;
         border-radius: 999px !important;
         z-index: 9999 !important;
-        border: 1px solid rgba(255,255,255,0.45) !important;
         
-        /* Efeito Liquid Glass Verde */
-        background: rgba(34, 197, 94, 0.85) !important;
-        backdrop-filter: blur(16px) !important;
-        -webkit-backdrop-filter: blur(16px) !important;
+        /* iOS 26 Liquid Dark Glassmorphism */
+        background: rgba(15, 23, 42, 0.84) !important;
+        backdrop-filter: blur(28px) saturate(190%) !important;
+        -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
         box-shadow:
-            0 10px 30px rgba(0,0,0,0.14),
-            0 2px 6px rgba(0,0,0,0.08),
-            inset 0 1px 1px rgba(255,255,255,0.7),
-            inset 0 -2px 4px rgba(0,0,0,0.10),
-            0 8px 28px rgba(34, 197, 94, 0.40) !important;
+            0 20px 45px rgba(0, 0, 0, 0.45),
+            0 4px 14px rgba(0, 0, 0, 0.25),
+            inset 0 1px 1px rgba(255, 255, 255, 0.22),
+            inset 0 -1px 2px rgba(0, 0, 0, 0.35) !important;
             
-        transition: transform 0.3s ease, opacity 0.3s ease !important;
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease !important;
     }
     
     .sidebar.sidebar-scrolled {
-        transform: scale(0.94) !important;
+        transform: scale(0.95) !important;
         opacity: 0.9 !important;
     }
 
-    /* Brilho curvo superior (reflexo especular) */
     .sidebar::before { display: none !important; }
 
     .sidebar-header,
@@ -4761,12 +4759,12 @@ section.summary-panel.d-none-important {
         box-shadow: none !important;
     }
 
-    /* Botão base */
+    /* Botão base iOS 26 */
     .nav-item {
         position: relative !important;
         z-index: 2 !important;
-        width: 52px !important;
-        height: 52px !important;
+        width: 48px !important;
+        height: 48px !important;
         border-radius: 50% !important;
         flex: none !important;
         display: flex !important;
@@ -4775,19 +4773,16 @@ section.summary-panel.d-none-important {
         align-items: center !important;
         padding: 0 !important;
         margin: 0 !important;
-        transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-        
-        /* Inativo sutil */
-        background: rgba(255,255,255,0.14) !important;
-        border: 1px solid rgba(255,255,255,0.25) !important;
-        box-shadow: inset 0 1px 1px rgba(255,255,255,0.5) !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
     }
 
     .nav-item i {
-        font-size: 24px !important;
-        color: rgba(255,255,255,0.85) !important;
-        transition: all 0.3s ease !important;
-        filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15)) !important;
+        font-size: 22px !important;
+        color: rgba(255, 255, 255, 0.62) !important;
+        transition: all 0.25s ease !important;
     }
 
     .nav-item span {
@@ -4796,44 +4791,43 @@ section.summary-panel.d-none-important {
     
     /* Efeito de mola ao clicar */
     .nav-item:active {
-        transform: scale(0.92) !important;
+        transform: scale(0.88) !important;
     }
 
-    /* O item ativo perde o fundo para a bolha flutuante aparecer atrás */
+    /* O item ativo ganha brilho suave e destaque */
     .nav-item.active {
         background: transparent !important;
         border-color: transparent !important;
         box-shadow: none !important;
-        transform: scale(1.08) !important;
+        transform: scale(1.06) !important;
     }
 
     .nav-item.active i {
         color: #ffffff !important;
-        -webkit-text-stroke: 0.5px #ffffff;
+        filter: drop-shadow(0 2px 8px rgba(0, 168, 132, 0.6)) !important;
     }
 
-    /* A Bolha Deslizante (Injetada via JS) */
+    /* A Bolha Deslizante Elástica iOS 26 (Injetada via JS) */
     .glass-bubble {
         position: absolute !important;
         top: 50% !important;
         transform: translateY(-50%) !important;
-        height: 56px !important;
-        width: 72px !important;
+        height: 48px !important;
+        width: 52px !important;
         border-radius: 999px !important;
         z-index: 1 !important;
         pointer-events: none !important;
         
-        background: rgba(255,255,255,0.28) !important;
-        backdrop-filter: blur(12px) saturate(200%) brightness(1.15) !important;
-        -webkit-backdrop-filter: blur(12px) saturate(200%) brightness(1.15) !important;
-        border: 1.5px solid rgba(255,255,255,0.85) !important;
+        /* Pílula Ativa Emerald com Brilho Refinado */
+        background: linear-gradient(135deg, rgba(0, 168, 132, 0.95) 0%, rgba(5, 150, 105, 0.9) 100%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.38) !important;
         box-shadow:
-            inset 0 2px 5px rgba(255,255,255,0.9),
-            inset 0 -3px 6px rgba(20, 150, 70, 0.30),
-            0 6px 16px rgba(0, 0, 0, 0.15) !important;
+            0 6px 20px rgba(0, 168, 132, 0.55),
+            inset 0 1px 2px rgba(255, 255, 255, 0.65),
+            inset 0 -1px 2px rgba(0, 0, 0, 0.2) !important;
             
-        /* Transição Suave */
-        transition: left 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        /* Transição com física elástica iOS */
+        transition: left 0.42s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.25s ease !important;
     }
 
     @supports (backdrop-filter: url(#liquid-glass-filter)) {
@@ -5181,4 +5175,448 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
         max-width: 100% !important;
     }
 }
+
+/* ==========================================================================
+   JARVIS VOICE AI & ORB STYLES
+   ========================================================================== */
+.jarvis-page {
+    background-color: var(--color-bg-main);
+}
+
+.jarvis-main-container {
+    padding-bottom: 120px;
+}
+
+.jarvis-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(16, 185, 129, 0.12);
+    color: #00a884;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.pulsing-green-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #10b981;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: crmPulseGreen 1.8s infinite;
+}
+
+.btn-jarvis-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+    color: var(--color-text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-jarvis-icon:hover {
+    background: var(--color-bg-main);
+    transform: translateY(-1px);
+}
+
+.jarvis-stage-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 10px 0 30px 0;
+}
+
+/* Mini Metrics Bar */
+.jarvis-metrics-pill-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 12px 20px;
+    border-radius: 18px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+    font-size: 13.5px;
+    color: var(--color-text-sec);
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.jarvis-metric-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.jarvis-metric-item i {
+    font-size: 18px;
+    color: var(--color-primary);
+}
+
+.jarvis-metric-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--color-border);
+}
+
+/* Central Glowing AI Hero Stage */
+.jarvis-hero-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 36px 20px 30px 20px;
+    background: var(--color-bg-card);
+    border-radius: 28px;
+    border: 1px solid var(--color-border);
+    box-shadow: 0 10px 36px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+/* AI Orb Stage */
+.jarvis-orb-container {
+    position: relative;
+    width: 190px;
+    height: 190px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 8px 0 20px 0;
+}
+
+.jarvis-glow-ring {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    transition: all 0.5s ease;
+}
+
+.jarvis-glow-ring.ring-1 {
+    width: 180px;
+    height: 180px;
+    border: 1.5px solid rgba(0, 168, 132, 0.35);
+    animation: jarvisPulseRing 3.2s ease-out infinite;
+}
+
+.jarvis-glow-ring.ring-2 {
+    width: 220px;
+    height: 220px;
+    border: 1px dashed rgba(0, 168, 132, 0.22);
+    animation: jarvisPulseRing 3.2s ease-out infinite 1.1s;
+}
+
+.jarvis-glow-ring.ring-3 {
+    width: 260px;
+    height: 260px;
+    border: 1px solid rgba(0, 168, 132, 0.08);
+    animation: jarvisPulseRing 3.2s ease-out infinite 2.2s;
+}
+
+@keyframes jarvisPulseRing {
+    0% { transform: scale(0.85); opacity: 0.8; }
+    50% { transform: scale(1.05); opacity: 0.35; }
+    100% { transform: scale(1.22); opacity: 0; }
+}
+
+.jarvis-orb {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #00f2fe 0%, #00a884 45%, #064e3b 85%);
+    box-shadow:
+        0 0 35px rgba(0, 168, 132, 0.55),
+        0 0 70px rgba(0, 242, 254, 0.25),
+        inset 0 2px 8px rgba(255, 255, 255, 0.8),
+        inset 0 -6px 14px rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: jarvisFloat 4s ease-in-out infinite;
+}
+
+@keyframes jarvisFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-7px); }
+}
+
+/* Orb States */
+.jarvis-orb.speaking {
+    transform: scale(1.12);
+    box-shadow:
+        0 0 50px rgba(0, 242, 254, 0.8),
+        0 0 100px rgba(0, 168, 132, 0.6),
+        inset 0 2px 10px rgba(255, 255, 255, 0.95);
+    animation: jarvisSpeakingPulse 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes jarvisSpeakingPulse {
+    0% { transform: scale(1.06); filter: brightness(1.1); }
+    100% { transform: scale(1.15); filter: brightness(1.3); }
+}
+
+.jarvis-orb.listening {
+    background: radial-gradient(circle at 35% 35%, #38bdf8 0%, #0284c7 45%, #0f172a 85%);
+    box-shadow:
+        0 0 55px rgba(56, 189, 248, 0.75),
+        0 0 110px rgba(2, 132, 199, 0.45);
+    animation: jarvisListeningPulse 1s ease-in-out infinite;
+}
+
+@keyframes jarvisListeningPulse {
+    0% { transform: scale(0.98); }
+    50% { transform: scale(1.12); }
+    100% { transform: scale(0.98); }
+}
+
+.jarvis-orb.thinking {
+    background: radial-gradient(circle at 35% 35%, #a855f7 0%, #6366f1 50%, #1e1b4b 90%);
+    box-shadow: 0 0 50px rgba(168, 85, 247, 0.65);
+    animation: jarvisSpin 2s linear infinite;
+}
+
+@keyframes jarvisSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Soundwave bars inside Orb */
+.jarvis-soundwaves {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 32px;
+    z-index: 2;
+}
+
+.jarvis-soundwaves span {
+    width: 4px;
+    height: 8px;
+    background: #ffffff;
+    border-radius: 999px;
+    transition: height 0.2s ease;
+}
+
+.jarvis-orb.speaking .jarvis-soundwaves span,
+.jarvis-orb.listening .jarvis-soundwaves span {
+    animation: jarvisWave 0.6s ease-in-out infinite alternate;
+}
+
+.jarvis-soundwaves span:nth-child(1) { animation-delay: 0.1s; }
+.jarvis-soundwaves span:nth-child(2) { animation-delay: 0.25s; }
+.jarvis-soundwaves span:nth-child(3) { animation-delay: 0.4s; }
+.jarvis-soundwaves span:nth-child(4) { animation-delay: 0.18s; }
+.jarvis-soundwaves span:nth-child(5) { animation-delay: 0.32s; }
+
+@keyframes jarvisWave {
+    0% { height: 8px; }
+    100% { height: 28px; }
+}
+
+.jarvis-status-box h3 {
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--color-text-main);
+    margin-bottom: 6px;
+    transition: color 0.3s ease;
+}
+
+.jarvis-hint-sub {
+    font-size: 13px;
+    color: var(--color-text-mut);
+}
+
+/* Voice Push-to-Talk Button */
+.jarvis-voice-controls {
+    margin-top: 22px;
+    margin-bottom: 18px;
+}
+
+.btn-jarvis-mic {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 30px;
+    background: linear-gradient(135deg, #00a884 0%, #059669 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 999px;
+    font-size: 14.5px;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 6px 22px rgba(0, 168, 132, 0.38);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-jarvis-mic i {
+    font-size: 20px;
+}
+
+.btn-jarvis-mic:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0, 168, 132, 0.48);
+}
+
+.btn-jarvis-mic.recording {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    box-shadow: 0 6px 25px rgba(239, 68, 68, 0.45);
+    animation: micPulseRecord 1s infinite alternate;
+}
+
+@keyframes micPulseRecord {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+}
+
+/* Quick Question Chips */
+.jarvis-chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    max-width: 720px;
+    margin-top: 10px;
+}
+
+.jarvis-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 15px;
+    background: var(--color-bg-main);
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-text-sec);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.jarvis-chip:hover {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+    color: var(--color-primary-dark);
+    transform: translateY(-1px);
+}
+
+/* Transcript Card */
+.jarvis-transcript-card {
+    background: var(--color-bg-card);
+    border-radius: 24px;
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.jarvis-transcript-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.jarvis-transcript-header h4 {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.jarvis-chat-timeline {
+    padding: 18px 20px;
+    height: 250px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.jarvis-input-bar {
+    padding: 12px 16px;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--color-bg-card);
+}
+
+.jarvis-input-bar input {
+    flex: 1;
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-main);
+    color: var(--color-text-main);
+    font-size: 13.5px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.jarvis-input-bar input:focus {
+    border-color: var(--color-primary);
+}
+
+.jarvis-input-bar button {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    border: none;
+    background: var(--color-primary);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.jarvis-input-bar button:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .jarvis-metrics-pill-bar {
+        font-size: 12px;
+        padding: 10px 14px;
+    }
+    .jarvis-metric-divider {
+        display: none;
+    }
+    .jarvis-hero-center {
+        padding: 24px 16px 20px 16px;
+    }
+    .jarvis-orb-container {
+        width: 160px;
+        height: 160px;
+    }
+    .jarvis-orb {
+        width: 120px;
+        height: 120px;
+    }
+    .jarvis-chat-timeline {
+        height: 220px;
+        padding: 14px;
+    }
+}
+
 
