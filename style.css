@@ -5628,6 +5628,11 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
 }
 
 @media (max-width: 768px) {
+    /* Ocultar os 3 botões de ação rápida no header mobile (manter apenas notificações e perfil) */
+    .btn-jarvis-icon {
+        display: none !important;
+    }
+
     .jarvis-metrics-pill-bar {
         font-size: 12px;
         padding: 10px 14px;
