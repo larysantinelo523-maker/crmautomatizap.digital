@@ -89,12 +89,60 @@ async function fetchElevenLabsAudio(text) {
     }
 }
 
+function getResolvedUserName() {
+    // 1. Preferência explícita definida pelo usuário no modal de configurações do Jarvis
+    const custom = localStorage.getItem('jarvis_user_name');
+    if (custom && custom.trim()) return custom.trim();
+
+    // 2. Do objeto loggedUser retornado pelo Supabase (tabela usuarios: nome_completo ou nome)
+    if (loggedUser) {
+        if (loggedUser.nome_completo && loggedUser.nome_completo.trim()) return loggedUser.nome_completo.trim();
+        if (loggedUser.nome && loggedUser.nome.trim()) return loggedUser.nome.trim();
+    }
+
+    // 3. Do elemento .user-name já preenchido na interface pelo script.js
+    const domUserEl = document.querySelector('.user-menu-btn .user-name') || document.querySelector('.user-name');
+    if (domUserEl && domUserEl.textContent && domUserEl.textContent.trim()) {
+        const text = domUserEl.textContent.trim();
+        if (!text.toLowerCase().includes('automatizap') && !text.toLowerCase().includes('usuário') && !text.toLowerCase().includes('erro')) {
+            return text;
+        }
+    }
+
+    // 4. Do token de autenticação do Supabase no localStorage (user_metadata)
+    try {
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.includes('auth-token')) {
+                const parsed = JSON.parse(localStorage.getItem(key));
+                const user = parsed?.user;
+                if (user?.user_metadata?.full_name) return user.user_metadata.full_name.trim();
+                if (user?.user_metadata?.name) return user.user_metadata.name.trim();
+                if (user?.email) {
+                    const nick = user.email.split('@')[0];
+                    return nick.charAt(0).toUpperCase() + nick.slice(1);
+                }
+            }
+        }
+    } catch(e) {}
+
+    return 'Arthur';
+}
+
 async function initJarvisGreeting() {
     if (greetingSpoken) return;
     greetingSpoken = true;
 
-    const rawName = (loggedUser && loggedUser.nome) ? loggedUser.nome : 'Gestor';
-    const firstName = rawName.trim().split(' ')[0];
+    // Limpa cache antigo que continha "gestor"
+    try {
+        ['dia', 'tarde', 'noite'].forEach(p => {
+            localStorage.removeItem(`jarvis_voice_v3_${p}_gestor`);
+            localStorage.removeItem(`jarvis_voice_v2_${p}_gestor`);
+        });
+    } catch(e) {}
+
+    const fullName = getResolvedUserName();
+    const firstName = fullName.trim().split(' ')[0];
 
     // Saudação dinâmica pelo horário de Brasília
     const now = window.getBrasiliaDate ? window.getBrasiliaDate() : new Date();
@@ -315,7 +363,7 @@ async function handleUserMessage(userText) {
     setOrbState('thinking');
     setStatusText('Consultando o AI Agent...');
 
-    const rawName = (loggedUser && loggedUser.nome) ? loggedUser.nome : 'Gestor';
+    const rawName = getResolvedUserName();
     const firstName = rawName.trim().split(' ')[0];
     const webhookUrl = getWebhookUrl();
 
@@ -572,12 +620,16 @@ function setupWebhookModal() {
     const btnSave = document.getElementById('btn-save-webhook');
     const btnReset = document.getElementById('btn-reset-webhook');
     const inputUrl = document.getElementById('input-webhook-url');
+    const inputName = document.getElementById('input-jarvis-user-name');
 
     if (!btnConfig || !modal) return;
 
     btnConfig.onclick = () => {
         if (inputUrl) {
             inputUrl.value = getWebhookUrl();
+        }
+        if (inputName) {
+            inputName.value = getResolvedUserName();
         }
         modal.style.display = 'flex';
     };
@@ -594,21 +646,37 @@ function setupWebhookModal() {
 
     if (btnSave) {
         btnSave.onclick = () => {
-            if (!inputUrl) return;
-            const val = inputUrl.value.trim();
-            if (val) {
-                localStorage.setItem('jarvis_webhook_url', val);
-                showJarvisToast('Webhook Salvo', 'URL atualizada com sucesso!');
-                closeModal();
+            if (inputUrl) {
+                const val = inputUrl.value.trim();
+                if (val) {
+                    localStorage.setItem('jarvis_webhook_url', val);
+                }
             }
+            if (inputName) {
+                const nameVal = inputName.value.trim();
+                if (nameVal) {
+                    const oldName = localStorage.getItem('jarvis_user_name');
+                    if (nameVal !== oldName) {
+                        localStorage.setItem('jarvis_user_name', nameVal);
+                        // Limpa o cache para forçar a nova voz com o novo nome
+                        ['dia', 'tarde', 'noite'].forEach(p => {
+                            localStorage.removeItem(`jarvis_voice_v3_${p}_${nameVal.toLowerCase().split(' ')[0]}`);
+                        });
+                    }
+                }
+            }
+            showJarvisToast('Configurações Salvas', 'Configurações do Jarvis atualizadas!');
+            closeModal();
         };
     }
 
     if (btnReset) {
         btnReset.onclick = () => {
             localStorage.removeItem('jarvis_webhook_url');
+            localStorage.removeItem('jarvis_user_name');
             if (inputUrl) inputUrl.value = DEFAULT_WEBHOOK_URL;
-            showJarvisToast('Webhook Padrão', 'URL restaurada para o padrão.');
+            if (inputName) inputName.value = getResolvedUserName();
+            showJarvisToast('Restaurado', 'Configurações restauradas para o padrão.');
             closeModal();
         };
     }
