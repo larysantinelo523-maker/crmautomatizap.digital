@@ -120,6 +120,9 @@
                     <button class="btn-jarvis-icon" id="btn-jarvis-clear" title="Reiniciar conversa">
                         <i class="ph ph-arrows-counter-clockwise"></i>
                     </button>
+                    <button class="btn-jarvis-icon" id="btn-jarvis-config" title="Configurar Webhook do AI Agent (n8n)">
+                        <i class="ph ph-sliders"></i>
+                    </button>
 
                     <div class="user-menu" id="user-menu-btn">
                         <div class="avatar dark">AD</div>
@@ -252,6 +255,30 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Modal de Configuração do Webhook do Agente -->
+    <div id="modal-webhook-config" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(8px); z-index: 10000; align-items: center; justify-content: center; padding: 16px;">
+        <div style="background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: 20px; width: 100%; max-width: 500px; padding: 24px; box-shadow: 0 20px 45px rgba(0,0,0,0.35); animation: fadeIn 0.2s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-robot" style="font-size: 24px; color: var(--color-primary);"></i>
+                    <h3 style="font-size: 17px; font-weight: 600; margin: 0; color: var(--color-text-main);">Webhook do AI Agent (n8n)</h3>
+                </div>
+                <button id="btn-close-webhook-modal" style="background: none; border: none; font-size: 22px; cursor: pointer; color: var(--color-text-mut); display: flex; align-items: center;"><i class="ph ph-x"></i></button>
+            </div>
+            <p style="font-size: 13px; color: var(--color-text-sec); line-height: 1.5; margin-bottom: 18px;">
+                O Jarvis envia suas mensagens para este webhook no n8n. O AI Agent do n8n pesquisa diretamente no Supabase e responde com raciocínio dinâmico:
+            </p>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; color: var(--color-text-mut); margin-bottom: 6px;">URL DO WEBHOOK (POST)</label>
+                <input type="url" id="input-webhook-url" style="width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--color-border); background: var(--color-bg-main); color: var(--color-text-main); font-size: 13px; outline: none; font-family: monospace;">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button id="btn-reset-webhook" style="padding: 10px 16px; font-size: 13px; border: 1px solid var(--color-border); background: transparent; color: var(--color-text-main); border-radius: 10px; cursor: pointer; font-weight: 500;">Restaurar Padrão</button>
+                <button id="btn-save-webhook" class="btn btn--primary" style="padding: 10px 20px; font-size: 13px; border-radius: 10px; cursor: pointer; font-weight: 600;">Salvar Webhook</button>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts -->

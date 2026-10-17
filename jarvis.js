@@ -1,9 +1,15 @@
 // ===================================================================
-// JARVIS AI - COPILOTO DE VOZ E INTELIGÊNCIA DO AUTOMATIZAP CRM
+// JARVIS AI - COPILOTO DE VOZ COM AI AGENT (N8N + SUPABASE)
 // ===================================================================
 
 import { supabase } from './supabase.js';
 import { fetchUserData, fetchLeads, fetchAgendamentos } from './data.js';
+
+const DEFAULT_WEBHOOK_URL = 'https://talonedlanternfish-n8n.cloudfy.live/webhook/jarvis-crm';
+
+function getWebhookUrl() {
+    return localStorage.getItem('jarvis_webhook_url') || DEFAULT_WEBHOOK_URL;
+}
 
 let isListening = false;
 let isSpeaking = false;
@@ -15,6 +21,7 @@ let loggedUser = null;
 let orbElement = null;
 let statusTextElement = null;
 let chatTimelineElement = null;
+let greetingSpoken = false;
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', async () => {
@@ -25,6 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupSpeechRecognition();
     setupControls();
     setupQuickChips();
+    setupWebhookModal();
 
     // Carrega dados do usuário e inicia a conversa automaticamente
     try {
@@ -35,12 +43,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(initJarvisGreeting, 600);
     }
 
-    // Carrega métricas rápidas nos cards inferiores
+    // Carrega métricas rápidas nos cards superiores
     loadLiveCrmMetrics();
 });
 
 // --- 1. SAUDAÇÃO INICIAL AUTOMÁTICA AO ENTRAR NA TELA ---
 async function initJarvisGreeting() {
+    if (greetingSpoken) return;
+    greetingSpoken = true;
+
     const rawName = (loggedUser && loggedUser.nome) ? loggedUser.nome : 'Gestor';
     const firstName = rawName.trim().split(' ')[0];
 
@@ -145,7 +156,7 @@ function setupSpeechRecognition() {
     recognition.onerror = (event) => {
         console.warn('SpeechRecognition erro:', event.error);
         stopListening();
-        setStatusText('Toque no microfone para tentar novamente');
+        setStatusText('Toque no microfone para falar');
     };
 
     recognition.onend = () => {
@@ -162,13 +173,13 @@ function startListening() {
         synthesis.cancel();
     }
     if (!recognition) {
-        showJarvisToast('Microfone não suportado', 'Utilize o Chrome ou Safari para reconhecimento de voz.');
+        showJarvisToast('Microfone', 'Use o navegador Chrome ou Safari para reconhecimento de voz.');
         return;
     }
     try {
         recognition.start();
     } catch (e) {
-        // Já estava ouvindo
+        // Já estava ativo
     }
 }
 
@@ -191,212 +202,81 @@ function toggleListening() {
     }
 }
 
-// --- 4. INTELIGÊNCIA DO CRM: PROCESSA O QUE VOCÊ PERGUNTOU ---
-// Helper para converter data para o fuso horário de Brasília
-function parseLeadBrasiliaDate(dateVal) {
-    if (!dateVal) return null;
-    const d = new Date(dateVal);
-    if (isNaN(d.getTime())) return null;
-    const str = d.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
-    const brDate = new Date(str);
-    const y = brDate.getFullYear();
-    const m = String(brDate.getMonth() + 1).padStart(2, '0');
-    const day = String(brDate.getDate()).padStart(2, '0');
-    return {
-        dateStr: `${y}-${m}-${day}`,
-        day: brDate.getDate(),
-        month: brDate.getMonth() + 1,
-        year: y,
-        raw: brDate
-    };
-}
-
+// --- 4. DISPARO PARA O WEBHOOK DO AI AGENT (SEM IF/ELSE ENGESSADO) ---
 async function handleUserMessage(userText) {
     addChatMessage('user', userText);
     setOrbState('thinking');
-    setStatusText('Consultando o CRM em tempo real...');
+    setStatusText('Consultando o AI Agent...');
+
+    const rawName = (loggedUser && loggedUser.nome) ? loggedUser.nome : 'Gestor';
+    const firstName = rawName.trim().split(' ')[0];
+    const webhookUrl = getWebhookUrl();
+
+    const payload = {
+        message: userText,
+        pergunta: userText,
+        user_name: firstName,
+        nome_usuario: rawName,
+        user_id: loggedUser ? loggedUser.id : null,
+        company_id: loggedUser ? loggedUser.id : null,
+        timestamp: (window.getBrasiliaDate ? window.getBrasiliaDate() : new Date()).toISOString()
+    };
 
     try {
-        // Busca os dados atualizados do banco
-        const [leads, agendamentos] = await Promise.all([
-            fetchLeads(),
-            fetchAgendamentos()
-        ]);
+        const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
 
-        const totalLeads = leads ? leads.length : 0;
-        const now = window.getBrasiliaDate ? window.getBrasiliaDate() : new Date();
-        const nowInfo = parseLeadBrasiliaDate(now);
-
-        // Reuniões agendadas totais
-        const reunioes = (agendamentos || []).filter(a => a.status && a.status.toLowerCase() === 'qualificado');
-        const reunioesCount = reunioes.length;
-
-        // Leads qualificados ou quentes
-        const leadsQuentes = (leads || []).filter(l => 
-            (l.qualificacao && l.qualificacao.toLowerCase() === 'alta') ||
-            (l.status && l.status.toLowerCase().includes('qualificado')) ||
-            (l.status && l.status.toLowerCase().includes('atendimento'))
-        );
-
-        // Normalização do texto para comparação sem acentos
-        const lower = userText.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-
-        // --- 1. RECONHECIMENTO DE DATA / PERÍODO ---
-        let targetDateStr = null;
-        let targetDay = null;
-        let targetLabel = '';
-        let isDateQuery = false;
-
-        if (lower.includes('ontem')) {
-            const y = new Date(now);
-            y.setDate(y.getDate() - 1);
-            const yInfo = parseLeadBrasiliaDate(y);
-            targetDateStr = yInfo.dateStr;
-            targetDay = yInfo.day;
-            targetLabel = `ontem, dia ${yInfo.day}`;
-            isDateQuery = true;
-        } else if (lower.includes('anteontem')) {
-            const a = new Date(now);
-            a.setDate(a.getDate() - 2);
-            const aInfo = parseLeadBrasiliaDate(a);
-            targetDateStr = aInfo.dateStr;
-            targetDay = aInfo.day;
-            targetLabel = `anteontem, dia ${aInfo.day}`;
-            isDateQuery = true;
-        } else if (lower.includes('hoje')) {
-            targetDateStr = nowInfo.dateStr;
-            targetDay = nowInfo.day;
-            targetLabel = `hoje, dia ${nowInfo.day}`;
-            isDateQuery = true;
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
         }
 
-        // Reconhecimento de dia numérico: "dia 16", "dia 15", "16 de outubro", "16/10", etc.
-        const diaMatch = lower.match(/dia\s+(\d{1,2})/i) || lower.match(/(\d{1,2})\s+de\s+[a-z]+/i) || lower.match(/(\d{1,2})\/(\d{1,2})/);
-        if (diaMatch) {
-            const dNum = parseInt(diaMatch[1], 10);
-            if (dNum >= 1 && dNum <= 31) {
-                targetDay = dNum;
-                const mStr = String(nowInfo.month).padStart(2, '0');
-                const dayStr = String(dNum).padStart(2, '0');
-                targetDateStr = `${nowInfo.year}-${mStr}-${dayStr}`;
-                if (!targetLabel) {
-                    targetLabel = `no dia ${dNum}`;
-                } else if (!targetLabel.includes(String(dNum))) {
-                    targetLabel += ` (dia ${dNum})`;
-                }
-                isDateQuery = true;
-            }
+        const data = await response.json();
+        
+        // Extrai a resposta textual inteligente do AI Agent
+        let aiAnswer = '';
+        if (typeof data === 'string') {
+            aiAnswer = data;
+        } else if (data.resposta) {
+            aiAnswer = data.resposta;
+        } else if (data.response) {
+            aiAnswer = data.response;
+        } else if (data.output) {
+            aiAnswer = data.output;
+        } else if (data.message) {
+            aiAnswer = data.message;
+        } else if (data.text) {
+            aiAnswer = data.text;
+        } else if (Array.isArray(data) && data.length > 0) {
+            const first = data[0];
+            aiAnswer = first.resposta || first.response || first.output || first.text || JSON.stringify(first);
+        } else {
+            aiAnswer = JSON.stringify(data);
         }
 
-        // Filtra leads e reuniões para a data alvo (se houver consulta de data)
-        const dateLeads = isDateQuery ? (leads || []).filter(l => {
-            const lInfo = parseLeadBrasiliaDate(l.criado_em);
-            if (!lInfo) return false;
-            if (lInfo.dateStr === targetDateStr) return true;
-            if (targetDay && lInfo.day === targetDay && Math.abs(lInfo.month - nowInfo.month) <= 1) return true;
-            return false;
-        }) : [];
-
-        const dateReunioes = isDateQuery ? (agendamentos || []).filter(a => {
-            const aDateVal = a.data_agendamento || a.data_vencimento || a.criado_em || a.created_at;
-            const aInfo = parseLeadBrasiliaDate(aDateVal);
-            if (!aInfo) return false;
-            if (aInfo.dateStr === targetDateStr) return true;
-            if (targetDay && aInfo.day === targetDay) return true;
-            return false;
-        }) : [];
-
-        let answer = '';
-
-        // --- ROTA A: PERGUNTA COM DATA ESPECÍFICA (Ex: "quantos leads ontem, dia 16", "o que atendi ontem", etc.) ---
-        if (isDateQuery && !lower.includes('resumo geral') && !lower.includes('trabalho de hoje')) {
-            if (lower.includes('reuni') || lower.includes('agend') || lower.includes('compromisso') || lower.includes('agenda')) {
-                if (dateReunioes.length > 0) {
-                    answer = `Em ${targetLabel}, você teve ${dateReunioes.length} reunião(ões) confirmada(s) no sistema.`;
-                } else {
-                    answer = `Em ${targetLabel}, você não teve novas reuniões agendadas. No total geral, temos ${reunioesCount} reuniões marcadas no CRM.`;
-                }
-            } else {
-                // Consulta sobre leads / atendimentos na data
-                if (dateLeads.length > 0) {
-                    const leadNames = dateLeads.slice(0, 3).map(l => l.nome || 'Cliente').join(', ');
-                    answer = `Em ${targetLabel}, você atendeu ${dateLeads.length} lead(s) no seu WhatsApp! `;
-                    if (dateLeads.length === 1) {
-                        const l0 = dateLeads[0];
-                        answer += `O contato foi de ${l0.nome || 'um cliente'}${l0.interesse ? ' com interesse em ' + l0.interesse : ''}.`;
-                    } else {
-                        answer += `Entre os contatos atendidos estão: ${leadNames}.`;
-                    }
-                    if (dateReunioes.length > 0) {
-                        answer += ` Além disso, foram registradas ${dateReunioes.length} reunião(ões) associada(s) a esse período.`;
-                    }
-                } else {
-                    answer = `Em ${targetLabel}, você não teve novos leads atendidos registrados no sistema. O seu CRM conta com ${totalLeads} leads no histórico total acumulado.`;
-                    if (leadsQuentes.length > 0) {
-                        answer += ` Atualmente você tem ${leadsQuentes.length} leads quentes em andamento na sua base geral.`;
-                    }
-                }
-            }
-        }
-        // --- ROTA B: REUNIÕES / AGENDAMENTOS GERAIS OU PRÓXIMAS ---
-        else if (lower.includes('reuni') || lower.includes('agend') || lower.includes('compromisso') || lower.includes('agenda')) {
-            if (reunioesCount > 0) {
-                answer = `Temos ${reunioesCount} reunião(ões) confirmada(s) no sistema. A equipe já está alinhada para realizar as apresentações.`;
-            } else {
-                answer = `No momento não temos reuniões agendadas pendentes, mas temos ${leadsQuentes.length} clientes quentes que podem fechar a qualquer momento.`;
-            }
-        }
-        // --- ROTA C: TOTAL DE LEADS / BASE COMPLETA ---
-        else if (lower.includes('total') || lower.includes('quantos leads eu tenho') || lower.includes('quantos contatos') || lower.includes('base')) {
-            answer = `Você tem um total de ${totalLeads} leads registrados no CRM, dos quais ${leadsQuentes.length} são contatos quentes e ${reunioesCount} possuem reuniões agendadas.`;
-        }
-        // --- ROTA D: LEADS QUENTES / QUALIFICADOS / INTERESSADOS ---
-        else if (lower.includes('quente') || lower.includes('qualificad') || lower.includes('fechad') || lower.includes('interessad')) {
-            if (leadsQuentes.length > 0) {
-                const names = leadsQuentes.slice(0, 3).map(l => l.nome || 'Cliente').join(', ');
-                answer = `Identifiquei ${leadsQuentes.length} leads com alto interesse! Os principais contatos agora são: ${names}. Vale a pena conferir a aba de conversas.`;
-            } else {
-                answer = `Temos ${totalLeads} leads registrados na base de dados. O robô continua atendendo e qualificando os novos contatos no WhatsApp.`;
-            }
-        }
-        // --- ROTA E: STATUS DO ROBÔ / AGENTE DE IA ---
-        else if (lower.includes('robo') || lower.includes('ia') || lower.includes('agente') || lower.includes('status') || lower.includes('whatsapp')) {
-            answer = `O seu agente no WhatsApp está 100% ativo e operacional, respondendo mensagens instantaneamente e coletando informações dos clientes.`;
-        }
-        // --- ROTA F: DÚVIDAS E OBJEÇÕES ---
-        else if (lower.includes('duvida') || lower.includes('objec') || lower.includes('preco') || lower.includes('dor') || lower.includes('reclam')) {
-            const withObjections = (leads || []).filter(l => l.objecao || l.dor_principal);
-            if (withObjections.length > 0) {
-                const sample = withObjections[0];
-                const objText = sample.objecao ? `objeção de "${sample.objecao}"` : `dor sobre "${sample.dor_principal}"`;
-                answer = `A IA identificou que a principal preocupação recente dos leads envolve ${objText}. O robô já utiliza respostas persuasivas para contornar essa questão.`;
-            } else {
-                answer = `A principal dúvida observada nos atendimentos recentes gira em torno do tempo de implementação e valores dos planos. A IA já está treinada para quebrar essas objeções.`;
-            }
-        }
-        // --- ROTA G: RESUMO GERAL DO DIA / TRABALHO DE HOJE ---
-        else if (lower.includes('resumo') || lower.includes('trabalho') || lower.includes('dia') || lower.includes('tudo')) {
-            const todayLeadsCount = (leads || []).filter(l => {
-                const lInfo = parseLeadBrasiliaDate(l.criado_em);
-                return lInfo && lInfo.dateStr === nowInfo.dateStr;
-            }).length;
-
-            answer = `Hoje no seu WhatsApp eu registrei ${todayLeadsCount > 0 ? todayLeadsCount : 'nenhum novo'} lead(s) até agora, somando ${totalLeads} contatos no CRM. Temos ${reunioesCount} reuniões marcadas e ${leadsQuentes.length} leads qualificados em negociação ativa.`;
-        }
-        // --- ROTA H: PADRÃO GERAL ---
-        else {
-            answer = `Entendido! No momento temos ${totalLeads} leads no total geral, ${leadsQuentes.length} contatos quentes e ${reunioesCount} agendamentos. Deseja saber sobre os atendimentos de ontem, de hoje ou ver as reuniões marcadas?`;
+        if (!aiAnswer || aiAnswer.trim() === '') {
+            aiAnswer = 'Recebi a confirmação do agente, mas não houve texto de resposta retornado.';
         }
 
-        // Adiciona resposta e fala por voz
-        addChatMessage('jarvis', answer);
-        await speakJarvis(answer);
+        addChatMessage('jarvis', aiAnswer);
+        await speakJarvis(aiAnswer);
 
     } catch (err) {
-        console.error('Erro ao processar consulta do Jarvis:', err);
-        const fallback = 'Tive uma pequena oscilação ao ler os dados do banco, mas seu robô continua ativo e atendendo clientes normalmente.';
-        addChatMessage('jarvis', fallback);
-        await speakJarvis(fallback);
+        console.warn('Erro ao consultar Webhook do AI Agent:', err);
+        
+        const fallbackMsg = `Estou pronto para raciocinar via IA Agent! O webhook está configurado para: ${webhookUrl}. Assim que você ativar o fluxo do AI Agent no n8n, responderei com dados em tempo real e raciocínio completo!`;
+        
+        addChatMessage('jarvis', fallbackMsg);
+        await speakJarvis('Estou pronto para conversar! Basta ativar o fluxo do AI Agent no seu n8n para eu consultar o Supabase ao vivo.');
+    } finally {
+        if (!isSpeaking) {
+            setOrbState('idle');
+            setStatusText('Toque no microfone para falar');
+        }
     }
 }
 
@@ -448,7 +328,7 @@ function addChatMessage(sender, text) {
     msgDiv.appendChild(bubble);
     chatTimelineElement.appendChild(msgDiv);
 
-    // Rola para baixo suavemente
+    // Rola suavemente para baixo
     chatTimelineElement.scrollTop = chatTimelineElement.scrollHeight;
 }
 
@@ -491,11 +371,11 @@ function setupControls() {
                 if (synthesis) synthesis.cancel();
                 muteBtn.innerHTML = '<i class="ph ph-speaker-slash"></i>';
                 muteBtn.style.color = '#ef4444';
-                showJarvisToast('Voz Desativada', 'O Jarvis agora responderá apenas em texto.');
+                showJarvisToast('Voz Desativada', 'O Jarvis responderá apenas por texto.');
             } else {
                 muteBtn.innerHTML = '<i class="ph ph-speaker-high"></i>';
                 muteBtn.style.color = 'var(--color-text-main)';
-                showJarvisToast('Voz Ativada', 'O Jarvis falará com você por voz.');
+                showJarvisToast('Voz Ativada', 'O Jarvis responderá por áudio.');
             }
         };
     }
@@ -505,6 +385,7 @@ function setupControls() {
         clearBtn.onclick = () => {
             if (chatTimelineElement) {
                 chatTimelineElement.innerHTML = '';
+                greetingSpoken = false;
                 initJarvisGreeting();
             }
         };
@@ -540,6 +421,9 @@ function setupControls() {
         if (synthesis && synthesis.paused) {
             synthesis.resume();
         }
+        if (!greetingSpoken && loggedUser) {
+            initJarvisGreeting();
+        }
     }, { once: true });
 }
 
@@ -551,6 +435,56 @@ function setupQuickChips() {
             handleUserMessage(query);
         };
     });
+}
+
+// --- 8. MODAL DE CONFIGURAÇÃO DO WEBHOOK DO AGENTE ---
+function setupWebhookModal() {
+    const btnConfig = document.getElementById('btn-jarvis-config');
+    const modal = document.getElementById('modal-webhook-config');
+    const btnClose = document.getElementById('btn-close-webhook-modal');
+    const btnSave = document.getElementById('btn-save-webhook');
+    const btnReset = document.getElementById('btn-reset-webhook');
+    const inputUrl = document.getElementById('input-webhook-url');
+
+    if (!btnConfig || !modal) return;
+
+    btnConfig.onclick = () => {
+        if (inputUrl) {
+            inputUrl.value = getWebhookUrl();
+        }
+        modal.style.display = 'flex';
+    };
+
+    const closeModal = () => {
+        modal.style.display = 'none';
+    };
+
+    if (btnClose) btnClose.onclick = closeModal;
+
+    modal.onclick = (e) => {
+        if (e.target === modal) closeModal();
+    };
+
+    if (btnSave) {
+        btnSave.onclick = () => {
+            if (!inputUrl) return;
+            const val = inputUrl.value.trim();
+            if (val) {
+                localStorage.setItem('jarvis_webhook_url', val);
+                showJarvisToast('Webhook Salvo', 'URL atualizada com sucesso!');
+                closeModal();
+            }
+        };
+    }
+
+    if (btnReset) {
+        btnReset.onclick = () => {
+            localStorage.removeItem('jarvis_webhook_url');
+            if (inputUrl) inputUrl.value = DEFAULT_WEBHOOK_URL;
+            showJarvisToast('Webhook Padrão', 'URL restaurada para o padrão.');
+            closeModal();
+        };
+    }
 }
 
 async function loadLiveCrmMetrics() {
