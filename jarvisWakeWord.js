@@ -288,13 +288,13 @@ export function isQuestionOutOfScope(question) {
 }
 
 export const OUT_OF_SCOPE_RESPONSES = [
-    (clientName) => `Desculpe, ${clientName}, eu cuido do atendimento aos seus clientes e das informações do WhatsApp da sua empresa. O que você gostaria de consultar agora? Posso verificar os novos contatos de hoje, os atendimentos de ontem ou os agendamentos.`,
+    (clientName) => `Desculpe, ${clientName}, eu cuido do atendimento aos seus clientes e das informações do WhatsApp da empresa. Quer que eu verifique quantos novos contatos entraram hoje?`,
 
-    (clientName) => `Desculpe, ${clientName}, meu trabalho é acompanhar os seus clientes e a movimentação do seu WhatsApp. Se desejar, posso lhe informar o total de atendimentos realizados, os horários marcados ou as mensagens recentes. O que prefere verificar?`,
+    (clientName) => `Desculpe, ${clientName}, meu trabalho aqui é acompanhar os clientes e o fluxo de mensagens do seu WhatsApp. Qual informação do seu atendimento você gostaria de consultar?`,
 
-    (clientName) => `${clientName}, estou à sua disposição para o atendimento aos seus clientes e o acompanhamento do WhatsApp da empresa. O que você precisa verificar no momento? Posso conferir os clientes que enviaram mensagem hoje, a sua agenda ou o histórico de conversas.`,
+    (clientName) => `${clientName}, estou à sua disposição para o atendimento aos seus clientes e o acompanhamento do WhatsApp da empresa. Deseja conferir os horários agendados na sua pauta para amanhã?`,
 
-    (clientName) => `Desculpe, ${clientName}, consigo te ajudar com o fluxo de atendimentos e as informações dos seus clientes no WhatsApp. Como posso ajudar com a sua empresa agora? Gostaria de ver a lista de clientes recentes ou conferir a sua agenda?`
+    (clientName) => `Desculpe, ${clientName}, consigo te ajudar com os dados e as conversas dos seus clientes no sistema. Gostaria de saber quem foi atendido recentemente?`
 ];
 
 let lastOutOfScopeIndex = -1;
