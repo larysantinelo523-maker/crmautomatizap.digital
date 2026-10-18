@@ -201,7 +201,7 @@ export function getContextualPhrases(question = '') {
             'Acessando conversas do WhatsApp...',
             'Localizando as últimas mensagens...',
             'Lendo o histórico dos diálogos...',
-            'Sintetizando o contexto...',
+            'Entendendo o assunto...',
             'Organizando o resumo...'
         ];
     }
@@ -575,7 +575,7 @@ async function playJarvisVoice(text, audioBase64 = null) {
 
         let src = audioBase64;
         if (!src && cleanText.length > 0) {
-            setJarvisScreenGlow('speaking', 'Sintetizando voz...');
+            setJarvisScreenGlow('thinking', 'Preparando resposta...');
             src = await fetchElevenLabsSpeech(cleanText);
         }
 

@@ -186,7 +186,7 @@ async function initJarvisGreeting() {
 
     if (!audioData) {
         setOrbState('thinking');
-        setStatusText('Sintetizando voz ElevenLabs...');
+        setStatusText('Preparando áudio...');
         audioData = await fetchElevenLabsAudio(greetingText);
         if (audioData) {
             try {
@@ -237,7 +237,7 @@ function speakJarvis(text, audioUrlOrBase64 = null) {
         let finalAudio = audioUrlOrBase64;
         if (!finalAudio && cleanText.length > 0) {
             setOrbState('thinking');
-            setStatusText('Gerando voz ElevenLabs...');
+            setStatusText('Preparando resposta...');
             finalAudio = await fetchElevenLabsAudio(cleanText);
         }
 
@@ -249,7 +249,8 @@ function speakJarvis(text, audioUrlOrBase64 = null) {
             audio.onplay = () => {
                 isSpeaking = true;
                 setOrbState('speaking');
-                setStatusText('Jarvis falando...');
+                const asstName = typeof getAssistantName === 'function' ? getAssistantName() : 'Jarvis';
+                setStatusText(`${asstName} falando...`);
             };
 
             audio.onended = () => {
@@ -305,7 +306,8 @@ function speakJarvis(text, audioUrlOrBase64 = null) {
             utterance.onstart = () => {
                 isSpeaking = true;
                 setOrbState('speaking');
-                setStatusText('Jarvis falando...');
+                const asstName = typeof getAssistantName === 'function' ? getAssistantName() : 'Jarvis';
+                setStatusText(`${asstName} falando...`);
             };
 
             const onFinish = () => {
