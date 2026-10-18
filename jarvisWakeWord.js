@@ -307,7 +307,7 @@ function createGlowElements() {
 
                 <!-- Subtítulo flutuante minimalista sem card gigante -->
                 <div class="jarvis-wake-caption-wrapper">
-                    <div class="jarvis-wake-caption-text" id="jarvis-wake-caption">Ouvindo você...</div>
+                    <div class="jarvis-wake-caption-text" id="jarvis-wake-caption">Estou te ouvindo</div>
                     <div class="jarvis-wake-hint-text">Diga "valeu" ou clique fora para encerrar</div>
                 </div>
             </div>
@@ -376,7 +376,7 @@ export function setJarvisScreenGlow(state, text = '') {
             modalOrbElement.classList.remove('speaking', 'thinking');
             modalOrbElement.classList.add('listening');
         }
-        setCaptionWithFade(text || 'Ouvindo você... (pode falar)');
+        setCaptionWithFade(text || 'Estou te ouvindo');
     } else if (state === 'speaking') {
         stopThinkingPhrases();
         glowElement.classList.remove('listening', 'closing');
@@ -389,9 +389,8 @@ export function setJarvisScreenGlow(state, text = '') {
             modalOrbElement.classList.remove('listening', 'thinking');
             modalOrbElement.classList.add('speaking');
         }
-        if (text) {
-            setCaptionWithFade(text);
-        }
+        // Remove a resposta em texto debaixo da orbe (conforme solicitado pelo usuário)
+        setCaptionWithFade('');
     } else if (state === 'thinking') {
         glowElement.classList.remove('listening', 'closing');
         glowElement.classList.add('active', 'speaking');
@@ -495,12 +494,15 @@ function speakWithBrowserSynthesis(text) {
 
             utterance.onstart = () => {
                 isSpeaking = true;
-                setJarvisScreenGlow('speaking', text.length > 60 ? text.substring(0, 60) + '...' : text);
+                setJarvisScreenGlow('speaking');
             };
 
             const onFinish = () => {
                 isSpeaking = false;
                 lastSpokeEndTime = Date.now();
+                if (isConversationActive) {
+                    setJarvisScreenGlow('listening', 'Estou te ouvindo');
+                }
                 setTimeout(() => {
                     if (wakeActive || isConversationActive) {
                         ensureSpeechRecognitionActive();
@@ -551,6 +553,10 @@ async function playJarvisVoice(text, audioBase64 = null) {
             lastSpokeEndTime = Date.now();
             currentAudioPlayer = null;
 
+            if (isConversationActive) {
+                setJarvisScreenGlow('listening', 'Estou te ouvindo');
+            }
+
             // Retoma escuta ativa imediatamente após terminar a fala
             setTimeout(() => {
                 if (wakeActive || isConversationActive) {
@@ -586,7 +592,7 @@ async function playJarvisVoice(text, audioBase64 = null) {
 
             audio.onplay = () => {
                 isSpeaking = true;
-                setJarvisScreenGlow('speaking', cleanText.length > 60 ? cleanText.substring(0, 60) + '...' : cleanText);
+                setJarvisScreenGlow('speaking');
             };
 
             audio.onended = finishSpeaking;
@@ -655,20 +661,22 @@ async function queryJarvisAgent(userQuestion) {
         if (typeof data === 'string') responseText = data;
         const audioSrc = data.audio || data.audio_base64 || null;
 
-        // Quando a resposta fica pronta, as frases param e a resposta é falada e exibida!
+        // Quando a resposta fica pronta, as frases param e a resposta é falada!
         stopThinkingPhrases();
+        setJarvisScreenGlow('speaking');
         await playJarvisVoice(responseText, audioSrc);
     } catch (err) {
         console.warn('Erro ao consultar n8n:', err);
         stopThinkingPhrases();
         const fallback = `Desculpe, ${clientName}, tive uma instabilidade momentânea para consultar os dados. Pode repetir?`;
+        setJarvisScreenGlow('speaking');
         await playJarvisVoice(fallback);
     } finally {
         stopThinkingPhrases();
         // CONVERSA CONTÍNUA:
         // Mantém o assistente ouvindo para as próximas perguntas até o usuário se despedir ou pausar!
         if (isConversationActive) {
-            setJarvisScreenGlow('listening', 'Estou ouvindo... (pode perguntar)');
+            setJarvisScreenGlow('listening', 'Estou te ouvindo');
             startSilenceTimer(60000); // Aguarda até 60 segundos de silêncio antes de encerrar
             setTimeout(() => {
                 ensureSpeechRecognitionActive();
@@ -705,7 +713,7 @@ function setupSpeechEngine() {
         // Quando o usuário começa a falar, cancela o timer de silêncio para não encerrar a sessão
         if (isConversationActive) {
             clearSilenceTimer();
-            setJarvisScreenGlow('listening', 'Ouvindo sua pergunta...');
+            setJarvisScreenGlow('listening', 'Estou te ouvindo');
         }
     };
 
@@ -740,9 +748,9 @@ function setupSpeechEngine() {
             const formattedName = setAssistantName(newName);
             const clientName = getClientGreetingName();
             const confirmMsg = `Entendido, ${clientName}! A partir de agora meu nome é ${formattedName}. Pode me chamar de "Fala ${formattedName}" sempre que precisar!`;
-            setJarvisScreenGlow('speaking', confirmMsg);
+            setJarvisScreenGlow('speaking');
             await playJarvisVoice(confirmMsg);
-            setJarvisScreenGlow('listening', 'Estou ouvindo... (pode perguntar)');
+            setJarvisScreenGlow('listening', 'Estou te ouvindo');
             startSilenceTimer(60000);
             setTimeout(() => {
                 ensureSpeechRecognitionActive();
@@ -758,9 +766,9 @@ function setupSpeechEngine() {
             const assistant = getAssistantName();
             const clientName = getClientGreetingName();
             const reply = `Meu nome é ${assistant}, ${clientName}! Em que posso te ajudar hoje?`;
-            setJarvisScreenGlow('speaking', reply);
+            setJarvisScreenGlow('speaking');
             await playJarvisVoice(reply);
-            setJarvisScreenGlow('listening', 'Estou ouvindo... (pode perguntar)');
+            setJarvisScreenGlow('listening', 'Estou te ouvindo');
             startSilenceTimer(60000);
             setTimeout(() => {
                 ensureSpeechRecognitionActive();
@@ -769,7 +777,7 @@ function setupSpeechEngine() {
         }
 
         const wakeRegex = getWakeRegex();
-        const farewellRegex = /(obrigad[oa]|valeu|tchau|at[eé]\s+mais|pode\s+fechar|^fechar$|^encerra[r]?$|s[oó]\s+isso|falou|at[eé]\s+logo|pode\s+parar|desativa[r]?|nada\s+mais|por\s+hoje\s+[eé]\s+s[oó]|era\s+s[oó]\s+isso)/i;
+        const farewellRegex = /(obrigad[oa]|valeu|tchau|at[eé]\\s+mais|pode\\s+fechar|^fechar$|^encerra[r]?$|s[oó]\\s+isso|falou|at[eé]\\s+logo|pode\\s+parar|desativa[r]?|nada\\s+mais|por\\s+hoje\\s+[eé]\\s+s[oó]|era\\s+s[oó]\\s+isso)/i;
 
         // CENÁRIO 1: Sessão de conversa já está ATIVA (usuário fez uma pergunta ou saudação anterior)
         if (isConversationActive) {
@@ -802,7 +810,7 @@ function setupSpeechEngine() {
                 await queryJarvisAgent(cleanCommand);
             } else {
                 // Apenas saudou ("Fala Jarvis", "Fala Reinaldo", etc.)
-                setJarvisScreenGlow('listening', `Fala, ${clientName}!`);
+                setJarvisScreenGlow('listening', 'Estou te ouvindo');
 
                 const hour = (window.getBrasiliaDate ? window.getBrasiliaDate() : new Date()).getHours();
                 let timeGreeting = 'Bom dia';
@@ -810,10 +818,11 @@ function setupSpeechEngine() {
                 else if (hour >= 18 || hour < 5) timeGreeting = 'Boa noite';
 
                 const greetingReply = `Fala, ${clientName}! Tô por aqui sim, ${timeGreeting.toLowerCase()}! Como posso te ajudar?`;
+                setJarvisScreenGlow('speaking');
                 await playJarvisVoice(greetingReply);
 
                 // Volta para modo de escuta com orbe respirando aguardando a pergunta
-                setJarvisScreenGlow('listening', 'Estou ouvindo... (pode perguntar)');
+                setJarvisScreenGlow('listening', 'Estou te ouvindo');
                 startSilenceTimer(60000);
                 setTimeout(() => {
                     ensureSpeechRecognitionActive();

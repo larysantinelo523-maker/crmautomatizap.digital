@@ -6218,6 +6218,7 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
     transition: opacity 0.26s cubic-bezier(0.16, 1, 0.3, 1), transform 0.26s cubic-bezier(0.16, 1, 0.3, 1);
     word-break: break-word;
     max-height: 220px;
+    min-height: 30px;
     overflow-y: auto;
     opacity: 1;
     transform: translateY(0);
