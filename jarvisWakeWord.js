@@ -149,15 +149,13 @@ function createGlowElements() {
         modalOverlayElement.className = 'jarvis-wake-overlay';
         modalOverlayElement.innerHTML = `
             <div class="jarvis-wake-modal" id="jarvis-wake-modal">
-                <div class="jarvis-wake-orb-container" id="jarvis-wake-orb-container">
-                    <div class="jarvis-wake-ring ring-3"></div>
-                    <div class="jarvis-wake-ring ring-2"></div>
-                    <div class="jarvis-wake-ring ring-1"></div>
-
-                    <div class="jarvis-wake-orb" id="jarvis-wake-orb">
-                        <div class="jarvis-wake-soundwaves">
-                            <span></span><span></span><span></span><span></span><span></span>
-                        </div>
+                <div class="jarvis-wake-siri-wrapper">
+                    <div class="siri" id="jarvis-wake-orb">
+                        <div class="blob b1"></div>
+                        <div class="blob b2"></div>
+                        <div class="blob b3"></div>
+                        <div class="blob b4"></div>
+                        <div class="brilho"></div>
                     </div>
                 </div>
 
