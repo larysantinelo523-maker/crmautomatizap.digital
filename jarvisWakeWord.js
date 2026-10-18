@@ -247,6 +247,68 @@ export function getContextualPhrases(question = '') {
     ];
 }
 
+// --- 1.3 REGRA DE SEGURANÇA E ESCOPO (GUARDRAIL ANTIDESVIO DE FUNÇÃO) ---
+export function isQuestionOutOfScope(question) {
+    if (!question || typeof question !== 'string') return false;
+    const q = question.toLowerCase().trim();
+
+    // 1. Saudações, despedidas e comandos do assistente NUNCA estão fora de escopo
+    if (/^(oi|ol[aá]|bom\s+dia|boa\s+tarde|boa\s+noite|tudo\s+bem|tudo\s+bom|opa|e\s+a[ií]|t[aá]\s+por\s+a[ií]|valeu|obrigad[oa]|tchau|at[eé]\s+mais|fechar|encerrar|parar|desativar)\b/i.test(q)) {
+        return false;
+    }
+    // Perguntas sobre a identidade do assistente
+    if (/(qual\s+[eé]\s+(o\s+)?seu\s+nome|quem\s+[eé]\s+voc[eê]|como\s+(voc[eê]|vc)\s+se\s+chama|o\s+que\s+(voc[eê]|vc)\s+faz|como\s+(voc[eê]|vc)\s+funciona|ajuda|quem\s+[eé]\s+o\s+jarvis)/i.test(q)) {
+        return false;
+    }
+    // Comandos de alteração de nome do assistente
+    if (/(?:mude|troque|chame|passar\s+a\s+se\s+chamar|vou\s+te\s+chamar)\s+(?:de|para)?/i.test(q)) {
+        return false;
+    }
+
+    // 2. Perguntas expressamente fora de escopo (Matemática, receitas, trivia, curiosidades, piadas, etc.)
+    const explicitOutOfScopeRegex = /(?:raiz\s+(?:quadrada|c[uú]bica)|quanto\s+[eé]\s+\d+|calcule\s+\d+|seno\s+de|cosseno\s+de|tabuada|soma\s+de|subtra[cç][aã]o|equa[cç][aã]o|capital\s+d[eao]|quem\s+(?:foi|descobriu|inventou|ganhou|escreveu|pintou|criou\s+o\s+mundo)|em\s+que\s+ano|quantos\s+planetas|presidente\s+d[eao]|hist[oó]ria\s+d[eao]|receita\s+de|como\s+(?:fazer|cozinhar|preparar)\s+(?:bolo|arroz|comida|doce|torta|caf[eé]|carne|almo[cç]o)|ingredientes\s+d[eao]|conte\s+uma?\s+piada|canta|letra\s+da\s+m[uú]sica|filme|futebol|quem\s+venceu\s+o\s+jogo|previs[aã]o\s+do\s+tempo|vai\s+chover|rem[eé]dio\s+pra?|sintomas\s+de|como\s+curar|c[oó]digo\s+em\s+python|programa\s+em|escreva\s+um\s+script|fa[cç]a\s+um\s+poema|escreva\s+uma\s+reda[cç][aã]o|conte\s+uma\s+hist[oó]ria)/i;
+
+    if (explicitOutOfScopeRegex.test(q)) {
+        return true;
+    }
+
+    // 3. Palavras-chave essenciais das operações de WhatsApp, CRM, Atendimento e Negócio
+    const allowedContextRegex = /(lead|cliente|contat|n[uú]mero|telefone|pessoa|atendid|atendimento|chamou|chamaram|entrou|entraram|quente|frio|recuperar|cadastr|conversa|whatsapp|zap|mensag|disse|falou|[aá]udio|texto|di[aá]log|bate-papo|agenda|agend|reuni|hor[aá]ri|compromiss|tarefa|calend[aá]ri|amanh[aã]|hoje|ontem|semana|m[eê]s|madrugada|noite|dia|tarde|relat|m[eé]tric|gr[aá]fic|taxa|convers|venda|fatur|desempenh|resultad|total|quantos?|quais|quanto|valor|pre[cç]o|plano|mensalidade|venciment|pagament|pix|assinatur|empresa|configura[cç]|perfil|conta|ajuda|status|rob[oô]|ia|bot|secret[aá]ri|operador|victor|geremias)/i;
+
+    // Se NÃO contém nenhuma menção nem intenção ligada ao CRM/WhatsApp:
+    if (!allowedContextRegex.test(q)) {
+        // Frases muito curtas de diálogo natural ("sim", "não", "como assim", "repita", "ok") são permitidas
+        if (q.split(/\s+/).length <= 2 && /(sim|n[aã]o|como|que|fala|ok|beleza|certo|entendi|repita)/i.test(q)) {
+            return false;
+        }
+        return true;
+    }
+
+    return false;
+}
+
+export const OUT_OF_SCOPE_RESPONSES = [
+    (clientName) => `Desculpe, ${clientName}, fui programado exclusivamente para tirar suas dúvidas referentes ao trabalho que estou fazendo no seu WhatsApp. O que você gostaria de saber? Total de clientes, quais clientes foram atendidos ontem ou os agendamentos de amanhã?`,
+
+    (clientName) => `Opa, ${clientName}! Meu foco aqui é 100% a gestão do seu CRM e o atendimento dos seus clientes no WhatsApp. Me pergunta sobre seus números de hoje, reuniões marcadas ou conversas recentes que eu te respondo na hora!`,
+
+    (clientName) => `${clientName}, essa aí foge das minhas responsabilidades! Eu sou o seu copiloto de vendas e WhatsApp aqui da empresa. Se você quiser saber quantos novos clientes entraram em contato ou como está o seu funil, é só me falar!`,
+
+    (clientName) => `Desculpe, ${clientName}, mas eu só respondo sobre as operações do seu negócio aqui no WhatsApp e no CRM. O que você quer consultar agora? Posso te passar os contatos do dia, agendamentos da semana ou as mensagens dos seus clientes.`
+];
+
+let lastOutOfScopeIndex = -1;
+
+export function getRandomOutOfScopeReply(clientName) {
+    let index;
+    do {
+        index = Math.floor(Math.random() * OUT_OF_SCOPE_RESPONSES.length);
+    } while (index === lastOutOfScopeIndex && OUT_OF_SCOPE_RESPONSES.length > 1);
+
+    lastOutOfScopeIndex = index;
+    return OUT_OF_SCOPE_RESPONSES[index](clientName);
+}
+
 let thinkingPhrasesInterval = null;
 
 function startThinkingPhrases(question) {
@@ -634,13 +696,28 @@ async function playJarvisVoice(text, audioBase64 = null) {
 async function queryJarvisAgent(userQuestion) {
     clearSilenceTimer();
     const cleanUserQuestion = normalizeSpeechPhonetics(userQuestion);
+    const clientName = getClientGreetingName();
+
+    // 0. GUARDRAIL ANTIDESVIO DE FUNÇÃO
+    if (isQuestionOutOfScope(cleanUserQuestion)) {
+        console.warn('🛡️ Pergunta fora de escopo bloqueada:', cleanUserQuestion);
+        const guardrailReply = getRandomOutOfScopeReply(clientName);
+        setJarvisScreenGlow('speaking');
+        await playJarvisVoice(guardrailReply);
+        setJarvisScreenGlow('listening', 'Estou te ouvindo');
+        startSilenceTimer(60000);
+        setTimeout(() => {
+            ensureSpeechRecognitionActive();
+        }, 300);
+        return;
+    }
+
     const assistantName = getAssistantName();
 
     // Ativa a orbe em modo thinking e inicia as frases contextuais do garçom!
     setJarvisScreenGlow('thinking');
     startThinkingPhrases(cleanUserQuestion);
 
-    const clientName = getClientGreetingName();
     const companyId = resolvedUser ? (resolvedUser.id_empresa || resolvedUser.id) : (localStorage.getItem('jarvis_company_id') || 'jarvis_crm');
 
     const payload = {
@@ -803,6 +880,19 @@ function setupSpeechEngine() {
             // Próxima pergunta do usuário na mesma sessão
             const cleanQuestion = stripWakeWord(rawTranscript) || rawTranscript;
             if (cleanQuestion.length >= 2) {
+                if (isQuestionOutOfScope(cleanQuestion)) {
+                    console.warn('🛡️ Pergunta fora de escopo bloqueada:', cleanQuestion);
+                    const clientName = getClientGreetingName();
+                    const guardrailReply = getRandomOutOfScopeReply(clientName);
+                    setJarvisScreenGlow('speaking');
+                    await playJarvisVoice(guardrailReply);
+                    setJarvisScreenGlow('listening', 'Estou te ouvindo');
+                    startSilenceTimer(60000);
+                    setTimeout(() => {
+                        ensureSpeechRecognitionActive();
+                    }, 300);
+                    return;
+                }
                 await queryJarvisAgent(cleanQuestion);
             }
             return;
@@ -818,6 +908,18 @@ function setupSpeechEngine() {
 
             if (cleanCommand.length > 3) {
                 // Usuário já fez a pergunta completa de primeira!
+                if (isQuestionOutOfScope(cleanCommand)) {
+                    console.warn('🛡️ Pergunta fora de escopo bloqueada:', cleanCommand);
+                    const guardrailReply = getRandomOutOfScopeReply(clientName);
+                    setJarvisScreenGlow('speaking');
+                    await playJarvisVoice(guardrailReply);
+                    setJarvisScreenGlow('listening', 'Estou te ouvindo');
+                    startSilenceTimer(60000);
+                    setTimeout(() => {
+                        ensureSpeechRecognitionActive();
+                    }, 300);
+                    return;
+                }
                 await queryJarvisAgent(cleanCommand);
             } else {
                 // Apenas saudou ("Fala Jarvis", "Fala Reinaldo", etc.)
@@ -1149,6 +1251,16 @@ window.testJarvisBillingReminder = function(days = 3) {
 };
 window.checkJarvisBillingReminder = checkAndScheduleBillingReminder;
 window.getDaysUntilDue = getDaysUntilDue;
+window.isQuestionOutOfScope = isQuestionOutOfScope;
+window.getRandomOutOfScopeReply = getRandomOutOfScopeReply;
+window.testOutOfScopeGuardrail = function(question = "qual é a raiz quadrada de 22") {
+    const isOut = isQuestionOutOfScope(question);
+    const clientName = getClientGreetingName();
+    const reply = getRandomOutOfScopeReply(clientName);
+    console.log(`[Guardrail Test] Pergunta: "${question}" | Fora de escopo: ${isOut}`);
+    console.log(`[Guardrail Test] Resposta gerada: "${reply}"`);
+    return { isOutOfScope: isOut, reply };
+};
 
 // Auto-inicializa quando o DOM estiver pronto
 if (document.readyState === 'loading') {

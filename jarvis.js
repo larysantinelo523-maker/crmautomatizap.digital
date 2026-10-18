@@ -4,7 +4,7 @@
 
 import { supabase } from './supabase.js';
 import { fetchUserData, fetchLeads, fetchAgendamentos } from './data.js';
-import { normalizeSpeechPhonetics, getAssistantName, setAssistantName, getContextualPhrases } from './jarvisWakeWord.js';
+import { normalizeSpeechPhonetics, getAssistantName, setAssistantName, getContextualPhrases, isQuestionOutOfScope, getRandomOutOfScopeReply } from './jarvisWakeWord.js';
 
 const DEFAULT_WEBHOOK_URL = 'https://talonedlanternfish-n8n.cloudfy.live/webhook/jarvis-crm';
 
@@ -446,6 +446,15 @@ async function handleUserMessage(userText) {
         const reply = `Meu nome é ${assistant}, ${salutationName}! Em que posso te ajudar hoje?`;
         addChatMessage('jarvis', reply);
         await speakJarvis(reply);
+        return;
+    }
+
+    // 3. Regra de segurança e escopo (Guardrail antidesvio de função)
+    if (isQuestionOutOfScope(normalizedText)) {
+        console.warn('🛡️ Pergunta fora de escopo bloqueada no chat:', normalizedText);
+        const guardrailReply = getRandomOutOfScopeReply(salutationName);
+        addChatMessage('jarvis', guardrailReply);
+        await speakJarvis(guardrailReply);
         return;
     }
 
