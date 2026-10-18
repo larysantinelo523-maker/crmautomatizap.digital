@@ -2,7 +2,7 @@ const { createClient } = require('@supabase/supabase-js');
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-    const { userId, nome_completo, email, mensalidade, data_vencimento, whatsapp, cnpj_cpf, segmento, descricao, localizacao } = req.body;
+    const { userId, nome_completo, nome_fantasia, nome_cliente, email, mensalidade, data_vencimento, whatsapp, cnpj_cpf, segmento, descricao, localizacao } = req.body;
     if (!userId) return res.status(400).json({ error: 'Missing userId' });
 
     const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://qosgrqdfeqzxnzhmwomv.supabase.co';
@@ -13,11 +13,25 @@ export default async function handler(req, res) {
 
     try {
         if (email) {
-            await supabase.auth.admin.updateUserById(userId, { email, user_metadata: { nome_completo } });
+            await supabase.auth.admin.updateUserById(userId, { 
+                email, 
+                user_metadata: { 
+                    nome_completo: nome_fantasia || nome_completo,
+                    nome_fantasia: nome_fantasia || nome_completo,
+                    nome_cliente: nome_cliente 
+                } 
+            });
         }
         
         const updateData = {};
-        if (nome_completo !== undefined) updateData.nome_completo = nome_completo;
+        if (nome_cliente !== undefined) updateData.nome_cliente = nome_cliente;
+        if (nome_fantasia !== undefined) {
+            updateData.nome_fantasia = nome_fantasia;
+            updateData.nome_completo = nome_fantasia;
+        } else if (nome_completo !== undefined) {
+            updateData.nome_completo = nome_completo;
+            updateData.nome_fantasia = nome_completo;
+        }
         if (email !== undefined) updateData.email = email;
         if (mensalidade !== undefined) updateData.mensalidade = mensalidade;
         if (data_vencimento !== undefined) updateData.data_vencimento = data_vencimento;

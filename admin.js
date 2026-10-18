@@ -412,7 +412,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">
                             ${(tenant.nome || "?").charAt(0).toUpperCase()}
                         </div>
-                        <span class="user-name" style="font-weight: 500;">${tenant.nome || "Empresa"}</span>
+                        <div style="display: flex; flex-direction: column;">
+                            <span class="user-name" style="font-weight: 600;">${tenant.nome || "Empresa"}</span>
+                            ${tenant.nome_cliente ? `<span style="font-size: 11.5px; color: var(--color-text-sec);">${tenant.nome_cliente}</span>` : ""}
+                        </div>
                     </div>
                 </td>
                 <td>${tenant.email || "N/A"}</td>
@@ -1244,6 +1247,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const mensalidadeNum = parseFloat(rawMensalidade) || 0;
 
       const payload = {
+        nome_cliente: (document.getElementById("tenant-nome-cliente")?.value || "").trim(),
         nome_empresa: document.getElementById("tenant-nome").value,
         email: document.getElementById("tenant-email").value,
         password: document.getElementById("tenant-senha").value,

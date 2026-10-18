@@ -301,7 +301,7 @@
             });
         });
     </script>
-  <script type="module" crossorigin src="/assets/admin-A7ssDx9I.js"></script>
+  <script type="module" crossorigin src="/assets/admin-BVru5afM.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/supabase-DUkCiNAm.js">
   <link rel="stylesheet" crossorigin href="/assets/conversas-D5Q0yPYI.css">
 </head>
@@ -979,6 +979,15 @@
             <div class="modal-body">
                 <form id="form-create-tenant" class="login-form">
                     <div class="form-group">
+                        <div class="form-group">
+                        <label style="color: var(--color-text-mut);">Nome do Cliente</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-user"></i>
+                            <input type="text" id="tenant-nome-cliente" class="form-control" placeholder="Ex: Seu Geremias, Jarbas..."
+                                required>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label style="color: var(--color-text-mut);">Nome da Empresa</label>
                         <div class="input-wrapper">
                             <i class="ph ph-building"></i>
@@ -987,7 +996,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label style="color: var(--color-text-mut);">E-mail de Login (Administrador da Empresa)</label>
+                        <label style="color: var(--color-text-mut);">E-mail de Login</label>
                         <div class="input-wrapper">
                             <i class="ph ph-envelope-simple"></i>
                             <input type="email" id="tenant-email" class="form-control" placeholder="contato@empresa.com"

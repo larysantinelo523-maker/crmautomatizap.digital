@@ -1,11 +1,11 @@
-﻿const { createClient } = require('@supabase/supabase-js');
+const { createClient } = require('@supabase/supabase-js');
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { email, password, nome_empresa, data_vencimento, mensalidade, segmento, descricao, localizacao } = req.body;
+    const { email, password, nome_empresa, nome_cliente, data_vencimento, mensalidade, segmento, descricao, localizacao } = req.body;
     
     if (!email || !password || !nome_empresa) {
         return res.status(400).json({ error: 'Missing required fields' });
@@ -21,6 +21,9 @@ export default async function handler(req, res) {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     try {
+        const clienteFinal = (nome_cliente || '').trim() || nome_empresa;
+        const empresaFinal = (nome_empresa || '').trim();
+
         // 1. Create User in Auth
         const { data: authData, error: authError } = await supabase.auth.admin.createUser({
             email: email,
@@ -28,7 +31,9 @@ export default async function handler(req, res) {
             email_confirm: true,
             user_metadata: {
                 tipo_usuario: 'usuário',
-                nome_completo: nome_empresa
+                nome_completo: empresaFinal,
+                nome_fantasia: empresaFinal,
+                nome_cliente: clienteFinal
             }
         });
 
@@ -41,7 +46,9 @@ export default async function handler(req, res) {
         // 2. Create/Update Usuario Profile
         const profileData = {
             id: userId,
-            nome_completo: nome_empresa,
+            nome_completo: empresaFinal,
+            nome_fantasia: empresaFinal,
+            nome_cliente: clienteFinal,
             tipo_usuario: 'usuário',
             status_assinatura: 'ativo',
             email: email

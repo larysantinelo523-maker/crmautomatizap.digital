@@ -94,8 +94,10 @@ function getResolvedUserName() {
     const custom = localStorage.getItem('jarvis_user_name');
     if (custom && custom.trim()) return custom.trim();
 
-    // 2. Do objeto loggedUser retornado pelo Supabase (tabela usuarios: nome_completo ou nome)
+    // 2. Do objeto loggedUser retornado pelo Supabase (tabela usuarios: nome_cliente, nome_fantasia, nome_completo ou nome)
     if (loggedUser) {
+        if (loggedUser.nome_cliente && loggedUser.nome_cliente.trim()) return loggedUser.nome_cliente.trim();
+        if (loggedUser.nome_fantasia && loggedUser.nome_fantasia.trim()) return loggedUser.nome_fantasia.trim();
         if (loggedUser.nome_completo && loggedUser.nome_completo.trim()) return loggedUser.nome_completo.trim();
         if (loggedUser.nome && loggedUser.nome.trim()) return loggedUser.nome.trim();
     }
@@ -129,6 +131,18 @@ function getResolvedUserName() {
     return 'Arthur';
 }
 
+function formatGreetingName(name) {
+    if (!name) return 'Gestor';
+    const trimmed = name.trim();
+    // Se começar com prefixos de respeito como "Seu", "Dona", "Sr.", "Sra.", preserva o conjunto (ex: "Seu Geremias", "Dona Maria")
+    const matchPrefix = trimmed.match(/^(seu|dona|sr\.|sra\.)\s+\S+/i);
+    if (matchPrefix) {
+        return matchPrefix[0];
+    }
+    // Caso contrário, pega o primeiro nome
+    return trimmed.split(' ')[0];
+}
+
 async function initJarvisGreeting() {
     if (greetingSpoken) return;
     greetingSpoken = true;
@@ -142,7 +156,7 @@ async function initJarvisGreeting() {
     } catch(e) {}
 
     const fullName = getResolvedUserName();
-    const firstName = fullName.trim().split(' ')[0];
+    const salutationName = formatGreetingName(fullName);
 
     // Saudação dinâmica pelo horário de Brasília
     const now = window.getBrasiliaDate ? window.getBrasiliaDate() : new Date();
@@ -157,13 +171,13 @@ async function initJarvisGreeting() {
         periodKey = 'noite';
     }
 
-    const greetingText = `Fala ${firstName}, e aí, tudo bom contigo? ${timeGreeting} O que você deseja saber sobre o dia de hoje?`;
+    const greetingText = `Fala, ${salutationName}! Tudo bom contigo? ${timeGreeting} O que você deseja saber sobre o dia de hoje?`;
 
     // Adiciona fala ao histórico
     addChatMessage('jarvis', greetingText);
 
     // Cache local no navegador para reprodução instantânea (0ms e sem gastar cota a cada F5)
-    const cacheKey = `jarvis_voice_v3_${periodKey}_${firstName.toLowerCase()}`;
+    const cacheKey = `jarvis_voice_v4_${periodKey}_${salutationName.toLowerCase().replace(/\s+/g, '_')}`;
     let audioData = null;
     try {
         audioData = localStorage.getItem(cacheKey);
@@ -364,13 +378,16 @@ async function handleUserMessage(userText) {
     setStatusText('Consultando o AI Agent...');
 
     const rawName = getResolvedUserName();
-    const firstName = rawName.trim().split(' ')[0];
+    const salutationName = formatGreetingName(rawName);
+    const empresaName = loggedUser?.nome_fantasia || loggedUser?.nome_completo || 'sua empresa';
     const webhookUrl = getWebhookUrl();
 
     const payload = {
         message: userText,
         pergunta: userText,
-        user_name: firstName,
+        user_name: salutationName,
+        nome_cliente: salutationName,
+        nome_empresa: empresaName,
         nome_usuario: rawName,
         user_id: loggedUser ? loggedUser.id : null,
         company_id: loggedUser ? loggedUser.id : null,

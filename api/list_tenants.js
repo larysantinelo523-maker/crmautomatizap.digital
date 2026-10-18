@@ -358,7 +358,9 @@ export default async function handler(req, res) {
 
             result.push({
                 id_empresa: user.id,
-                nome: user.nome_completo || 'Sem Nome',
+                nome: user.nome_fantasia || user.nome_completo || 'Sem Nome',
+                nome_fantasia: user.nome_fantasia || user.nome_completo || 'Sem Nome',
+                nome_cliente: user.nome_cliente || null,
                 email: user.email || 'N/A',
                 vencimento: user.data_vencimento || 'N/A',
                 status: evaluatedStatus,
