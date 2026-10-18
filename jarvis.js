@@ -4,6 +4,7 @@
 
 import { supabase } from './supabase.js';
 import { fetchUserData, fetchLeads, fetchAgendamentos } from './data.js';
+import { normalizeSpeechPhonetics } from './jarvisWakeWord.js';
 
 const DEFAULT_WEBHOOK_URL = 'https://talonedlanternfish-n8n.cloudfy.live/webhook/jarvis-crm';
 
@@ -351,7 +352,7 @@ function setupSpeechRecognition() {
     recognition.onresult = async (event) => {
         const transcript = event.results[0][0].transcript;
         if (transcript && transcript.trim()) {
-            const clean = transcript.trim();
+            const clean = normalizeSpeechPhonetics(transcript.trim());
             const farewellRegex = /^(obrigad[oa]|valeu|tchau|at[eé]\s+mais|pode\s+fechar|fechar|encerra[r]?|s[oó]\s+isso|falou|at[eé]\s+logo|pode\s+parar|desativa[r]?|nada\s+mais)\b/i;
             if (farewellRegex.test(clean)) {
                 const rawName = getResolvedUserName();
@@ -419,7 +420,8 @@ function toggleListening() {
 
 // --- 4. DISPARO PARA O WEBHOOK DO AI AGENT (SEM IF/ELSE ENGESSADO) ---
 async function handleUserMessage(userText) {
-    addChatMessage('user', userText);
+    const normalizedText = normalizeSpeechPhonetics(userText);
+    addChatMessage('user', normalizedText);
     setOrbState('thinking');
     setStatusText('Consultando o AI Agent...');
 
@@ -429,8 +431,8 @@ async function handleUserMessage(userText) {
     const webhookUrl = getWebhookUrl();
 
     const payload = {
-        message: userText,
-        pergunta: userText,
+        message: normalizedText,
+        pergunta: normalizedText,
         user_name: salutationName,
         nome_cliente: salutationName,
         nome_empresa: empresaName,

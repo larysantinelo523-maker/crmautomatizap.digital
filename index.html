@@ -364,7 +364,7 @@
                                         <th>Nome</th>
                                         <th>Interesse</th>
                                         <th>Status</th>
-                                        <th>Lead criado em:</th>
+                                        <th>Última interação:</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -463,7 +463,28 @@
     <script>
         window.initDashboard = async function () {
             if (!window.dbAPI) return;
-            let leads = await window.dbAPI.fetchLeads();
+            let leads = [];
+            let latestMsgs = {};
+            try {
+                const leadsPromise = window.dbAPI.fetchLeads();
+                const latestPromise = (window.dbAPI && window.dbAPI.fetchLatestMessages)
+                    ? window.dbAPI.fetchLatestMessages()
+                    : import('./data.js').then(m => m.fetchLatestMessages ? m.fetchLatestMessages() : {});
+                const res = await Promise.all([leadsPromise, latestPromise]);
+                leads = res[0] || [];
+                latestMsgs = res[1] || {};
+            } catch (e) {
+                console.error('Erro ao carregar leads/mensagens no dashboard:', e);
+                leads = await window.dbAPI.fetchLeads();
+            }
+            window.latestMessagesMap = latestMsgs || {};
+
+            // Ordena leads pelo horário da última mensagem/interação recente (exatamente igual a conversas.html)
+            leads.sort((a, b) => {
+                const timeA = (window.latestMessagesMap[a.id]?.criado_em) || a.ultima_interacao_cliente || a.ultima_interacao || a.criado_em;
+                const timeB = (window.latestMessagesMap[b.id]?.criado_em) || b.ultima_interacao_cliente || b.ultima_interacao || b.criado_em;
+                return new Date(timeB || 0) - new Date(timeA || 0);
+            });
 
             // Filter by date
             const filterStart = localStorage.getItem('calendar_filter_start');
@@ -485,14 +506,14 @@
             if (startDt) {
                 startDt.setHours(0,0,0,0);
                 leads = leads.filter(l => {
-                    const lDate = new Date(l.criado_em);
+                    const lDate = new Date((window.latestMessagesMap[l.id]?.criado_em) || l.ultima_interacao_cliente || l.ultima_interacao || l.criado_em);
                     return lDate >= startDt;
                 });
             }
             if (endDt) {
                 endDt.setHours(23,59,59,999);
                 leads = leads.filter(l => {
-                    const lDate = new Date(l.criado_em);
+                    const lDate = new Date((window.latestMessagesMap[l.id]?.criado_em) || l.ultima_interacao_cliente || l.ultima_interacao || l.criado_em);
                     return lDate <= endDt;
                 });
             }
@@ -701,7 +722,11 @@
                         if (st === 'em atendimento') badgeClass = 'warning-light';
                         else if (st === 'qualificado') badgeClass = 'primary-light';
 
-                        const date = new Date(lead.criado_em);
+                        const lastInteraction = (window.latestMessagesMap && window.latestMessagesMap[lead.id]?.criado_em)
+                            || lead.ultima_interacao_cliente 
+                            || lead.ultima_interacao 
+                            || lead.criado_em;
+                        const date = new Date(lastInteraction);
                         const formattedDate = !isNaN(date.getTime())
                             ? (date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }))
                             : (lead.criado_em || '--');

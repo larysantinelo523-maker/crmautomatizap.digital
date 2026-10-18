@@ -609,6 +609,11 @@ export function initRealtimeNotifications() {
                     // Atualiza pontinho vermelho na tela
                     const notifDot = document.querySelector('.notification-dot');
                     if (notifDot) notifDot.style.display = 'block';
+
+                    // Reordena o dashboard imediatamente ao receber nova mensagem
+                    if (typeof window.initDashboard === 'function') {
+                        window.initDashboard();
+                    }
                 }
             }
         )

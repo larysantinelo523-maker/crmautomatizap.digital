@@ -23,6 +23,22 @@ let wakeActive = false;
 let resolvedUser = null;
 let watchdogInterval = null;
 
+// --- NORMALIZAÇÃO FONÉTICA INTELIGENTE DE TERMOS DE VOZ (LEADS) ---
+export function normalizeSpeechPhonetics(rawText) {
+    if (!rawText || typeof rawText !== 'string') return rawText;
+    let normalized = rawText;
+
+    // Normaliza variações fonéticas onde pt-BR confunde "leads" com "litros", "lides", "leds", "lids", "lidis"
+    normalized = normalized
+        .replace(/\b(quantos?|quais|total de|todos os|novos?|meus?|esses?|aqueles?|filtrar|ver|listar|buscar|mostrar|cadastrar|salvar|chamou|entrou|entraram)\s+(litros?|lides?|ledes?|lids?|lidis?)\b/gi, '$1 leads')
+        .replace(/\b(litros|lides|ledes|lids|lidis)\b/gi, (match) => {
+            return match.toLowerCase().endsWith('s') ? 'leads' : 'lead';
+        })
+        .replace(/\b(um|o|novo|esse|aquele)\s+litro\b/gi, '$1 lead');
+
+    return normalized;
+}
+
 // --- GARANTIA ABSOLUTA DE RECONHECIMENTO ATIVO (CICLO DE VIDA BLINDADO) ---
 function ensureSpeechRecognitionActive() {
     if (!wakeActive && !isConversationActive) return;
@@ -370,15 +386,16 @@ async function playJarvisVoice(text, audioBase64 = null) {
 // --- 4. CONSULTA AO WEBHOOK DO AGENTE JARVIS NO N8N ---
 async function queryJarvisAgent(userQuestion) {
     clearSilenceTimer();
+    const cleanUserQuestion = normalizeSpeechPhonetics(userQuestion);
     setJarvisScreenGlow('speaking', 'Jarvis consultando o sistema...');
     const clientName = getClientGreetingName();
 
     const companyId = resolvedUser ? (resolvedUser.id_empresa || resolvedUser.id) : (localStorage.getItem('jarvis_company_id') || 'jarvis_crm');
 
     const payload = {
-        message: userQuestion,
-        pergunta: userQuestion,
-        chatInput: userQuestion,
+        message: cleanUserQuestion,
+        pergunta: cleanUserQuestion,
+        chatInput: cleanUserQuestion,
         user_name: clientName,
         nome_cliente: clientName,
         nome_empresa: resolvedUser?.nome_fantasia || resolvedUser?.nome_completo || 'sua empresa',
@@ -465,7 +482,7 @@ function setupSpeechEngine() {
         for (let i = event.resultIndex; i < event.results.length; ++i) {
             transcript += event.results[i][0].transcript;
         }
-        const rawTranscript = transcript.trim();
+        const rawTranscript = normalizeSpeechPhonetics(transcript.trim());
         if (!rawTranscript) return;
 
         // Supressão de eco pós-áudio apenas para ruídos de menos de 5 caracteres
