@@ -26,6 +26,16 @@ let silenceTimer = null;
 let wakeActive = false;
 let resolvedUser = null;
 let watchdogInterval = null;
+let hasUserInteracted = false;
+const markGlobalInteraction = () => {
+    hasUserInteracted = true;
+};
+if (typeof window !== 'undefined') {
+    window.addEventListener('click', markGlobalInteraction, { passive: true });
+    window.addEventListener('touchstart', markGlobalInteraction, { passive: true });
+    window.addEventListener('keydown', markGlobalInteraction, { passive: true });
+    window.addEventListener('scroll', markGlobalInteraction, { passive: true });
+}
 
 // --- NORMALIZAÇÃO FONÉTICA INTELIGENTE DE TERMOS DE VOZ (LEADS) ---
 export function normalizeSpeechPhonetics(rawText) {
@@ -643,6 +653,7 @@ async function queryJarvisAgent(userQuestion) {
         user_id: resolvedUser ? resolvedUser.id : null,
         company_id: companyId,
         id_empresa: companyId,
+        data_vencimento: resolvedUser?.data_vencimento || window.tenantVencDateStr || null,
         assistant_name: assistantName,
         timestamp: new Date().toISOString()
     };
@@ -887,6 +898,180 @@ function toggleWakeWord() {
     }
 }
 
+// --- 6.1 ATIVAÇÃO PROATIVA: LEMBRETE DE COBRANÇA (3 DIAS ANTES, 1X AO DIA) ---
+export function getDaysUntilDue(dateVal) {
+    if (!dateVal || dateVal === 'N/A') return null;
+
+    const now = window.getBrasiliaDate ? window.getBrasiliaDate() : new Date();
+    now.setHours(0, 0, 0, 0);
+
+    let targetDate = null;
+    const str = String(dateVal).trim();
+
+    // Formato 1: YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+        const parts = str.split('T')[0].split('-');
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const d = parseInt(parts[2], 10);
+        targetDate = new Date(y, m, d, 0, 0, 0, 0);
+
+        // Se a data já passou (ex: assinatura recorrente mensal todo dia X)
+        if (targetDate.getTime() < now.getTime()) {
+            const currentMonthDue = new Date(now.getFullYear(), now.getMonth(), d, 0, 0, 0, 0);
+            if (currentMonthDue.getTime() >= now.getTime()) {
+                targetDate = currentMonthDue;
+            } else {
+                targetDate = new Date(now.getFullYear(), now.getMonth() + 1, d, 0, 0, 0, 0);
+            }
+        }
+    }
+    // Formato 2: DD/MM/YYYY
+    else if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(str)) {
+        const parts = str.split('/');
+        const d = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const y = parseInt(parts[2], 10);
+        targetDate = new Date(y, m, d, 0, 0, 0, 0);
+
+        if (targetDate.getTime() < now.getTime()) {
+            const currentMonthDue = new Date(now.getFullYear(), now.getMonth(), d, 0, 0, 0, 0);
+            if (currentMonthDue.getTime() >= now.getTime()) {
+                targetDate = currentMonthDue;
+            } else {
+                targetDate = new Date(now.getFullYear(), now.getMonth() + 1, d, 0, 0, 0, 0);
+            }
+        }
+    }
+    // Formato 3: Apenas o dia do mês (ex: 10, "10")
+    else if (/^\d{1,2}$/.test(str)) {
+        const d = parseInt(str, 10);
+        const currentMonthDue = new Date(now.getFullYear(), now.getMonth(), d, 0, 0, 0, 0);
+        if (currentMonthDue.getTime() >= now.getTime()) {
+            targetDate = currentMonthDue;
+        } else {
+            targetDate = new Date(now.getFullYear(), now.getMonth() + 1, d, 0, 0, 0, 0);
+        }
+    }
+
+    if (!targetDate || isNaN(targetDate.getTime())) return null;
+
+    const diffTime = targetDate.getTime() - now.getTime();
+    return Math.round(diffTime / (1000 * 60 * 60 * 24));
+}
+
+function getBillingReminderMessage(clientName, diffDays) {
+    if (diffDays === 3) {
+        return `${clientName}, consultei o CRM, estou passando aqui pra te lembrar de não esquecer de fazer o pagamento da mensalidade do sistema, beleza? Vence daqui a 3 dias! Falo isso só pra que os seus clientes continuem sendo atendidos por mim normalmente.`;
+    }
+    if (diffDays === 2) {
+        return `${clientName}, consultei o CRM, estou passando aqui pra te lembrar que faltam apenas 2 dias para o vencimento da mensalidade do sistema, beleza? Falo isso só pra que os seus clientes continuem sendo atendidos por mim sem nenhuma pausa.`;
+    }
+    if (diffDays === 1) {
+        return `${clientName}, consultei o CRM, estou passando aqui pra te lembrar que a sua mensalidade vence amanhã, beleza? Te aviso com carinho só pra você não esquecer e manter seus clientes sendo atendidos normalmente por mim!`;
+    }
+    // diffDays === 0 (Vence hoje)
+    return `${clientName}, consultei o CRM, estou passando aqui pra te avisar que a sua mensalidade do sistema vence hoje, beleza? Falo isso pra mantermos o atendimento automático dos seus clientes funcionando perfeitamente por aqui!`;
+}
+
+let billingReminderTriggered = false;
+
+export async function triggerJarvisBillingReminder(diffDays) {
+    if (isSpeaking || isConversationActive || billingReminderTriggered) return;
+    billingReminderTriggered = true;
+
+    const clientName = getClientGreetingName();
+    const reminderMessage = getBillingReminderMessage(clientName, diffDays);
+
+    const now = window.getBrasiliaDate ? window.getBrasiliaDate() : new Date();
+    const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const storageKey = `jarvis_billing_reminder_${resolvedUser?.id || 'default'}`;
+    localStorage.setItem(storageKey, todayKey);
+
+    console.log(`🔔 Jarvis ativando lembrete de cobrança: Faltam ${diffDays} dia(s) para o vencimento.`);
+
+    isConversationActive = true;
+    clearSilenceTimer();
+
+    // 1. Abre a tela do Jarvis com a orbe centralizada no modo falando
+    setJarvisScreenGlow('speaking');
+
+    // 2. Cache local do áudio para playback imediato (0ms e economiza créditos)
+    const voiceCacheKey = `jarvis_voice_billing_${diffDays}_${clientName.toLowerCase().replace(/\s+/g, '_')}`;
+    let cachedAudio = null;
+    try {
+        cachedAudio = localStorage.getItem(voiceCacheKey);
+    } catch(e) {}
+
+    let audioToPlay = cachedAudio;
+    if (!audioToPlay) {
+        audioToPlay = await fetchElevenLabsSpeech(reminderMessage);
+        if (audioToPlay) {
+            try { localStorage.setItem(voiceCacheKey, audioToPlay); } catch(e) {}
+        }
+    }
+
+    // 3. Fala o áudio do lembrete (ElevenLabs voz oficial George ou síntese nativa do navegador)
+    await playJarvisVoice(reminderMessage, audioToPlay);
+
+    // 4. Após terminar a fala, entra em modo de escuta com "Estou te ouvindo"
+    setJarvisScreenGlow('listening', 'Estou te ouvindo');
+    startSilenceTimer(60000); // 60 segundos de silêncio para fechar se o usuário não responder
+
+    setTimeout(() => {
+        ensureSpeechRecognitionActive();
+    }, 300);
+}
+
+export function checkAndScheduleBillingReminder() {
+    // 1. Verifica se já avisou hoje
+    const now = window.getBrasiliaDate ? window.getBrasiliaDate() : new Date();
+    const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const storageKey = `jarvis_billing_reminder_${resolvedUser?.id || 'default'}`;
+
+    if (localStorage.getItem(storageKey) === todayKey) {
+        return; // Já avisou hoje!
+    }
+
+    // 2. Busca data de vencimento da empresa/usuário
+    const rawDate = resolvedUser?.data_vencimento || resolvedUser?.vencimento || window.tenantVencDateStr || localStorage.getItem('tenant_data_vencimento') || localStorage.getItem('user_data_vencimento');
+    if (!rawDate) return;
+
+    // 3. Calcula quantos dias faltam para a data de cobrança
+    const diffDays = getDaysUntilDue(rawDate);
+    if (diffDays === null || diffDays < 0 || diffDays > 3) return;
+
+    console.log(`ℹ️ [Jarvis] Lembrete de cobrança programado para hoje. Faltam ${diffDays} dia(s) para o vencimento.`);
+
+    // 4. Se o usuário já interagiu com a página, dispara após 1.5s
+    if (hasUserInteracted) {
+        setTimeout(() => {
+            triggerJarvisBillingReminder(diffDays);
+        }, 1500);
+        return;
+    }
+
+    // 5. Caso contrário, aguarda o primeiro clique/toque do usuário (política de autoplay de áudio dos navegadores)
+    let triggered = false;
+    const executeTrigger = () => {
+        if (triggered) return;
+        triggered = true;
+        window.removeEventListener('click', executeTrigger);
+        window.removeEventListener('touchstart', executeTrigger);
+        window.removeEventListener('keydown', executeTrigger);
+        window.removeEventListener('scroll', executeTrigger);
+
+        setTimeout(() => {
+            triggerJarvisBillingReminder(diffDays);
+        }, 800);
+    };
+
+    window.addEventListener('click', executeTrigger, { once: true, passive: true });
+    window.addEventListener('touchstart', executeTrigger, { once: true, passive: true });
+    window.addEventListener('keydown', executeTrigger, { once: true, passive: true });
+    window.addEventListener('scroll', executeTrigger, { once: true, passive: true });
+}
+
 // --- 6. BOTÃO PILL NO HEADER DE TODAS AS PÁGINAS (OCULTADO A PEDIDO DO USUÁRIO) ---
 function injectHeaderPill() {
     // Ocultado: remove do DOM se existir e não injeta novo elemento
@@ -943,6 +1128,12 @@ export async function initJarvisWakeWord() {
     } catch (e) {
         console.warn('Erro ao carregar usuário em jarvisWakeWord:', e);
     }
+
+    // Checa lembrete proativo de cobrança (3 dias antes, 1 vez ao dia)
+    checkAndScheduleBillingReminder();
+    window.addEventListener('tenantDateLoaded', () => {
+        checkAndScheduleBillingReminder();
+    });
 }
 
 window.setJarvisScreenGlow = setJarvisScreenGlow;
@@ -950,6 +1141,14 @@ window.startWakeWordListening = startWakeWordListening;
 window.stopWakeWordListening = stopWakeWordListening;
 window.getAssistantName = getAssistantName;
 window.setAssistantName = setAssistantName;
+window.testJarvisBillingReminder = function(days = 3) {
+    const storageKey = `jarvis_billing_reminder_${resolvedUser?.id || 'default'}`;
+    localStorage.removeItem(storageKey);
+    billingReminderTriggered = false;
+    triggerJarvisBillingReminder(Number(days));
+};
+window.checkJarvisBillingReminder = checkAndScheduleBillingReminder;
+window.getDaysUntilDue = getDaysUntilDue;
 
 // Auto-inicializa quando o DOM estiver pronto
 if (document.readyState === 'loading') {
