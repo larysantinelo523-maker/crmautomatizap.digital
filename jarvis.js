@@ -315,10 +315,23 @@ function setupSpeechRecognition() {
         updateMicButtonState(true);
     };
 
-    recognition.onresult = (event) => {
+    recognition.onresult = async (event) => {
         const transcript = event.results[0][0].transcript;
         if (transcript && transcript.trim()) {
-            handleUserMessage(transcript.trim());
+            const clean = transcript.trim();
+            const farewellRegex = /^(obrigad[oa]|valeu|tchau|at[eé]\s+mais|pode\s+fechar|fechar|encerra[r]?|s[oó]\s+isso|falou|at[eé]\s+logo|pode\s+parar|desativa[r]?|nada\s+mais)\b/i;
+            if (farewellRegex.test(clean)) {
+                const rawName = getResolvedUserName();
+                const salutationName = formatGreetingName(rawName);
+                const farewellMsg = `Por nada, ${salutationName}! Se precisar de mais alguma coisa, é só me chamar. Até mais!`;
+                addChatMessage('jarvis', farewellMsg);
+                await speakJarvis(farewellMsg);
+                stopListening();
+                setOrbState('idle');
+                setStatusText('Toque no microfone para falar');
+                return;
+            }
+            handleUserMessage(clean);
         }
     };
 
@@ -446,7 +459,14 @@ async function handleUserMessage(userText) {
         addChatMessage('jarvis', fallbackMsg);
         await speakJarvis('Estou pronto para conversar! Basta ativar o fluxo do AI Agent no seu n8n para eu consultar o Supabase ao vivo.');
     } finally {
-        if (!isSpeaking) {
+        if (!isMuted) {
+            setTimeout(() => {
+                if (!isSpeaking && !isListening) {
+                    startListening();
+                    setStatusText('Ouvindo você... (pode fazer a próxima pergunta)');
+                }
+            }, 500);
+        } else {
             setOrbState('idle');
             setStatusText('Toque no microfone para falar');
         }

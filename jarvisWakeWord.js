@@ -12,6 +12,8 @@ const N8N_WEBHOOK_URL = 'https://talonedlanternfish-n8n.cloudfy.live/webhook/jar
 let recognition = null;
 let isListening = false;
 let isSpeaking = false;
+let isConversationActive = false;
+let lastSpokeEndTime = 0;
 let glowElement = null;
 let toastElement = null;
 let toastTextElement = null;
@@ -19,6 +21,38 @@ let currentAudioPlayer = null;
 let silenceTimer = null;
 let wakeActive = false;
 let resolvedUser = null;
+
+// --- CONTROLE DE SESSÃO CONTÍNUA E SILÊNCIO ---
+function startSilenceTimer(durationMs = 25000) {
+    clearSilenceTimer();
+    silenceTimer = setTimeout(() => {
+        if (isConversationActive && !isSpeaking) {
+            console.log('⏳ Tempo limite de silêncio atingido (25s). Adormecendo bate-papo...');
+            endConversationSession(false);
+        }
+    }, durationMs);
+}
+
+function clearSilenceTimer() {
+    if (silenceTimer) {
+        clearTimeout(silenceTimer);
+        silenceTimer = null;
+    }
+}
+
+export async function endConversationSession(withFarewell = true) {
+    isConversationActive = false;
+    clearSilenceTimer();
+
+    if (withFarewell) {
+        const clientName = getClientGreetingName();
+        const farewell = `Por nada, ${clientName}! Se precisar de mais alguma coisa, é só me chamar. Até mais!`;
+        setJarvisScreenGlow('speaking', 'Encerrando bate-papo...');
+        await playJarvisVoice(farewell);
+    }
+
+    setJarvisScreenGlow('idle');
+}
 
 // --- 1. RESOLUÇÃO INTELIGENTE DO NOME DO USUÁRIO ---
 function getClientGreetingName() {
@@ -66,11 +100,22 @@ function createGlowElements() {
         toastElement.id = 'jarvis-floating-toast';
         toastElement.className = 'jarvis-floating-toast';
         toastElement.innerHTML = `
-            <i class="ph-fill ph-waveform" style="color: #00A884; font-size: 18px; animation: spin 3s linear infinite;"></i>
-            <span id="jarvis-toast-text">Jarvis ativado</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="ph-fill ph-waveform" style="color: #00A884; font-size: 18px; animation: spin 3s linear infinite;"></i>
+                <span id="jarvis-toast-text">Jarvis ativado</span>
+            </div>
+            <button id="btn-close-jarvis-session" type="button" title="Encerrar bate-papo" style="background: rgba(255,255,255,0.15); border: none; color: #fff; cursor: pointer; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-left: 8px; transition: all 0.2s;">
+                <i class="ph ph-x"></i>
+            </button>
         `;
         document.body.appendChild(toastElement);
         toastTextElement = toastElement.querySelector('#jarvis-toast-text');
+
+        toastElement.querySelector('#btn-close-jarvis-session')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            endConversationSession(false);
+        });
     } else if (!toastElement) {
         toastElement = document.getElementById('jarvis-floating-toast');
         toastTextElement = toastElement.querySelector('#jarvis-toast-text');
@@ -81,16 +126,15 @@ export function setJarvisScreenGlow(state, text = '') {
     createGlowElements();
     if (!glowElement) return;
 
-    if (silenceTimer) {
-        clearTimeout(silenceTimer);
-        silenceTimer = null;
+    if (silenceTimer && state !== 'listening') {
+        clearSilenceTimer();
     }
 
     if (state === 'listening') {
         glowElement.classList.remove('speaking', 'closing');
         glowElement.classList.add('active', 'listening');
         if (toastElement) {
-            toastTextElement.textContent = text || 'Ouvindo você... (fale agora)';
+            toastTextElement.textContent = text || 'Ouvindo você... (pode falar)';
             toastElement.classList.add('visible');
         }
     } else if (state === 'speaking') {
@@ -178,12 +222,14 @@ async function playJarvisVoice(text, audioBase64 = null) {
 
             audio.onended = () => {
                 isSpeaking = false;
+                lastSpokeEndTime = Date.now();
                 currentAudioPlayer = null;
                 resolve();
             };
 
             audio.onerror = () => {
                 isSpeaking = false;
+                lastSpokeEndTime = Date.now();
                 currentAudioPlayer = null;
                 resolve();
             };
@@ -191,6 +237,7 @@ async function playJarvisVoice(text, audioBase64 = null) {
             audio.play().catch(err => {
                 console.warn('Autoplay bloqueado pelo navegador:', err);
                 isSpeaking = false;
+                lastSpokeEndTime = Date.now();
                 currentAudioPlayer = null;
                 resolve();
             });
@@ -198,12 +245,14 @@ async function playJarvisVoice(text, audioBase64 = null) {
         }
 
         isSpeaking = false;
+        lastSpokeEndTime = Date.now();
         resolve();
     });
 }
 
 // --- 4. CONSULTA AO WEBHOOK DO AGENTE JARVIS NO N8N ---
 async function queryJarvisAgent(userQuestion) {
+    clearSilenceTimer();
     setJarvisScreenGlow('speaking', 'Jarvis consultando o sistema...');
     const clientName = getClientGreetingName();
 
@@ -238,8 +287,14 @@ async function queryJarvisAgent(userQuestion) {
         const fallback = `Desculpe, ${clientName}, tive uma instabilidade momentânea para consultar os dados. Pode repetir?`;
         await playJarvisVoice(fallback);
     } finally {
-        // Após responder à pergunta, fecha a luz suavemente em 0.5s
-        setJarvisScreenGlow('idle');
+        // CONVERSA CONTÍNUA:
+        // Mantém o Jarvis ouvindo para as próximas perguntas até o usuário se despedir ou pausar!
+        if (isConversationActive) {
+            setJarvisScreenGlow('listening', 'Estou ouvindo... (pode perguntar)');
+            startSilenceTimer(25000); // Aguarda até 25 segundos antes de adormecer
+        } else {
+            setJarvisScreenGlow('idle');
+        }
     }
 }
 
@@ -263,28 +318,52 @@ function setupSpeechEngine() {
 
     recognition.onresult = async (event) => {
         if (isSpeaking) return; // Não ouve a si mesmo enquanto fala
+        if (Date.now() - lastSpokeEndTime < 450) return; // Supressão de eco pós-áudio
 
         const lastIndex = event.results.length - 1;
-        const transcript = (event.results[lastIndex][0].transcript || '').trim();
-        if (!transcript) return;
+        const rawTranscript = (event.results[lastIndex][0].transcript || '').trim();
+        if (!rawTranscript) return;
 
-        console.log('🗣️ Voz ouvida:', transcript);
+        console.log('🗣️ Voz ouvida:', rawTranscript, '| Conversa ativa:', isConversationActive);
 
-        // Regex para detecção flexível de "Fala Jarvis", "Jarvis tá por aí", "Jarvis tudo bom", etc.
         const wakeRegex = /(fala\s+)?(jarvis|jarbas|iarvis)/i;
+        const farewellRegex = /^(obrigad[oa]|valeu|tchau|at[eé]\s+mais|pode\s+fechar|fechar|encerra[r]?|s[oó]\s+isso|falou|at[eé]\s+logo|pode\s+parar|desativa[r]?|nada\s+mais)\b/i;
 
-        if (wakeRegex.test(transcript)) {
-            // Wake Word DETECTADA!
+        // CENÁRIO 1: Sessão de conversa já está ATIVA (usuário fez uma pergunta ou saudação anterior)
+        if (isConversationActive) {
+            clearSilenceTimer();
+
+            // Usuário pediu para encerrar a conversa ("valeu", "obrigado", "tchau", "pode fechar")
+            if (farewellRegex.test(rawTranscript)) {
+                await endConversationSession(true);
+                return;
+            }
+
+            // Próxima pergunta do usuário na mesma sessão (ex: "Me diga quem são esses leads")
+            const cleanQuestion = rawTranscript.replace(wakeRegex, '').trim() || rawTranscript;
+
+            if (cleanQuestion.length >= 2) {
+                setJarvisScreenGlow('speaking', `"${cleanQuestion}"`);
+                await queryJarvisAgent(cleanQuestion);
+            }
+            return;
+        }
+
+        // CENÁRIO 2: Sessão NÃO estava ativa, mas o usuário falou "Fala Jarvis..."
+        if (wakeRegex.test(rawTranscript)) {
+            isConversationActive = true;
+            clearSilenceTimer();
+
             const clientName = getClientGreetingName();
 
             // Extrai a pergunta se o usuário já falou tudo na mesma frase (ex: "Fala jarvis, quantos clientes entraram hoje?")
-            const cleanCommand = transcript
+            const cleanCommand = rawTranscript
                 .replace(/^(fala\s+)?(jarvis|jarbas|iarvis)[,.?!]?\s*(t[aá]\s+por\s+a[ií][,.]?|tudo\s+bom[,.]?|tudo\s+bem[,.]?|bom\s+dia[,.]?|boa\s+tarde[,.]?|boa\s+noite[,.]?)?\s*/i, '')
                 .trim();
 
             if (cleanCommand.length > 3) {
                 // Usuário já fez a pergunta completa!
-                setJarvisScreenGlow('listening', `"${cleanCommand}"`);
+                setJarvisScreenGlow('speaking', `"${cleanCommand}"`);
                 await queryJarvisAgent(cleanCommand);
             } else {
                 // Apenas saudou ("Fala Jarvis, tá por aí?" ou "Fala Jarvis, tudo bom?")
@@ -299,17 +378,9 @@ function setupSpeechEngine() {
                 await playJarvisVoice(greetingReply);
 
                 // Volta para modo de escuta com moldura verde respirando aguardando a pergunta
-                setJarvisScreenGlow('listening', 'Pode falar sua pergunta...');
-
-                // Timeout de silêncio: se não falar nada em 9 segundos, desativa a luz
-                silenceTimer = setTimeout(() => {
-                    setJarvisScreenGlow('idle');
-                }, 9000);
+                setJarvisScreenGlow('listening', 'Estou ouvindo... (pode perguntar)');
+                startSilenceTimer(25000);
             }
-        } else if (glowElement && glowElement.classList.contains('listening')) {
-            // A luz já estava acesa esperando a pergunta após a saudação inicial!
-            setJarvisScreenGlow('listening', `"${transcript}"`);
-            await queryJarvisAgent(transcript);
         }
     };
 
@@ -350,6 +421,8 @@ export function startWakeWordListening() {
 
 export function stopWakeWordListening() {
     wakeActive = false;
+    isConversationActive = false;
+    clearSilenceTimer();
     localStorage.setItem('jarvis_wake_active', 'false');
     if (recognition) {
         try { recognition.stop(); } catch(e) {}
@@ -407,6 +480,11 @@ function updatePillUI(isActive) {
 
 // --- 7. INICIALIZAÇÃO AUTOMÁTICA EM QUALQUER PÁGINA (SEMPRE ATIVO) ---
 export async function initJarvisWakeWord() {
+    // Se estiver na tela exclusiva do Jarvis (jarvis.html), o jarvis.js já controla o áudio e microfone
+    if (document.body.classList.contains('jarvis-page') || window.location.pathname.endsWith('jarvis.html')) {
+        return;
+    }
+
     createGlowElements();
     injectHeaderPill();
     setupSpeechEngine();
