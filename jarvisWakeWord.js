@@ -99,7 +99,7 @@ export async function endConversationSession(withFarewell = true) {
 
     if (withFarewell) {
         const clientName = getClientGreetingName();
-        const farewell = `Por nada, ${clientName}! Se precisar de mais alguma coisa, é só me chamar. Até mais!`;
+        const farewell = `Por nada, ${clientName}! Se precisar de mais alguma coisa, estou à disposição. Até logo!`;
         setJarvisScreenGlow('speaking', 'Encerrando bate-papo...');
         await playJarvisVoice(farewell);
     }
@@ -288,13 +288,13 @@ export function isQuestionOutOfScope(question) {
 }
 
 export const OUT_OF_SCOPE_RESPONSES = [
-    (clientName) => `Desculpe, ${clientName}, fui programado exclusivamente para tirar suas dúvidas referentes ao trabalho que estou fazendo no seu WhatsApp. O que você gostaria de saber? Total de clientes, quais clientes foram atendidos ontem ou os agendamentos de amanhã?`,
+    (clientName) => `Desculpe, ${clientName}, eu cuido do atendimento aos seus clientes e das informações do WhatsApp da sua empresa. O que você gostaria de consultar agora? Posso verificar os novos contatos de hoje, os atendimentos de ontem ou os agendamentos.`,
 
-    (clientName) => `Opa, ${clientName}! Meu foco aqui é 100% a gestão do seu CRM e o atendimento dos seus clientes no WhatsApp. Me pergunta sobre seus números de hoje, reuniões marcadas ou conversas recentes que eu te respondo na hora!`,
+    (clientName) => `Desculpe, ${clientName}, meu trabalho é acompanhar os seus clientes e a movimentação do seu WhatsApp. Se desejar, posso lhe informar o total de atendimentos realizados, os horários marcados ou as mensagens recentes. O que prefere verificar?`,
 
-    (clientName) => `${clientName}, essa aí foge das minhas responsabilidades! Eu sou o seu copiloto de vendas e WhatsApp aqui da empresa. Se você quiser saber quantos novos clientes entraram em contato ou como está o seu funil, é só me falar!`,
+    (clientName) => `${clientName}, estou à sua disposição para o atendimento aos seus clientes e o acompanhamento do WhatsApp da empresa. O que você precisa verificar no momento? Posso conferir os clientes que enviaram mensagem hoje, a sua agenda ou o histórico de conversas.`,
 
-    (clientName) => `Desculpe, ${clientName}, mas eu só respondo sobre as operações do seu negócio aqui no WhatsApp e no CRM. O que você quer consultar agora? Posso te passar os contatos do dia, agendamentos da semana ou as mensagens dos seus clientes.`
+    (clientName) => `Desculpe, ${clientName}, consigo te ajudar com o fluxo de atendimentos e as informações dos seus clientes no WhatsApp. Como posso ajudar com a sua empresa agora? Gostaria de ver a lista de clientes recentes ou conferir a sua agenda?`
 ];
 
 let lastOutOfScopeIndex = -1;
@@ -930,7 +930,7 @@ function setupSpeechEngine() {
                 if (hour >= 12 && hour < 18) timeGreeting = 'Boa tarde';
                 else if (hour >= 18 || hour < 5) timeGreeting = 'Boa noite';
 
-                const greetingReply = `Fala, ${clientName}! Tô por aqui sim, ${timeGreeting.toLowerCase()}! Como posso te ajudar?`;
+                const greetingReply = `Olá, ${clientName}! ${timeGreeting}! Como posso ajudar você agora?`;
                 setJarvisScreenGlow('speaking');
                 await playJarvisVoice(greetingReply);
 
@@ -1064,16 +1064,16 @@ export function getDaysUntilDue(dateVal) {
 
 function getBillingReminderMessage(clientName, diffDays) {
     if (diffDays === 3) {
-        return `${clientName}, consultei o CRM, estou passando aqui pra te lembrar de não esquecer de fazer o pagamento da mensalidade do sistema, beleza? Vence daqui a 3 dias! Falo isso só pra que os seus clientes continuem sendo atendidos por mim normalmente.`;
+        return `${clientName}, passando para lembrá-lo de que a mensalidade do sistema vence em 3 dias. Te aviso com antecedência para garantir que o atendimento aos seus clientes continue funcionando sem nenhuma interrupção.`;
     }
     if (diffDays === 2) {
-        return `${clientName}, consultei o CRM, estou passando aqui pra te lembrar que faltam apenas 2 dias para o vencimento da mensalidade do sistema, beleza? Falo isso só pra que os seus clientes continuem sendo atendidos por mim sem nenhuma pausa.`;
+        return `${clientName}, passando para lembrá-lo de que faltam apenas 2 dias para o vencimento da mensalidade do sistema. Faço esse lembrete para que os atendimentos no seu WhatsApp continuem ativos normalmente.`;
     }
     if (diffDays === 1) {
-        return `${clientName}, consultei o CRM, estou passando aqui pra te lembrar que a sua mensalidade vence amanhã, beleza? Te aviso com carinho só pra você não esquecer e manter seus clientes sendo atendidos normalmente por mim!`;
+        return `${clientName}, lembrando que a sua mensalidade do sistema vence amanhã. É importante realizar o pagamento para mantermos o atendimento aos seus clientes em pleno funcionamento.`;
     }
     // diffDays === 0 (Vence hoje)
-    return `${clientName}, consultei o CRM, estou passando aqui pra te avisar que a sua mensalidade do sistema vence hoje, beleza? Falo isso pra mantermos o atendimento automático dos seus clientes funcionando perfeitamente por aqui!`;
+    return `${clientName}, passando para avisar que a sua mensalidade do sistema vence hoje. Faço esse lembrete para mantermos o atendimento automático aos seus clientes funcionando sem interrupções.`;
 }
 
 let billingReminderTriggered = false;

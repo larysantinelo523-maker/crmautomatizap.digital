@@ -172,7 +172,7 @@ async function initJarvisGreeting() {
         periodKey = 'noite';
     }
 
-    const greetingText = `Fala, ${salutationName}! Tudo bom contigo? ${timeGreeting} O que você deseja saber sobre o dia de hoje?`;
+    const greetingText = `Olá, ${salutationName}! ${timeGreeting} O que você gostaria de consultar sobre o dia de hoje?`;
 
     // Adiciona fala ao histórico
     addChatMessage('jarvis', greetingText);
