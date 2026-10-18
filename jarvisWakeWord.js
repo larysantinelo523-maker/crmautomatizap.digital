@@ -292,7 +292,7 @@ export const OUT_OF_SCOPE_RESPONSES = [
 
     (clientName) => `Desculpe, ${clientName}, meu trabalho aqui é acompanhar os clientes e o fluxo de mensagens do seu WhatsApp. Qual informação do seu atendimento você gostaria de consultar?`,
 
-    (clientName) => `${clientName}, estou à sua disposição para o atendimento aos seus clientes e o acompanhamento do WhatsApp da empresa. Deseja conferir os horários agendados na sua pauta para amanhã?`,
+    (clientName) => `${clientName}, estou à sua disposição para o atendimento aos seus clientes e o acompanhamento do WhatsApp da empresa. Deseja saber quantos clientes foram atendidos no dia de ontem?`,
 
     (clientName) => `Desculpe, ${clientName}, consigo te ajudar com os dados e as conversas dos seus clientes no sistema. Gostaria de saber quem foi atendido recentemente?`
 ];
