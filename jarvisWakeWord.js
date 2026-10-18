@@ -21,13 +21,36 @@ let currentAudioPlayer = null;
 let silenceTimer = null;
 let wakeActive = false;
 let resolvedUser = null;
+let watchdogInterval = null;
+
+// --- GARANTIA ABSOLUTA DE RECONHECIMENTO ATIVO (CICLO DE VIDA BLINDADO) ---
+function ensureSpeechRecognitionActive() {
+    if (!wakeActive && !isConversationActive) return;
+    if (isSpeaking) return;
+
+    if (!recognition) {
+        setupSpeechEngine();
+    }
+    if (!recognition) return;
+
+    try {
+        recognition.start();
+        isListening = true;
+        updatePillUI(true);
+    } catch (e) {
+        // Se der InvalidStateError ou "already started", significa que já está ativo e operando
+        if (e.name === 'InvalidStateError' || (e.message && e.message.includes('already started'))) {
+            isListening = true;
+        }
+    }
+}
 
 // --- CONTROLE DE SESSÃO CONTÍNUA E SILÊNCIO ---
-function startSilenceTimer(durationMs = 25000) {
+function startSilenceTimer(durationMs = 60000) {
     clearSilenceTimer();
     silenceTimer = setTimeout(() => {
         if (isConversationActive && !isSpeaking) {
-            console.log('⏳ Tempo limite de silêncio atingido (25s). Adormecendo bate-papo...');
+            console.log('⏳ Tempo limite de silêncio atingido (60s). Encerrando sessão de conversa...');
             endConversationSession(false);
         }
     }, durationMs);
@@ -52,6 +75,11 @@ export async function endConversationSession(withFarewell = true) {
     }
 
     setJarvisScreenGlow('idle');
+
+    // Volta imediatamente para o modo sempre ouvindo "Fala Jarvis" de prontidão
+    if (wakeActive) {
+        setTimeout(ensureSpeechRecognitionActive, 350);
+    }
 }
 
 // --- 1. RESOLUÇÃO INTELIGENTE DO NOME DO USUÁRIO ---
@@ -198,6 +226,21 @@ async function playJarvisVoice(text, audioBase64 = null) {
             currentAudioPlayer = null;
         }
 
+        const finishSpeaking = () => {
+            isSpeaking = false;
+            lastSpokeEndTime = Date.now();
+            currentAudioPlayer = null;
+
+            // Retoma escuta ativa imediatamente após terminar a fala
+            setTimeout(() => {
+                if (wakeActive || isConversationActive) {
+                    ensureSpeechRecognitionActive();
+                }
+            }, 250);
+
+            resolve();
+        };
+
         const cleanText = (text || '')
             .replace(/\*+/g, '')
             .replace(/#{1,6}\s+/g, '')
@@ -220,33 +263,21 @@ async function playJarvisVoice(text, audioBase64 = null) {
                 setJarvisScreenGlow('speaking', cleanText.length > 60 ? cleanText.substring(0, 60) + '...' : cleanText);
             };
 
-            audio.onended = () => {
-                isSpeaking = false;
-                lastSpokeEndTime = Date.now();
-                currentAudioPlayer = null;
-                resolve();
+            audio.onended = finishSpeaking;
+            audio.onerror = (err) => {
+                console.warn('Erro ao reproduzir áudio ElevenLabs:', err);
+                finishSpeaking();
             };
-
-            audio.onerror = () => {
-                isSpeaking = false;
-                lastSpokeEndTime = Date.now();
-                currentAudioPlayer = null;
-                resolve();
-            };
+            audio.onabort = finishSpeaking;
 
             audio.play().catch(err => {
                 console.warn('Autoplay bloqueado pelo navegador:', err);
-                isSpeaking = false;
-                lastSpokeEndTime = Date.now();
-                currentAudioPlayer = null;
-                resolve();
+                finishSpeaking();
             });
             return;
         }
 
-        isSpeaking = false;
-        lastSpokeEndTime = Date.now();
-        resolve();
+        finishSpeaking();
     });
 }
 
@@ -256,14 +287,18 @@ async function queryJarvisAgent(userQuestion) {
     setJarvisScreenGlow('speaking', 'Jarvis consultando o sistema...');
     const clientName = getClientGreetingName();
 
+    const companyId = resolvedUser ? (resolvedUser.id_empresa || resolvedUser.id) : (localStorage.getItem('jarvis_company_id') || 'jarvis_crm');
+
     const payload = {
         message: userQuestion,
         pergunta: userQuestion,
+        chatInput: userQuestion,
         user_name: clientName,
         nome_cliente: clientName,
         nome_empresa: resolvedUser?.nome_fantasia || resolvedUser?.nome_completo || 'sua empresa',
         user_id: resolvedUser ? resolvedUser.id : null,
-        company_id: resolvedUser ? resolvedUser.id : null,
+        company_id: companyId,
+        id_empresa: companyId,
         timestamp: new Date().toISOString()
     };
 
@@ -291,7 +326,10 @@ async function queryJarvisAgent(userQuestion) {
         // Mantém o Jarvis ouvindo para as próximas perguntas até o usuário se despedir ou pausar!
         if (isConversationActive) {
             setJarvisScreenGlow('listening', 'Estou ouvindo... (pode perguntar)');
-            startSilenceTimer(25000); // Aguarda até 25 segundos antes de adormecer
+            startSilenceTimer(60000); // Aguarda até 60 segundos de silêncio antes de encerrar
+            setTimeout(() => {
+                ensureSpeechRecognitionActive();
+            }, 300);
         } else {
             setJarvisScreenGlow('idle');
         }
@@ -306,6 +344,10 @@ function setupSpeechEngine() {
         return;
     }
 
+    if (recognition) {
+        try { recognition.abort(); } catch(e) {}
+    }
+
     recognition = new SpeechRecognition();
     recognition.lang = 'pt-BR';
     recognition.continuous = true;
@@ -316,30 +358,49 @@ function setupSpeechEngine() {
         updatePillUI(true);
     };
 
+    recognition.onspeechstart = () => {
+        // Quando o usuário começa a falar, cancela o timer de silêncio para não encerrar a sessão
+        if (isConversationActive) {
+            clearSilenceTimer();
+            setJarvisScreenGlow('listening', 'Ouvindo sua pergunta...');
+        }
+    };
+
+    recognition.onsoundstart = () => {
+        if (isConversationActive && !isSpeaking) {
+            clearSilenceTimer();
+        }
+    };
+
     recognition.onresult = async (event) => {
         if (isSpeaking) return; // Não ouve a si mesmo enquanto fala
-        if (Date.now() - lastSpokeEndTime < 450) return; // Supressão de eco pós-áudio
 
-        const lastIndex = event.results.length - 1;
-        const rawTranscript = (event.results[lastIndex][0].transcript || '').trim();
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+            transcript += event.results[i][0].transcript;
+        }
+        const rawTranscript = transcript.trim();
         if (!rawTranscript) return;
+
+        // Supressão de eco pós-áudio apenas para ruídos de menos de 5 caracteres
+        if (Date.now() - lastSpokeEndTime < 300 && rawTranscript.length < 5) return;
 
         console.log('🗣️ Voz ouvida:', rawTranscript, '| Conversa ativa:', isConversationActive);
 
         const wakeRegex = /(fala\s+)?(jarvis|jarbas|iarvis)/i;
-        const farewellRegex = /^(obrigad[oa]|valeu|tchau|at[eé]\s+mais|pode\s+fechar|fechar|encerra[r]?|s[oó]\s+isso|falou|at[eé]\s+logo|pode\s+parar|desativa[r]?|nada\s+mais)\b/i;
+        const farewellRegex = /(obrigad[oa]|valeu|tchau|at[eé]\s+mais|pode\s+fechar|^fechar$|^encerra[r]?$|s[oó]\s+isso|falou|at[eé]\s+logo|pode\s+parar|desativa[r]?|nada\s+mais|por\s+hoje\s+[eé]\s+s[oó]|era\s+s[oó]\s+isso)/i;
 
         // CENÁRIO 1: Sessão de conversa já está ATIVA (usuário fez uma pergunta ou saudação anterior)
         if (isConversationActive) {
             clearSilenceTimer();
 
-            // Usuário pediu para encerrar a conversa ("valeu", "obrigado", "tchau", "pode fechar")
+            // Usuário pediu para encerrar a conversa ("valeu", "obrigado", "tchau", "pode fechar", "era só isso")
             if (farewellRegex.test(rawTranscript)) {
                 await endConversationSession(true);
                 return;
             }
 
-            // Próxima pergunta do usuário na mesma sessão (ex: "Me diga quem são esses leads")
+            // Próxima pergunta do usuário na mesma sessão (ex: "Quero salvar o numero que não foi salvo como matheus")
             const cleanQuestion = rawTranscript.replace(wakeRegex, '').trim() || rawTranscript;
 
             if (cleanQuestion.length >= 2) {
@@ -379,7 +440,10 @@ function setupSpeechEngine() {
 
                 // Volta para modo de escuta com moldura verde respirando aguardando a pergunta
                 setJarvisScreenGlow('listening', 'Estou ouvindo... (pode perguntar)');
-                startSilenceTimer(25000);
+                startSilenceTimer(60000);
+                setTimeout(() => {
+                    ensureSpeechRecognitionActive();
+                }, 300);
             }
         }
     };
@@ -393,29 +457,29 @@ function setupSpeechEngine() {
     recognition.onend = () => {
         isListening = false;
         // Reinício contínuo e ininterrupto em segundo plano (SEMPRE ATIVO)
-        if (wakeActive) {
+        if ((wakeActive || isConversationActive) && !isSpeaking) {
             setTimeout(() => {
-                if (wakeActive && !isSpeaking) {
-                    try { recognition.start(); } catch(e) {}
-                }
-            }, 250);
-        } else {
+                ensureSpeechRecognitionActive();
+            }, 200);
+        } else if (!wakeActive && !isConversationActive) {
             updatePillUI(false);
         }
     };
+
+    // Watchdog protetor contra congelamento do SpeechRecognition do Chrome
+    if (!watchdogInterval) {
+        watchdogInterval = setInterval(() => {
+            if ((wakeActive || isConversationActive) && !isSpeaking && !isListening) {
+                ensureSpeechRecognitionActive();
+            }
+        }, 2500);
+    }
 }
 
 export function startWakeWordListening() {
     wakeActive = true;
     localStorage.setItem('jarvis_wake_active', 'true');
-    if (!recognition) setupSpeechEngine();
-    if (recognition) {
-        try {
-            recognition.start();
-        } catch (e) {
-            // Já estava rodando
-        }
-    }
+    ensureSpeechRecognitionActive();
     updatePillUI(true);
 }
 
@@ -427,6 +491,7 @@ export function stopWakeWordListening() {
     if (recognition) {
         try { recognition.stop(); } catch(e) {}
     }
+    isListening = false;
     setJarvisScreenGlow('idle');
     updatePillUI(false);
 }
