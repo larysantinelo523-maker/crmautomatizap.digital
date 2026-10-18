@@ -219,6 +219,79 @@ async function fetchElevenLabsSpeech(text) {
     }
 }
 
+// --- SÍNTESE DE VOZ NATIVA DO NAVEGADOR (FALLBACK SE ELEVENLABS ESGOTAR COTA) ---
+function speakWithBrowserSynthesis(text) {
+    return new Promise((resolve) => {
+        if (!('speechSynthesis' in window)) {
+            resolve();
+            return;
+        }
+        try {
+            window.speechSynthesis.cancel();
+        } catch(e) {}
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'pt-BR';
+        utterance.rate = 1.05;
+        utterance.pitch = 1.0;
+
+        const setVoiceAndSpeak = () => {
+            try {
+                const voices = window.speechSynthesis.getVoices() || [];
+                const ptVoice = voices.find(v => v.lang && v.lang.replace('_', '-').toLowerCase().startsWith('pt-br') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Luciana') || v.name.includes('Felipe') || v.name.includes('Francisca') || v.name.includes('Antonio') || v.name.includes('Yara') || v.name.includes('Daniel') || v.name.includes('Maria')))
+                             || voices.find(v => v.lang && v.lang.replace('_', '-').toLowerCase().startsWith('pt-br'))
+                             || voices.find(v => v.lang && v.lang.toLowerCase().startsWith('pt'));
+                if (ptVoice) {
+                    utterance.voice = ptVoice;
+                }
+            } catch(e) {}
+
+            utterance.onstart = () => {
+                isSpeaking = true;
+                setJarvisScreenGlow('speaking', text.length > 60 ? text.substring(0, 60) + '...' : text);
+            };
+
+            const onFinish = () => {
+                isSpeaking = false;
+                lastSpokeEndTime = Date.now();
+                setTimeout(() => {
+                    if (wakeActive || isConversationActive) {
+                        ensureSpeechRecognitionActive();
+                    }
+                }, 250);
+                resolve();
+            };
+
+            utterance.onend = onFinish;
+            utterance.onerror = (err) => {
+                console.warn('SpeechSynthesis erro:', err);
+                onFinish();
+            };
+
+            try {
+                window.speechSynthesis.speak(utterance);
+            } catch (err) {
+                console.warn('Erro ao disparar speechSynthesis:', err);
+                onFinish();
+            }
+        };
+
+        if (window.speechSynthesis.getVoices().length > 0) {
+            setVoiceAndSpeak();
+        } else {
+            let voicesChangedFired = false;
+            window.speechSynthesis.onvoiceschanged = () => {
+                voicesChangedFired = true;
+                window.speechSynthesis.onvoiceschanged = null;
+                setVoiceAndSpeak();
+            };
+            setTimeout(() => {
+                if (!voicesChangedFired) setVoiceAndSpeak();
+            }, 100);
+        }
+    });
+}
+
 async function playJarvisVoice(text, audioBase64 = null) {
     return new Promise(async (resolve) => {
         if (currentAudioPlayer) {
@@ -248,12 +321,18 @@ async function playJarvisVoice(text, audioBase64 = null) {
             .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
             .trim();
 
+        if (!cleanText) {
+            finishSpeaking();
+            return;
+        }
+
         let src = audioBase64;
         if (!src && cleanText.length > 0) {
             setJarvisScreenGlow('speaking', 'Sintetizando voz...');
             src = await fetchElevenLabsSpeech(cleanText);
         }
 
+        // 1. Áudio de estúdio do ElevenLabs disponível
         if (src && typeof src === 'string' && src.length > 50) {
             const audio = new Audio(src);
             currentAudioPlayer = audio;
@@ -264,20 +343,27 @@ async function playJarvisVoice(text, audioBase64 = null) {
             };
 
             audio.onended = finishSpeaking;
-            audio.onerror = (err) => {
-                console.warn('Erro ao reproduzir áudio ElevenLabs:', err);
-                finishSpeaking();
+            audio.onerror = async (err) => {
+                console.warn('Erro ao reproduzir áudio ElevenLabs, usando síntese nativa do navegador:', err);
+                currentAudioPlayer = null;
+                await speakWithBrowserSynthesis(cleanText);
+                resolve();
             };
             audio.onabort = finishSpeaking;
 
-            audio.play().catch(err => {
-                console.warn('Autoplay bloqueado pelo navegador:', err);
-                finishSpeaking();
+            audio.play().catch(async (err) => {
+                console.warn('Autoplay bloqueado pelo navegador, usando síntese nativa:', err);
+                currentAudioPlayer = null;
+                await speakWithBrowserSynthesis(cleanText);
+                resolve();
             });
             return;
         }
 
-        finishSpeaking();
+        // 2. FALLBACK IMEDIATO: Cota do ElevenLabs excedida ou erro de rede -> Fala pela voz do navegador!
+        console.warn('⚠️ ElevenLabs sem áudio (cota de créditos atingida ou erro). Acionando voz nativa do navegador imediatamente!');
+        await speakWithBrowserSynthesis(cleanText);
+        resolve();
     });
 }
 

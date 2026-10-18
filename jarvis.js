@@ -287,7 +287,40 @@ function speakJarvis(text, audioUrlOrBase64 = null) {
             return;
         }
 
-        // Sem áudio: finaliza graciosamente sem som mecânico
+        // Fallback para voz nativa do navegador caso ElevenLabs esteja sem créditos
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'pt-BR';
+            utterance.rate = 1.05;
+            utterance.pitch = 1.0;
+
+            const voices = window.speechSynthesis.getVoices() || [];
+            const ptVoice = voices.find(v => v.lang && v.lang.replace('_', '-').toLowerCase().startsWith('pt-br') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Luciana') || v.name.includes('Felipe') || v.name.includes('Francisca') || v.name.includes('Antonio') || v.name.includes('Yara') || v.name.includes('Daniel') || v.name.includes('Maria')))
+                         || voices.find(v => v.lang && v.lang.replace('_', '-').toLowerCase().startsWith('pt-br'))
+                         || voices.find(v => v.lang && v.lang.toLowerCase().startsWith('pt'));
+            if (ptVoice) utterance.voice = ptVoice;
+
+            utterance.onstart = () => {
+                isSpeaking = true;
+                setOrbState('speaking');
+                setStatusText('Jarvis falando...');
+            };
+
+            const onFinish = () => {
+                isSpeaking = false;
+                setOrbState('idle');
+                setStatusText('Toque no microfone para falar');
+                resolve();
+            };
+
+            utterance.onend = onFinish;
+            utterance.onerror = onFinish;
+
+            window.speechSynthesis.speak(utterance);
+            return;
+        }
+
         isSpeaking = false;
         setOrbState('idle');
         setStatusText('Toque no microfone para falar');
