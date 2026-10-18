@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // --- 1. SAUDAÇÃO INICIAL AUTOMÁTICA AO ENTRAR NA TELA (ELEVENLABS) ---
-const ELEVENLABS_API_KEY = 'sk_e7cd40a1ccbc8a532e1c833272570bfec741758f0a63d29b';
+const ELEVENLABS_API_KEY = 'sk_9d8130a1fd315eaf626dfc180968547c688a999e8730c673';
 const ELEVENLABS_VOICE_ID = 'JBFqnCBsd6RMkjVDRZzb'; // George (Voz Oficial de Estúdio)
 
 async function fetchElevenLabsAudio(text) {

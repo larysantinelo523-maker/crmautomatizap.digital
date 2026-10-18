@@ -5,7 +5,7 @@
 
 import { supabase } from './supabase.js';
 
-const ELEVENLABS_API_KEY = 'sk_e7cd40a1ccbc8a532e1c833272570bfec741758f0a63d29b';
+const ELEVENLABS_API_KEY = 'sk_9d8130a1fd315eaf626dfc180968547c688a999e8730c673';
 const ELEVENLABS_VOICE_ID = 'JBFqnCBsd6RMkjVDRZzb'; // George (Voz Oficial)
 const N8N_WEBHOOK_URL = 'https://talonedlanternfish-n8n.cloudfy.live/webhook/jarvis-crm';
 
