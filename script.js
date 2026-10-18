@@ -1,6 +1,7 @@
 // --- Verificação de Autenticação Global ---
 import { fetchUserData } from './data.js';
 import { initRealtimeNotifications, updateNotificationUI, playChimeSound, showSystemNotification, requestNotificationPermission } from './notifications.js';
+import './jarvisWakeWord.js';
 
 
 window.getBrasiliaDate = function() {

@@ -510,6 +510,9 @@ function setOrbState(state) {
     if (!orbElement) return;
     orbElement.classList.remove('speaking', 'listening', 'thinking', 'idle');
     orbElement.classList.add(state);
+    if (window.setJarvisScreenGlow) {
+        window.setJarvisScreenGlow(state === 'thinking' ? 'listening' : state);
+    }
 }
 
 function setStatusText(text) {

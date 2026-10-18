@@ -5797,5 +5797,228 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
     }
 }
 
+/* ===================================================================
+   JARVIS "CIRCLE TO SEARCH" GLOW BORDER EFFECT (SAMSUNG / GOOGLE STYLE)
+   =================================================================== */
+
+.jarvis-screen-glow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    pointer-events: none;
+    z-index: 9999999;
+    box-sizing: border-box;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s ease;
+}
+
+/* Camada 1: Glow Inset Difuso nas 4 Bordas */
+.jarvis-screen-glow::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow:
+        inset 0 0 25px 6px rgba(0, 168, 132, 0.5),
+        inset 0 0 60px 16px rgba(16, 185, 129, 0.32),
+        inset 0 0 110px 30px rgba(34, 197, 94, 0.16);
+    pointer-events: none;
+    border-radius: 0;
+    transition: box-shadow 0.4s ease, opacity 0.4s ease;
+}
+
+/* Camada 2: Filete de Luz Neon com Gradiente Orgânico nas 4 Bordas */
+.jarvis-screen-glow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 3.5px solid transparent;
+    border-image: linear-gradient(
+        135deg,
+        rgba(0, 168, 132, 0.95) 0%,
+        rgba(34, 197, 94, 0.85) 30%,
+        rgba(6, 182, 212, 0.9) 60%,
+        rgba(16, 185, 129, 0.95) 100%
+    ) 1;
+    filter: drop-shadow(0 0 10px rgba(0, 168, 132, 0.85)) drop-shadow(0 0 20px rgba(34, 197, 94, 0.6));
+    pointer-events: none;
+}
+
+/* Estado 1: Ativação (Fade-in 0.4s) */
+.jarvis-screen-glow.active {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s ease;
+}
+
+/* Estado 2: Ouvindo / Respirando (Pulsa suavemente) */
+.jarvis-screen-glow.listening::before {
+    animation: jarvisBreathGlow 3s ease-in-out infinite alternate;
+}
+.jarvis-screen-glow.listening::after {
+    animation: jarvisNeonPulse 3s ease-in-out infinite alternate;
+}
+
+/* Estado 3: Falando (Pulso mais forte e vivo no ritmo da fala) */
+.jarvis-screen-glow.speaking::before {
+    animation: jarvisSpeakingGlow 0.85s ease-in-out infinite alternate;
+}
+.jarvis-screen-glow.speaking::after {
+    animation: jarvisSpeakingBorder 0.85s ease-in-out infinite alternate;
+}
+
+/* Estado 4: Desativando (Fade-out 0.5s suave) */
+.jarvis-screen-glow.closing {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease;
+}
+
+/* Keyframes de Animação */
+@keyframes jarvisBreathGlow {
+    0% {
+        box-shadow:
+            inset 0 0 20px 4px rgba(0, 168, 132, 0.4),
+            inset 0 0 50px 12px rgba(16, 185, 129, 0.22),
+            inset 0 0 90px 24px rgba(34, 197, 94, 0.1);
+    }
+    100% {
+        box-shadow:
+            inset 0 0 32px 8px rgba(0, 168, 132, 0.65),
+            inset 0 0 75px 22px rgba(16, 185, 129, 0.42),
+            inset 0 0 130px 40px rgba(34, 197, 94, 0.22);
+    }
+}
+
+@keyframes jarvisNeonPulse {
+    0% {
+        opacity: 0.75;
+        filter: drop-shadow(0 0 6px rgba(0, 168, 132, 0.6)) drop-shadow(0 0 14px rgba(34, 197, 94, 0.4));
+    }
+    100% {
+        opacity: 1;
+        filter: drop-shadow(0 0 14px rgba(0, 168, 132, 0.95)) drop-shadow(0 0 28px rgba(34, 197, 94, 0.75));
+    }
+}
+
+@keyframes jarvisSpeakingGlow {
+    0% {
+        box-shadow:
+            inset 0 0 30px 8px rgba(0, 168, 132, 0.6),
+            inset 0 0 70px 20px rgba(16, 185, 129, 0.4),
+            inset 0 0 120px 35px rgba(34, 197, 94, 0.2);
+    }
+    100% {
+        box-shadow:
+            inset 0 0 48px 14px rgba(0, 168, 132, 0.85),
+            inset 0 0 100px 30px rgba(16, 185, 129, 0.58),
+            inset 0 0 165px 50px rgba(34, 197, 94, 0.35);
+    }
+}
+
+@keyframes jarvisSpeakingBorder {
+    0% {
+        opacity: 0.85;
+        border-width: 3.5px;
+        filter: drop-shadow(0 0 10px rgba(0, 168, 132, 0.8)) drop-shadow(0 0 20px rgba(34, 197, 94, 0.6));
+    }
+    100% {
+        opacity: 1;
+        border-width: 4.5px;
+        filter: drop-shadow(0 0 18px rgba(0, 168, 132, 1)) drop-shadow(0 0 35px rgba(34, 197, 94, 0.9));
+    }
+}
+
+/* Suporte à redução de movimento */
+@media (prefers-reduced-motion: reduce) {
+    .jarvis-screen-glow.listening::before,
+    .jarvis-screen-glow.speaking::before,
+    .jarvis-screen-glow.listening::after,
+    .jarvis-screen-glow.speaking::after {
+        animation: none !important;
+    }
+}
+
+/* Botão Pill de Voz no Header */
+.btn-jarvis-wake-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    font-weight: 600;
+    background: var(--color-bg-card, #ffffff);
+    color: var(--color-text-sec, #64748b);
+    border: 1px solid var(--color-border, #e2e8f0);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    user-select: none;
+    margin-right: 4px;
+}
+.btn-jarvis-wake-pill:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: rgba(0, 168, 132, 0.05);
+}
+.btn-jarvis-wake-pill.active {
+    background: rgba(0, 168, 132, 0.1);
+    color: #00A884;
+    border-color: #00A884;
+    box-shadow: 0 0 12px rgba(0, 168, 132, 0.25);
+}
+.btn-jarvis-wake-pill .wake-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #94a3b8;
+    transition: background-color 0.25s ease;
+}
+.btn-jarvis-wake-pill.active .wake-pulse-dot {
+    background: #22c55e;
+    box-shadow: 0 0 8px #22c55e;
+    animation: wakePulseDot 1.6s ease-in-out infinite;
+}
+@keyframes wakePulseDot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.35); opacity: 0.6; }
+}
+
+/* Indicador flutuante de transcrição e status no rodapé */
+.jarvis-floating-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #ffffff;
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-size: 13.5px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 25px rgba(0, 168, 132, 0.4);
+    border: 1px solid rgba(0, 168, 132, 0.55);
+    z-index: 10000000;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    max-width: 90vw;
+    text-align: center;
+}
+.jarvis-floating-toast.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
 
 
