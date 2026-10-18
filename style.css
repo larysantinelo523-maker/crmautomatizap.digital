@@ -5942,33 +5942,9 @@ textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: el
     }
 }
 
-/* Botão Pill de Voz no Header */
+/* Botão Pill de Voz no Header (Ocultado a pedido do usuário) */
 .btn-jarvis-wake-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12.5px;
-    font-weight: 600;
-    background: var(--color-bg-card, #ffffff);
-    color: var(--color-text-sec, #64748b);
-    border: 1px solid var(--color-border, #e2e8f0);
-    cursor: pointer;
-    transition: all 0.25s ease;
-    user-select: none;
-    margin-right: 4px;
-}
-.btn-jarvis-wake-pill:hover {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-    background: rgba(0, 168, 132, 0.05);
-}
-.btn-jarvis-wake-pill.active {
-    background: rgba(0, 168, 132, 0.1);
-    color: #00A884;
-    border-color: #00A884;
-    box-shadow: 0 0 12px rgba(0, 168, 132, 0.25);
+    display: none !important;
 }
 .btn-jarvis-wake-pill .wake-pulse-dot {
     width: 8px;

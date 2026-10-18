@@ -607,43 +607,16 @@ function toggleWakeWord() {
     }
 }
 
-// --- 6. BOTÃO PILL NO HEADER DE TODAS AS PÁGINAS ---
+// --- 6. BOTÃO PILL NO HEADER DE TODAS AS PÁGINAS (OCULTADO A PEDIDO DO USUÁRIO) ---
 function injectHeaderPill() {
-    if (document.getElementById('btn-jarvis-wake-pill')) return;
-
-    const headerActions = document.querySelector('.header-actions');
-    if (!headerActions) return;
-
-    const pill = document.createElement('button');
-    pill.id = 'btn-jarvis-wake-pill';
-    pill.type = 'button';
-    pill.className = 'btn-jarvis-wake-pill active';
-    pill.title = 'Modo Sempre Ativo: fale "Fala Jarvis, tá por aí?" a qualquer momento.';
-    pill.innerHTML = `
-        <span class="wake-pulse-dot"></span>
-        <span class="wake-pill-text">🟢 Ouvindo "Fala Jarvis"</span>
-    `;
-
-    pill.addEventListener('click', (e) => {
-        e.preventDefault();
-        toggleWakeWord();
-    });
-
-    headerActions.insertBefore(pill, headerActions.firstChild);
+    // Ocultado: remove do DOM se existir e não injeta novo elemento
+    const existing = document.getElementById('btn-jarvis-wake-pill');
+    if (existing) existing.remove();
 }
 
 function updatePillUI(isActive) {
     const pill = document.getElementById('btn-jarvis-wake-pill');
-    if (!pill) return;
-    const textEl = pill.querySelector('.wake-pill-text');
-
-    if (isActive) {
-        pill.classList.add('active');
-        if (textEl) textEl.textContent = '🟢 Ouvindo "Fala Jarvis"';
-    } else {
-        pill.classList.remove('active');
-        if (textEl) textEl.textContent = '🔇 "Fala Jarvis" (Pausado)';
-    }
+    if (pill) pill.style.display = 'none';
 }
 
 // --- 7. INICIALIZAÇÃO AUTOMÁTICA EM QUALQUER PÁGINA (SEMPRE ATIVO) ---
