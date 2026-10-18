@@ -4,7 +4,7 @@
 
 import { supabase } from './supabase.js';
 import { fetchUserData, fetchLeads, fetchAgendamentos } from './data.js';
-import { normalizeSpeechPhonetics } from './jarvisWakeWord.js';
+import { normalizeSpeechPhonetics, getAssistantName, setAssistantName, getContextualPhrases } from './jarvisWakeWord.js';
 
 const DEFAULT_WEBHOOK_URL = 'https://talonedlanternfish-n8n.cloudfy.live/webhook/jarvis-crm';
 
@@ -422,11 +422,42 @@ function toggleListening() {
 async function handleUserMessage(userText) {
     const normalizedText = normalizeSpeechPhonetics(userText);
     addChatMessage('user', normalizedText);
-    setOrbState('thinking');
-    setStatusText('Consultando o AI Agent...');
 
     const rawName = getResolvedUserName();
     const salutationName = formatGreetingName(rawName);
+
+    // 1. Comando para mudar o nome do assistente (ex: "Quero que você se chame Reinaldo")
+    const renameRegex = /(?:quero\s+(?:que\s+(?:voc[eê]|vc)\s+)?(?:se\s+chame|passe\s+a\s+se\s+chamar)|quero\s+te\s+chamar\s+de|mude\s+(?:seu\s+)?nome\s+para|troque\s+(?:seu\s+)?nome\s+para|seu\s+nome\s+agora\s+[eé]|agora\s+(?:seu\s+nome\s+[eé]|(?:voc[eê]|vc)\s+se\s+chama)|vou\s+te\s+chamar\s+de|a\s+partir\s+de\s+agora\s+(?:voc[eê]|vc\s+)?(?:se\s+chama|[eé]))\s+([A-Za-zÀ-ÿ]+)/i;
+    const renameMatch = normalizedText.match(renameRegex);
+    if (renameMatch && renameMatch[1]) {
+        const newName = setAssistantName(renameMatch[1]);
+        const confirmMsg = `Entendido, ${salutationName}! A partir de agora meu nome é ${newName}. Pode me chamar de "${newName}" sempre que precisar!`;
+        addChatMessage('jarvis', confirmMsg);
+        await speakJarvis(confirmMsg);
+        return;
+    }
+
+    // 2. Pergunta sobre o nome do assistente
+    const nameInquiryRegex = /(qual\s+[eé]\s+(o\s+)?seu\s+nome|quem\s+[eé]\s+voc[eê]|como\s+(voc[eê]|vc)\s+se\s+chama)/i;
+    if (nameInquiryRegex.test(normalizedText)) {
+        const assistant = getAssistantName();
+        const reply = `Meu nome é ${assistant}, ${salutationName}! Em que posso te ajudar hoje?`;
+        addChatMessage('jarvis', reply);
+        await speakJarvis(reply);
+        return;
+    }
+
+    setOrbState('thinking');
+
+    // Inicia frases contextuais dinâmicas do garçom!
+    const phrases = getContextualPhrases(normalizedText);
+    let phraseIdx = 0;
+    setStatusText(phrases[0]);
+    const phraseInterval = setInterval(() => {
+        phraseIdx = (phraseIdx + 1) % phrases.length;
+        setStatusText(phrases[phraseIdx]);
+    }, 1800);
+
     const empresaName = loggedUser?.nome_fantasia || loggedUser?.nome_completo || 'sua empresa';
     const webhookUrl = getWebhookUrl();
 
@@ -439,6 +470,7 @@ async function handleUserMessage(userText) {
         nome_usuario: rawName,
         user_id: loggedUser ? loggedUser.id : null,
         company_id: loggedUser ? loggedUser.id : null,
+        assistant_name: getAssistantName(),
         timestamp: (window.getBrasiliaDate ? window.getBrasiliaDate() : new Date()).toISOString()
     };
 
@@ -450,6 +482,8 @@ async function handleUserMessage(userText) {
             },
             body: JSON.stringify(payload)
         });
+
+        clearInterval(phraseInterval);
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
@@ -487,6 +521,7 @@ async function handleUserMessage(userText) {
         await speakJarvis(aiAnswer, elevenAudio);
 
     } catch (err) {
+        clearInterval(phraseInterval);
         console.warn('Erro ao consultar Webhook do AI Agent:', err);
         
         const fallbackMsg = `Estou pronto para raciocinar via IA Agent! O webhook está configurado para: ${webhookUrl}. Assim que você ativar o fluxo do AI Agent no n8n, responderei com dados em tempo real e raciocínio completo!`;

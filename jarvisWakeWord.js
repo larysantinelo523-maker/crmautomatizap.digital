@@ -132,6 +132,152 @@ function formatName(name) {
     return trimmed.split(' ')[0];
 }
 
+// --- 1.1 CONTROLE DE NOME PERSONALIZADO DO ASSISTENTE ---
+export function getAssistantName() {
+    const custom = localStorage.getItem('jarvis_assistant_custom_name');
+    if (custom && custom.trim()) return custom.trim();
+    return 'Jarvis';
+}
+
+export function setAssistantName(newName) {
+    if (!newName || !newName.trim()) return 'Jarvis';
+    const clean = newName.trim().charAt(0).toUpperCase() + newName.trim().slice(1).toLowerCase();
+    localStorage.setItem('jarvis_assistant_custom_name', clean);
+    updateAssistantNameUI(clean);
+    return clean;
+}
+
+export function updateAssistantNameUI(name = null) {
+    const assistant = name || getAssistantName();
+    document.querySelectorAll('.jarvis-assistant-name-display').forEach(el => {
+        el.textContent = assistant;
+    });
+}
+
+function getWakeRegex() {
+    const assistant = getAssistantName();
+    const escaped = assistant.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`(?:fala\\s+)?(?:${escaped}|jarvis|jarbas|iarvis)`, 'i');
+}
+
+function stripWakeWord(text) {
+    const assistant = getAssistantName();
+    const escaped = assistant.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const pattern = new RegExp(`^(?:fala\\s+)?(?:${escaped}|jarvis|jarbas|iarvis)[,.?!]?\\s*(?:t[aá]\\s+por\\s+a[ií][,.]?|tudo\\s+bom[,.]?|tudo\\s+bem[,.]?|bom\\s+dia[,.]?|boa\\s+tarde[,.]?|boa\\s+noite[,.]?)?\\s*`, 'i');
+    return text.replace(pattern, '').trim();
+}
+
+// --- 1.2 FRASES CONTEXTUAIS DINÂMICAS ENQUANTO CONSULTA (ANALOGIA DO GARÇOM) ---
+export function getContextualPhrases(question = '') {
+    const q = (question || '').toLowerCase();
+
+    // 1. Agendamentos / Agenda / Reuniões / Horários / Calendário / Tarefas
+    if (/(agend|agenda|reuni|hor[aá]ri|amanh[aã]|calend[aá]ri|compromiss|tarefa)/i.test(q)) {
+        return [
+            'Abrindo sua agenda...',
+            'Olhando os horários de amanhã...',
+            'Contando os agendamentos...',
+            'Conferindo os nomes dos clientes...',
+            'Organizando tudo pra você...',
+            'Finalizando consulta da agenda...'
+        ];
+    }
+
+    // 2. Leads / Clientes / Contatos / Novos / Entraram / Chamaram / Números
+    if (/(lead|cliente|contat|entrou|entraram|chamou|chamaram|novo|novos|cadastr|recuperar|n[uú]mero)/i.test(q)) {
+        return [
+            'Fazendo pesquisa...',
+            'Analisando histórico de leads...',
+            'Reunindo dados...',
+            'Coletando os últimos contatos...',
+            'Organizando tudo pra você...',
+            'Quase pronto...'
+        ];
+    }
+
+    // 3. Conversas / Mensagens / WhatsApp / Falou / Disse / Áudios
+    if (/(conversa|whatsapp|zap|mensag|falou|disse|[aá]udio|texto|bate-papo)/i.test(q)) {
+        return [
+            'Acessando conversas do WhatsApp...',
+            'Localizando as últimas mensagens...',
+            'Lendo o histórico dos diálogos...',
+            'Sintetizando o contexto...',
+            'Organizando o resumo...'
+        ];
+    }
+
+    // 4. Relatórios / Métricas / Gráficos / Faturamento / Conversão / Vendas / Desempenho
+    if (/(relat|m[eé]tric|gr[aá]fic|fatur|convers|venda|desempenh|taxa|total|porcent)/i.test(q)) {
+        return [
+            'Consultando painel de métricas...',
+            'Calculando taxas e números...',
+            'Comparando desempenho...',
+            'Gerando resumo dos resultados...',
+            'Quase pronto...'
+        ];
+    }
+
+    // 5. Configurações / Empresa / Assinatura / Plano / Pix / Conta
+    if (/(config|empresa|assinatur|plano|pix|conta|perfil|pagamento)/i.test(q)) {
+        return [
+            'Acessando suas configurações...',
+            'Verificando dados da empresa...',
+            'Conferindo informações...',
+            'Organizando os detalhes...'
+        ];
+    }
+
+    // 6. Genérico / Outras perguntas (Analogia do Garçom)
+    return [
+        'Já anotei sua pergunta...',
+        'Consultando a base de dados...',
+        'Analisando as informações...',
+        'Reunindo tudo pra você...',
+        'Já está saindo a resposta...'
+    ];
+}
+
+let thinkingPhrasesInterval = null;
+
+function startThinkingPhrases(question) {
+    stopThinkingPhrases();
+    if (!modalCaptionElement) return;
+
+    const phrases = getContextualPhrases(question);
+    let index = 0;
+
+    // Exibe a primeira frase imediatamente
+    setCaptionWithFade(phrases[0]);
+
+    // Troca suavemente com fade a cada 1.8 segundos
+    thinkingPhrasesInterval = setInterval(() => {
+        index = (index + 1) % phrases.length;
+        setCaptionWithFade(phrases[index]);
+    }, 1800);
+}
+
+function stopThinkingPhrases() {
+    if (thinkingPhrasesInterval) {
+        clearInterval(thinkingPhrasesInterval);
+        thinkingPhrasesInterval = null;
+    }
+}
+
+function setCaptionWithFade(newText) {
+    if (!modalCaptionElement) return;
+    if (modalCaptionElement.textContent === newText) return;
+
+    modalCaptionElement.classList.add('fade-out');
+    setTimeout(() => {
+        modalCaptionElement.textContent = newText;
+        modalCaptionElement.classList.remove('fade-out');
+        modalCaptionElement.classList.add('fade-in');
+        setTimeout(() => {
+            modalCaptionElement.classList.remove('fade-in');
+        }, 50);
+    }, 240);
+}
+
 // --- 2. CONTROLE DO MODAL CENTRAL COM ORBE 3D E ESPELHO DESFOCADO ---
 function createGlowElements() {
     if (!glowElement && !document.getElementById('jarvis-screen-glow')) {
@@ -159,27 +305,23 @@ function createGlowElements() {
                     </div>
                 </div>
 
-                <div class="jarvis-wake-info">
-                    <button id="btn-close-jarvis-modal" class="jarvis-wake-close-btn" type="button" title="Fechar (Esc)">
-                        <i class="ph ph-x"></i>
-                    </button>
-                    <div class="jarvis-wake-status-badge">
-                        <span class="jarvis-wake-status-dot"></span>
-                        <span id="jarvis-wake-badge-label">JARVIS AI</span>
-                    </div>
-                    <div class="jarvis-wake-caption" id="jarvis-wake-caption">Ouvindo você...</div>
-                    <div class="jarvis-wake-hint">
-                        <i class="ph ph-waveform" style="color: #00f2fe;"></i> Diga "valeu" ou clique fora para encerrar
-                    </div>
+                <!-- Subtítulo flutuante minimalista sem card gigante -->
+                <div class="jarvis-wake-caption-wrapper">
+                    <div class="jarvis-wake-caption-text" id="jarvis-wake-caption">Ouvindo você...</div>
+                    <div class="jarvis-wake-hint-text">Diga "valeu" ou clique fora para encerrar</div>
                 </div>
             </div>
+
+            <!-- Botão fechar discreto no canto superior da tela -->
+            <button id="btn-close-jarvis-modal" class="jarvis-wake-screen-close" type="button" title="Fechar (Esc)">
+                <i class="ph ph-x"></i>
+            </button>
         `;
         document.body.appendChild(modalOverlayElement);
 
         modalContainerElement = modalOverlayElement.querySelector('#jarvis-wake-modal');
         modalOrbElement = modalOverlayElement.querySelector('#jarvis-wake-orb');
         modalCaptionElement = modalOverlayElement.querySelector('#jarvis-wake-caption');
-        modalBadgeElement = modalOverlayElement.querySelector('#jarvis-wake-badge-label');
 
         // Botão de fechar modal
         modalOverlayElement.querySelector('#btn-close-jarvis-modal')?.addEventListener('click', (e) => {
@@ -206,7 +348,6 @@ function createGlowElements() {
         modalContainerElement = document.getElementById('jarvis-wake-modal');
         modalOrbElement = document.getElementById('jarvis-wake-orb');
         modalCaptionElement = document.getElementById('jarvis-wake-caption');
-        modalBadgeElement = document.getElementById('jarvis-wake-badge-label');
     }
 }
 
@@ -224,6 +365,7 @@ export function setJarvisScreenGlow(state, text = '') {
     }
 
     if (state === 'listening') {
+        stopThinkingPhrases();
         glowElement.classList.remove('speaking', 'closing');
         glowElement.classList.add('active', 'listening');
 
@@ -234,11 +376,9 @@ export function setJarvisScreenGlow(state, text = '') {
             modalOrbElement.classList.remove('speaking', 'thinking');
             modalOrbElement.classList.add('listening');
         }
-        if (modalBadgeElement) modalBadgeElement.textContent = 'OUVINDO VOCÊ';
-        if (modalCaptionElement) {
-            modalCaptionElement.textContent = text || 'Ouvindo você... (pode falar)';
-        }
+        setCaptionWithFade(text || 'Ouvindo você... (pode falar)');
     } else if (state === 'speaking') {
+        stopThinkingPhrases();
         glowElement.classList.remove('listening', 'closing');
         glowElement.classList.add('active', 'speaking');
 
@@ -249,9 +389,8 @@ export function setJarvisScreenGlow(state, text = '') {
             modalOrbElement.classList.remove('listening', 'thinking');
             modalOrbElement.classList.add('speaking');
         }
-        if (modalBadgeElement) modalBadgeElement.textContent = 'JARVIS FALANDO';
-        if (modalCaptionElement) {
-            modalCaptionElement.textContent = text || 'Jarvis falando...';
+        if (text) {
+            setCaptionWithFade(text);
         }
     } else if (state === 'thinking') {
         glowElement.classList.remove('listening', 'closing');
@@ -264,11 +403,11 @@ export function setJarvisScreenGlow(state, text = '') {
             modalOrbElement.classList.remove('listening', 'speaking');
             modalOrbElement.classList.add('thinking');
         }
-        if (modalBadgeElement) modalBadgeElement.textContent = 'PROCESSANDO DADOS';
-        if (modalCaptionElement) {
-            modalCaptionElement.textContent = text || 'Jarvis consultando o sistema...';
+        if (text) {
+            setCaptionWithFade(text);
         }
     } else if (state === 'idle') {
+        stopThinkingPhrases();
         glowElement.classList.remove('listening', 'speaking');
         glowElement.classList.add('closing');
 
@@ -479,9 +618,13 @@ async function playJarvisVoice(text, audioBase64 = null) {
 async function queryJarvisAgent(userQuestion) {
     clearSilenceTimer();
     const cleanUserQuestion = normalizeSpeechPhonetics(userQuestion);
-    setJarvisScreenGlow('thinking', 'Jarvis consultando o sistema...');
-    const clientName = getClientGreetingName();
+    const assistantName = getAssistantName();
 
+    // Ativa a orbe em modo thinking e inicia as frases contextuais do garçom!
+    setJarvisScreenGlow('thinking');
+    startThinkingPhrases(cleanUserQuestion);
+
+    const clientName = getClientGreetingName();
     const companyId = resolvedUser ? (resolvedUser.id_empresa || resolvedUser.id) : (localStorage.getItem('jarvis_company_id') || 'jarvis_crm');
 
     const payload = {
@@ -494,6 +637,7 @@ async function queryJarvisAgent(userQuestion) {
         user_id: resolvedUser ? resolvedUser.id : null,
         company_id: companyId,
         id_empresa: companyId,
+        assistant_name: assistantName,
         timestamp: new Date().toISOString()
     };
 
@@ -511,14 +655,18 @@ async function queryJarvisAgent(userQuestion) {
         if (typeof data === 'string') responseText = data;
         const audioSrc = data.audio || data.audio_base64 || null;
 
+        // Quando a resposta fica pronta, as frases param e a resposta é falada e exibida!
+        stopThinkingPhrases();
         await playJarvisVoice(responseText, audioSrc);
     } catch (err) {
         console.warn('Erro ao consultar n8n:', err);
+        stopThinkingPhrases();
         const fallback = `Desculpe, ${clientName}, tive uma instabilidade momentânea para consultar os dados. Pode repetir?`;
         await playJarvisVoice(fallback);
     } finally {
+        stopThinkingPhrases();
         // CONVERSA CONTÍNUA:
-        // Mantém o Jarvis ouvindo para as próximas perguntas até o usuário se despedir ou pausar!
+        // Mantém o assistente ouvindo para as próximas perguntas até o usuário se despedir ou pausar!
         if (isConversationActive) {
             setJarvisScreenGlow('listening', 'Estou ouvindo... (pode perguntar)');
             startSilenceTimer(60000); // Aguarda até 60 segundos de silêncio antes de encerrar
@@ -582,7 +730,45 @@ function setupSpeechEngine() {
 
         console.log('🗣️ Voz ouvida:', rawTranscript, '| Conversa ativa:', isConversationActive);
 
-        const wakeRegex = /(fala\s+)?(jarvis|jarbas|iarvis)/i;
+        // 1. COMANDO PARA MUDAR O NOME DO ASSISTENTE (ex: "Quero que você se chame Reinaldo" / "Mude seu nome para Reinaldo")
+        const renameRegex = /(?:quero\s+(?:que\s+(?:voc[eê]|vc)\s+)?(?:se\s+chame|passe\s+a\s+se\s+chamar)|quero\s+te\s+chamar\s+de|mude\s+(?:seu\s+)?nome\s+para|troque\s+(?:seu\s+)?nome\s+para|seu\s+nome\s+agora\s+[eé]|agora\s+(?:seu\s+nome\s+[eé]|(?:voc[eê]|vc)\s+se\s+chama)|vou\s+te\s+chamar\s+de|a\s+partir\s+de\s+agora\s+(?:voc[eê]|vc\s+)?(?:se\s+chama|[eé]))\s+([A-Za-zÀ-ÿ]+)/i;
+        const renameMatch = rawTranscript.match(renameRegex);
+        if (renameMatch && renameMatch[1]) {
+            isConversationActive = true;
+            clearSilenceTimer();
+            const newName = renameMatch[1].trim();
+            const formattedName = setAssistantName(newName);
+            const clientName = getClientGreetingName();
+            const confirmMsg = `Entendido, ${clientName}! A partir de agora meu nome é ${formattedName}. Pode me chamar de "Fala ${formattedName}" sempre que precisar!`;
+            setJarvisScreenGlow('speaking', confirmMsg);
+            await playJarvisVoice(confirmMsg);
+            setJarvisScreenGlow('listening', 'Estou ouvindo... (pode perguntar)');
+            startSilenceTimer(60000);
+            setTimeout(() => {
+                ensureSpeechRecognitionActive();
+            }, 300);
+            return;
+        }
+
+        // 2. PERGUNTA SOBRE O NOME DO ASSISTENTE (ex: "Qual é o seu nome?" / "Como você se chama?")
+        const nameInquiryRegex = /(qual\s+[eé]\s+(o\s+)?seu\s+nome|quem\s+[eé]\s+voc[eê]|como\s+(voc[eê]|vc)\s+se\s+chama)/i;
+        if (nameInquiryRegex.test(rawTranscript)) {
+            isConversationActive = true;
+            clearSilenceTimer();
+            const assistant = getAssistantName();
+            const clientName = getClientGreetingName();
+            const reply = `Meu nome é ${assistant}, ${clientName}! Em que posso te ajudar hoje?`;
+            setJarvisScreenGlow('speaking', reply);
+            await playJarvisVoice(reply);
+            setJarvisScreenGlow('listening', 'Estou ouvindo... (pode perguntar)');
+            startSilenceTimer(60000);
+            setTimeout(() => {
+                ensureSpeechRecognitionActive();
+            }, 300);
+            return;
+        }
+
+        const wakeRegex = getWakeRegex();
         const farewellRegex = /(obrigad[oa]|valeu|tchau|at[eé]\s+mais|pode\s+fechar|^fechar$|^encerra[r]?$|s[oó]\s+isso|falou|at[eé]\s+logo|pode\s+parar|desativa[r]?|nada\s+mais|por\s+hoje\s+[eé]\s+s[oó]|era\s+s[oó]\s+isso)/i;
 
         // CENÁRIO 1: Sessão de conversa já está ATIVA (usuário fez uma pergunta ou saudação anterior)
@@ -595,34 +781,27 @@ function setupSpeechEngine() {
                 return;
             }
 
-            // Próxima pergunta do usuário na mesma sessão (ex: "Quero salvar o numero que não foi salvo como matheus")
-            const cleanQuestion = rawTranscript.replace(wakeRegex, '').trim() || rawTranscript;
-
+            // Próxima pergunta do usuário na mesma sessão
+            const cleanQuestion = stripWakeWord(rawTranscript) || rawTranscript;
             if (cleanQuestion.length >= 2) {
-                setJarvisScreenGlow('speaking', `"${cleanQuestion}"`);
                 await queryJarvisAgent(cleanQuestion);
             }
             return;
         }
 
-        // CENÁRIO 2: Sessão NÃO estava ativa, mas o usuário falou "Fala Jarvis..."
+        // CENÁRIO 2: Sessão NÃO estava ativa, mas o usuário chamou "Fala Jarvis...", "Fala Reinaldo...", etc.
         if (wakeRegex.test(rawTranscript)) {
             isConversationActive = true;
             clearSilenceTimer();
 
             const clientName = getClientGreetingName();
-
-            // Extrai a pergunta se o usuário já falou tudo na mesma frase (ex: "Fala jarvis, quantos clientes entraram hoje?")
-            const cleanCommand = rawTranscript
-                .replace(/^(fala\s+)?(jarvis|jarbas|iarvis)[,.?!]?\s*(t[aá]\s+por\s+a[ií][,.]?|tudo\s+bom[,.]?|tudo\s+bem[,.]?|bom\s+dia[,.]?|boa\s+tarde[,.]?|boa\s+noite[,.]?)?\s*/i, '')
-                .trim();
+            const cleanCommand = stripWakeWord(rawTranscript);
 
             if (cleanCommand.length > 3) {
-                // Usuário já fez a pergunta completa!
-                setJarvisScreenGlow('speaking', `"${cleanCommand}"`);
+                // Usuário já fez a pergunta completa de primeira!
                 await queryJarvisAgent(cleanCommand);
             } else {
-                // Apenas saudou ("Fala Jarvis, tá por aí?" ou "Fala Jarvis, tudo bom?")
+                // Apenas saudou ("Fala Jarvis", "Fala Reinaldo", etc.)
                 setJarvisScreenGlow('listening', `Fala, ${clientName}!`);
 
                 const hour = (window.getBrasiliaDate ? window.getBrasiliaDate() : new Date()).getHours();
@@ -633,7 +812,7 @@ function setupSpeechEngine() {
                 const greetingReply = `Fala, ${clientName}! Tô por aqui sim, ${timeGreeting.toLowerCase()}! Como posso te ajudar?`;
                 await playJarvisVoice(greetingReply);
 
-                // Volta para modo de escuta com moldura verde respirando aguardando a pergunta
+                // Volta para modo de escuta com orbe respirando aguardando a pergunta
                 setJarvisScreenGlow('listening', 'Estou ouvindo... (pode perguntar)');
                 startSilenceTimer(60000);
                 setTimeout(() => {
@@ -760,6 +939,8 @@ export async function initJarvisWakeWord() {
 window.setJarvisScreenGlow = setJarvisScreenGlow;
 window.startWakeWordListening = startWakeWordListening;
 window.stopWakeWordListening = stopWakeWordListening;
+window.getAssistantName = getAssistantName;
+window.setAssistantName = setAssistantName;
 
 // Auto-inicializa quando o DOM estiver pronto
 if (document.readyState === 'loading') {
