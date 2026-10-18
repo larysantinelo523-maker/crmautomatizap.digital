@@ -314,20 +314,20 @@ function setupSpeechEngine() {
     };
 
     recognition.onerror = (e) => {
-        if (e.error !== 'no-speech') {
+        if (e.error !== 'no-speech' && e.error !== 'aborted') {
             console.warn('SpeechRecognition aviso:', e.error);
         }
     };
 
     recognition.onend = () => {
         isListening = false;
-        // Reinício automático em segundo plano se o modo "Fala Jarvis" estiver ativado
+        // Reinício contínuo e ininterrupto em segundo plano (SEMPRE ATIVO)
         if (wakeActive) {
             setTimeout(() => {
                 if (wakeActive && !isSpeaking) {
                     try { recognition.start(); } catch(e) {}
                 }
-            }, 400);
+            }, 250);
         } else {
             updatePillUI(false);
         }
@@ -376,11 +376,11 @@ function injectHeaderPill() {
     const pill = document.createElement('button');
     pill.id = 'btn-jarvis-wake-pill';
     pill.type = 'button';
-    pill.className = 'btn-jarvis-wake-pill';
-    pill.title = 'Ative para chamar o Jarvis a qualquer momento dizendo: "Fala Jarvis, tá por aí?"';
+    pill.className = 'btn-jarvis-wake-pill active';
+    pill.title = 'Modo Sempre Ativo: fale "Fala Jarvis, tá por aí?" a qualquer momento.';
     pill.innerHTML = `
         <span class="wake-pulse-dot"></span>
-        <span class="wake-pill-text">"Fala Jarvis"</span>
+        <span class="wake-pill-text">🟢 Ouvindo "Fala Jarvis"</span>
     `;
 
     pill.addEventListener('click', (e) => {
@@ -388,21 +388,7 @@ function injectHeaderPill() {
         toggleWakeWord();
     });
 
-    // Insere antes do primeiro elemento de ações (ou antes do user menu)
     headerActions.insertBefore(pill, headerActions.firstChild);
-
-    // Se já estava salvo como ativo, tenta iniciar no primeiro clique em qualquer lugar da tela
-    const savedActive = localStorage.getItem('jarvis_wake_active') === 'true';
-    if (savedActive) {
-        updatePillUI(true);
-        const startOnUserAction = () => {
-            document.removeEventListener('click', startOnUserAction);
-            document.removeEventListener('touchstart', startOnUserAction);
-            startWakeWordListening();
-        };
-        document.addEventListener('click', startOnUserAction, { once: true });
-        document.addEventListener('touchstart', startOnUserAction, { once: true });
-    }
 }
 
 function updatePillUI(isActive) {
@@ -415,15 +401,38 @@ function updatePillUI(isActive) {
         if (textEl) textEl.textContent = '🟢 Ouvindo "Fala Jarvis"';
     } else {
         pill.classList.remove('active');
-        if (textEl) textEl.textContent = '"Fala Jarvis"';
+        if (textEl) textEl.textContent = '🔇 "Fala Jarvis" (Pausado)';
     }
 }
 
-// --- 7. INICIALIZAÇÃO AUTOMÁTICA EM QUALQUER PÁGINA ---
+// --- 7. INICIALIZAÇÃO AUTOMÁTICA EM QUALQUER PÁGINA (SEMPRE ATIVO) ---
 export async function initJarvisWakeWord() {
     createGlowElements();
     injectHeaderPill();
     setupSpeechEngine();
+
+    // Sempre ativo por padrão, a não ser que o usuário tenha explicitamente pausado
+    const isMutedByUser = localStorage.getItem('jarvis_wake_active') === 'false';
+    if (!isMutedByUser) {
+        wakeActive = true;
+        // 1. Tenta iniciar imediatamente
+        try {
+            startWakeWordListening();
+        } catch (e) {}
+
+        // 2. Garante o início no primeiro toque/clique em qualquer lugar da tela (política de autoplay dos navegadores)
+        const autoUnlockAudioAndMic = () => {
+            document.removeEventListener('click', autoUnlockAudioAndMic);
+            document.removeEventListener('touchstart', autoUnlockAudioAndMic);
+            document.removeEventListener('keydown', autoUnlockAudioAndMic);
+            document.removeEventListener('scroll', autoUnlockAudioAndMic);
+            startWakeWordListening();
+        };
+        document.addEventListener('click', autoUnlockAudioAndMic, { once: true, passive: true });
+        document.addEventListener('touchstart', autoUnlockAudioAndMic, { once: true, passive: true });
+        document.addEventListener('keydown', autoUnlockAudioAndMic, { once: true, passive: true });
+        document.addEventListener('scroll', autoUnlockAudioAndMic, { once: true, passive: true });
+    }
 
     // Carrega dados do usuário para saudar pelo nome correto
     try {
