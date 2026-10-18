@@ -15,8 +15,12 @@ let isSpeaking = false;
 let isConversationActive = false;
 let lastSpokeEndTime = 0;
 let glowElement = null;
-let toastElement = null;
-let toastTextElement = null;
+let modalOverlayElement = null;
+let modalContainerElement = null;
+let modalOrbElement = null;
+let modalCaptionElement = null;
+let modalBadgeElement = null;
+let modalExitTimeout = null;
 let currentAudioPlayer = null;
 let silenceTimer = null;
 let wakeActive = false;
@@ -128,7 +132,7 @@ function formatName(name) {
     return trimmed.split(' ')[0];
 }
 
-// --- 2. CONTROLE DO EFEITO VISUAL "CIRCLE TO SEARCH" (MOLDURA DE LUZ) ---
+// --- 2. CONTROLE DO MODAL CENTRAL COM ORBE 3D E ESPELHO DESFOCADO ---
 function createGlowElements() {
     if (!glowElement && !document.getElementById('jarvis-screen-glow')) {
         glowElement = document.createElement('div');
@@ -139,36 +143,83 @@ function createGlowElements() {
         glowElement = document.getElementById('jarvis-screen-glow');
     }
 
-    if (!toastElement && !document.getElementById('jarvis-floating-toast')) {
-        toastElement = document.createElement('div');
-        toastElement.id = 'jarvis-floating-toast';
-        toastElement.className = 'jarvis-floating-toast';
-        toastElement.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <i class="ph-fill ph-waveform" style="color: #00A884; font-size: 18px; animation: spin 3s linear infinite;"></i>
-                <span id="jarvis-toast-text">Jarvis ativado</span>
-            </div>
-            <button id="btn-close-jarvis-session" type="button" title="Encerrar bate-papo" style="background: rgba(255,255,255,0.15); border: none; color: #fff; cursor: pointer; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-left: 8px; transition: all 0.2s;">
-                <i class="ph ph-x"></i>
-            </button>
-        `;
-        document.body.appendChild(toastElement);
-        toastTextElement = toastElement.querySelector('#jarvis-toast-text');
+    if (!modalOverlayElement && !document.getElementById('jarvis-wake-overlay')) {
+        modalOverlayElement = document.createElement('div');
+        modalOverlayElement.id = 'jarvis-wake-overlay';
+        modalOverlayElement.className = 'jarvis-wake-overlay';
+        modalOverlayElement.innerHTML = `
+            <div class="jarvis-wake-modal" id="jarvis-wake-modal">
+                <div class="jarvis-wake-orb-container" id="jarvis-wake-orb-container">
+                    <div class="jarvis-wake-ring ring-3"></div>
+                    <div class="jarvis-wake-ring ring-2"></div>
+                    <div class="jarvis-wake-ring ring-1"></div>
 
-        toastElement.querySelector('#btn-close-jarvis-session')?.addEventListener('click', (e) => {
+                    <div class="jarvis-wake-orb" id="jarvis-wake-orb">
+                        <div class="jarvis-wake-soundwaves">
+                            <span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="jarvis-wake-info">
+                    <button id="btn-close-jarvis-modal" class="jarvis-wake-close-btn" type="button" title="Fechar (Esc)">
+                        <i class="ph ph-x"></i>
+                    </button>
+                    <div class="jarvis-wake-status-badge">
+                        <span class="jarvis-wake-status-dot"></span>
+                        <span id="jarvis-wake-badge-label">JARVIS AI</span>
+                    </div>
+                    <div class="jarvis-wake-caption" id="jarvis-wake-caption">Ouvindo você...</div>
+                    <div class="jarvis-wake-hint">
+                        <i class="ph ph-waveform" style="color: #00f2fe;"></i> Diga "valeu" ou clique fora para encerrar
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modalOverlayElement);
+
+        modalContainerElement = modalOverlayElement.querySelector('#jarvis-wake-modal');
+        modalOrbElement = modalOverlayElement.querySelector('#jarvis-wake-orb');
+        modalCaptionElement = modalOverlayElement.querySelector('#jarvis-wake-caption');
+        modalBadgeElement = modalOverlayElement.querySelector('#jarvis-wake-badge-label');
+
+        // Botão de fechar modal
+        modalOverlayElement.querySelector('#btn-close-jarvis-modal')?.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             endConversationSession(false);
         });
-    } else if (!toastElement) {
-        toastElement = document.getElementById('jarvis-floating-toast');
-        toastTextElement = toastElement.querySelector('#jarvis-toast-text');
+
+        // Fechar ao clicar no fundo desfocado (fora do modal)
+        modalOverlayElement.addEventListener('click', (e) => {
+            if (e.target === modalOverlayElement) {
+                endConversationSession(false);
+            }
+        });
+
+        // Fechar ao teclar Esc
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isConversationActive) {
+                endConversationSession(false);
+            }
+        });
+    } else if (!modalOverlayElement) {
+        modalOverlayElement = document.getElementById('jarvis-wake-overlay');
+        modalContainerElement = document.getElementById('jarvis-wake-modal');
+        modalOrbElement = document.getElementById('jarvis-wake-orb');
+        modalCaptionElement = document.getElementById('jarvis-wake-caption');
+        modalBadgeElement = document.getElementById('jarvis-wake-badge-label');
     }
 }
 
 export function setJarvisScreenGlow(state, text = '') {
     createGlowElements();
-    if (!glowElement) return;
+    if (!glowElement || !modalOverlayElement) return;
+
+    if (modalExitTimeout) {
+        clearTimeout(modalExitTimeout);
+        modalExitTimeout = null;
+    }
 
     if (silenceTimer && state !== 'listening') {
         clearSilenceTimer();
@@ -177,23 +228,66 @@ export function setJarvisScreenGlow(state, text = '') {
     if (state === 'listening') {
         glowElement.classList.remove('speaking', 'closing');
         glowElement.classList.add('active', 'listening');
-        if (toastElement) {
-            toastTextElement.textContent = text || 'Ouvindo você... (pode falar)';
-            toastElement.classList.add('visible');
+
+        modalOverlayElement.classList.remove('exiting');
+        modalOverlayElement.classList.add('visible');
+
+        if (modalOrbElement) {
+            modalOrbElement.classList.remove('speaking', 'thinking');
+            modalOrbElement.classList.add('listening');
+        }
+        if (modalBadgeElement) modalBadgeElement.textContent = 'OUVINDO VOCÊ';
+        if (modalCaptionElement) {
+            modalCaptionElement.textContent = text || 'Ouvindo você... (pode falar)';
         }
     } else if (state === 'speaking') {
         glowElement.classList.remove('listening', 'closing');
         glowElement.classList.add('active', 'speaking');
-        if (toastElement) {
-            toastTextElement.textContent = text || 'Jarvis falando...';
-            toastElement.classList.add('visible');
+
+        modalOverlayElement.classList.remove('exiting');
+        modalOverlayElement.classList.add('visible');
+
+        if (modalOrbElement) {
+            modalOrbElement.classList.remove('listening', 'thinking');
+            modalOrbElement.classList.add('speaking');
+        }
+        if (modalBadgeElement) modalBadgeElement.textContent = 'JARVIS FALANDO';
+        if (modalCaptionElement) {
+            modalCaptionElement.textContent = text || 'Jarvis falando...';
+        }
+    } else if (state === 'thinking') {
+        glowElement.classList.remove('listening', 'closing');
+        glowElement.classList.add('active', 'speaking');
+
+        modalOverlayElement.classList.remove('exiting');
+        modalOverlayElement.classList.add('visible');
+
+        if (modalOrbElement) {
+            modalOrbElement.classList.remove('listening', 'speaking');
+            modalOrbElement.classList.add('thinking');
+        }
+        if (modalBadgeElement) modalBadgeElement.textContent = 'PROCESSANDO DADOS';
+        if (modalCaptionElement) {
+            modalCaptionElement.textContent = text || 'Jarvis consultando o sistema...';
         }
     } else if (state === 'idle') {
         glowElement.classList.remove('listening', 'speaking');
         glowElement.classList.add('closing');
-        if (toastElement) {
-            toastElement.classList.remove('visible');
+
+        // Animação de saída de cima/meio para baixo
+        if (modalOverlayElement.classList.contains('visible')) {
+            modalOverlayElement.classList.add('exiting');
+            modalOverlayElement.classList.remove('visible');
+
+            modalExitTimeout = setTimeout(() => {
+                modalOverlayElement.classList.remove('exiting');
+                if (modalOrbElement) {
+                    modalOrbElement.classList.remove('listening', 'speaking', 'thinking');
+                }
+                modalExitTimeout = null;
+            }, 450);
         }
+
         setTimeout(() => {
             if (glowElement.classList.contains('closing')) {
                 glowElement.classList.remove('active', 'closing');
@@ -387,7 +481,7 @@ async function playJarvisVoice(text, audioBase64 = null) {
 async function queryJarvisAgent(userQuestion) {
     clearSilenceTimer();
     const cleanUserQuestion = normalizeSpeechPhonetics(userQuestion);
-    setJarvisScreenGlow('speaking', 'Jarvis consultando o sistema...');
+    setJarvisScreenGlow('thinking', 'Jarvis consultando o sistema...');
     const clientName = getClientGreetingName();
 
     const companyId = resolvedUser ? (resolvedUser.id_empresa || resolvedUser.id) : (localStorage.getItem('jarvis_company_id') || 'jarvis_crm');
