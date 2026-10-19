@@ -26,6 +26,9 @@ let silenceTimer = null;
 let wakeActive = false;
 let resolvedUser = null;
 let watchdogInterval = null;
+let voiceFadeInterval = null;
+let currentVoiceResolver = null;
+let currentQueryId = 0;
 let hasUserInteracted = false;
 const markGlobalInteraction = () => {
     hasUserInteracted = true;
@@ -93,15 +96,106 @@ function clearSilenceTimer() {
     }
 }
 
+// --- FADE OUT SUAVE DA VOZ DO JARVIS AO FECHAR NO X ---
+export function stopJarvisVoiceWithFade(fadeDurationMs = 350) {
+    if (voiceFadeInterval) {
+        clearInterval(voiceFadeInterval);
+        voiceFadeInterval = null;
+    }
+
+    currentQueryId++; // Invalida qualquer requisição ou resposta de IA pendente
+    stopThinkingPhrases();
+
+    const audioToFade = currentAudioPlayer;
+    currentAudioPlayer = null;
+
+    if (audioToFade && !audioToFade.paused) {
+        const startVolume = typeof audioToFade.volume === 'number' ? audioToFade.volume : 1;
+        const steps = 18;
+        const stepTime = Math.max(10, Math.floor(fadeDurationMs / steps));
+        let step = 0;
+
+        audioToFade.onplay = null;
+        audioToFade.onerror = null;
+        audioToFade.onabort = null;
+        audioToFade.onended = () => {
+            if (voiceFadeInterval) {
+                clearInterval(voiceFadeInterval);
+                voiceFadeInterval = null;
+            }
+            try { audioToFade.pause(); } catch(e) {}
+            isSpeaking = false;
+            lastSpokeEndTime = Date.now();
+            if (currentVoiceResolver) {
+                const r = currentVoiceResolver;
+                currentVoiceResolver = null;
+                r();
+            }
+        };
+
+        voiceFadeInterval = setInterval(() => {
+            step++;
+            const factor = Math.max(0, 1 - (step / steps));
+            try {
+                audioToFade.volume = Math.max(0, startVolume * factor);
+            } catch (e) {}
+
+            if (step >= steps || audioToFade.volume <= 0.02) {
+                clearInterval(voiceFadeInterval);
+                voiceFadeInterval = null;
+                try {
+                    audioToFade.pause();
+                    audioToFade.currentTime = 0;
+                    audioToFade.src = '';
+                } catch (e) {}
+                isSpeaking = false;
+                lastSpokeEndTime = Date.now();
+                if (currentVoiceResolver) {
+                    const r = currentVoiceResolver;
+                    currentVoiceResolver = null;
+                    r();
+                }
+            }
+        }, stepTime);
+    } else {
+        if (audioToFade) {
+            try {
+                audioToFade.pause();
+                audioToFade.currentTime = 0;
+                audioToFade.src = '';
+            } catch (e) {}
+        }
+        isSpeaking = false;
+        lastSpokeEndTime = Date.now();
+        if (currentVoiceResolver) {
+            const r = currentVoiceResolver;
+            currentVoiceResolver = null;
+            r();
+        }
+    }
+
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        try {
+            window.speechSynthesis.cancel();
+        } catch (e) {}
+    }
+}
+
 export async function endConversationSession(withFarewell = true) {
     isConversationActive = false;
+    currentQueryId++;
     clearSilenceTimer();
+    stopThinkingPhrases();
 
     if (withFarewell) {
         const clientName = getClientGreetingName();
         const farewell = `Por nada, ${clientName}! Se precisar de mais alguma coisa, estou à disposição. Até logo!`;
         setJarvisScreenGlow('speaking', 'Encerrando bate-papo...');
         await playJarvisVoice(farewell);
+    } else {
+        // Fechamento manual (pelo X-zinho, clique fora ou tecla Esc):
+        // Fade out suave de áudio decrescendo o volume até silenciar totalmente a voz
+        stopJarvisVoiceWithFade(350);
     }
 
     setJarvisScreenGlow('idle');
@@ -615,6 +709,13 @@ function speakWithBrowserSynthesis(text) {
 
 async function playJarvisVoice(text, audioBase64 = null) {
     return new Promise(async (resolve) => {
+        if (!isConversationActive) {
+            resolve();
+            return;
+        }
+
+        currentVoiceResolver = resolve;
+
         if (currentAudioPlayer) {
             try { currentAudioPlayer.pause(); } catch(e) {}
             currentAudioPlayer = null;
@@ -624,6 +725,12 @@ async function playJarvisVoice(text, audioBase64 = null) {
             isSpeaking = false;
             lastSpokeEndTime = Date.now();
             currentAudioPlayer = null;
+
+            if (currentVoiceResolver) {
+                const r = currentVoiceResolver;
+                currentVoiceResolver = null;
+                r();
+            }
 
             if (isConversationActive) {
                 setJarvisScreenGlow('listening', 'Estou te ouvindo');
@@ -635,8 +742,6 @@ async function playJarvisVoice(text, audioBase64 = null) {
                     ensureSpeechRecognitionActive();
                 }
             }, 250);
-
-            resolve();
         };
 
         const cleanText = (text || '')
@@ -657,38 +762,72 @@ async function playJarvisVoice(text, audioBase64 = null) {
             src = await fetchElevenLabsSpeech(cleanText);
         }
 
+        // Se o usuário fechou o Jarvis no X enquanto gerava áudio:
+        if (!isConversationActive) {
+            finishSpeaking();
+            return;
+        }
+
         // 1. Áudio de estúdio do ElevenLabs disponível
         if (src && typeof src === 'string' && src.length > 50) {
             const audio = new Audio(src);
             currentAudioPlayer = audio;
 
             audio.onplay = () => {
+                if (!isConversationActive) {
+                    try { audio.pause(); } catch(e) {}
+                    return;
+                }
                 isSpeaking = true;
                 setJarvisScreenGlow('speaking');
             };
 
             audio.onended = finishSpeaking;
             audio.onerror = async (err) => {
+                if (!isConversationActive) {
+                    finishSpeaking();
+                    return;
+                }
                 console.warn('Erro ao reproduzir áudio ElevenLabs, usando síntese nativa do navegador:', err);
                 currentAudioPlayer = null;
                 await speakWithBrowserSynthesis(cleanText);
-                resolve();
+                if (currentVoiceResolver) {
+                    const r = currentVoiceResolver;
+                    currentVoiceResolver = null;
+                    r();
+                }
             };
             audio.onabort = finishSpeaking;
 
             audio.play().catch(async (err) => {
+                if (!isConversationActive) {
+                    finishSpeaking();
+                    return;
+                }
                 console.warn('Autoplay bloqueado pelo navegador, usando síntese nativa:', err);
                 currentAudioPlayer = null;
                 await speakWithBrowserSynthesis(cleanText);
-                resolve();
+                if (currentVoiceResolver) {
+                    const r = currentVoiceResolver;
+                    currentVoiceResolver = null;
+                    r();
+                }
             });
             return;
         }
 
         // 2. FALLBACK IMEDIATO: Cota do ElevenLabs excedida ou erro de rede -> Fala pela voz do navegador!
+        if (!isConversationActive) {
+            finishSpeaking();
+            return;
+        }
         console.warn('⚠️ ElevenLabs sem áudio (cota de créditos atingida ou erro). Acionando voz nativa do navegador imediatamente!');
         await speakWithBrowserSynthesis(cleanText);
-        resolve();
+        if (currentVoiceResolver) {
+            const r = currentVoiceResolver;
+            currentVoiceResolver = null;
+            r();
+        }
     });
 }
 
@@ -704,6 +843,7 @@ async function queryJarvisAgent(userQuestion) {
         const guardrailReply = getRandomOutOfScopeReply(clientName);
         setJarvisScreenGlow('speaking');
         await playJarvisVoice(guardrailReply);
+        if (!isConversationActive) return;
         setJarvisScreenGlow('listening', 'Estou te ouvindo');
         startSilenceTimer(60000);
         setTimeout(() => {
@@ -713,6 +853,7 @@ async function queryJarvisAgent(userQuestion) {
     }
 
     const assistantName = getAssistantName();
+    const thisQueryId = ++currentQueryId;
 
     // Ativa a orbe em modo thinking e inicia as frases contextuais do garçom!
     setJarvisScreenGlow('thinking');
@@ -742,8 +883,18 @@ async function queryJarvisAgent(userQuestion) {
             body: JSON.stringify(payload)
         });
 
+        if (!isConversationActive || thisQueryId !== currentQueryId) {
+            console.log('🛑 Consulta ignorada pois o Jarvis foi fechado pelo usuário.');
+            return;
+        }
+
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
+
+        if (!isConversationActive || thisQueryId !== currentQueryId) {
+            console.log('🛑 Resposta ignorada pois o Jarvis foi fechado pelo usuário.');
+            return;
+        }
 
         let responseText = data.resposta || data.response || data.output || data.message || data.text || '';
         if (typeof data === 'string') responseText = data;
@@ -751,9 +902,13 @@ async function queryJarvisAgent(userQuestion) {
 
         // Quando a resposta fica pronta, as frases param e a resposta é falada!
         stopThinkingPhrases();
+        if (!isConversationActive) return;
         setJarvisScreenGlow('speaking');
         await playJarvisVoice(responseText, audioSrc);
     } catch (err) {
+        if (!isConversationActive || thisQueryId !== currentQueryId) {
+            return;
+        }
         console.warn('Erro ao consultar n8n:', err);
         stopThinkingPhrases();
         const fallback = `Desculpe, ${clientName}, tive uma instabilidade momentânea para consultar os dados. Pode repetir?`;
@@ -838,6 +993,7 @@ function setupSpeechEngine() {
             const confirmMsg = `Entendido, ${clientName}! A partir de agora meu nome é ${formattedName}. Pode me chamar de "Fala ${formattedName}" sempre que precisar!`;
             setJarvisScreenGlow('speaking');
             await playJarvisVoice(confirmMsg);
+            if (!isConversationActive) return;
             setJarvisScreenGlow('listening', 'Estou te ouvindo');
             startSilenceTimer(60000);
             setTimeout(() => {
@@ -856,6 +1012,7 @@ function setupSpeechEngine() {
             const reply = `Meu nome é ${assistant}, ${clientName}! Em que posso te ajudar hoje?`;
             setJarvisScreenGlow('speaking');
             await playJarvisVoice(reply);
+            if (!isConversationActive) return;
             setJarvisScreenGlow('listening', 'Estou te ouvindo');
             startSilenceTimer(60000);
             setTimeout(() => {
@@ -886,6 +1043,7 @@ function setupSpeechEngine() {
                     const guardrailReply = getRandomOutOfScopeReply(clientName);
                     setJarvisScreenGlow('speaking');
                     await playJarvisVoice(guardrailReply);
+                    if (!isConversationActive) return;
                     setJarvisScreenGlow('listening', 'Estou te ouvindo');
                     startSilenceTimer(60000);
                     setTimeout(() => {
@@ -913,6 +1071,7 @@ function setupSpeechEngine() {
                     const guardrailReply = getRandomOutOfScopeReply(clientName);
                     setJarvisScreenGlow('speaking');
                     await playJarvisVoice(guardrailReply);
+                    if (!isConversationActive) return;
                     setJarvisScreenGlow('listening', 'Estou te ouvindo');
                     startSilenceTimer(60000);
                     setTimeout(() => {
@@ -933,6 +1092,7 @@ function setupSpeechEngine() {
                 const greetingReply = `Olá, ${clientName}! ${timeGreeting}! Como posso ajudar você agora?`;
                 setJarvisScreenGlow('speaking');
                 await playJarvisVoice(greetingReply);
+                if (!isConversationActive) return;
 
                 // Volta para modo de escuta com orbe respirando aguardando a pergunta
                 setJarvisScreenGlow('listening', 'Estou te ouvindo');
@@ -1114,7 +1274,9 @@ export async function triggerJarvisBillingReminder(diffDays) {
     }
 
     // 3. Fala o áudio do lembrete (ElevenLabs voz oficial George ou síntese nativa do navegador)
+    if (!isConversationActive) return;
     await playJarvisVoice(reminderMessage, audioToPlay);
+    if (!isConversationActive) return;
 
     // 4. Após terminar a fala, entra em modo de escuta com "Estou te ouvindo"
     setJarvisScreenGlow('listening', 'Estou te ouvindo');
@@ -1241,6 +1403,8 @@ export async function initJarvisWakeWord() {
 window.setJarvisScreenGlow = setJarvisScreenGlow;
 window.startWakeWordListening = startWakeWordListening;
 window.stopWakeWordListening = stopWakeWordListening;
+window.stopJarvisVoiceWithFade = stopJarvisVoiceWithFade;
+window.endConversationSession = endConversationSession;
 window.getAssistantName = getAssistantName;
 window.setAssistantName = setAssistantName;
 window.testJarvisBillingReminder = function(days = 3) {
